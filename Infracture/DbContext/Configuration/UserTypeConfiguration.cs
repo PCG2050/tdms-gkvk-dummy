@@ -27,6 +27,10 @@ namespace Infrastructure.DbContext.Configuration
                 .HasForeignKey(u => u.UpdatedById)
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder
+                .Property(u => u.Role)
+                .HasConversion<string>();
         }
     }
 }

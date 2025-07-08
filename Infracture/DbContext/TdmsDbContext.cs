@@ -60,6 +60,7 @@ namespace Infrastructure.DbContext
         public DbSet<EeuTrainingProgramme> EeuTrainingProgrammes { get; set; }
         public DbSet<EeuOtherActivity> EeuOtherActivities { get; set; }
         #endregion
+        public DbSet<UnitUser> UnitUsers { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
