@@ -1,0 +1,14 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json.Serialization;
+namespace Domain.Entities
+{
+    public class Organization:AuditableBaseEntity
+    {
+        public required string Name { get; set; }
+        public string? Logo { get; set; }
+        [JsonIgnore]
+        public virtual ICollection<User> Users { get; set; } = [];
+    }
+}
