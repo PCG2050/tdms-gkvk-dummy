@@ -1,10 +1,13 @@
-﻿namespace Domain.Entities
+﻿using Domain.Entities.Junction;
+
+namespace Domain.Entities
 {
     public abstract class ReportEntryBaseEntity:AuditableBaseEntity
     {
-        public int ReportRecordId { get; set; }
-        public ReportRecord ReportRecord { get; set; } = null!;
-        public int UnitId {  get; set; }
-        public Unit Unit { get; set; } = null!;
+        public DateOnly Date { get; set; }
+        public int UnitLocationId {  get; set; }
+        public int OrganizationId { get; set; }
+        public OrganizationUnitLocation UnitLocation { get; set; } = null!;
+        public Organization Organization { get; set; } = null!;
     }
 }

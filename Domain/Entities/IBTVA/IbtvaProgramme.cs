@@ -9,7 +9,6 @@ namespace Domain.Entities.IBTVA
     public class IbtvaProgramme:ReportEntryBaseEntity
     {
         public required string TrainingTitle { get; set; }
-        public DateOnly Date { get; set; }
         public TimeSpan Duration { get; set; }
         public int ParticipantCount { get; set; }
     }

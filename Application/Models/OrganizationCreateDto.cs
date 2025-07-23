@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Entities.Report
+namespace Application.Models
 {
-    public class ReportingPeriod:ReportEntryBaseEntity
+    public class OrganizationCreateDto
     {
+        public string Name { get; set; } = string.Empty;
     }
 }

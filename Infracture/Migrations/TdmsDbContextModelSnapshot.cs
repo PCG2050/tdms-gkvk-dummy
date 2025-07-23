@@ -41,14 +41,14 @@ namespace Infrastructure.Migrations
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
 
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
                     b.Property<string>("OrganizationName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ReportRecordId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UnitId")
+                    b.Property<int>("UnitLocationId")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
@@ -64,9 +64,9 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("ReportRecordId");
+                    b.HasIndex("OrganizationId");
 
-                    b.HasIndex("UnitId");
+                    b.HasIndex("UnitLocationId");
 
                     b.HasIndex("UpdatedById");
 
@@ -92,7 +92,10 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
-                    b.Property<int>("ReportRecordId")
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<int>("OrganizationId")
                         .HasColumnType("int");
 
                     b.Property<int>("ServiceCount")
@@ -102,7 +105,7 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UnitId")
+                    b.Property<int>("UnitLocationId")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
@@ -115,9 +118,9 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("ReportRecordId");
+                    b.HasIndex("OrganizationId");
 
-                    b.HasIndex("UnitId");
+                    b.HasIndex("UnitLocationId");
 
                     b.HasIndex("UpdatedById");
 
@@ -144,10 +147,13 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
-                    b.Property<int>("ReportRecordId")
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<int>("OrganizationId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UnitId")
+                    b.Property<int>("UnitLocationId")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
@@ -160,9 +166,9 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("ReportRecordId");
+                    b.HasIndex("OrganizationId");
 
-                    b.HasIndex("UnitId");
+                    b.HasIndex("UnitLocationId");
 
                     b.HasIndex("UpdatedById");
 
@@ -185,9 +191,15 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
                     b.Property<string>("Details")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
 
                     b.Property<double>("Quantity")
                         .HasColumnType("float");
@@ -196,10 +208,7 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ReportRecordId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UnitId")
+                    b.Property<int>("UnitLocationId")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
@@ -212,9 +221,9 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("ReportRecordId");
+                    b.HasIndex("OrganizationId");
 
-                    b.HasIndex("UnitId");
+                    b.HasIndex("UnitLocationId");
 
                     b.HasIndex("UpdatedById");
 
@@ -246,18 +255,21 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ReportRecordId")
+                    b.Property<int>("OrganizationId")
                         .HasColumnType("int");
 
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UnitId")
+                    b.Property<int>("UnitLocationId")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
@@ -270,9 +282,9 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("ReportRecordId");
+                    b.HasIndex("OrganizationId");
 
-                    b.HasIndex("UnitId");
+                    b.HasIndex("UnitLocationId");
 
                     b.HasIndex("UpdatedById");
 
@@ -299,10 +311,13 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
-                    b.Property<int>("ReportRecordId")
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<int>("OrganizationId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UnitId")
+                    b.Property<int>("UnitLocationId")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
@@ -315,13 +330,53 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("ReportRecordId");
+                    b.HasIndex("OrganizationId");
 
-                    b.HasIndex("UnitId");
+                    b.HasIndex("UnitLocationId");
 
                     b.HasIndex("UpdatedById");
 
                     b.ToTable("DeuOtherActivities");
+                });
+
+            modelBuilder.Entity("Domain.Entities.District", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StateId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("StateId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("Districts");
                 });
 
             modelBuilder.Entity("Domain.Entities.EEU.EeuFLD", b =>
@@ -347,11 +402,14 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
                     b.Property<double>("PercentIncreaseInYield")
                         .HasColumnType("float");
-
-                    b.Property<int>("ReportRecordId")
-                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -369,7 +427,7 @@ namespace Infrastructure.Migrations
                     b.Property<int>("TrialMaleScStCount")
                         .HasColumnType("int");
 
-                    b.Property<int>("UnitId")
+                    b.Property<int>("UnitLocationId")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
@@ -388,9 +446,9 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("ReportRecordId");
+                    b.HasIndex("OrganizationId");
 
-                    b.HasIndex("UnitId");
+                    b.HasIndex("UnitLocationId");
 
                     b.HasIndex("UpdatedById");
 
@@ -420,11 +478,14 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
                     b.Property<double>("PercentIncreaseInYield")
                         .HasColumnType("float");
-
-                    b.Property<int>("ReportRecordId")
-                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -442,7 +503,7 @@ namespace Infrastructure.Migrations
                     b.Property<int>("TrialMaleScStCount")
                         .HasColumnType("int");
 
-                    b.Property<int>("UnitId")
+                    b.Property<int>("UnitLocationId")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
@@ -461,9 +522,9 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("ReportRecordId");
+                    b.HasIndex("OrganizationId");
 
-                    b.HasIndex("UnitId");
+                    b.HasIndex("UnitLocationId");
 
                     b.HasIndex("UpdatedById");
 
@@ -490,10 +551,13 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
-                    b.Property<int>("ReportRecordId")
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<int>("OrganizationId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UnitId")
+                    b.Property<int>("UnitLocationId")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
@@ -506,9 +570,9 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("ReportRecordId");
+                    b.HasIndex("OrganizationId");
 
-                    b.HasIndex("UnitId");
+                    b.HasIndex("UnitLocationId");
 
                     b.HasIndex("UpdatedById");
 
@@ -537,10 +601,10 @@ namespace Infrastructure.Migrations
                     b.Property<TimeSpan>("Duration")
                         .HasColumnType("time");
 
-                    b.Property<int>("ParticipantCount")
+                    b.Property<int>("OrganizationId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ReportRecordId")
+                    b.Property<int>("ParticipantCount")
                         .HasColumnType("int");
 
                     b.Property<int>("TrainingCount")
@@ -550,7 +614,7 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UnitId")
+                    b.Property<int>("UnitLocationId")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
@@ -563,9 +627,9 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("ReportRecordId");
+                    b.HasIndex("OrganizationId");
 
-                    b.HasIndex("UnitId");
+                    b.HasIndex("UnitLocationId");
 
                     b.HasIndex("UpdatedById");
 
@@ -591,19 +655,22 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
                     b.Property<bool>("IsOther")
                         .HasColumnType("bit");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
 
                     b.Property<string>("OtherName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ReportRecordId")
-                        .HasColumnType("int");
-
                     b.Property<int>("TypeId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UnitId")
+                    b.Property<int>("UnitLocationId")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
@@ -616,11 +683,11 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("ReportRecordId");
+                    b.HasIndex("OrganizationId");
 
                     b.HasIndex("TypeId");
 
-                    b.HasIndex("UnitId");
+                    b.HasIndex("UnitLocationId");
 
                     b.HasIndex("UpdatedById");
 
@@ -682,10 +749,13 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
-                    b.Property<int>("ReportRecordId")
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<int>("OrganizationId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UnitId")
+                    b.Property<int>("UnitLocationId")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
@@ -698,9 +768,9 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("ReportRecordId");
+                    b.HasIndex("OrganizationId");
 
-                    b.HasIndex("UnitId");
+                    b.HasIndex("UnitLocationId");
 
                     b.HasIndex("UpdatedById");
 
@@ -733,10 +803,10 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ParticipantCount")
+                    b.Property<int>("OrganizationId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ReportRecordId")
+                    b.Property<int>("ParticipantCount")
                         .HasColumnType("int");
 
                     b.Property<int>("TrainingCount")
@@ -746,7 +816,7 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UnitId")
+                    b.Property<int>("UnitLocationId")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
@@ -759,9 +829,9 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("ReportRecordId");
+                    b.HasIndex("OrganizationId");
 
-                    b.HasIndex("UnitId");
+                    b.HasIndex("UnitLocationId");
 
                     b.HasIndex("UpdatedById");
 
@@ -788,10 +858,13 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
-                    b.Property<int>("ReportRecordId")
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<int>("OrganizationId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UnitId")
+                    b.Property<int>("UnitLocationId")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
@@ -804,9 +877,9 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("ReportRecordId");
+                    b.HasIndex("OrganizationId");
 
-                    b.HasIndex("UnitId");
+                    b.HasIndex("UnitLocationId");
 
                     b.HasIndex("UpdatedById");
 
@@ -835,15 +908,59 @@ namespace Infrastructure.Migrations
                     b.Property<TimeSpan>("Duration")
                         .HasColumnType("time");
 
-                    b.Property<int>("ParticipantCount")
+                    b.Property<int>("OrganizationId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ReportRecordId")
+                    b.Property<int>("ParticipantCount")
                         .HasColumnType("int");
 
                     b.Property<string>("TrainingTitle")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UnitLocationId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.HasIndex("UnitLocationId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("IbtvaProgrammes");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Junction.OrganizationUnitLocation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DistrictId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
 
                     b.Property<int>("UnitId")
                         .HasColumnType("int");
@@ -858,13 +975,56 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("ReportRecordId");
+                    b.HasIndex("DistrictId");
+
+                    b.HasIndex("OrganizationId");
 
                     b.HasIndex("UnitId");
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("IbtvaProgrammes");
+                    b.ToTable("OrganizationUnitLocations");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Junction.TrainerAssignment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TrainerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UnitLocationId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("TrainerId");
+
+                    b.HasIndex("UnitLocationId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("UnitTrainers");
                 });
 
             modelBuilder.Entity("Domain.Entities.Organization", b =>
@@ -905,47 +1065,6 @@ namespace Infrastructure.Migrations
                     b.ToTable("Organizations");
                 });
 
-            modelBuilder.Entity("Domain.Entities.ReportRecord", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
-
-                    b.Property<int?>("CreatedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTimeOffset>("ReportEndTime")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset>("ReportStartTime")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<int?>("UpdatedById")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("UpdatedById");
-
-                    b.ToTable("ReportRecord");
-                });
-
             modelBuilder.Entity("Domain.Entities.STU.DaesiOtherActivity", b =>
                 {
                     b.Property<int>("Id")
@@ -966,10 +1085,13 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
-                    b.Property<int>("ReportRecordId")
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<int>("OrganizationId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UnitId")
+                    b.Property<int>("UnitLocationId")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
@@ -982,9 +1104,9 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("ReportRecordId");
+                    b.HasIndex("OrganizationId");
 
-                    b.HasIndex("UnitId");
+                    b.HasIndex("UnitLocationId");
 
                     b.HasIndex("UpdatedById");
 
@@ -1010,6 +1132,9 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
                     b.Property<int>("DealerCount")
                         .HasColumnType("int");
 
@@ -1017,14 +1142,14 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Place")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ReportRecordId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UnitId")
+                    b.Property<int>("UnitLocationId")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
@@ -1037,9 +1162,9 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("ReportRecordId");
+                    b.HasIndex("OrganizationId");
 
-                    b.HasIndex("UnitId");
+                    b.HasIndex("UnitLocationId");
 
                     b.HasIndex("UpdatedById");
 
@@ -1066,10 +1191,13 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
-                    b.Property<int>("ReportRecordId")
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<int>("OrganizationId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UnitId")
+                    b.Property<int>("UnitLocationId")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
@@ -1082,9 +1210,9 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("ReportRecordId");
+                    b.HasIndex("OrganizationId");
 
-                    b.HasIndex("UnitId");
+                    b.HasIndex("UnitLocationId");
 
                     b.HasIndex("UpdatedById");
 
@@ -1117,14 +1245,14 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ParticipantCount")
                         .HasColumnType("int");
 
                     b.Property<string>("Place")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ReportRecordId")
-                        .HasColumnType("int");
 
                     b.Property<int>("TrainingCount")
                         .HasColumnType("int");
@@ -1133,7 +1261,7 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UnitId")
+                    b.Property<int>("UnitLocationId")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
@@ -1146,9 +1274,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("ReportRecordId");
-
-                    b.HasIndex("UnitId");
+                    b.HasIndex("UnitLocationId");
 
                     b.HasIndex("UpdatedById");
 
@@ -1177,14 +1303,14 @@ namespace Infrastructure.Migrations
                     b.Property<TimeSpan>("Duration")
                         .HasColumnType("time");
 
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ParticipantCount")
                         .HasColumnType("int");
 
                     b.Property<string>("Place")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ReportRecordId")
-                        .HasColumnType("int");
 
                     b.Property<int>("TrainingCount")
                         .HasColumnType("int");
@@ -1193,7 +1319,7 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UnitId")
+                    b.Property<int>("UnitLocationId")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
@@ -1206,13 +1332,48 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("ReportRecordId");
+                    b.HasIndex("OrganizationId");
 
-                    b.HasIndex("UnitId");
+                    b.HasIndex("UnitLocationId");
 
                     b.HasIndex("UpdatedById");
 
                     b.ToTable("StuTrainingProgrammes");
+                });
+
+            modelBuilder.Entity("Domain.Entities.State", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("States");
                 });
 
             modelBuilder.Entity("Domain.Entities.Unit", b =>
@@ -1252,48 +1413,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("Unit");
-                });
-
-            modelBuilder.Entity("Domain.Entities.UnitUser", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
-
-                    b.Property<int?>("CreatedById")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UnitId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<int?>("UpdatedById")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("UnitId");
-
-                    b.HasIndex("UpdatedById");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UnitUsers");
+                    b.ToTable("Units");
                 });
 
             modelBuilder.Entity("Domain.Entities.User", b =>
@@ -1330,11 +1450,18 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("OrganizationId")
+                    b.Property<int?>("OrganizationId")
                         .HasColumnType("int");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Phone")
                         .HasColumnType("int");
+
+                    b.Property<string>("ProfileImageUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Role")
                         .IsRequired()
@@ -1361,29 +1488,31 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.ReportRecord", "ReportRecord")
+                    b.HasOne("Domain.Entities.Organization", "Organization")
                         .WithMany()
-                        .HasForeignKey("ReportRecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Unit", "Unit")
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
                         .WithMany()
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("UnitLocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
-                        .HasForeignKey("UpdatedById");
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("CreatedBy");
 
-                    b.Navigation("ReportRecord");
+                    b.Navigation("Organization");
 
-                    b.Navigation("Unit");
+                    b.Navigation("UnitLocation");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -1392,29 +1521,31 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.ReportRecord", "ReportRecord")
+                    b.HasOne("Domain.Entities.Organization", "Organization")
                         .WithMany()
-                        .HasForeignKey("ReportRecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Unit", "Unit")
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
                         .WithMany()
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("UnitLocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
-                        .HasForeignKey("UpdatedById");
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("CreatedBy");
 
-                    b.Navigation("ReportRecord");
+                    b.Navigation("Organization");
 
-                    b.Navigation("Unit");
+                    b.Navigation("UnitLocation");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -1423,29 +1554,31 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.ReportRecord", "ReportRecord")
+                    b.HasOne("Domain.Entities.Organization", "Organization")
                         .WithMany()
-                        .HasForeignKey("ReportRecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Unit", "Unit")
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
                         .WithMany()
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("UnitLocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
-                        .HasForeignKey("UpdatedById");
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("CreatedBy");
 
-                    b.Navigation("ReportRecord");
+                    b.Navigation("Organization");
 
-                    b.Navigation("Unit");
+                    b.Navigation("UnitLocation");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -1454,29 +1587,31 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.ReportRecord", "ReportRecord")
+                    b.HasOne("Domain.Entities.Organization", "Organization")
                         .WithMany()
-                        .HasForeignKey("ReportRecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Unit", "Unit")
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
                         .WithMany()
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("UnitLocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
-                        .HasForeignKey("UpdatedById");
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("CreatedBy");
 
-                    b.Navigation("ReportRecord");
+                    b.Navigation("Organization");
 
-                    b.Navigation("Unit");
+                    b.Navigation("UnitLocation");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -1485,29 +1620,31 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.ReportRecord", "ReportRecord")
+                    b.HasOne("Domain.Entities.Organization", "Organization")
                         .WithMany()
-                        .HasForeignKey("ReportRecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Unit", "Unit")
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
                         .WithMany()
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("UnitLocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
-                        .HasForeignKey("UpdatedById");
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("CreatedBy");
 
-                    b.Navigation("ReportRecord");
+                    b.Navigation("Organization");
 
-                    b.Navigation("Unit");
+                    b.Navigation("UnitLocation");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -1516,29 +1653,56 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.ReportRecord", "ReportRecord")
+                    b.HasOne("Domain.Entities.Organization", "Organization")
                         .WithMany()
-                        .HasForeignKey("ReportRecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Unit", "Unit")
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
                         .WithMany()
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("UnitLocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
-                        .HasForeignKey("UpdatedById");
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("CreatedBy");
 
-                    b.Navigation("ReportRecord");
+                    b.Navigation("Organization");
 
-                    b.Navigation("Unit");
+                    b.Navigation("UnitLocation");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.District", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.State", "State")
+                        .WithMany("Districts")
+                        .HasForeignKey("StateId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("State");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -1547,29 +1711,31 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.ReportRecord", "ReportRecord")
+                    b.HasOne("Domain.Entities.Organization", "Organization")
                         .WithMany()
-                        .HasForeignKey("ReportRecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Unit", "Unit")
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
                         .WithMany()
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("UnitLocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
-                        .HasForeignKey("UpdatedById");
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("CreatedBy");
 
-                    b.Navigation("ReportRecord");
+                    b.Navigation("Organization");
 
-                    b.Navigation("Unit");
+                    b.Navigation("UnitLocation");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -1578,29 +1744,31 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.ReportRecord", "ReportRecord")
+                    b.HasOne("Domain.Entities.Organization", "Organization")
                         .WithMany()
-                        .HasForeignKey("ReportRecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Unit", "Unit")
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
                         .WithMany()
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("UnitLocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
-                        .HasForeignKey("UpdatedById");
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("CreatedBy");
 
-                    b.Navigation("ReportRecord");
+                    b.Navigation("Organization");
 
-                    b.Navigation("Unit");
+                    b.Navigation("UnitLocation");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -1609,29 +1777,31 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.ReportRecord", "ReportRecord")
+                    b.HasOne("Domain.Entities.Organization", "Organization")
                         .WithMany()
-                        .HasForeignKey("ReportRecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Unit", "Unit")
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
                         .WithMany()
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("UnitLocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
-                        .HasForeignKey("UpdatedById");
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("CreatedBy");
 
-                    b.Navigation("ReportRecord");
+                    b.Navigation("Organization");
 
-                    b.Navigation("Unit");
+                    b.Navigation("UnitLocation");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -1640,29 +1810,31 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.ReportRecord", "ReportRecord")
+                    b.HasOne("Domain.Entities.Organization", "Organization")
                         .WithMany()
-                        .HasForeignKey("ReportRecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Unit", "Unit")
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
                         .WithMany()
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("UnitLocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
-                        .HasForeignKey("UpdatedById");
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("CreatedBy");
 
-                    b.Navigation("ReportRecord");
+                    b.Navigation("Organization");
 
-                    b.Navigation("Unit");
+                    b.Navigation("UnitLocation");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -1671,37 +1843,39 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.ReportRecord", "ReportRecord")
+                    b.HasOne("Domain.Entities.Organization", "Organization")
                         .WithMany()
-                        .HasForeignKey("ReportRecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.FIU.FiuProgrammeType", "Type")
                         .WithMany()
                         .HasForeignKey("TypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Unit", "Unit")
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
                         .WithMany()
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("UnitLocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
-                        .HasForeignKey("UpdatedById");
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("CreatedBy");
 
-                    b.Navigation("ReportRecord");
+                    b.Navigation("Organization");
 
                     b.Navigation("Type");
 
-                    b.Navigation("Unit");
+                    b.Navigation("UnitLocation");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -1710,11 +1884,13 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
-                        .HasForeignKey("UpdatedById");
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("CreatedBy");
 
@@ -1725,29 +1901,31 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.ReportRecord", "ReportRecord")
+                    b.HasOne("Domain.Entities.Organization", "Organization")
                         .WithMany()
-                        .HasForeignKey("ReportRecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Unit", "Unit")
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
                         .WithMany()
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("UnitLocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
-                        .HasForeignKey("UpdatedById");
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("CreatedBy");
 
-                    b.Navigation("ReportRecord");
+                    b.Navigation("Organization");
 
-                    b.Navigation("Unit");
+                    b.Navigation("UnitLocation");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -1756,29 +1934,31 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.ReportRecord", "ReportRecord")
+                    b.HasOne("Domain.Entities.Organization", "Organization")
                         .WithMany()
-                        .HasForeignKey("ReportRecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Unit", "Unit")
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
                         .WithMany()
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("UnitLocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
-                        .HasForeignKey("UpdatedById");
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("CreatedBy");
 
-                    b.Navigation("ReportRecord");
+                    b.Navigation("Organization");
 
-                    b.Navigation("Unit");
+                    b.Navigation("UnitLocation");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -1787,29 +1967,31 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.ReportRecord", "ReportRecord")
+                    b.HasOne("Domain.Entities.Organization", "Organization")
                         .WithMany()
-                        .HasForeignKey("ReportRecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Unit", "Unit")
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
                         .WithMany()
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("UnitLocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
-                        .HasForeignKey("UpdatedById");
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("CreatedBy");
 
-                    b.Navigation("ReportRecord");
+                    b.Navigation("Organization");
 
-                    b.Navigation("Unit");
+                    b.Navigation("UnitLocation");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -1818,49 +2000,110 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.ReportRecord", "ReportRecord")
+                    b.HasOne("Domain.Entities.Organization", "Organization")
                         .WithMany()
-                        .HasForeignKey("ReportRecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Unit", "Unit")
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
                         .WithMany()
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("UnitLocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
-                        .HasForeignKey("UpdatedById");
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("CreatedBy");
 
-                    b.Navigation("ReportRecord");
+                    b.Navigation("Organization");
+
+                    b.Navigation("UnitLocation");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Junction.OrganizationUnitLocation", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.District", "District")
+                        .WithMany()
+                        .HasForeignKey("DistrictId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Unit", "Unit")
+                        .WithMany("OrganizationUnits")
+                        .HasForeignKey("UnitId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("District");
+
+                    b.Navigation("Organization");
 
                     b.Navigation("Unit");
 
                     b.Navigation("UpdatedBy");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Organization", b =>
+            modelBuilder.Entity("Domain.Entities.Junction.TrainerAssignment", b =>
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.User", "Trainer")
+                        .WithMany()
+                        .HasForeignKey("TrainerId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
+                        .WithMany()
+                        .HasForeignKey("UnitLocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
-                        .HasForeignKey("UpdatedById");
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("CreatedBy");
+
+                    b.Navigation("Trainer");
+
+                    b.Navigation("UnitLocation");
 
                     b.Navigation("UpdatedBy");
                 });
 
-            modelBuilder.Entity("Domain.Entities.ReportRecord", b =>
+            modelBuilder.Entity("Domain.Entities.Organization", b =>
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
@@ -1879,29 +2122,31 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.ReportRecord", "ReportRecord")
+                    b.HasOne("Domain.Entities.Organization", "Organization")
                         .WithMany()
-                        .HasForeignKey("ReportRecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Unit", "Unit")
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
                         .WithMany()
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("UnitLocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
-                        .HasForeignKey("UpdatedById");
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("CreatedBy");
 
-                    b.Navigation("ReportRecord");
+                    b.Navigation("Organization");
 
-                    b.Navigation("Unit");
+                    b.Navigation("UnitLocation");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -1910,29 +2155,31 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.ReportRecord", "ReportRecord")
+                    b.HasOne("Domain.Entities.Organization", "Organization")
                         .WithMany()
-                        .HasForeignKey("ReportRecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Unit", "Unit")
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
                         .WithMany()
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("UnitLocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
-                        .HasForeignKey("UpdatedById");
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("CreatedBy");
 
-                    b.Navigation("ReportRecord");
+                    b.Navigation("Organization");
 
-                    b.Navigation("Unit");
+                    b.Navigation("UnitLocation");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -1941,29 +2188,31 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.ReportRecord", "ReportRecord")
+                    b.HasOne("Domain.Entities.Organization", "Organization")
                         .WithMany()
-                        .HasForeignKey("ReportRecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Unit", "Unit")
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
                         .WithMany()
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("UnitLocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
-                        .HasForeignKey("UpdatedById");
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("CreatedBy");
 
-                    b.Navigation("ReportRecord");
+                    b.Navigation("Organization");
 
-                    b.Navigation("Unit");
+                    b.Navigation("UnitLocation");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -1972,29 +2221,23 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.ReportRecord", "ReportRecord")
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
                         .WithMany()
-                        .HasForeignKey("ReportRecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.Unit", "Unit")
-                        .WithMany()
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("UnitLocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
-                        .HasForeignKey("UpdatedById");
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("CreatedBy");
 
-                    b.Navigation("ReportRecord");
-
-                    b.Navigation("Unit");
+                    b.Navigation("UnitLocation");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -2003,29 +2246,48 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.ReportRecord", "ReportRecord")
+                    b.HasOne("Domain.Entities.Organization", "Organization")
                         .WithMany()
-                        .HasForeignKey("ReportRecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Unit", "Unit")
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
                         .WithMany()
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("UnitLocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
-                        .HasForeignKey("UpdatedById");
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("CreatedBy");
 
-                    b.Navigation("ReportRecord");
+                    b.Navigation("Organization");
 
-                    b.Navigation("Unit");
+                    b.Navigation("UnitLocation");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.State", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -2034,52 +2296,24 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Domain.Entities.Unit", "ParentUnit")
                         .WithMany()
-                        .HasForeignKey("ParentUnitId");
+                        .HasForeignKey("ParentUnitId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
-                        .HasForeignKey("UpdatedById");
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("CreatedBy");
 
                     b.Navigation("ParentUnit");
 
                     b.Navigation("UpdatedBy");
-                });
-
-            modelBuilder.Entity("Domain.Entities.UnitUser", b =>
-                {
-                    b.HasOne("Domain.Entities.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById");
-
-                    b.HasOne("Domain.Entities.Unit", "Unit")
-                        .WithMany()
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.User", "UpdatedBy")
-                        .WithMany()
-                        .HasForeignKey("UpdatedById");
-
-                    b.HasOne("Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("Unit");
-
-                    b.Navigation("UpdatedBy");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Domain.Entities.User", b =>
@@ -2091,9 +2325,7 @@ namespace Infrastructure.Migrations
 
                     b.HasOne("Domain.Entities.Organization", "Organization")
                         .WithMany("Users")
-                        .HasForeignKey("OrganizationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("OrganizationId");
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
@@ -2110,6 +2342,16 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Organization", b =>
                 {
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("Domain.Entities.State", b =>
+                {
+                    b.Navigation("Districts");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Unit", b =>
+                {
+                    b.Navigation("OrganizationUnits");
                 });
 #pragma warning restore 612, 618
         }

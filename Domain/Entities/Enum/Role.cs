@@ -10,6 +10,14 @@ namespace Domain.Entities.Enum
     {
         UNDEFINED,
         TRAINER,
-        ADMIN
+        ADMIN,
+        SUPERADMIN
+    }
+
+    public static class RoleString
+    {
+        public const string Trainer = "TRAINER";
+        public const string Admin = "ADMIN";
+        public const string SuperAdmin = "SUPERADMIN";
     }
 }

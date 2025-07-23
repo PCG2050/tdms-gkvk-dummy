@@ -1,4 +1,7 @@
-﻿namespace Domain.Entities
+﻿using Domain.Entities.Junction;
+using System.Text.Json.Serialization;
+
+namespace Domain.Entities
 {
     public class Unit:AuditableBaseEntity
     {
@@ -8,5 +11,8 @@
         /// </summary>
         public int? ParentUnitId {  get; set; }
         public Unit? ParentUnit { get; set; }
+        
+        [JsonIgnore]
+        public ICollection<OrganizationUnitLocation> OrganizationUnits { get; set; } = [];
     }
 }

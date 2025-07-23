@@ -2,6 +2,14 @@
 using Scalar.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.DbContext;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Application.Interface;
+using Infrastructure.Services;
+using Application.Interface.Repository;
+using Infrastructure.Repository;
+using WebApi.Services;
+using System.Text;
 
 namespace WebApi
 {
@@ -18,9 +26,30 @@ namespace WebApi
             builder.Services.AddOpenApi();
             builder.Services.AddDbContext<TdmsDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DatabaseContext")));
+            builder.Services.AddHttpContextAccessor();//For IHttpContextAccessor in infracture
+            builder.Services.AddScoped<ICurrentUserService,CurrentUserService>();
+            builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+            builder.Services.AddScoped<ITokenService, AuthTokenService>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
+            builder.Services.AddScoped<IOrganizationService, OrganizationService>();
+            builder.Services.AddScoped<IUserService, UserService>();
 
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(o=>
+                {
+                    o.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateAudience = true,
+                        ValidAudience = builder.Configuration["AppSettings:Audience"],
+                        ValidateIssuer = true,
+                        ValidIssuer = builder.Configuration["AppSettings:Issuer"],
+                        ValidateLifetime = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:TokenKey"]!)),
+                        ValidateIssuerSigningKey = true
+                    };
+                });
             var app = builder.Build();
-
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
