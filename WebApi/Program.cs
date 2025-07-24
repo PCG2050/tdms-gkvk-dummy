@@ -34,6 +34,17 @@ namespace WebApi
             builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
             builder.Services.AddScoped<IOrganizationService, OrganizationService>();
             builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IStateRepository, StateRepository>();
+            builder.Services.AddScoped<IDistrictRepository, DistrictRepository>();
+            builder.Services.AddScoped<ILocationService, LocationService>();
+            builder.Services.AddScoped<IUnitRepository, UnitRepository>();
+            builder.Services.AddScoped<IUnitService, UnitService>();
+            builder.Services.AddScoped<IOrganizationUnitRepository, OrganizationUnitRepository>();
+            builder.Services.AddScoped<IOrganizationUnitService, OrganizationUnitService>();
+            builder.Services.AddScoped<ITrainerAssignmentRepository, TrainerAssignmentRepository>();
+            builder.Services.AddScoped<ITrainerAssignmentService, TrainerAssignmentService>();
+            builder.Services.AddScoped<IFtiTrainingProgrammeRepository, FtiTrainingProgrammeRepository>();
+            builder.Services.AddScoped<IFtiTrainingProgrammeService, FtiTrainingProgrammeService>();
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(o=>
