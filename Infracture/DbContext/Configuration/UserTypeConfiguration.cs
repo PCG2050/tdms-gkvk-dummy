@@ -31,6 +31,19 @@ namespace Infrastructure.DbContext.Configuration
             builder
                 .Property(u => u.Role)
                 .HasConversion<string>();
+
+            builder
+                .HasMany(u => u.TrainerAssignments)
+                .WithOne(u => u.Trainer)
+                .HasForeignKey(u => u.TrainerId);
+
+            builder
+                .Property(x => x.EmployementType)
+                .HasConversion<string>();
+
+            builder
+                .Property(u => u.Gender)
+                .HasConversion<string>();
         }
     }
 }

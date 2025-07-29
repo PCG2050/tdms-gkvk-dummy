@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities
 {
-    public class District:AuditableBaseEntity
+    public class District:BaseEntity
     {
         public int StateId { get; set; }
         public required string Name { get; set; }

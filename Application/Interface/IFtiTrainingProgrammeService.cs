@@ -10,9 +10,10 @@ namespace Application.Interface
 {
     public interface IFtiTrainingProgrammeService
     {
-        Task<PaginatedResult<FtiTrainingProgram>> GetEtries(int pageNumber = Constants.PAGINATION_PAGEN_NUMBER_DEFAULT, int pageSize = Constants.PAGINATION_PAGE_SIZE_DEFAULT);
-        Task<FtiTrainingProgram> AddEntry(CreateFtiTrainingProgrammeEntryDto createDto);
-        Task UpdateEntry(UpdateTrainingProgrammeEntryDto updateDto);
-        Task DeleteEntry(int id);
+        Task<PaginatedResult<FtiTrainingProgram>> GetPaginatedItemsAsync(int pageNumber = Constants.PAGINATION_PAGE_NUMBER_DEFAULT, int pageSize = Constants.PAGINATION_PAGE_SIZE_DEFAULT);
+        Task<FtiTrainingProgram> AddAsync(CreateFtiTrainingProgrammeEntryDto createDto);
+        Task UpdateAsync(UpdateTrainingProgrammeEntryDto updateDto);
+        Task DeleteAsync(int id);
+        Task DeleteAsync(FtiTrainingProgram entity);
     }
 }

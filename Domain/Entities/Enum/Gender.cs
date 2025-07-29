@@ -4,10 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Models
+namespace Domain.Entities.Enum
 {
-    public class QueryFilter
+    public enum Gender
     {
-        public Dictionary<string, object> Filters { get; set; } = new();
+        UNDEFINED,
+        MALE,
+        FEMALE,
+        OTHER
     }
 }

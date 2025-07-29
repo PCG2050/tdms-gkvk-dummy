@@ -1,8 +1,5 @@
-using Domain.Entities;
 using Infrastructure.DbContext;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
 
 namespace WebApi.Controllers
 {
@@ -17,21 +14,6 @@ namespace WebApi.Controllers
         {
             _logger = logger;
             _context = context;
-        }
-
-        [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<User> Get()
-        {
-            return _context.Users
-                .Include(u=> u.Organization)
-                .ToList();
-        }
-        [HttpGet("orgs",Name = "GetWeatherForecast2")]
-        public IEnumerable<Organization> Get2()
-        {
-            var orgs =  _context.Organizations.ToList();
-            var orgsWithUsers = _context.Organizations.Include(o => o.Users).AsNoTracking().ToList();
-            return orgsWithUsers;
         }
     }
 }

@@ -2,7 +2,8 @@
 {
     public class CreateFtiTrainingProgrammeEntryDto
     {
-        public DateOnly EntryDate { get; set; }
+        public DateOnly StartDate { get; set; }
+        public DateOnly EndDate { get; set; }
         public required string OrganisationName { get; set; }
         public required string TrainingTitle { get; set; }
         public TimeSpan Duration { get; set; }

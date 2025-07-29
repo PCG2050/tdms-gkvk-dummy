@@ -10,6 +10,8 @@ using Application.Interface.Repository;
 using Infrastructure.Repository;
 using WebApi.Services;
 using System.Text;
+using Application.Interface.Repository.DataTables;
+using Infrastructure.Repository.DataTables;
 
 namespace WebApi
 {

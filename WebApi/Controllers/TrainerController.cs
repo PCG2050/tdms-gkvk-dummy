@@ -1,8 +1,10 @@
 ﻿using Application.Interface;
+using Application.Models;
 using Domain.Entities.Enum;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace WebApi.Controllers
 {
@@ -11,10 +13,20 @@ namespace WebApi.Controllers
     public class TrainerController:ControllerBase
     {
         private readonly ITrainerAssignmentService _assignmentService;
+        private readonly IUserService _userService;
 
-        public TrainerController(ITrainerAssignmentService assignmentService)
+        public TrainerController(ITrainerAssignmentService assignmentService, IUserService userService)
         {
             _assignmentService = assignmentService;
+            _userService = userService;
+        }
+
+        [HttpGet]
+        [Authorize(Roles = RoleString.Admin)]
+        public async Task<IActionResult> GetTrainersOverview([FromQuery]PaginationRequest paginationRequest)
+        {
+            var paginatedResult = await _userService.GetPaginatedOrganizationTrainers(paginationRequest.PageNumber, paginationRequest.PageSize);
+            return Ok(paginatedResult);
         }
 
         [HttpGet("{trainerId}/units")]

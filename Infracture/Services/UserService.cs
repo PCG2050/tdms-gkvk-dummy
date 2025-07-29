@@ -1,4 +1,5 @@
-﻿using Application.Interface;
+﻿using Application;
+using Application.Interface;
 using Application.Interface.Repository;
 using Application.Models;
 using Domain.Entities;
@@ -15,14 +16,12 @@ namespace Infrastructure.Services
         private readonly IUserRepository _userRepository;
         private readonly IPasswordHasher _passwordHasher;
         private readonly ICurrentUserService _currentUser;
-        private readonly IOrganizationRepository _organizationRepository;
 
-        public UserService(IUserRepository userRepository, IPasswordHasher passwordHasher,ICurrentUserService currentUser, IOrganizationRepository organizationRepository)
+        public UserService(IUserRepository userRepository, IPasswordHasher passwordHasher,ICurrentUserService currentUser)
         {
             _userRepository = userRepository;
             _passwordHasher = passwordHasher;
             _currentUser = currentUser;
-            _organizationRepository = organizationRepository;
         }
 
         public async Task<User> CreateUserAsync(UserRegisterDto registerDto)
@@ -31,6 +30,7 @@ namespace Infrastructure.Services
             var existingUser = await _userRepository.GetByEmailAsync(registerDto.Email);
             if (existingUser != null)
                 throw new InvalidOperationException("User with this email already exists");
+
 
             var user = new User() {
                 Email=registerDto.Email,
@@ -78,8 +78,13 @@ namespace Infrastructure.Services
 
         public  Task<List<User>> GetOrganizationUnitTrainers(int unitId)
         {
-            //return await _userRepository.GetBoardParticipantsAsync(boardId);
             throw new NotImplementedException();
+        }
+
+        public async Task<PaginatedResult<TrainerDetailsDto>> GetPaginatedOrganizationTrainers(int pageNumber=Constants.PAGINATION_PAGE_NUMBER_DEFAULT, int pageSize = Constants.PAGINATION_PAGE_SIZE_DEFAULT)
+        {
+            var usersResult = await _userRepository.GetPaginatedItemsAsync(_currentUser.OrganizationId, pageNumber, null, pageSize);
+            return usersResult;
         }
 
         public Task<List<User>> GetAllOrganizationUsersAsync()
@@ -92,6 +97,11 @@ namespace Infrastructure.Services
             int userId = _currentUser.UserId;
             var user = await _userRepository.GetByIdAsync(userId);
             return user;
+        }
+
+        Task<List<User>> IUserService.GetOrganizationTrainers()
+        {
+            throw new NotImplementedException();
         }
     }
 }

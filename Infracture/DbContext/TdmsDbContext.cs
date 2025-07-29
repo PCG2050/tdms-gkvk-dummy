@@ -80,7 +80,8 @@ namespace Infrastructure.DbContext
             new DeuCourseTypeConfiguration().Configure(modelBuilder.Entity<DeuCourse>());
 
             foreach (var entityType in modelBuilder.Model.GetEntityTypes()
-        .Where(t => typeof(AuditableBaseEntity).IsAssignableFrom(t.ClrType)))
+        .Where(t => typeof(AuditableBaseEntity).IsAssignableFrom(t.ClrType)
+                    || typeof(BaseEntity).IsAssignableFrom(t.ClrType)))
             {
                 modelBuilder.Entity(entityType.ClrType).Property(nameof(ReportEntryBaseEntity.CreatedAt))
                     .ValueGeneratedOnAdd()

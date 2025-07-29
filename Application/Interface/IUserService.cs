@@ -18,6 +18,8 @@ namespace Application.Interface
         Task UpdateUserAsync(User user);
         Task<List<User>> GetAllOrganizationUsersAsync();
         Task<List<User>> GetOrganizationUnitTrainers(int unitId);
+        Task<List<User>> GetOrganizationTrainers();
         Task<User> GetCurrentUserDetailsAsync();
+        Task<PaginatedResult<TrainerDetailsDto>> GetPaginatedOrganizationTrainers(int pageNumber = Constants.PAGINATION_PAGE_NUMBER_DEFAULT, int pageSize = Constants.PAGINATION_PAGE_SIZE_DEFAULT);
     }
 }

@@ -20,16 +20,16 @@ namespace WebApi.Controllers.DataTables
         }
         [Authorize(Roles =$"{RoleString.Admin},{RoleString.Trainer}")]
         [HttpGet("training-programmes")]
-        public async Task<IActionResult> GetAllTrainingProgrammeEntries(int pageNumber = Constants.PAGINATION_PAGEN_NUMBER_DEFAULT, int pageSize = Constants.PAGINATION_PAGE_SIZE_DEFAULT)
+        public async Task<IActionResult> GetAllTrainingProgrammeEntries([FromQuery]PaginationRequest paginationRequest)
         {
-            return Ok(await _trainingProgrammeService.GetEtries(pageNumber, pageSize));
+            return Ok(await _trainingProgrammeService.GetPaginatedItemsAsync(paginationRequest.PageNumber, paginationRequest.PageSize));
         }
 
         [Authorize(Roles = $"{RoleString.Admin},{RoleString.Trainer}")]
         [HttpPost("training-programmes")]
         public async Task<IActionResult> AddEntry(CreateFtiTrainingProgrammeEntryDto createDto)
         {
-            var entry = await _trainingProgrammeService.AddEntry(createDto);
+            var entry = await _trainingProgrammeService.AddAsync(createDto);
             return Ok(entry);
         }
 
@@ -37,14 +37,14 @@ namespace WebApi.Controllers.DataTables
         [HttpPatch("training-programmes/{id}")]
         public async Task<IActionResult> UpdateEntry(int id, UpdateTrainingProgrammeEntryDto updateDto)
         {
-            await _trainingProgrammeService.UpdateEntry(updateDto);
+            await _trainingProgrammeService.UpdateAsync(updateDto);
             return NoContent();
         }
         [Authorize(Roles = $"{RoleString.Admin},{RoleString.Trainer}")]
         [HttpDelete("training-programmes/{id}")]
         public async Task<IActionResult> DeleteEntry(int id)
         {
-            await _trainingProgrammeService.DeleteEntry(id);
+            await _trainingProgrammeService.DeleteAsync(id);
             return NoContent();
         }
     }
