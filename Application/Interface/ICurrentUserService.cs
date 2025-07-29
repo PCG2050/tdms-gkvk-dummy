@@ -12,5 +12,6 @@ namespace Application.Interface
         int UserId { get; }
         Role Role { get; }
         int OrganizationId { get; }
+        Task<IReadOnlyCollection<int>> MappedUnitLocationIds();
     }
 }

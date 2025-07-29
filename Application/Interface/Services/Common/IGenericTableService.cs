@@ -12,7 +12,7 @@ namespace Application.Interface.Services.Common
     public interface IGenericTableService<T>
     {
         Task<ServiceResult<T>> AddAsync(FtiOtherActivityCreateDto createDto);
-        Task<ServiceResult<T>> UpdateAsync(FitOtherActivityUpdateDto updateDto);
+        Task<ServiceResult<T>> UpdateAsync(FtiOtherActivityUpdateDto updateDto);
         Task<ServiceResult> DeleteAsync(int id);
     }
 }

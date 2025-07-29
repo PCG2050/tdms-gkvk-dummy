@@ -20,12 +20,12 @@ namespace Application.Models.DataTables
         public string ActivityDetails { get; set; } = string.Empty;
         public string Assets { get; set; }
     }
-    public class FitOtherActivityUpdateDto
+    public class FtiOtherActivityUpdateDto
     {
         public int Id { get; set; }
         public DateOnly? StartDate { get; set; }
         public DateOnly? EndDate { get; set; }
         public string? ActivityDetails { get; set; }
-        public string? Assets { get; set; }
+        public string? Attachements { get; set; }
     }
 }

@@ -1,18 +1,17 @@
 ﻿using Application.Interface;
 using Domain.Entities.Enum;
+using Infrastructure.DbContext;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Services
 {
     public class CurrentUserService : ICurrentUserService
     {
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly TdmsDbContext _context;
+
         public ClaimsPrincipal? User => _contextAccessor.HttpContext.User;
         public int UserId {
             get
@@ -40,9 +39,24 @@ namespace Infrastructure.Services
                 throw new InvalidOperationException("Organization Id is missing from token");
             }
         }
-        public CurrentUserService(IHttpContextAccessor contextAccessor)
+        public CurrentUserService(IHttpContextAccessor contextAccessor, TdmsDbContext context)
         {
             _contextAccessor = contextAccessor;
+            _context = context;
+        }
+
+        public async Task<IReadOnlyCollection<int>> MappedUnitLocationIds()
+        {
+            try
+            {
+                int userId = this.UserId;
+                var unitLocations = await _context.UnitTrainers.Where(x => x.TrainerId == userId).Select(x => x.UnitLocationId).ToArrayAsync();
+                return unitLocations??[];
+            }
+            catch(Exception ex)
+            {
+                return [];
+            }
         }
     }
 }

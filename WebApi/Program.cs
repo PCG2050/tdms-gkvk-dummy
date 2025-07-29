@@ -12,6 +12,9 @@ using WebApi.Services;
 using System.Text;
 using Application.Interface.Repository.DataTables;
 using Infrastructure.Repository.DataTables;
+using Application.Interface.Services.DataTables;
+using Infrastructure.Services.DataTables;
+using Application.Interface.Services.Common;
 
 namespace WebApi
 {
@@ -28,6 +31,7 @@ namespace WebApi
             builder.Services.AddOpenApi();
             builder.Services.AddDbContext<TdmsDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DatabaseContext")));
+
             builder.Services.AddHttpContextAccessor();//For IHttpContextAccessor in infracture
             builder.Services.AddScoped<ICurrentUserService,CurrentUserService>();
             builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
@@ -45,8 +49,11 @@ namespace WebApi
             builder.Services.AddScoped<IOrganizationUnitService, OrganizationUnitService>();
             builder.Services.AddScoped<ITrainerAssignmentRepository, TrainerAssignmentRepository>();
             builder.Services.AddScoped<ITrainerAssignmentService, TrainerAssignmentService>();
+            builder.Services.AddScoped<IEntityPermissionService, EntityPermissionService>();
             builder.Services.AddScoped<IFtiTrainingProgrammeRepository, FtiTrainingProgrammeRepository>();
             builder.Services.AddScoped<IFtiTrainingProgrammeService, FtiTrainingProgrammeService>();
+            builder.Services.AddScoped<IFtiOtherActivitiesRepository, FtiOtherActivitiesRepository>();
+            builder.Services.AddScoped<IFtiOtherActivityService, FtiOtherActivityService>();
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(o=>

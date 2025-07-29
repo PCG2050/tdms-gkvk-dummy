@@ -1,14 +1,10 @@
 ﻿using Application.Interface;
 using Application.Interface.Repository.DataTables;
+using Application.Interface.Services.Common;
 using Application.Interface.Services.DataTables;
 using Application.Models;
 using Application.Models.DataTables;
 using Domain.Entities.FTI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Services.DataTables
 {
@@ -16,11 +12,13 @@ namespace Infrastructure.Services.DataTables
     {
         private readonly IFtiOtherActivitiesRepository _ftiOtherActivitiesRepository;
         private readonly ICurrentUserService _currentUserService;
+        private readonly IEntityPermissionService _entityPermissionService;
 
-        public FtiOtherActivityService(IFtiOtherActivitiesRepository ftiOtherActivitiesRepository, ICurrentUserService currentUserService)
+        public FtiOtherActivityService(IFtiOtherActivitiesRepository ftiOtherActivitiesRepository, ICurrentUserService currentUserService, IEntityPermissionService entityPermissionService)
         {
             _ftiOtherActivitiesRepository = ftiOtherActivitiesRepository;
             _currentUserService = currentUserService;
+            _entityPermissionService = entityPermissionService;
         }
 
         public async Task<ServiceResult<FtiOtherActivity>> AddAsync(FtiOtherActivityCreateDto createDto)
@@ -44,6 +42,7 @@ namespace Infrastructure.Services.DataTables
         {
             var activity = await _ftiOtherActivitiesRepository.GetAsync(id);
             if (activity is null) return ServiceResult.Failure("Activity not found", ServiceErrorStatus.NOTFOUND);
+            if (!await _entityPermissionService.CanModify(activity)) return ServiceResult.Failure("User does not have permission to delete this item", ServiceErrorStatus.FORBIDDEN);
             await _ftiOtherActivitiesRepository.DeleteAsync(activity);
             return ServiceResult.Success();
         }
@@ -53,9 +52,18 @@ namespace Infrastructure.Services.DataTables
             throw new NotImplementedException();
         }
 
-        public Task<ServiceResult<FtiOtherActivity>> UpdateAsync(FitOtherActivityUpdateDto updateDto)
+        public async Task<ServiceResult<FtiOtherActivity>> UpdateAsync(FtiOtherActivityUpdateDto updateDto)
         {
-            throw new NotImplementedException();
+            var activity = await _ftiOtherActivitiesRepository.GetAsync(updateDto.Id);
+            if (activity is null) return ServiceResult<FtiOtherActivity>.Failure("Activity not found", ServiceErrorStatus.NOTFOUND);
+            if (!await _entityPermissionService.CanModify(activity)) return ServiceResult<FtiOtherActivity>.Failure("User does not have permission to delete this item", ServiceErrorStatus.FORBIDDEN);
+            // modification
+            if(updateDto.EndDate.HasValue)activity.EndDate = updateDto.EndDate.Value;
+            if (updateDto.StartDate.HasValue) activity.StartDate = updateDto.StartDate.Value;
+            if (updateDto.ActivityDetails is not null) activity.ActivityDetails = updateDto.ActivityDetails;
+            if (updateDto.Attachements is not null) activity.Attachements = updateDto.Attachements;
+            await _ftiOtherActivitiesRepository.UpdateAsync(activity);
+            return ServiceResult<FtiOtherActivity>.Success(activity);
         }
     }
 }

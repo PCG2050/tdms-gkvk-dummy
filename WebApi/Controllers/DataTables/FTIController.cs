@@ -1,6 +1,8 @@
 ﻿using Application;
 using Application.Interface;
+using Application.Interface.Services.DataTables;
 using Application.Models;
+using Application.Models.DataTables;
 using Domain.Entities.Enum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -13,10 +15,12 @@ namespace WebApi.Controllers.DataTables
     public class FTIController : ControllerBase
     {
         private readonly IFtiTrainingProgrammeService _trainingProgrammeService;
+        private readonly IFtiOtherActivityService _otherActivityService;
 
-        public FTIController(IFtiTrainingProgrammeService trainingProgrammeService)
+        public FTIController(IFtiTrainingProgrammeService trainingProgrammeService, IFtiOtherActivityService otherActivityService)
         {
             _trainingProgrammeService = trainingProgrammeService;
+            _otherActivityService = otherActivityService;
         }
         [Authorize(Roles =$"{RoleString.Admin},{RoleString.Trainer}")]
         [HttpGet("training-programmes")]
@@ -45,6 +49,37 @@ namespace WebApi.Controllers.DataTables
         public async Task<IActionResult> DeleteEntry(int id)
         {
             await _trainingProgrammeService.DeleteAsync(id);
+            return NoContent();
+        }
+
+
+        [Authorize(Roles = $"{RoleString.Admin},{RoleString.Trainer}")]
+        [HttpGet("other-activities")]
+        public async Task<IActionResult> GetAllOtherActivitiesEntries([FromQuery] PaginationRequest paginationRequest)
+        {
+            return Ok(await _otherActivityService.GetPaginatedItemsAsync(paginationRequest.PageNumber, paginationRequest.PageSize));
+        }
+
+        [Authorize(Roles = $"{RoleString.Admin},{RoleString.Trainer}")]
+        [HttpPost("other-activities")]
+        public async Task<IActionResult> AddOAEntry(FtiOtherActivityCreateDto createDto)
+        {
+            var entry = await _otherActivityService.AddAsync(createDto);
+            return Ok(entry);
+        }
+
+        [Authorize(Roles = $"{RoleString.Admin},{RoleString.Trainer}")]
+        [HttpPatch("other-activities/{id}")]
+        public async Task<IActionResult> UpdateOAEntry(int id, FtiOtherActivityUpdateDto updateDto)
+        {
+            var updatedEntry = await _otherActivityService.UpdateAsync(updateDto);
+            return Ok(updatedEntry);
+        }
+        [Authorize(Roles = $"{RoleString.Admin},{RoleString.Trainer}")]
+        [HttpDelete("other-activities/{id}")]
+        public async Task<IActionResult> DeleteOAEntry(int id)
+        {
+            await _otherActivityService.DeleteAsync(id);
             return NoContent();
         }
     }
