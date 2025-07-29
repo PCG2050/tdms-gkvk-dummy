@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace Application.Interface.Services.Common
 {
-    public interface IGenericTableService<T>
+    public interface IGenericTableService<T,C,U>
     {
-        Task<ServiceResult<T>> AddAsync(FtiOtherActivityCreateDto createDto);
-        Task<ServiceResult<T>> UpdateAsync(FtiOtherActivityUpdateDto updateDto);
+        Task<ServiceResult<T>> AddAsync(C createDto);
+        Task<ServiceResult<T>> UpdateAsync(U updateDto);
         Task<ServiceResult> DeleteAsync(int id);
     }
 }

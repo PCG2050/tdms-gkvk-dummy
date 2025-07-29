@@ -55,6 +55,9 @@ namespace WebApi
             builder.Services.AddScoped<IFtiOtherActivitiesRepository, FtiOtherActivitiesRepository>();
             builder.Services.AddScoped<IFtiOtherActivityService, FtiOtherActivityService>();
 
+            builder.Services.AddScoped<IStuTrainingProgrammeRepository, StuTrainingProgrammeRepository>();
+            builder.Services.AddScoped<IStuTrainingProgrammeService, StuTrainingProgrammeService>();
+
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(o=>
                 {
