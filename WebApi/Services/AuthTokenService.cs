@@ -4,13 +4,14 @@ using Domain.Entities.Enum;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace WebApi.Services
 {
     public class AuthTokenService(IConfiguration configuration) : ITokenService
     {
-        public Task<string> GenerateAccessToken(int userId, string userName, Role role, int organizationId)
+        public string GenerateAccessToken(int userId, string userName, Role role, int organizationId)
         {
             var claims = new List<Claim>
             {
@@ -30,12 +31,28 @@ namespace WebApi.Services
                 expires: DateTime.UtcNow.AddDays(1),
                 signingCredentials: signingCred
                 );
-            return Task.FromResult(new JwtSecurityTokenHandler().WriteToken(token));
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public Task<string> GenerateRefreshToken()
+        public string GenerateRefreshToken()
         {
-            throw new NotImplementedException();
+            var randomNumber = new byte[64];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
+            return Convert.ToBase64String(randomNumber);
+        }
+        public DateTime GetTokenExpiration(string token)
+        {
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var jsonToken = tokenHandler.ReadJwtToken(token);
+                return jsonToken.ValidTo;
+            }
+            catch
+            {
+                return DateTime.UtcNow;
+            }
         }
     }
 }

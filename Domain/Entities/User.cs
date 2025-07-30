@@ -22,7 +22,9 @@ namespace Domain.Entities
         public int Phone { get; set; }
         public bool IsPhoneConfirmed { get; set; }
         public required int? OrganizationId { get; set; }
+
         public Organization Organization { get; set; } = null!;
         public ICollection<TrainerAssignment> TrainerAssignments { get; set; } = [];
+        public ICollection<UserSession> UserSessions { get; set; } = [];
     }
 }

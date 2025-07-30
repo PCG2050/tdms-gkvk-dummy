@@ -18,7 +18,7 @@ namespace Application.Models.DataTables
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }
         public string ActivityDetails { get; set; } = string.Empty;
-        public string Assets { get; set; }
+        public string Attachements { get; set; }
     }
     public class StuOtherActivityUpdateDto
     {

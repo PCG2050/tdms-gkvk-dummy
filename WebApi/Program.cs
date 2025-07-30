@@ -1,20 +1,22 @@
 
-using Scalar.AspNetCore;
-using Microsoft.EntityFrameworkCore;
-using Infrastructure.DbContext;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using Application.Interface;
-using Infrastructure.Services;
 using Application.Interface.Repository;
-using Infrastructure.Repository;
-using WebApi.Services;
-using System.Text;
 using Application.Interface.Repository.DataTables;
-using Infrastructure.Repository.DataTables;
-using Application.Interface.Services.DataTables;
-using Infrastructure.Services.DataTables;
 using Application.Interface.Services.Common;
+using Application.Interface.Services.DataTables;
+using Infrastructure.DbContext;
+using Infrastructure.Repository;
+using Infrastructure.Repository.DataTables;
+using Infrastructure.Services;
+using Infrastructure.Services.DataTables;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Scalar.AspNetCore;
+using System.Reflection;
+using System.Text;
+using WebApi.Services;
 
 namespace WebApi
 {
@@ -36,7 +38,9 @@ namespace WebApi
             builder.Services.AddScoped<ICurrentUserService,CurrentUserService>();
             builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
             builder.Services.AddScoped<ITokenService, AuthTokenService>();
+            builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IUserSessionRepository, UserSessionRepository>();
             builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
             builder.Services.AddScoped<IOrganizationService, OrganizationService>();
             builder.Services.AddScoped<IUserService, UserService>();
@@ -57,6 +61,8 @@ namespace WebApi
 
             builder.Services.AddScoped<IStuTrainingProgrammeRepository, StuTrainingProgrammeRepository>();
             builder.Services.AddScoped<IStuTrainingProgrammeService, StuTrainingProgrammeService>();
+            builder.Services.AddScoped<IStuSposoredTrainingProgrammeRepository, StuSponsoredTrainingProgrammeRepository>();
+            builder.Services.AddScoped<IStuSponsoredTrainingProgrammeService, StuSponsoredTrainingProgrammeService>();
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(o=>
@@ -72,6 +78,7 @@ namespace WebApi
                         ValidateIssuerSigningKey = true
                     };
                 });
+
             var app = builder.Build();
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
