@@ -32,7 +32,7 @@ namespace Infrastructure.DbContext
         public DbSet<FtiOtherActivity> FtiOtherActivities { get; set; }
         #region STU
         public DbSet<StuTrainingProgramme> StuTrainingProgrammes { get; set; }
-        public DbSet<StuSponseredTrainingProgramme> StuSponseredTrainingProgrammes { get; set; }
+        public DbSet<StuSponsoredTrainingProgramme> StuSponsoredTrainingProgrammes { get; set; }
         public DbSet<StuOtherActivity> StuOtherActivities { get; set; }
         public DbSet<DaesiProgramme> DaesiProgrammes { get; set; }
         public DbSet<DaesiOtherActivity> DaesiOtherActivities { get; set; }

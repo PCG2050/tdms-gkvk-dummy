@@ -8,26 +8,27 @@ using Domain.Entities.STU;
 
 namespace Infrastructure.Services.DataTables
 {
-    public class StuTrainingProgrammeService: IStuTrainingProgrammeService
+    public class StuSponsoredTrainingProgrammeService: IStuSponsoredTrainingProgrammeService
     {
-        private readonly IStuTrainingProgrammeRepository _sposoredTrainingProgrammeRepository;
+        private readonly IStuSposoredTrainingProgrammeRepository _sposoredTrainingProgrammeRepository;
         private readonly ICurrentUserService _currentUserService;
         private readonly IEntityPermissionService _entityPermissionService;
 
-        public StuTrainingProgrammeService(IStuTrainingProgrammeRepository stuTrainingProgrammeRepository, ICurrentUserService currentUserService, IEntityPermissionService entityPermissionService)
+        public StuSponsoredTrainingProgrammeService(IStuSposoredTrainingProgrammeRepository sposoredTrainingProgrammeRepository, ICurrentUserService currentUserService, IEntityPermissionService entityPermissionService)
         {
-            _sposoredTrainingProgrammeRepository = stuTrainingProgrammeRepository;
+            _sposoredTrainingProgrammeRepository = sposoredTrainingProgrammeRepository;
             _currentUserService = currentUserService;
             _entityPermissionService = entityPermissionService;
         }
 
-        public async Task<ServiceResult<StuTrainingProgramme>> AddAsync(StuTrainingProgrammeCreateDto createDto)
+        public async Task<ServiceResult<StuSponsoredTrainingProgramme>> AddAsync(StuSponsoredTrainingProgrammeCreateDto createDto)
         {
             int userId = _currentUserService.UserId;
             int orgId = _currentUserService.OrganizationId;
             //validation
-            var entity = new StuTrainingProgramme
+            var entity = new StuSponsoredTrainingProgramme
             {
+                SponsorOrganization = createDto.SponsoredOrganization,
                 TrainingTitle = createDto.TrainingTitle,
                 ParticipantCount = createDto.ParticipantCount,
                 TrainingCount = createDto.TrainingCount,
@@ -40,7 +41,7 @@ namespace Infrastructure.Services.DataTables
                 OrganizationId = orgId
             };
             await _sposoredTrainingProgrammeRepository.AddAsync(entity);
-            return ServiceResult<StuTrainingProgramme>.Success(entity);
+            return ServiceResult<StuSponsoredTrainingProgramme>.Success(entity);
         }
 
         public async Task<ServiceResult> DeleteAsync(int id)
@@ -52,17 +53,18 @@ namespace Infrastructure.Services.DataTables
             return ServiceResult.Success();
         }
 
-        public Task<PaginatedResult<StuTrainingProgrammeDto>> GetPaginatedItemsAsync(int pageNumber, int pageSize)
+        public Task<PaginatedResult<StuSponsoredTrainingProgrammeDto>> GetPaginatedItemsAsync(int pageNumber, int pageSize)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<ServiceResult<StuTrainingProgramme>> UpdateAsync(StuTrainingProgrammeUpdateDto updateDto)
+        public async Task<ServiceResult<StuSponsoredTrainingProgramme>> UpdateAsync(StuSponsoredTrainingProgrammeUpdateDto updateDto)
         {
             var activity = await _sposoredTrainingProgrammeRepository.GetAsync(updateDto.Id);
-            if (activity is null) return ServiceResult<StuTrainingProgramme>.Failure("Activity not found", ServiceErrorStatus.NOTFOUND);
-            if (!await _entityPermissionService.CanModify(activity)) return ServiceResult<StuTrainingProgramme>.Failure("User does not have permission to delete this item", ServiceErrorStatus.FORBIDDEN);
+            if (activity is null) return ServiceResult<StuSponsoredTrainingProgramme>.Failure("Activity not found", ServiceErrorStatus.NOTFOUND);
+            if (!await _entityPermissionService.CanModify(activity)) return ServiceResult<StuSponsoredTrainingProgramme>.Failure("User does not have permission to delete this item", ServiceErrorStatus.FORBIDDEN);
             // modification
+            if (updateDto.SponsorOrganization is not null) activity.SponsorOrganization = updateDto.SponsorOrganization;
             if (updateDto.EndDate.HasValue) activity.EndDate = updateDto.EndDate.Value;
             if (updateDto.StartDate.HasValue) activity.StartDate = updateDto.StartDate.Value;
             if (updateDto.Duration.HasValue) activity.Duration = updateDto.Duration.Value;
@@ -71,7 +73,7 @@ namespace Infrastructure.Services.DataTables
             if (updateDto.TrainingCount.HasValue) activity.TrainingCount = updateDto.TrainingCount.Value;
             if (updateDto.Attachements is not null) activity.Attachements = updateDto.Attachements;
             await _sposoredTrainingProgrammeRepository.UpdateAsync(activity);
-            return ServiceResult<StuTrainingProgramme>.Success(activity);
+            return ServiceResult<StuSponsoredTrainingProgramme>.Success(activity);
         }
 
     }

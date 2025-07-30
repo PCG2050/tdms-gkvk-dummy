@@ -8,24 +8,24 @@ using Microsoft.AspNetCore.Mvc;
 namespace WebApi.Controllers.DataTables.STU
 {
     [ApiController]
-    [Route("api/STU/training-programme")]
-    public class FtuTrainingProgrammeController : ControllerBase
+    [Route("api/STU/sponsored-training-programme")]
+    public class StuSponsoredTrainingProgrammeController : ControllerBase
     {
         private readonly IStuTrainingProgrammeService _trainingProgrammeService;
 
-        public FtuTrainingProgrammeController(IStuTrainingProgrammeService trainingProgrammeService)
+        public StuSponsoredTrainingProgrammeController(IStuTrainingProgrammeService trainingProgrammeService)
         {
             _trainingProgrammeService = trainingProgrammeService;
         }
         [Authorize(Roles = $"{RoleString.Admin},{RoleString.Trainer}")]
-        [HttpGet("other-activities")]
+        [HttpGet]
         public async Task<IActionResult> GetAllOtherActivitiesEntries([FromQuery] PaginationRequest paginationRequest)
         {
             return Ok(await _trainingProgrammeService.GetPaginatedItemsAsync(paginationRequest.PageNumber, paginationRequest.PageSize));
         }
 
         [Authorize(Roles = $"{RoleString.Admin},{RoleString.Trainer}")]
-        [HttpPost("other-activities")]
+        [HttpPost]
         public async Task<IActionResult> AddEntry(StuTrainingProgrammeCreateDto createDto)
         {
             var entry = await _trainingProgrammeService.AddAsync(createDto);
@@ -33,14 +33,14 @@ namespace WebApi.Controllers.DataTables.STU
         }
 
         [Authorize(Roles = $"{RoleString.Admin},{RoleString.Trainer}")]
-        [HttpPatch("other-activities/{id}")]
+        [HttpPatch("{id}")]
         public async Task<IActionResult> UpdateEntry(int id, StuTrainingProgrammeUpdateDto updateDto)
         {
             var updatedEntry = await _trainingProgrammeService.UpdateAsync(updateDto);
             return Ok(updatedEntry);
         }
         [Authorize(Roles = $"{RoleString.Admin},{RoleString.Trainer}")]
-        [HttpDelete("other-activities/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEntry(int id)
         {
             await _trainingProgrammeService.DeleteAsync(id);
