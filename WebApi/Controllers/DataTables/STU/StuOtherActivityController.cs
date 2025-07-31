@@ -9,6 +9,7 @@ namespace WebApi.Controllers.DataTables.STU
 {
     [ApiController]
     [Route("api/STU/other-activity")]
+    [Authorize(Roles = $"{RoleString.Admin},{RoleString.UnitHead},{RoleString.Trainer}")]
     public class StuOtherActivityController : ControllerBase
     {
         private readonly IStuOtherActivityService _otherActivityService;
@@ -17,14 +18,12 @@ namespace WebApi.Controllers.DataTables.STU
         {
             _otherActivityService = otherActivityService;
         }
-        [Authorize(Roles = $"{RoleString.Admin},{RoleString.Trainer}")]
         [HttpGet]
         public async Task<IActionResult> GetEntries([FromQuery] PaginationRequest paginationRequest)
         {
             return Ok(await _otherActivityService.GetPaginatedItemsAsync(paginationRequest.PageNumber, paginationRequest.PageSize));
         }
 
-        [Authorize(Roles = $"{RoleString.Admin},{RoleString.Trainer}")]
         [HttpPost]
         public async Task<IActionResult> AddOAEntry(StuOtherActivityCreateDto createDto)
         {
@@ -32,14 +31,12 @@ namespace WebApi.Controllers.DataTables.STU
             return Ok(entry);
         }
 
-        [Authorize(Roles = $"{RoleString.Admin},{RoleString.Trainer}")]
         [HttpPatch("{id}")]
         public async Task<IActionResult> UpdateOAEntry(int id, StuOtherActivityUpdateDto updateDto)
         {
             var updatedEntry = await _otherActivityService.UpdateAsync(updateDto);
             return Ok(updatedEntry);
         }
-        [Authorize(Roles = $"{RoleString.Admin},{RoleString.Trainer}")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOAEntry(int id)
         {

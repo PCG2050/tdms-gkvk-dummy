@@ -62,13 +62,13 @@ namespace WebApi.Controllers
             return Ok(organization);
         }
 
-        [HttpPost("{id}/admins")]
+        [HttpPost("{id}/users")]
         [Authorize(Roles = RoleString.SuperAdmin)]
-        public async Task<ActionResult<UserDto>> CreateOrganizationAdminUser(int id,UserRegisterDto user)
+        public async Task<ActionResult<UserDto>> CreateUsers(int id,UserRegisterDto user)
         {
             try
             {
-                var admin = await _organizationService.CreateAdminAsync(user, id);
+                var admin = await _organizationService.CreateUser(user, id);
                 return CreatedAtAction("", new { id = admin.Id }, new UserDto
                 {
                     Id = admin.Id,

@@ -46,10 +46,17 @@ namespace Application.Interface
 
         }
 
-        public async Task<User> CreateAdminAsync(UserRegisterDto registerDto, int organizationId)
+        public async Task<User> CreateUser(UserRegisterDto registerDto, int organizationId)
         {
-            if (_currentUser.Role != Domain.Entities.Enum.Role.SUPERADMIN) throw new UnauthorizedAccessException("Not authorized to perform this action");
-            var organization = await _organizationRepository.GetOrganizationAsync(organizationId);
+            if (registerDto.Role == Domain.Entities.Enum.Role.ADMIN
+                && _currentUser.Role != Domain.Entities.Enum.Role.SUPERADMIN) throw new UnauthorizedAccessException("Not authorized to creat a user with this role");
+            else if (registerDto.Role == Domain.Entities.Enum.Role.UNITHEAD
+                && _currentUser.Role != Domain.Entities.Enum.Role.ADMIN) throw new UnauthorizedAccessException("Not authorized to creat a user with this role");
+            else if (registerDto.Role == Domain.Entities.Enum.Role.TRAINER
+                && (_currentUser.Role != Domain.Entities.Enum.Role.ADMIN
+                    || _currentUser.Role != Domain.Entities.Enum.Role.UNITHEAD)) throw new UnauthorizedAccessException("Not authorized to creat a user with this role");
+            else if(registerDto.Role == Domain.Entities.Enum.Role.UNDEFINED)throw new ArgumentException($"Role {registerDto.Role} is not valid");
+                var organization = await _organizationRepository.GetOrganizationAsync(organizationId);
             if (organization is null)
                 throw new InvalidOperationException("Organization does not exist");
             var existingUser = await _userRepository.GetByEmailAsync(registerDto.Email);
@@ -64,7 +71,8 @@ namespace Application.Interface
                 LastName = registerDto.LastName,
                 OrganizationId = organizationId,
                 CreatedById = _currentUser.UserId,
-                CreatedAt = DateTimeOffset.UtcNow
+                CreatedAt = DateTimeOffset.UtcNow,
+                Role = registerDto.Role
             };
 
             await _userRepository.SaveAsync(user);

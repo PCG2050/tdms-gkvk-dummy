@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Entities.Enum;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,5 +15,6 @@ namespace Application.Models
         public string Password { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
         public int? OrganizationId { get; set; }
+        public Role Role { get; set; }
     }
 }

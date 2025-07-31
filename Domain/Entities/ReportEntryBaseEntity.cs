@@ -1,4 +1,5 @@
 ﻿using Domain.Entities.Junction;
+using System.Text.Json.Serialization;
 
 namespace Domain.Entities
 {
@@ -9,7 +10,9 @@ namespace Domain.Entities
         public string? Attachements { get; set; } = null; //comma seperated urls of assets
         public int UnitLocationId {  get; set; }
         public int OrganizationId { get; set; }
+        [JsonIgnore]
         public OrganizationUnitLocation UnitLocation { get; set; } = null!;
+        [JsonIgnore]
         public Organization Organization { get; set; } = null!;
     }
 }

@@ -9,6 +9,7 @@ namespace WebApi.Controllers.DataTables.STU
 {
     [ApiController]
     [Route("api/STU/sponsored-training-programme")]
+    [Authorize(Roles = $"{RoleString.Admin},{RoleString.UnitHead},{RoleString.Trainer}")]
     public class StuSponsoredTrainingProgrammeController : ControllerBase
     {
         private readonly IStuTrainingProgrammeService _trainingProgrammeService;
@@ -17,14 +18,12 @@ namespace WebApi.Controllers.DataTables.STU
         {
             _trainingProgrammeService = trainingProgrammeService;
         }
-        [Authorize(Roles = $"{RoleString.Admin},{RoleString.Trainer}")]
         [HttpGet]
         public async Task<IActionResult> GetEntries([FromQuery] PaginationRequest paginationRequest)
         {
             return Ok(await _trainingProgrammeService.GetPaginatedItemsAsync(paginationRequest.PageNumber, paginationRequest.PageSize));
         }
 
-        [Authorize(Roles = $"{RoleString.Admin},{RoleString.Trainer}")]
         [HttpPost]
         public async Task<IActionResult> AddEntry(StuTrainingProgrammeCreateDto createDto)
         {
@@ -32,14 +31,12 @@ namespace WebApi.Controllers.DataTables.STU
             return Ok(entry);
         }
 
-        [Authorize(Roles = $"{RoleString.Admin},{RoleString.Trainer}")]
         [HttpPatch("{id}")]
         public async Task<IActionResult> UpdateEntry(int id, StuTrainingProgrammeUpdateDto updateDto)
         {
             var updatedEntry = await _trainingProgrammeService.UpdateAsync(updateDto);
             return Ok(updatedEntry);
         }
-        [Authorize(Roles = $"{RoleString.Admin},{RoleString.Trainer}")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEntry(int id)
         {

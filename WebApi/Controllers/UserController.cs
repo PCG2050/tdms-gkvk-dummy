@@ -11,27 +11,24 @@ namespace WebApi.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IOrganizationService _organizationService;
+        private readonly ICurrentUserService _currentUserService;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, IOrganizationService organizationService, ICurrentUserService currentUserService)
         {
             _userService = userService;
+            _organizationService = organizationService;
+            _currentUserService = currentUserService;
         }
         [HttpPost]
-        [Authorize(Roles = RoleString.Admin)]
-        public async Task<IActionResult> RegisterUser(UserRegisterDto userRegisterDto)
+        [Authorize(Roles = $"{RoleString.Admin},{RoleString.UnitHead}")]
+        public async Task<IActionResult> RegisterUser(UserRegisterDto registerDto)
         {
             try
             {
-                var user = await _userService.CreateUserAsync(userRegisterDto);
-                var userDto = new UserDto
-                {
-                    Id = user.Id,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    Email = user.Email,
-                    ProfileImageUrl = user.ProfileImageUrl
-                };
-                return CreatedAtRoute("",userDto);
+                int orgId = _currentUserService.OrganizationId;
+                var user = await _organizationService.CreateUser(registerDto, orgId);
+                return CreatedAtRoute("",user);
             }
             catch(InvalidOperationException e)
             {
