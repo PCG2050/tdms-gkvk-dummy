@@ -7,25 +7,25 @@ using Domain.Entities.FTI;
 
 namespace Infrastructure.Services.DataTables
 {
-    public class FtiOtherActivityService : GenericTableService<FtiOtherActivity, FtiOtherActivityCreateDto, FtiOtherActivityUpdateDto, FtiOtherActivityDto>,IFtiOtherActivityService
+    public class FtiOtherActivityService : GenericTableService<FtiOtherActivity, OtherActivityCreateDto, OtherActivityUpdateDto, OtherActivityDto>,IFtiOtherActivityService
     {
         public FtiOtherActivityService(IFtiOtherActivitiesRepository ftiOtherActivitiesRepository, ICurrentUserService currentUserService, IEntityPermissionService entityPermissionService)
             :base(ftiOtherActivitiesRepository,currentUserService,entityPermissionService)
         {
         }
 
-        protected override Task<FtiOtherActivity> MapCreateDtoToEntityAsync(FtiOtherActivityCreateDto createDto)
+        protected override Task<FtiOtherActivity> MapCreateDtoToEntityAsync(OtherActivityCreateDto createDto)
         {
             var r = new FtiOtherActivity
             {
                 ActivityDetails = createDto.ActivityDetails,
-                Attachements = createDto.Assets,
+                Attachements = createDto.Attachements,
                 UnitLocationId = createDto.UnitLocationId
             };
             return Task.FromResult(r);
         }
 
-        protected override Task MapUpdateDtoToEntityAsync(FtiOtherActivityUpdateDto updateDto, FtiOtherActivity entity)
+        protected override Task MapUpdateDtoToEntityAsync(OtherActivityUpdateDto updateDto, FtiOtherActivity entity)
         {
             if (updateDto.EndDate.HasValue) entity.EndDate = updateDto.EndDate.Value;
             if (updateDto.StartDate.HasValue) entity.StartDate = updateDto.StartDate.Value;

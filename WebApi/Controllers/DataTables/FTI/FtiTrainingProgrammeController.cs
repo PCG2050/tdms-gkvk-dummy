@@ -6,16 +6,13 @@ using Domain.Entities.FTI;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace WebApi.Controllers.DataTables
+namespace WebApi.Controllers.DataTables.FTI
 {
-    [ApiController]
+    
     [Route("api/FTI/training-programme")]
     [Authorize(Roles = $"{RoleString.Admin},{RoleString.UnitHead},{RoleString.Trainer}")]
     public class FtiTrainingProgrammeController : GenericTableApiController<FtiTrainingProgram, FtiTrainingProgrammeCreateDto, FtiTrainingProgrammeUpdateDto, FtiTrainingProgram>
     {
-        private readonly IFtiTrainingProgrammeService _trainingProgrammeService;
-        private readonly IFtiOtherActivityService _otherActivityService;
-
         public FtiTrainingProgrammeController(IFtiTrainingProgrammeService trainingProgrammeService, IFtiOtherActivityService otherActivityService)
             : base(trainingProgrammeService)
         {

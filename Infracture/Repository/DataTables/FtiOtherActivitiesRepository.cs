@@ -6,14 +6,14 @@ using Infrastructure.DbContext;
 
 namespace Infrastructure.Repository.DataTables
 {
-    public class FtiOtherActivitiesRepository : GenericRepository<FtiOtherActivity, FtiOtherActivityDto>,IFtiOtherActivitiesRepository
+    public class FtiOtherActivitiesRepository : GenericRepository<FtiOtherActivity, OtherActivityDto>,IFtiOtherActivitiesRepository
     {
         public FtiOtherActivitiesRepository(TdmsDbContext context):base(context)
         {
         }
-        protected override IQueryable<FtiOtherActivityDto> ProjectToDto(IQueryable<FtiOtherActivity> query)
+        protected override IQueryable<OtherActivityDto> ProjectToDto(IQueryable<FtiOtherActivity> query)
         {
-            return query.Select(f => new FtiOtherActivityDto
+            return query.Select(f => new OtherActivityDto
             {
                 Id = f.Id,
                 ActivityDetails = f.ActivityDetails,

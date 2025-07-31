@@ -5,7 +5,7 @@ using Domain.Entities.FTI;
 
 namespace Application.Interface.Services.DataTables
 {
-    public interface IFtiOtherActivityService:IGenericTableService<FtiOtherActivity,FtiOtherActivityCreateDto,FtiOtherActivityUpdateDto,FtiOtherActivityDto>
+    public interface IFtiOtherActivityService:IGenericTableService<FtiOtherActivity,OtherActivityCreateDto,OtherActivityUpdateDto,OtherActivityDto>
     {
     }
 }
