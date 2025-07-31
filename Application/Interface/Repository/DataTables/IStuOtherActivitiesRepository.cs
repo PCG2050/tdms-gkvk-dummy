@@ -5,7 +5,7 @@ using Infrastructure.Repository;
 
 namespace Application.Interface.Repository.DataTables
 {
-    public interface IStuOtherActivitiesRepository:IGenericRepository<StuOtherActivity,StuOtherActivityDto>//,IPagination<StuOtherActivityDto>//IDataTableRepositoryActions<StuOtherActivity>
+    public interface IStuOtherActivitiesRepository:IGenericRepository<StuOtherActivity,OtherActivityDto>//,IPagination<StuOtherActivityDto>//IDataTableRepositoryActions<StuOtherActivity>
     {
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Application.Models.DataTables
+﻿using Application.Interface;
+
+namespace Application.Models.DataTables
 {
     public class StuTrainingProgrammeDto:StuTrainingProgrammeCreateDto
     {
@@ -18,7 +20,7 @@
         public string Attachements { get; set; }
     }
 
-    public class StuTrainingProgrammeUpdateDto
+    public class StuTrainingProgrammeUpdateDto:IUpdateDto
     {
         public int Id { get; set; }
         public DateOnly? StartDate { get; set; }

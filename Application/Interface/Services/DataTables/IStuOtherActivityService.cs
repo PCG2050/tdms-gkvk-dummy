@@ -4,7 +4,7 @@ using Domain.Entities.STU;
 
 namespace Application.Interface.Services.DataTables
 {
-    public interface IStuOtherActivityService:IGenericTableService<StuOtherActivity,StuOtherActivityCreateDto, StuOtherActivityUpdateDto>,IGenericPaginationService<StuOtherActivityDto>
+    public interface IStuOtherActivityService:IGenericTableService<StuOtherActivity,OtherActivityCreateDto, OtherActivityUpdateDto, OtherActivityDto>
     {
     }
 }

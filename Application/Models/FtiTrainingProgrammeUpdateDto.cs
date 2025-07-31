@@ -1,6 +1,8 @@
-﻿namespace Application.Models
+﻿using Application.Interface;
+
+namespace Application.Models
 {
-    public class UpdateTrainingProgrammeEntryDto
+    public class FtiTrainingProgrammeUpdateDto:IUpdateDto
     {
         public int Id { get; set; }
         public DateOnly? StartDate { get; set; }

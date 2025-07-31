@@ -6,7 +6,7 @@ using Domain.Entities.STU;
 
 namespace Application.Interface.Services.DataTables
 {
-    public interface IStuSponsoredTrainingProgrammeService : IGenericTableService<StuSponsoredTrainingProgramme, StuSponsoredTrainingProgrammeCreateDto, StuSponsoredTrainingProgrammeUpdateDto>,IGenericPaginationService<StuSponsoredTrainingProgrammeDto>
+    public interface IStuSponsoredTrainingProgrammeService : IGenericTableService<StuSponsoredTrainingProgramme, StuSponsoredTrainingProgrammeCreateDto, StuSponsoredTrainingProgrammeUpdateDto,StuSponsoredTrainingProgrammeDto>
     {
     }
 }

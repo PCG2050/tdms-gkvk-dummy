@@ -1,6 +1,6 @@
 ﻿namespace Application.Models
 {
-    public class CreateFtiTrainingProgrammeEntryDto
+    public class FtiTrainingProgrammeCreateDto
     {
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }

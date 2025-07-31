@@ -5,15 +5,15 @@ using Infrastructure.DbContext;
 
 namespace Infrastructure.Repository.DataTables
 {
-    public class StuOtherActivitiesRepository : GenericRepository<StuOtherActivity,StuOtherActivityDto>,IStuOtherActivitiesRepository
+    public class StuOtherActivitiesRepository : GenericRepository<StuOtherActivity,OtherActivityDto>,IStuOtherActivitiesRepository
     {
         public StuOtherActivitiesRepository(TdmsDbContext context) : base(context)
         {
         }
 
-        protected override IQueryable<StuOtherActivityDto> ProjectToDto(IQueryable<StuOtherActivity> query)
+        protected override IQueryable<OtherActivityDto> ProjectToDto(IQueryable<StuOtherActivity> query)
         {
-            return query.Select(f => new StuOtherActivityDto
+            return query.Select(f => new OtherActivityDto
             {
                 Id = f.Id,
                 ActivityDetails = f.ActivityDetails,

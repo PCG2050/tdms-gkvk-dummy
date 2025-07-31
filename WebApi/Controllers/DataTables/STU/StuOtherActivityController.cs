@@ -25,14 +25,14 @@ namespace WebApi.Controllers.DataTables.STU
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddOAEntry(StuOtherActivityCreateDto createDto)
+        public async Task<IActionResult> AddOAEntry(OtherActivityCreateDto createDto)
         {
             var entry = await _otherActivityService.AddAsync(createDto);
             return Ok(entry);
         }
 
         [HttpPatch("{id}")]
-        public async Task<IActionResult> UpdateOAEntry(int id, StuOtherActivityUpdateDto updateDto)
+        public async Task<IActionResult> UpdateOAEntry(int id, OtherActivityUpdateDto updateDto)
         {
             var updatedEntry = await _otherActivityService.UpdateAsync(updateDto);
             return Ok(updatedEntry);

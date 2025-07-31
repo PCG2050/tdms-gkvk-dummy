@@ -49,14 +49,14 @@ namespace WebApi.Controllers.DataTables
         }
 
         [HttpPost("training-programmes")]
-        public async Task<ActionResult<FtiTrainingProgram>> AddEntry(CreateFtiTrainingProgrammeEntryDto createDto)
+        public async Task<ActionResult<FtiTrainingProgram>> AddEntry(FtiTrainingProgrammeCreateDto createDto)
         {
             var entry = await _trainingProgrammeService.AddAsync(createDto);
             return Ok(entry);
         }
 
         [HttpPatch("training-programmes/{id}")]
-        public async Task<IActionResult> UpdateEntry(int id, UpdateTrainingProgrammeEntryDto updateDto)
+        public async Task<IActionResult> UpdateEntry(int id, FtiTrainingProgrammeUpdateDto updateDto)
         {
             await _trainingProgrammeService.UpdateAsync(updateDto);
             return NoContent();

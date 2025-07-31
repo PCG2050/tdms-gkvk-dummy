@@ -1,6 +1,6 @@
 ﻿namespace Application.Models
 {
-    public class FtiTrainingProgrammeDto : CreateFtiTrainingProgrammeEntryDto
+    public class FtiTrainingProgrammeDto : FtiTrainingProgrammeCreateDto
     {
         public int Id { get; set; }
     }

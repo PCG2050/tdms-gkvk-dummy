@@ -4,28 +4,22 @@ using Application.Interface.Services.Common;
 using Application.Interface.Services.DataTables;
 using Application.Models;
 using Application.Models.DataTables;
+using Domain.Entities;
 using Domain.Entities.STU;
+using System.Diagnostics;
+using System.Security.Cryptography;
 
 namespace Infrastructure.Services.DataTables
 {
-    public class StuTrainingProgrammeService: IStuTrainingProgrammeService
+    public class StuTrainingProgrammeService: GenericTableService<StuTrainingProgramme, StuTrainingProgrammeCreateDto, StuTrainingProgrammeUpdateDto, StuTrainingProgrammeDto>,IStuTrainingProgrammeService
     {
-        private readonly IStuTrainingProgrammeRepository _sposoredTrainingProgrammeRepository;
-        private readonly ICurrentUserService _currentUserService;
-        private readonly IEntityPermissionService _entityPermissionService;
-
         public StuTrainingProgrammeService(IStuTrainingProgrammeRepository stuTrainingProgrammeRepository, ICurrentUserService currentUserService, IEntityPermissionService entityPermissionService)
+            :base(stuTrainingProgrammeRepository,currentUserService,entityPermissionService)
         {
-            _sposoredTrainingProgrammeRepository = stuTrainingProgrammeRepository;
-            _currentUserService = currentUserService;
-            _entityPermissionService = entityPermissionService;
         }
 
-        public async Task<ServiceResult<StuTrainingProgramme>> AddAsync(StuTrainingProgrammeCreateDto createDto)
+        protected override Task<StuTrainingProgramme> MapCreateDtoToEntityAsync(StuTrainingProgrammeCreateDto createDto)
         {
-            int userId = _currentUserService.UserId;
-            int orgId = _currentUserService.OrganizationId;
-            //validation
             var entity = new StuTrainingProgramme
             {
                 TrainingTitle = createDto.TrainingTitle,
@@ -36,43 +30,20 @@ namespace Infrastructure.Services.DataTables
                 Attachements = createDto.Attachements,
                 EndDate = createDto.EndDate,
                 StartDate = createDto.StartDate,
-                CreatedById = userId,
-                OrganizationId = orgId
             };
-            await _sposoredTrainingProgrammeRepository.AddAsync(entity);
-            return ServiceResult<StuTrainingProgramme>.Success(entity);
+            return Task.FromResult(entity);
         }
 
-        public async Task<ServiceResult> DeleteAsync(int id)
+        protected override Task MapUpdateDtoToEntityAsync(StuTrainingProgrammeUpdateDto updateDto, StuTrainingProgramme entity)
         {
-            var activity = await _sposoredTrainingProgrammeRepository.GetAsync(id);
-            if (activity is null) return ServiceResult.Failure("Activity not found", ServiceErrorStatus.NOTFOUND);
-            if (!await _entityPermissionService.CanModify(activity)) return ServiceResult.Failure("User does not have permission to delete this item", ServiceErrorStatus.FORBIDDEN);
-            await _sposoredTrainingProgrammeRepository.DeleteAsync(activity);
-            return ServiceResult.Success();
+            if (updateDto.EndDate.HasValue) entity.EndDate = updateDto.EndDate.Value;
+            if (updateDto.StartDate.HasValue) entity.StartDate = updateDto.StartDate.Value;
+            if (updateDto.Duration.HasValue) entity.Duration = updateDto.Duration.Value;
+            if (updateDto.ParticipantCount.HasValue) entity.ParticipantCount = updateDto.ParticipantCount.Value;
+            if (updateDto.TrainingTitle is not null) entity.TrainingTitle = updateDto.TrainingTitle;
+            if (updateDto.TrainingCount.HasValue) entity.TrainingCount = updateDto.TrainingCount.Value;
+            if (updateDto.Attachements is not null) entity.Attachements = updateDto.Attachements;
+            return Task.CompletedTask;
         }
-
-        public Task<PaginatedResult<StuTrainingProgrammeDto>> GetPaginatedItemsAsync(int pageNumber, int pageSize)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<ServiceResult<StuTrainingProgramme>> UpdateAsync(StuTrainingProgrammeUpdateDto updateDto)
-        {
-            var activity = await _sposoredTrainingProgrammeRepository.GetAsync(updateDto.Id);
-            if (activity is null) return ServiceResult<StuTrainingProgramme>.Failure("Activity not found", ServiceErrorStatus.NOTFOUND);
-            if (!await _entityPermissionService.CanModify(activity)) return ServiceResult<StuTrainingProgramme>.Failure("User does not have permission to delete this item", ServiceErrorStatus.FORBIDDEN);
-            // modification
-            if (updateDto.EndDate.HasValue) activity.EndDate = updateDto.EndDate.Value;
-            if (updateDto.StartDate.HasValue) activity.StartDate = updateDto.StartDate.Value;
-            if (updateDto.Duration.HasValue) activity.Duration = updateDto.Duration.Value;
-            if(updateDto.ParticipantCount.HasValue) activity.ParticipantCount = updateDto.ParticipantCount.Value;
-            if (updateDto.TrainingTitle is not null) activity.TrainingTitle = updateDto.TrainingTitle;
-            if (updateDto.TrainingCount.HasValue) activity.TrainingCount = updateDto.TrainingCount.Value;
-            if (updateDto.Attachements is not null) activity.Attachements = updateDto.Attachements;
-            await _sposoredTrainingProgrammeRepository.UpdateAsync(activity);
-            return ServiceResult<StuTrainingProgramme>.Success(activity);
-        }
-
     }
 }
