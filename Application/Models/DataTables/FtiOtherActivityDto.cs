@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Application.Interface;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,7 +21,7 @@ namespace Application.Models.DataTables
         public string ActivityDetails { get; set; } = string.Empty;
         public string Assets { get; set; }
     }
-    public class FtiOtherActivityUpdateDto
+    public class FtiOtherActivityUpdateDto:IUpdateDto
     {
         public int Id { get; set; }
         public DateOnly? StartDate { get; set; }

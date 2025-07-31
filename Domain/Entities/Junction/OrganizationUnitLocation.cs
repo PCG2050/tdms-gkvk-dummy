@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Domain.Entities.Junction
+﻿namespace Domain.Entities.Junction
 {
     public class OrganizationUnitLocation:AuditableBaseEntity
     {
