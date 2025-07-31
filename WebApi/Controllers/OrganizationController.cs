@@ -1,6 +1,7 @@
 ﻿using Application.Interface;
 using Application.Models;
 using Domain.Entities.Enum;
+using Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,17 +30,38 @@ namespace WebApi.Controllers
                 Name = organization.Name
             });
         }
+
+        [Authorize(Roles =RoleString.SuperAdmin)]
+        [HttpGet]
+        [ProducesResponseType(typeof(PaginatedResult<OrganizationDto>),200)]
+        public async Task<IActionResult> GetOrganizations([FromQuery]PaginationRequest request)
+        {
+            var paginatedResult = await _organizationService.GetPaginatedItemsAsync(request.PageNumber, request.PageSize);
+            return Ok(paginatedResult);
+        }
+
         [HttpPost]
         [Authorize(Roles = RoleString.SuperAdmin)]
-        public async Task<ActionResult<OrganizationDto>> CreateOrganization(OrganizationCreateDto createDto)
+        [ProducesResponseType(type:typeof(OrganizationDto),200)]
+        public async Task<IActionResult> CreateOrganization(OrganizationCreateDto createDto)
         {
-            var organization = await _organizationService.CreateOrganizationAsync(createDto);
-            return CreatedAtAction(nameof(GetOrganization),new {id=organization.Id}, new OrganizationDto
-            {
-                Id = organization.Id,
-                Name = organization.Name
-            });
+            var organizationResult = await _organizationService.CreateOrganizationAsync(createDto);
+            if (!organizationResult.IsSuccess) return ServiceResponseToActionResult.Error(organizationResult.ErrorMessage, organizationResult.ErrorStatus);
+            var organization = organizationResult.Data;
+            return CreatedAtAction(nameof(GetOrganization),new {id=organization.Id}, organization);
         }
+
+        [HttpPost]
+        [Authorize(Roles = RoleString.SuperAdmin)]
+        [ProducesResponseType(type: typeof(OrganizationDto), 200)]
+        public async Task<IActionResult> UpdateOrganization(OrganizationUpdateDto updateDto)
+        {
+            var organizationResult = await _organizationService.UpdateOrganizationAsync(updateDto);
+            if (!organizationResult.IsSuccess) return ServiceResponseToActionResult.Error(organizationResult.ErrorMessage, organizationResult.ErrorStatus);
+            var organization = organizationResult.Data;
+            return Ok(organization);
+        }
+
         [HttpPost("{id}/admins")]
         [Authorize(Roles = RoleString.SuperAdmin)]
         public async Task<ActionResult<UserDto>> CreateOrganizationAdminUser(int id,UserRegisterDto user)

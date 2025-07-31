@@ -1,5 +1,6 @@
 ﻿using Application;
 using Application.Interface;
+using Application.Interface.Services;
 using Application.Interface.Services.DataTables;
 using Application.Models;
 using Application.Models.DataTables;
@@ -21,6 +22,22 @@ namespace WebApi.Controllers.DataTables
         {
             _trainingProgrammeService = trainingProgrammeService;
             _otherActivityService = otherActivityService;
+        }
+        [HttpGet]
+        public ActionResult Index()
+        {
+            var routes = new Dictionary<string, string>
+            {
+                {
+                    "Training Programme Overview",
+                    Url.Action(nameof(GetAllTrainingProgrammeEntries))??string.Empty
+                },
+                {
+                    "Any Other Activities",
+                    Url.Action(nameof(GetAllOtherActivitiesEntries))??string.Empty
+                }
+            };
+            return Ok(routes);
         }
         [Authorize(Roles =$"{RoleString.Admin},{RoleString.Trainer}")]
         [HttpGet("training-programmes")]

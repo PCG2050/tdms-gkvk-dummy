@@ -19,7 +19,7 @@ namespace WebApi.Controllers.DataTables.STU
         }
         [Authorize(Roles = $"{RoleString.Admin},{RoleString.Trainer}")]
         [HttpGet]
-        public async Task<IActionResult> GetAllOtherActivitiesEntries([FromQuery] PaginationRequest paginationRequest)
+        public async Task<IActionResult> GetEntries([FromQuery] PaginationRequest paginationRequest)
         {
             return Ok(await _otherActivityService.GetPaginatedItemsAsync(paginationRequest.PageNumber, paginationRequest.PageSize));
         }

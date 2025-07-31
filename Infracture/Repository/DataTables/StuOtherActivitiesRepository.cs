@@ -1,7 +1,6 @@
 ﻿using Application.Interface.Repository.DataTables;
 using Application.Models;
 using Application.Models.DataTables;
-using Domain.Entities.Stu;
 using Domain.Entities.STU;
 using Infrastructure.DbContext;
 using Microsoft.EntityFrameworkCore;

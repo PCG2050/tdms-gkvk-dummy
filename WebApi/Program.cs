@@ -2,6 +2,7 @@
 using Application.Interface;
 using Application.Interface.Repository;
 using Application.Interface.Repository.DataTables;
+using Application.Interface.Services;
 using Application.Interface.Services.Common;
 using Application.Interface.Services.DataTables;
 using Infrastructure.DbContext;
@@ -33,12 +34,14 @@ namespace WebApi
             builder.Services.AddOpenApi();
             builder.Services.AddDbContext<TdmsDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DatabaseContext")));
+            builder.Services.AddScoped<IRouteService, RouteService>();
 
             builder.Services.AddHttpContextAccessor();//For IHttpContextAccessor in infracture
             builder.Services.AddScoped<ICurrentUserService,CurrentUserService>();
             builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
             builder.Services.AddScoped<ITokenService, AuthTokenService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IAzureStorageService, AzureStorageService>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserSessionRepository, UserSessionRepository>();
             builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
