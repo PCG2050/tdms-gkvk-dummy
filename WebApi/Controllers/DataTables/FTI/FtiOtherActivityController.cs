@@ -1,7 +1,4 @@
-﻿using Application;
-using Application.Interface;
-using Application.Interface.Services;
-using Application.Interface.Services.DataTables;
+﻿using Application.Interface.Services.DataTables;
 using Application.Models.DataTables;
 using Domain.Entities.Enum;
 using Domain.Entities.FTI;

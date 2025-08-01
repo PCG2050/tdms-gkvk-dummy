@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers.DataTables.FTI
 {
-    
+    [ApiController]
     [Route("api/FTI/training-programme")]
     [Authorize(Roles = $"{RoleString.Admin},{RoleString.UnitHead},{RoleString.Trainer}")]
     public class FtiTrainingProgrammeController : GenericTableApiController<FtiTrainingProgram, FtiTrainingProgrammeCreateDto, FtiTrainingProgrammeUpdateDto, FtiTrainingProgram>
