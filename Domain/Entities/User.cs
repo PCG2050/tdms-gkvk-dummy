@@ -1,8 +1,6 @@
 ﻿using Domain.Entities.Enum;
 using Domain.Entities.FTI;
 using Domain.Entities.Junction;
-using System.Text.Json.Serialization;
-
 namespace Domain.Entities
 {
     public class User:AuditableBaseEntity
@@ -22,6 +20,7 @@ namespace Domain.Entities
         public int Phone { get; set; }
         public bool IsPhoneConfirmed { get; set; }
         public required int? OrganizationId { get; set; }
+        public bool IsDeactivated { get; set; } = false;
 
         public Organization Organization { get; set; } = null!;
         public ICollection<TrainerAssignment> TrainerAssignments { get; set; } = [];

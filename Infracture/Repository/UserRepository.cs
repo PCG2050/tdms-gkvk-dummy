@@ -15,12 +15,10 @@ namespace Infrastructure.Repository
     public class UserRepository : IUserRepository
     {
         private readonly TdmsDbContext _context;
-        private readonly ICurrentUserService _currentUserService;
 
-        public UserRepository(TdmsDbContext context, ICurrentUserService currentUserService)
+        public UserRepository(TdmsDbContext context)
         {
             _context = context;
-            _currentUserService = currentUserService;
         }
 
         public async Task<User?> GetByIdAsync(int id)

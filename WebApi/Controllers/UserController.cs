@@ -1,6 +1,7 @@
 ﻿using Application.Interface;
 using Application.Models;
 using Domain.Entities.Enum;
+using Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -66,6 +67,14 @@ namespace WebApi.Controllers
                 user.OrganizationId,
                 user.ProfileImageUrl
             });
+        }
+        [HttpPost("{userId}/deactivate")]
+        [Authorize(Roles = $"{RoleString.Admin},{RoleString.SuperAdmin},{RoleString.UnitHead}")]
+        public async Task<IActionResult> DeactivateAccount(int userId)
+        {
+            var result = await _userService.DeactivateUser(userId);
+            if (!result.IsSuccess) return ServiceResponseToActionResult.Error(result.ErrorMessage, result.ErrorStatus);
+            return NoContent();
         }
     }
 }

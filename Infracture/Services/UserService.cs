@@ -3,6 +3,7 @@ using Application.Interface;
 using Application.Interface.Repository;
 using Application.Models;
 using Domain.Entities;
+using Domain.Entities.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -102,6 +103,27 @@ namespace Infrastructure.Services
         Task<List<User>> IUserService.GetOrganizationTrainers()
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<ServiceResult> DeactivateUser(int id)
+        {
+            var user = await _userRepository.GetByIdAsync(id);
+            if (user == null) return ServiceResult.Failure("User with {id} not found", ServiceErrorStatus.NOTFOUND);
+            //can current user do this action
+            var cRole = _currentUser.Role;
+            var cOrg = _currentUser.OrganizationId;
+            if (user.Role == Role.SUPERADMIN
+                || (user.Role == Role.ADMIN && cRole != Domain.Entities.Enum.Role.SUPERADMIN)
+                || (user.Role == Role.UNITHEAD 
+                    && (cRole != Role.SUPERADMIN
+                        || !(cRole == Role.ADMIN && cOrg == user.OrganizationId)))
+                || (user.Role == Role.TRAINER 
+                    && (cRole != Role.SUPERADMIN 
+                        || !(cRole == Role.ADMIN && cOrg == user.OrganizationId))))
+                ServiceResult.Failure($"User does not have the permission to deactivate user {id}", ServiceErrorStatus.FORBIDDEN);
+            user.IsDeactivated = true;
+            await _userRepository.SaveAsync(user);
+            return ServiceResult.Success();
         }
     }
 }

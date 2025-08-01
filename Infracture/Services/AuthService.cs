@@ -37,6 +37,10 @@ namespace Infrastructure.Services
             {
                 throw new UnauthorizedAccessException("Invalid credentials");
             }
+            if (user.IsDeactivated)
+            {
+                throw new InvalidOperationException("Account is deactivated");
+            }
 
             // Create new session
             var session = new UserSession
