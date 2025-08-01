@@ -67,6 +67,12 @@ namespace WebApi
             builder.Services.AddScoped<IStuSposoredTrainingProgrammeRepository, StuSponsoredTrainingProgrammeRepository>();
             builder.Services.AddScoped<IStuSponsoredTrainingProgrammeService, StuSponsoredTrainingProgrammeService>();
 
+            builder.Services.AddScoped<IDaesiProgrammeRepository, DaesiProgramRepository>();
+            builder.Services.AddScoped<IDaesiProgrammeService, DaesiProgrammeService>();
+
+            builder.Services.AddScoped<IIbtvaProgrammeRepository, IbtvaProgrammeRepository>();
+            builder.Services.AddScoped<IIbtvaProgrammeService, IbtvaProgrammeService>();
+
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(o=>
                 {
