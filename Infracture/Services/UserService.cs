@@ -72,9 +72,31 @@ namespace Infrastructure.Services
             return await _userRepository.GetByActivationTokenAsync(token);
         }
 
-        public async Task UpdateUserAsync(User user)
+        public async Task<ServiceResult> UpdateUserAsync(UserUpdateDto updateDto)
         {
-            await _userRepository.SaveAsync(user);
+            var user = await _userRepository.GetByIdAsync(updateDto.Id);
+            if (user is null) return ServiceResult.Failure($"User with id {updateDto.Id} not found", ServiceErrorStatus.NOTFOUND);
+            var cId = _currentUser.UserId;
+            var cRole = _currentUser.Role;
+            var cOrg = _currentUser.OrganizationId;
+            if (cRole == Role.SUPERADMIN
+                || user.Role == Role.UNITHEAD
+                    && (cId == user.Id || ( cRole == Role.ADMIN && cOrg == user.OrganizationId))
+                || user.Role == Role.TRAINER 
+                    && (cId == user.Id ||(cRole == Role.ADMIN && cOrg == user.OrganizationId)))
+            {
+                if (updateDto.Password is not null) user.PasswordHash = _passwordHasher.HashPassword(updateDto.Password);
+                if(updateDto.FirstName is not null) user.FirstName = updateDto.FirstName;
+                if(updateDto.LastName is not null) user.LastName = updateDto.LastName;
+                if (updateDto.Phone is not null)
+                {
+                    user.Phone = updateDto.Phone;
+                    user.IsPhoneConfirmed = false;
+                }
+                await _userRepository.SaveAsync(user);
+                return ServiceResult.Success();
+            }
+            return ServiceResult.Failure("User is not authorized to perform this action", ServiceErrorStatus.FORBIDDEN);
         }
 
         public  Task<List<User>> GetOrganizationUnitTrainers(int unitId)
@@ -105,7 +127,7 @@ namespace Infrastructure.Services
             throw new NotImplementedException();
         }
 
-        public async Task<ServiceResult> DeactivateUser(int id)
+        public async Task<ServiceResult> UpdatedAccountStatus(int id, bool activate = true)
         {
             var user = await _userRepository.GetByIdAsync(id);
             if (user == null) return ServiceResult.Failure("User with {id} not found", ServiceErrorStatus.NOTFOUND);
@@ -113,7 +135,7 @@ namespace Infrastructure.Services
             var cRole = _currentUser.Role;
             var cOrg = _currentUser.OrganizationId;
             if (user.Role == Role.SUPERADMIN
-                || (user.Role == Role.ADMIN && cRole != Domain.Entities.Enum.Role.SUPERADMIN)
+                || (user.Role == Role.ADMIN && cRole != Role.SUPERADMIN)
                 || (user.Role == Role.UNITHEAD 
                     && (cRole != Role.SUPERADMIN
                         || !(cRole == Role.ADMIN && cOrg == user.OrganizationId)))
@@ -121,7 +143,7 @@ namespace Infrastructure.Services
                     && (cRole != Role.SUPERADMIN 
                         || !(cRole == Role.ADMIN && cOrg == user.OrganizationId))))
                 ServiceResult.Failure($"User does not have the permission to deactivate user {id}", ServiceErrorStatus.FORBIDDEN);
-            user.IsDeactivated = true;
+            user.IsDeactivated = !activate;
             await _userRepository.SaveAsync(user);
             return ServiceResult.Success();
         }

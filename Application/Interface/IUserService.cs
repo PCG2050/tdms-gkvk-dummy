@@ -15,12 +15,12 @@ namespace Application.Interface
         Task<User?> GetUserByIdAsync(int id);
         Task<User?> GetUserByEmailAsync(string email);
         Task<User> GetUserByActivationTokenAsync(string token);
-        Task UpdateUserAsync(User user);
+        Task<ServiceResult> UpdateUserAsync(UserUpdateDto updateDto);
         Task<List<User>> GetAllOrganizationUsersAsync();
         Task<List<User>> GetOrganizationUnitTrainers(int unitId);
         Task<List<User>> GetOrganizationTrainers();
         Task<User> GetCurrentUserDetailsAsync();
         Task<PaginatedResult<TrainerDetailsDto>> GetPaginatedOrganizationTrainers(int pageNumber = Constants.PAGINATION_PAGE_NUMBER_DEFAULT, int pageSize = Constants.PAGINATION_PAGE_SIZE_DEFAULT);
-        Task<ServiceResult> DeactivateUser(int id);
+        Task<ServiceResult> UpdatedAccountStatus(int id, bool activate = true);
     }
 }

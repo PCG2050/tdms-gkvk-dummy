@@ -60,7 +60,7 @@ namespace Infrastructure.Repository
 
         public async Task<PaginatedResult<TrainerDetailsDto>> GetPaginatedItemsAsync(int organizationId, int pageNumber = 1, QueryFilter? queryFilter = null, int pageSize = 10)
         {
-            var query = _context.Users.Where(x => x.OrganizationId == organizationId && x.Role == Domain.Entities.Enum.Role.TRAINER);
+            var query = _context.Users.Where(x => x.OrganizationId == organizationId && (x.Role == Domain.Entities.Enum.Role.TRAINER || x.Role == Domain.Entities.Enum.Role.UNITHEAD));
             if (queryFilter?.Filters?.Count > 0)
             {
                 var filters = queryFilter.Filters;
