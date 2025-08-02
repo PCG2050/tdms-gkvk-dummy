@@ -78,12 +78,18 @@ namespace WebApi
             builder.Services.AddScoped<IAsmVisitRepository, AsmVisitRepository>();
             builder.Services.AddScoped<IDeuCourseRepository, DeuCourseRepository>();
             builder.Services.AddScoped<INaepDetailsRepository, NaepDetailsRepository>();
+            builder.Services.AddScoped<IEeuOftRepository, EeuOftRepository>();
+            builder.Services.AddScoped<IEeuFldRepository, EeuFldRepository>();
+            builder.Services.AddScoped<IEeuTrainingProgrammeRepository, EeuTrainingProgrammeRepository>();
 
             builder.Services.AddScoped<IAticAdvisoryServiceService, AticAdvisoryServiceService>();
             builder.Services.AddScoped<IAticSalesService, AticSalesService>();
             builder.Services.AddScoped<IAsmVisitService, AsmVisitService>();
             builder.Services.AddScoped<IDeuCourseService, DeuCourseService>();
             builder.Services.AddScoped<INaepDetailsService, NaepDetailsService>();
+            builder.Services.AddScoped<IEeuOftService, EeuOftService>();
+            builder.Services.AddScoped<IEeuFldService, EeuFldService>();
+            builder.Services.AddScoped<IEeuTrainingProgrammeService, EeuTrainingProgrammeService>();
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(o=>
