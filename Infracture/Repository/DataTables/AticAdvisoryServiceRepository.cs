@@ -1,5 +1,6 @@
 ﻿using Application.Interface.Repository.DataTables;
 using Application.Models.DataTables;
+using Domain.Entities.ATIC;
 using Domain.Entities.STU;
 using Infrastructure.DbContext;
 using System;
@@ -10,24 +11,23 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Repository.DataTables
 {
-    public class DaesiProgramRepository : GenericRepository<DaesiProgramme, DaesiProgrammeDto>, IDaesiProgrammeRepository
+    public class AticAdvisoryServiceRepository : GenericRepository<AticAdvisoryService, AticAdvisoryServiceDto>, IAticAdvisoryServiceRepository
     {
-        public DaesiProgramRepository(TdmsDbContext context) : base(context)
+        public AticAdvisoryServiceRepository(TdmsDbContext context) : base(context)
         {
         }
 
-        protected override IQueryable<DaesiProgrammeDto> ProjectToDto(IQueryable<DaesiProgramme> query)
+        protected override IQueryable<AticAdvisoryServiceDto> ProjectToDto(IQueryable<AticAdvisoryService> query)
         {
-            return query.Select(d => new DaesiProgrammeDto
+            return query.Select(d => new AticAdvisoryServiceDto
             {
                 Id = d.Id,
                 StartDate = d.StartDate,
                 EndDate = d.EndDate,
-                NodalTrainingInstitute = d.NodalTrainingInstitute,
-                Place = d.Place,
                 UnitLocationId = d.UnitLocationId,
-                BatchCount = d.BatchCount,
-                DealerCount = d.DealerCount,
+                ServiceType = d.ServiceType,
+                BeneficiaryCount = d.BeneficiaryCount,
+                ServiceCount = d.ServiceCount,
                 Attachements = d.Attachements,
                 CreatedAt = d.CreatedAt,
                 UpdatedAt = d.UpdatedAt

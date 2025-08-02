@@ -1,4 +1,5 @@
 ﻿using Application.Interface;
+using Application.Interface.Repository.DataTables;
 using Application.Interface.Services.Common;
 using Application.Interface.Services.DataTables;
 using Application.Models.DataTables;
@@ -9,7 +10,7 @@ namespace Infrastructure.Services.DataTables
 {
     public class IbtvaProgrammeService : GenericTableService<IbtvaProgramme, IbtvaProgrammeCreateDto, IbtvaProgrammeUpdateDto, IbtvaProgrammeDto>, IIbtvaProgrammeService
     {
-        public IbtvaProgrammeService(IGenericRepository<IbtvaProgramme, IbtvaProgrammeDto> repository, ICurrentUserService currentUserService, IEntityPermissionService entityPermissionService) : base(repository, currentUserService, entityPermissionService)
+        public IbtvaProgrammeService(IIbtvaProgrammeRepository repository, ICurrentUserService currentUserService, IEntityPermissionService entityPermissionService) : base(repository, currentUserService, entityPermissionService)
         {
         }
 

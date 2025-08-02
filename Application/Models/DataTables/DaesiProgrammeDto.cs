@@ -13,7 +13,7 @@ namespace Application.Models.DataTables
     {
         public required DateOnly StartDate { get; set; }
         public required DateOnly EndDate { get; set; }
-        public required int UnitLocatioId { get; set; }
+        public required int UnitLocationId { get; set; }
         public required string Place { get; set; }
         public required string NodalTrainingInstitute { get; set; }
         public int BatchCount { get; set; }

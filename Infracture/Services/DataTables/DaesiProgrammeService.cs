@@ -19,7 +19,7 @@ namespace Infrastructure.Services.DataTables
             {
                 NodalTrainingInstitute = createDto.NodalTrainingInstitute,
                 Place = createDto.Place,
-                UnitLocationId = createDto.UnitLocatioId,
+                UnitLocationId = createDto.UnitLocationId,
                 BatchCount = createDto.BatchCount,
                 DealerCount = createDto.DealerCount,
                 Attachements = createDto.Attachements,
@@ -35,6 +35,7 @@ namespace Infrastructure.Services.DataTables
             if (updateDto.EndDate.HasValue) entity.EndDate = updateDto.EndDate.Value;
             if (updateDto.DealerCount.HasValue) entity.DealerCount = updateDto.DealerCount.Value;
             if (updateDto.BatchCount.HasValue) entity.BatchCount = updateDto.BatchCount.Value;
+            if (updateDto.Attachements is not null) entity.Attachements = updateDto.Attachements;
             return Task.CompletedTask;
         }
     }
