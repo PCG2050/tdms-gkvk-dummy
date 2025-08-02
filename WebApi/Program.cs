@@ -36,6 +36,18 @@ namespace WebApi
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DatabaseContext")));
             builder.Services.AddScoped<IRouteService, RouteService>();
 
+            var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(name: MyAllowSpecificOrigins,
+                                  policy =>
+                                  {
+                                      policy.AllowAnyOrigin();
+                                      policy.AllowAnyHeader();
+                                      policy.AllowAnyMethod();
+                                  });
+            });
+
             builder.Services.AddHttpContextAccessor();//For IHttpContextAccessor in infracture
             builder.Services.AddScoped<ICurrentUserService,CurrentUserService>();
             builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
@@ -118,7 +130,7 @@ namespace WebApi
                     .WithTheme(ScalarTheme.DeepSpace);
                 });
             }
-
+            app.UseCors(MyAllowSpecificOrigins);
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
