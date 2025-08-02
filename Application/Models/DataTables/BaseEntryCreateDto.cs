@@ -7,6 +7,12 @@ using System.Threading.Tasks;
 
 namespace Application.Models.DataTables
 {
+    public interface IBaseEntryDto
+    {
+        int Id { get; set; }
+        DateTimeOffset CreatedAt { get; set; }
+        DateTimeOffset? UpdatedAt { get; set; }
+    }
     public abstract class BaseEntryCreateDto
     {
         public int UnitLocationId { get; set; }

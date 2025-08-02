@@ -1,6 +1,6 @@
 ﻿namespace Application.Models.DataTables
 {
-    public class AticAdvisoryServiceDto:AticAdvisoryServiceCreateDto
+    public class AticAdvisoryServiceDto:AticAdvisoryServiceCreateDto, IBaseEntryDto
     {
         public int Id { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
