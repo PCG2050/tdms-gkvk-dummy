@@ -21,6 +21,7 @@ namespace WebApi.Controllers.DataTables
         }
 
         [HttpGet]
+        [ProducesDefaultResponseType(type: typeof(PaginatedResult<object>))]
         public virtual async Task<IActionResult> GetEntries([FromQuery] PaginationRequest paginationRequest)
         {
             var result = await _service.GetPaginatedItemsAsync(paginationRequest.PageNumber, paginationRequest.PageSize);
@@ -28,6 +29,7 @@ namespace WebApi.Controllers.DataTables
         }
 
         [HttpPost]
+        [ProducesResponseType(type: typeof(ServiceResult<object>), 200)]
         public virtual async Task<IActionResult> AddEntry(TCreateDto createDto)
         {
             var result = await _service.AddAsync(createDto);
@@ -39,6 +41,7 @@ namespace WebApi.Controllers.DataTables
         }
 
         [HttpPatch("{id}")]
+        [ProducesResponseType(type: typeof(ServiceResult<object>), 200)]
         public virtual async Task<IActionResult> UpdateEntry(int id, TUpdateDto updateDto)
         {
             // Ensure the ID in the route matches the DTO

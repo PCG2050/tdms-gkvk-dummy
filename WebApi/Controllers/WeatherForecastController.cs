@@ -8,12 +8,18 @@ namespace WebApi.Controllers
     public class WeatherForecastController : ControllerBase
     {
         private readonly ILogger<WeatherForecastController> _logger;
-        private readonly TdmsDbContext _context;
+        private readonly IConfiguration _configuration;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger, TdmsDbContext context)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IConfiguration configuration)
         {
             _logger = logger;
-            _context = context;
+            _configuration = configuration;
+        }
+
+        [HttpGet]
+        public ActionResult Index()
+        {
+            return Ok("Server is live");
         }
     }
 }
