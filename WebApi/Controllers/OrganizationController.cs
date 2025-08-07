@@ -51,7 +51,9 @@ namespace WebApi.Controllers
             return CreatedAtAction(nameof(GetOrganization),new {id=organization.Id}, organization);
         }
 
-        [HttpPost]
+    
+
+        [HttpPatch]
         [Authorize(Roles = RoleString.SuperAdmin)]
         [ProducesResponseType(type: typeof(OrganizationDto), 200)]
         public async Task<IActionResult> UpdateOrganization(OrganizationUpdateDto updateDto)
@@ -69,7 +71,7 @@ namespace WebApi.Controllers
             try
             {
                 var admin = await _organizationService.CreateUser(user, id);
-                return CreatedAtAction("", new { id = admin.Id }, new UserDto
+                return Ok( new UserDto
                 {
                     Id = admin.Id,
                     Email = admin.Email,

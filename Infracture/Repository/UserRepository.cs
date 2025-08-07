@@ -81,6 +81,7 @@ namespace Infrastructure.Repository
                                         UserId = u.Id,
                                         FirstName = u.FirstName,
                                         LastName = u.LastName,
+                                        Email = u.Email,
                                         Units = u.TrainerAssignments
                                             .Select(ta => ta.UnitLocation.Unit) // Select the Unit entity first
                                             .Distinct() // Get unique units if a trainer is assigned to multiple locations within the same unit

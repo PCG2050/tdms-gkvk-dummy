@@ -72,6 +72,7 @@ namespace Application.Interface
                 OrganizationId = organizationId,
                 CreatedById = _currentUser.UserId,
                 CreatedAt = DateTimeOffset.UtcNow,
+                Phone = registerDto.Phone,
                 Role = registerDto.Role
             };
 
@@ -120,5 +121,7 @@ namespace Application.Interface
             if (_currentUser.Role != Domain.Entities.Enum.Role.SUPERADMIN) throw new UnauthorizedAccessException();
             return await _organizationRepository.GetPaginatedItemsAsync(page, pageSize);
         }
+
+    
     }
 }

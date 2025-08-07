@@ -31,7 +31,7 @@ namespace WebApi.Controllers
             {
                 int orgId = _currentUserService.OrganizationId;
                 var user = await _organizationService.CreateUser(registerDto, orgId);
-                return CreatedAtRoute("",user);
+                return Ok(user);
             }
             catch(InvalidOperationException e)
             {
