@@ -49,19 +49,22 @@ namespace WebApi.Controllers
             if (!organizationResult.IsSuccess) return ServiceResponseToActionResult.Error(organizationResult.ErrorMessage, organizationResult.ErrorStatus);
             var organization = organizationResult.Data;
             return CreatedAtAction(nameof(GetOrganization),new {id=organization.Id}, organization);
-        }
+        } 
 
-    
+     
 
-        [HttpPatch]
+        [HttpPatch("{id}")]
         [Authorize(Roles = RoleString.SuperAdmin)]
-        [ProducesResponseType(type: typeof(OrganizationDto), 200)]
-        public async Task<IActionResult> UpdateOrganization(OrganizationUpdateDto updateDto)
+        [ProducesResponseType(typeof(OrganizationDto), 200)]
+        public async Task<IActionResult> UpdateOrganization(int id, OrganizationUpdateDto updateDto)
         {
+            updateDto.Id = id; // Ensure ID from route overrides body
             var organizationResult = await _organizationService.UpdateOrganizationAsync(updateDto);
-            if (!organizationResult.IsSuccess) return ServiceResponseToActionResult.Error(organizationResult.ErrorMessage, organizationResult.ErrorStatus);
-            var organization = organizationResult.Data;
-            return Ok(organization);
+
+            if (!organizationResult.IsSuccess)
+                return ServiceResponseToActionResult.Error(organizationResult.ErrorMessage, organizationResult.ErrorStatus);
+
+            return Ok(organizationResult.Data);
         }
 
         [HttpPost("{id}/users")]
@@ -76,7 +79,8 @@ namespace WebApi.Controllers
                     Id = admin.Id,
                     Email = admin.Email,
                     FirstName = admin.FirstName,
-                    LastName = admin.LastName
+                    LastName = admin.LastName                
+               
                 });
             }catch(InvalidOperationException e)
             {
@@ -90,6 +94,32 @@ namespace WebApi.Controllers
             {
                 return Problem();
             }
+        }
+
+        [HttpGet("{id}/admins")]
+        [Authorize(Roles = RoleString.SuperAdmin)]
+        [ProducesResponseType(typeof(List<UserDto>), 200)]
+        public async Task<IActionResult> GetAdmins(int id)
+        {
+            try
+            {
+                var admins = await _organizationService.GetAdminsByOrganizationIdAsync(id);
+                return Ok(admins);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid(ex.Message);
+            }
+        }
+
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = RoleString.SuperAdmin)]
+        public async Task<IActionResult> DeleteOrganization(int id)
+        {
+            var result = await _organizationService.DeleteOrganizationAsync(id);
+
+            return Ok();
         }
 
     }

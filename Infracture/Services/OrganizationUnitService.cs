@@ -19,6 +19,7 @@ namespace Infrastructure.Services
         private readonly ICurrentUserService _currentUser;
         private readonly IUserService _userService;
         private readonly ITrainerAssignmentRepository _trainerAssignment;
+     
 
         public OrganizationUnitService(IOrganizationUnitRepository organizationUnit, ICurrentUserService currentUser,
                                        IUserService userService, ITrainerAssignmentRepository trainerAssignment)
@@ -26,7 +27,7 @@ namespace Infrastructure.Services
             _organizationUnit = organizationUnit;
             _currentUser = currentUser;
             _userService = userService;
-            _trainerAssignment = trainerAssignment;
+            _trainerAssignment = trainerAssignment;         
         }
 
         public async Task<OrganizationUnitLocation> AddUnitToOrganization(OrganizationUnitLocationDto addUnitLocationDto)
@@ -109,7 +110,6 @@ namespace Infrastructure.Services
             await _trainerAssignment.AddAsync(newAssignment);
             return ServiceResult.Success();
         }
-
         public async Task<ServiceResult> UnMapTrainerFromUnitLocationAsync(ExistingTrainerAssignmentDto trainerAssignment)
         {
             var unitLocation = await _organizationUnit.GetByOrganizationUnitDistrictAsync(_currentUser.OrganizationId, trainerAssignment.UnitId, trainerAssignment.DistrictId);
@@ -121,5 +121,6 @@ namespace Infrastructure.Services
             await _trainerAssignment.DeleteAsync(existingAssignment);
             return ServiceResult.Success();
         }
+       
     }
 }

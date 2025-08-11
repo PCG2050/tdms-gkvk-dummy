@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Entities.Enum;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,12 @@ namespace Application.Models
         public string FirstName {  get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
-        public string? ProfileImageUrl = null;
+        public string? ProfileImageUrl = null;    
+       
+        public Role Role { get; set; }
+        public string Phone { get; set; }  
+        public int? OrganizationId { get; set; }
+        public bool IsDeactivated { get; set; } = false;
+
     }
 }

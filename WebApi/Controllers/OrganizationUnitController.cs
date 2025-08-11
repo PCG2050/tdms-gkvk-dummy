@@ -27,17 +27,17 @@ namespace WebApi.Controllers
 
         [HttpPost]
         [Authorize(Roles = RoleString.Admin)]
-        public ActionResult AddUnitToOrg(OrganizationUnitLocationDto orgUnitAssignment)
+        public async Task<ActionResult> AddUnitToOrg(OrganizationUnitLocationDto orgUnitAssignment)
         {
-            _organizationUnit.AddUnitToOrganization(orgUnitAssignment);
+            await _organizationUnit.AddUnitToOrganization(orgUnitAssignment);
             return Created();
         }
 
         [HttpDelete]
         [Authorize(Roles = RoleString.Admin)]
-        public ActionResult DeleteUnitFromOrg(OrganizationUnitLocationDto orgUnitAssignment)
+        public async Task<ActionResult> DeleteUnitFromOrg(OrganizationUnitLocationDto orgUnitAssignment)
         {
-            _organizationUnit.RemoveUnitFromOrganization(orgUnitAssignment);
+            await _organizationUnit.RemoveUnitFromOrganization(orgUnitAssignment);
             return NoContent();
         }
 

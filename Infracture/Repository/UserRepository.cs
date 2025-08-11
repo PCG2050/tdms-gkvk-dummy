@@ -2,6 +2,7 @@
 using Application.Interface.Repository;
 using Application.Models;
 using Domain.Entities;
+using Domain.Entities.Enum;
 using Infrastructure.DbContext;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -56,6 +57,13 @@ namespace Infrastructure.Repository
         {
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<User>> GetUsersByOrganizationAndRoleAsync(int organizationId, Role role)
+        {
+            return await _context.Users
+                .Where(u => u.OrganizationId == organizationId && u.Role == role)
+                .ToListAsync();
         }
 
         public async Task<PaginatedResult<TrainerDetailsDto>> GetPaginatedItemsAsync(int organizationId, int pageNumber = 1, QueryFilter? queryFilter = null, int pageSize = 10)

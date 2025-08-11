@@ -41,6 +41,7 @@ namespace Infrastructure.Repository
                     LogoUrl = o.Logo,
                     DistrictName = o.District.Name,
                     StateName = o.District.State.Name,
+                    Pincode = o.PinCode,
                     StorageContainerName = o.StorageContainerName
                 }).AsNoTracking();
             var paginatedResult = new PaginatedResult<OrganizationDto>
@@ -72,6 +73,17 @@ namespace Infrastructure.Repository
         {
             if (_context.Entry(organization).State == Microsoft.EntityFrameworkCore.EntityState.Modified)
                 await _context.SaveChangesAsync();
+        }
+
+        public async Task<Organization?> DeleteAsync(int id)
+        {
+            var organization = await _context.Organizations.FindAsync(id);
+            if (organization != null)
+            {
+                _context.Organizations.Remove(organization);
+                await _context.SaveChangesAsync();
+            }
+            return organization;
         }
     }
 }

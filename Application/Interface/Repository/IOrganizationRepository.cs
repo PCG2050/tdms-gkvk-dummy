@@ -14,5 +14,7 @@ namespace Application.Interface.Repository
         Task SaveAsync(Organization organization);
         Task UpdateAsync(Organization organization);
         Task<PaginatedResult<OrganizationDto>> GetPaginatedItemsAsync(int page, int pageSize);
+
+        Task <Organization?> DeleteAsync(int id);
     }
 }

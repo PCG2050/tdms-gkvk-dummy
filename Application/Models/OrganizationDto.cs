@@ -14,6 +14,8 @@ namespace Application.Models
         public string StateName { get; set; }
         public string LogoUrl { get; set; }
         public string StorageContainerName { get; set; }
+
+        public string Pincode { get; set; }
         public string StorageContainerNamePublic { get => StorageContainerName is null ? string.Empty : $"{StorageContainerName}-public"; }
     }
 }
