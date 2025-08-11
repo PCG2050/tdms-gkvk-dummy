@@ -1,6 +1,7 @@
 ﻿using Application.Interface.Repository;
 using Application.Models;
 using Domain.Entities;
+using Domain.Entities.Enum;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Application.Interface
@@ -122,6 +123,25 @@ namespace Application.Interface
             return await _organizationRepository.GetPaginatedItemsAsync(page, pageSize);
         }
 
-    
+        public async Task<List<UserDto>> GetAdminsByOrganizationIdAsync(int organizationId)
+        {
+            if (_currentUser.Role != Role.SUPERADMIN)
+                throw new UnauthorizedAccessException("Only SuperAdmins can access this data.");
+
+            var admins = await _userRepository.GetUsersByOrganizationAndRoleAsync(organizationId, Role.ADMIN);
+
+            return admins.Select(admin => new UserDto
+            {
+                Id = admin.Id,
+                Email = admin.Email,
+                FirstName = admin.FirstName,
+                LastName = admin.LastName,
+                Role = admin.Role,
+                Phone = admin.Phone,
+                OrganizationId = admin.OrganizationId
+            }).ToList();
+        }
+
+
     }
 }

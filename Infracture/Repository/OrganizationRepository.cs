@@ -41,6 +41,7 @@ namespace Infrastructure.Repository
                     LogoUrl = o.Logo,
                     DistrictName = o.District.Name,
                     StateName = o.District.State.Name,
+                    Pincode = o.PinCode,
                     StorageContainerName = o.StorageContainerName
                 }).AsNoTracking();
             var paginatedResult = new PaginatedResult<OrganizationDto>

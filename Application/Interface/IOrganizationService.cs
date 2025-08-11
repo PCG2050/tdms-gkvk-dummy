@@ -11,5 +11,7 @@ namespace Application.Interface
         Task<User> CreateUser(UserRegisterDto registerDto, int organizationId);
         Task<List<User>> GetAllOrganizationAdminsAsync(int id);
         Task<PaginatedResult<OrganizationDto>> GetPaginatedItemsAsync(int page, int pageSize);
+        Task<List<UserDto>> GetAdminsByOrganizationIdAsync(int organizationId);
+
     }
 }

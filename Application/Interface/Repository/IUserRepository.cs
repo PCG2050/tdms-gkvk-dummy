@@ -1,5 +1,6 @@
 ﻿using Application.Models;
 using Domain.Entities;
+using Domain.Entities.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,5 +17,6 @@ namespace Application.Interface.Repository
         Task<List<User>> GetAllAsync();
         Task SaveAsync(User user);
         Task DeleteAsync(User user);
+        Task<List<User>> GetUsersByOrganizationAndRoleAsync(int organizationId, Role role);
     }
 }

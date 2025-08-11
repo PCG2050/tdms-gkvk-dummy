@@ -65,7 +65,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost("{id}/users")]
-        [Authorize(Roles = RoleString.SuperAdmin)]
+        [Authorize(Roles = $"{RoleString.Admin},{RoleString.SuperAdmin},{RoleString.UnitHead}")]
         public async Task<ActionResult<UserDto>> CreateUsers(int id,UserRegisterDto user)
         {
             try
@@ -91,6 +91,25 @@ namespace WebApi.Controllers
                 return Problem();
             }
         }
+
+        [HttpGet("{id}/admins")]
+        [Authorize(Roles = RoleString.SuperAdmin)]
+        [ProducesResponseType(typeof(List<UserDto>), 200)]
+        public async Task<IActionResult> GetAdmins(int id)
+        {
+            try
+            {
+                var admins = await _organizationService.GetAdminsByOrganizationIdAsync(id);
+                return Ok(admins);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid(ex.Message);
+            }
+        }
+
+   
+
 
     }
 }
