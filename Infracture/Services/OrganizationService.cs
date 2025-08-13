@@ -141,7 +141,15 @@ namespace Application.Interface
                 OrganizationId = admin.OrganizationId
             }).ToList();
         }
+        public async Task<ServiceResult> DeleteOrganizationAsync(int id)
+        {
+            var organization = await _organizationRepository.GetOrganizationAsync(id);
+            if (organization == null)
+                return ServiceResult.Failure("Organization not found", ServiceErrorStatus.NOTFOUND);
 
+            await _organizationRepository.DeleteAsync(id);
+            return ServiceResult.Success();
+        }
 
     }
 }

@@ -12,6 +12,7 @@ namespace Application.Interface
         Task<List<User>> GetAllOrganizationAdminsAsync(int id);
         Task<PaginatedResult<OrganizationDto>> GetPaginatedItemsAsync(int page, int pageSize);
         Task<List<UserDto>> GetAdminsByOrganizationIdAsync(int organizationId);
+        Task<ServiceResult> DeleteOrganizationAsync(int id);
 
     }
 }

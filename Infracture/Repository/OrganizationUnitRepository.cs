@@ -20,9 +20,9 @@ namespace Infrastructure.Repository
 
         public async Task<bool> ExistsAsync(int orgId, int unitId, int districtId)
         {
-            return await _dbContext.OrganizationUnitLocations.AnyAsync(x=> x.OrganizationId == orgId && x.UnitId == unitId && x.DistrictId == districtId);
+            return await _dbContext.OrganizationUnitLocations
+                .AnyAsync(x => x.OrganizationId == orgId && x.UnitId == unitId && x.DistrictId == districtId);
         }
-
         public Task<IEnumerable<OrganizationUnitLocation>> GetByDistrictIdAsync(int districtId)
         {
             throw new NotImplementedException();
@@ -55,10 +55,9 @@ namespace Infrastructure.Repository
 
         public async Task SaveAsync(OrganizationUnitLocation entity)
         {
-            if(_dbContext.Entry(entity).State != EntityState.Detached)
-            {
-                _dbContext.OrganizationUnitLocations.Add(entity);
-            }
+           
+            _dbContext.OrganizationUnitLocations.Add(entity);                   
+            
             await _dbContext.SaveChangesAsync();
         }
     }

@@ -35,7 +35,7 @@ namespace Infrastructure.Services
 
             var user = new User() {
                 Email=registerDto.Email,
-                PasswordHash = registerDto.Password,
+                PasswordHash = _passwordHasher.HashPassword(registerDto.Password),
                 FirstName = registerDto.FirstName,
                 LastName= registerDto.LastName,
                 OrganizationId = registerDto.OrganizationId
@@ -139,6 +139,7 @@ namespace Infrastructure.Services
                 || (user.Role == Role.UNITHEAD 
                     && (cRole != Role.SUPERADMIN
                         || !(cRole == Role.ADMIN && cOrg == user.OrganizationId)))
+                       
                 || (user.Role == Role.TRAINER 
                     && (cRole != Role.SUPERADMIN 
                         || !(cRole == Role.ADMIN && cOrg == user.OrganizationId))))
