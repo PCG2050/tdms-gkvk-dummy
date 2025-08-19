@@ -51,7 +51,8 @@ namespace WebApi.Controllers
                 user.LastName,
                 user.Email,
                 user.OrganizationId,
-                user.ProfileImageUrl
+                user.ProfileImageUrl,
+                user.Phone
             });
         }
         [HttpGet("profile/{userId}")]
@@ -101,5 +102,30 @@ namespace WebApi.Controllers
             _logger.LogInformation($"Updated user {userId} successfully");
             return NoContent();
         }
+        // Anyone can request a reset link
+        [HttpPost("forgot-password")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
+        {
+            var result = await _userService.ForgotPasswordAsync(dto);
+            if (!result.IsSuccess)
+                return ServiceResponseToActionResult.Error(result.ErrorMessage, result.ErrorStatus);
+
+            // Always 204 (no info leak)
+            return NoContent();
+        }
+
+        // Anyone with a token can reset
+        [HttpPost("reset-password")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
+        {
+            var result = await _userService.ResetPasswordAsync(dto);
+            if (!result.IsSuccess)
+                return ServiceResponseToActionResult.Error(result.ErrorMessage, result.ErrorStatus);
+
+            return NoContent();
+        }
+
     }
 }

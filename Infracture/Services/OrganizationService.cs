@@ -97,11 +97,16 @@ namespace Application.Interface
                 if (!result.IsSuccess) return ServiceResult<Organization>.Failure(result.ErrorMessage, result.ErrorStatus);
                 organization.StorageContainerName = updateDto.StorageContainerName;
             }
-            if (updateDto.Name is not null)
+            
+            if (!string.IsNullOrWhiteSpace(updateDto.Name) && !string.Equals(organization.Name, updateDto.Name, StringComparison.OrdinalIgnoreCase))
             {
-                if (!await _organizationRepository.HasOrganizationWithNameAsync(updateDto.Name)) return ServiceResult<Organization>.Failure("An organization with this name already exists", ServiceErrorStatus.INVALIDOPERATION);
+                var nameExists = await _organizationRepository.HasOrganizationWithNameAsync(updateDto.Name);
+                if (nameExists)
+                    return ServiceResult<Organization>.Failure("An organization with this name already exists", ServiceErrorStatus.INVALIDOPERATION);
+
                 organization.Name = updateDto.Name;
-            }
+            }              
+            
             if (updateDto.Pincode is not null) organization.PinCode = updateDto.Pincode;
             if (updateDto.DistrictId.HasValue && organization.DistrictId != updateDto.DistrictId.Value) organization.DistrictId = updateDto.DistrictId.Value;
             await _organizationRepository.UpdateAsync(organization);
@@ -122,6 +127,7 @@ namespace Application.Interface
             if (_currentUser.Role != Domain.Entities.Enum.Role.SUPERADMIN) throw new UnauthorizedAccessException();
             return await _organizationRepository.GetPaginatedItemsAsync(page, pageSize);
         }
+        
 
         public async Task<List<UserDto>> GetAdminsByOrganizationIdAsync(int organizationId)
         {

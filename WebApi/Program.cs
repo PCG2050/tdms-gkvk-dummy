@@ -10,6 +10,7 @@ using Infrastructure.Repository;
 using Infrastructure.Repository.DataTables;
 using Infrastructure.Services;
 using Infrastructure.Services.DataTables;
+using Infrastructure.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -47,12 +48,15 @@ namespace WebApi
                                       policy.AllowAnyMethod();
                                   });
             });
+            builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+            builder.Services.Configure<SendGridSettings>(builder.Configuration.GetSection("SendGridMail"));
+            builder.Services.AddTransient<IEmailService, SendGridEmailService>();
 
             builder.Services.AddHttpContextAccessor();//For IHttpContextAccessor in infracture
             builder.Services.AddScoped<ICurrentUserService,CurrentUserService>();
             builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
             builder.Services.AddScoped<ITokenService, AuthTokenService>();
-            builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IAuthService, AuthService>();           
             builder.Services.AddScoped<IAzureStorageService, AzureStorageService>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserSessionRepository, UserSessionRepository>();

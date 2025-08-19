@@ -18,5 +18,8 @@ namespace Application.Interface.Repository
         Task SaveAsync(User user);
         Task DeleteAsync(User user);
         Task<List<User>> GetUsersByOrganizationAndRoleAsync(int organizationId, Role role);
+        Task SetPasswordResetTokenAsync(int userId, string token, DateTimeOffset expiresAt);
+        Task<User?> GetByPasswordResetTokenAsync(string token);
+        Task ClearPasswordResetTokenAsync(int userId);
     }
 }

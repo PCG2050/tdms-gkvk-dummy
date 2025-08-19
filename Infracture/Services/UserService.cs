@@ -4,9 +4,12 @@ using Application.Interface.Repository;
 using Application.Models;
 using Domain.Entities;
 using Domain.Entities.Enum;
+using Infrastructure.Settings;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,12 +20,18 @@ namespace Infrastructure.Services
         private readonly IUserRepository _userRepository;
         private readonly IPasswordHasher _passwordHasher;
         private readonly ICurrentUserService _currentUser;
+        private readonly IEmailService _emailService;
+        private readonly EmailSettings _emailSettings;
+       
 
-        public UserService(IUserRepository userRepository, IPasswordHasher passwordHasher,ICurrentUserService currentUser)
+        public UserService(IUserRepository userRepository, IPasswordHasher passwordHasher,ICurrentUserService currentUser,IEmailService emailService, IOptions<EmailSettings> emailOptions)
         {
             _userRepository = userRepository;
             _passwordHasher = passwordHasher;
             _currentUser = currentUser;
+            _emailService = emailService;
+            _emailSettings = emailOptions.Value;       
+           
         }
 
         public async Task<User> CreateUserAsync(UserRegisterDto registerDto)
@@ -80,10 +89,9 @@ namespace Infrastructure.Services
             var cRole = _currentUser.Role;
             var cOrg = _currentUser.OrganizationId;
             if (cRole == Role.SUPERADMIN
-                || user.Role == Role.UNITHEAD
-                    && (cId == user.Id || ( cRole == Role.ADMIN && cOrg == user.OrganizationId))
-                || user.Role == Role.TRAINER 
-                    && (cId == user.Id ||(cRole == Role.ADMIN && cOrg == user.OrganizationId)))
+                || cId == user.Id //Update there own profile
+                || user.Role == Role.UNITHEAD && (cId == user.Id || ( cRole == Role.ADMIN && cOrg == user.OrganizationId))
+                || user.Role == Role.TRAINER  && (cId == user.Id ||(cRole == Role.ADMIN && cOrg == user.OrganizationId)))
             {
                 if (updateDto.Password is not null) user.PasswordHash = _passwordHasher.HashPassword(updateDto.Password);
                 if(updateDto.FirstName is not null) user.FirstName = updateDto.FirstName;
@@ -146,6 +154,48 @@ namespace Infrastructure.Services
                 ServiceResult.Failure($"User does not have the permission to deactivate user {id}", ServiceErrorStatus.FORBIDDEN);
             user.IsDeactivated = !activate;
             await _userRepository.SaveAsync(user);
+            return ServiceResult.Success();
+        }
+
+        // NEW: Forgot Password
+        public async Task<ServiceResult> ForgotPasswordAsync(ForgotPasswordDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Email))
+                return ServiceResult.Failure("Email is required", ServiceErrorStatus.INVALIDOPERATION);
+
+            var user = await _userRepository.GetByEmailAsync(dto.Email);
+
+            // Always return success (avoid user enumeration)
+            if (user == null) return ServiceResult.Success();
+
+            var tokenBytes = RandomNumberGenerator.GetBytes(48);
+            var token = Convert.ToBase64String(tokenBytes)
+                .Replace("+", "-").Replace("/", "_").Replace("=", "");
+
+
+            var expiresAt = DateTimeOffset.UtcNow.AddHours(1);
+            await _userRepository.SetPasswordResetTokenAsync(user.Id, token, expiresAt);
+
+            var resetLink = $"{_emailSettings.ResetPasswordUrlBase}{token}";
+            await _emailService.SendPasswordResetEmailAsync(user.Email, resetLink);
+
+            return ServiceResult.Success();
+        }
+
+        // NEW: Reset Password
+        public async Task<ServiceResult> ResetPasswordAsync(ResetPasswordDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Token) || string.IsNullOrWhiteSpace(dto.NewPassword))
+                return ServiceResult.Failure("Token and new password are required", ServiceErrorStatus.INVALIDOPERATION);
+
+            var user = await _userRepository.GetByPasswordResetTokenAsync(dto.Token);
+            if (user == null)
+                return ServiceResult.Failure("Invalid or expired token", ServiceErrorStatus.INVALIDOPERATION);
+
+            user.PasswordHash = _passwordHasher.HashPassword(dto.NewPassword);
+            await _userRepository.SaveAsync(user);
+            await _userRepository.ClearPasswordResetTokenAsync(user.Id);
+
             return ServiceResult.Success();
         }
     }

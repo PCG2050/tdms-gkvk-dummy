@@ -25,5 +25,9 @@ namespace Domain.Entities
         public Organization Organization { get; set; } = null!;
         public ICollection<TrainerAssignment> TrainerAssignments { get; set; } = [];
         public ICollection<UserSession> UserSessions { get; set; } = [];
+
+        public string? PasswordResetToken { get; set; }
+        public DateTimeOffset? PasswordResetTokenExpiresAt { get; set; }
     }
 }
+    

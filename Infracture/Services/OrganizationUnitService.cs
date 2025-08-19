@@ -30,6 +30,8 @@ namespace Infrastructure.Services
             _trainerAssignment = trainerAssignment;         
         }
 
+        
+
         public async Task<OrganizationUnitLocation> AddUnitToOrganization(OrganizationUnitLocationDto addUnitLocationDto)
         {
             var role = _currentUser.Role;

@@ -123,5 +123,35 @@ namespace Infrastructure.Repository
             result.Items = trainersDtoQuery;
             return result;
         }
+
+        public async Task SetPasswordResetTokenAsync(int userId, string token, DateTimeOffset expiresAt)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null) return;
+
+            user.PasswordResetToken = token;
+            user.PasswordResetTokenExpiresAt = expiresAt;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<User?> GetByPasswordResetTokenAsync(string token)
+        {
+            var now = DateTimeOffset.UtcNow;
+            return await _context.Users.FirstOrDefaultAsync(u =>
+            u.PasswordResetToken == token &&
+            u.PasswordResetTokenExpiresAt != null &&
+            u.PasswordResetTokenExpiresAt > now &&
+            !u.IsDeactivated);
+        }
+
+        public async Task ClearPasswordResetTokenAsync(int userId)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null) return;
+            user.PasswordResetTokenExpiresAt = null;
+            user.PasswordResetToken = null;
+            await _context.SaveChangesAsync();
+             
+        }
     }
 }
