@@ -20,6 +20,7 @@ namespace Infrastructure.DbContext
 {
     public class TdmsDbContext : Microsoft.EntityFrameworkCore.DbContext
     {
+
         public TdmsDbContext(DbContextOptions<TdmsDbContext> options):base(options)
         {
         }
@@ -29,8 +30,7 @@ namespace Infrastructure.DbContext
         public DbSet<User> Users { get; set; }
         public DbSet<UserSession> UserSessions { get; set; }
         public DbSet<Unit> Units { get; set; }
-
-
+        
         public DbSet<FtiTrainingProgram> FtiTrainingPrograms { get; set; }
         public DbSet<FtiOtherActivity> FtiOtherActivities { get; set; }
         #region STU
@@ -69,6 +69,7 @@ namespace Infrastructure.DbContext
         #region Juntions
         public DbSet<OrganizationUnitLocation> OrganizationUnitLocations { get; set; }
         public DbSet<TrainerAssignment> UnitTrainers { get; set; }
+        public DbSet<UnitHeadAssignment> UnitHeadAssignments { get; set; }
         #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -88,8 +89,38 @@ namespace Infrastructure.DbContext
             {
                 modelBuilder.Entity(entityType.ClrType).Property(nameof(ReportEntryBaseEntity.CreatedAt))
                     .ValueGeneratedOnAdd()
-                    .HasDefaultValueSql("SYSUTCDATETIME()"); // for SQL Server/SQLite
+                    .HasDefaultValueSql("SYSUTCDATETIME()"); // for SQL Server/SQLite 
             }
+
+            //configure UnitHeadAssignment and assign them to location with 
+            modelBuilder.Entity<UnitHeadAssignment>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.HasOne(e => e.UnitHead)
+                    .WithMany(u => u.UnitHeadAssignments)
+                    .HasForeignKey(e => e.UnitHeadId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.UnitLocation)
+                    .WithMany(ul => ul.UnitHeadAssignments)
+                    .HasForeignKey(e => e.UnitLocationId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                // Ensure a UnitHead can only be assigned once per UnitLocation
+                entity.HasIndex(e => new { e.UnitHeadId, e.UnitLocationId })
+                    .IsUnique()
+                    .HasDatabaseName("IX_UnitHeadAssignment_UnitHead_UnitLocation");
+            });
+
+           
+
+            modelBuilder.Entity<TrainerAssignment>(entity =>
+            {
+                entity.ToTable(t => t.HasCheckConstraint("CK_TrainerAssignment_ValidSupervisor", 
+                 "([TrainerId] IS NULL OR EXISTS (SELECT 1 FROM Users u WHERE u.Id = [TrainerId] AND (u.SupervisorId IS NULL OR EXISTS (SELECT 1 FROM Users s WHERE s.Id = u.SupervisorId AND s.Role = 'UNITHEAD'))))"));
+            });
+
         }
     }
 }

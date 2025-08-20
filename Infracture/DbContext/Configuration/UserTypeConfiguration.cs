@@ -44,6 +44,12 @@ namespace Infrastructure.DbContext.Configuration
             builder
                 .Property(u => u.Gender)
                 .HasConversion<string>();
+
+            // ADD this new hierarchical relationship:
+            builder.HasOne(e => e.Supervisor)
+                .WithMany(u => u.Subordinates)
+                .HasForeignKey(e => e.SupervisorId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
