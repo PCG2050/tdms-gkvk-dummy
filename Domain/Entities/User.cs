@@ -20,21 +20,16 @@ namespace Domain.Entities
         public string Phone { get; set; }
         public bool IsPhoneConfirmed { get; set; }
         public required int? OrganizationId { get; set; }
-        public bool IsDeactivated { get; set; } = false;        
+        public bool IsDeactivated { get; set; } = false;
+
+        public Organization Organization { get; set; } = null!;
+        public ICollection<TrainerAssignment> TrainerAssignments { get; set; } = [];
+
+        public ICollection<UnitHeadAssignment> UnitHeadAssignments { get; set; } = [];
+        public ICollection<UserSession> UserSessions { get; set; } = [];
 
         public string? PasswordResetToken { get; set; }
         public DateTimeOffset? PasswordResetTokenExpiresAt { get; set; }
-
-        // NEW: Hierarchical relationship
-        public int? SupervisorId { get; set; }
-        public User? Supervisor { get; set; }
-        public ICollection<User> Subordinates { get; set; } = [];
-
-        // Navigation properties
-        public Organization Organization { get; set; } = null!;
-        public ICollection<TrainerAssignment> TrainerAssignments { get; set; } = [];
-        public ICollection<UnitHeadAssignment> UnitHeadAssignments { get; set; } = []; // NEW
-        public ICollection<UserSession> UserSessions { get; set; } = [];
     }
 }
     

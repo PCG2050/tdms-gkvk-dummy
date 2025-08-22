@@ -8,15 +8,24 @@ namespace Application.Models
 {
     public class UnitHeadDetailsDto
     {
-        public int  UnitId { get; set; }
-        public string Name { get; set; }
-        public List<UnitLocationDto> Locations { get; set; } = new List<UnitLocationDto>();
+        public int UserId { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Email { get; set; }
+        public List<UnitHeadUnitDto> Units { get; set; } = new List<UnitHeadUnitDto>();
     }
+
+    public class UnitHeadUnitDto
+    {
+        public int UnitId { get; set; }
+        public string Name { get; set; } // Unit Name
+        public List<UnitHeadLocationDto> Locations { get; set; } = new List<UnitHeadLocationDto>();
+    }
+
     public class UnitHeadLocationDto
     {
-        public int UnitLocationId { get; set; }
         public int StateId { get; set; }
-        public string StateName { get; set; }
+        public string StateName { get; set; } 
         public List<UnitHeadDistrictDto> Districts { get; set; } = new List<UnitHeadDistrictDto>();
     }
 
@@ -24,13 +33,5 @@ namespace Application.Models
     {
         public int DistrictId { get; set; }
         public string DistrictName { get; set; }
-    }
-
-    public class SubordinateTrainerDto
-    {
-        public int UserId { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Email { get; set; }
     }
 }

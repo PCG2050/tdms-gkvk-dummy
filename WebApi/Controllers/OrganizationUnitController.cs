@@ -19,11 +19,13 @@ namespace WebApi.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<ActionResult<IEnumerable<OrgUnitLocationDetailsDto>>> GetOrgUnits()
+        public async Task<ActionResult<IEnumerable<OrgUnitLocationIdDetailsDto>>> GetOrgUnits()
         {
             var mappedUnitsWithLocations = await _organizationUnit.GetOrganizationUnitsDetails();
             return Ok(mappedUnitsWithLocations);
         }
+
+
 
         [HttpPost]
         [Authorize(Roles = RoleString.Admin)]
@@ -58,5 +60,26 @@ namespace WebApi.Controllers
             if (!result.IsSuccess) return BadRequest(result.ErrorMessage);
             return Ok();
         }
+
+
+        [HttpPost("unitHeads/bulk")]
+        [Authorize(Roles = RoleString.Admin)]
+        public async Task<ActionResult> MapExistingUnitHeadsBulk(BulkUnitHeadAssignmentDto unitHeadsAssignments)
+        {
+            var results = await _organizationUnit.MapExistingUnitHeadsBulkAsync(unitHeadsAssignments);
+         
+            return Ok(results);
+        }
+
+        [HttpPost("unitHeads/bulkremap")]
+        [Authorize(Roles = RoleString.Admin)]
+        public async Task<ActionResult> ReMapExistingUnitHeadsBulk(BulkUnitHeadAssignmentDto unitHeadAssignmentDto)
+        {
+            var results = await _organizationUnit.UnMapExistingUnitHeadsBulkAsync(unitHeadAssignmentDto);
+                return Ok(results);
+        }
+
+
+
     }
 }

@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Services
 {
-    public class UserService:IUserService
+    public class UserService: IUserService
     {
         private readonly IUserRepository _userRepository;
         private readonly IPasswordHasher _passwordHasher;
@@ -110,6 +110,7 @@ namespace Infrastructure.Services
         public  Task<List<User>> GetOrganizationUnitTrainers(int unitId)
         {
             throw new NotImplementedException();
+         
         }
 
         public async Task<PaginatedResult<TrainerDetailsDto>> GetPaginatedOrganizationTrainers(int pageNumber=Constants.PAGINATION_PAGE_NUMBER_DEFAULT, int pageSize = Constants.PAGINATION_PAGE_SIZE_DEFAULT)
@@ -117,6 +118,13 @@ namespace Infrastructure.Services
             var usersResult = await _userRepository.GetPaginatedItemsAsync(_currentUser.OrganizationId, pageNumber, null, pageSize);
             return usersResult;
         }
+
+        public async Task<PaginatedResult<UnitHeadDetailsDto>> GetPaginatedOrganizationUnitHeads(int pageNumber = Constants.PAGINATION_PAGE_NUMBER_DEFAULT, int pageSize = Constants.PAGINATION_PAGE_SIZE_DEFAULT)
+        {
+            var usersResult = await _userRepository.GetPaginatedUnitHeadsAsync(_currentUser.OrganizationId, pageNumber, null, pageSize);
+            return usersResult;
+        }      
+
 
         public Task<List<User>> GetAllOrganizationUsersAsync()
         {

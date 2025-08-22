@@ -29,6 +29,8 @@ namespace Application.Models
     public class ServiceResult:IServiceResult
     {
         public bool IsSuccess { get; private set; }
+
+        public string SuccessMessage { get; set; }
         public string ErrorMessage { get; private set; } = null!;
 
         public ServiceErrorStatus ErrorStatus { get; private set; } = ServiceErrorStatus.NONE;
@@ -39,10 +41,25 @@ namespace Application.Models
             ErrorMessage = message,
             ErrorStatus = status
         };
-        public static ServiceResult Success() => new()
+      
+        public static ServiceResult Success() 
+         
         {
-            IsSuccess = true
-        };
+            return new()
+            {
+                IsSuccess = true
+            };
+            
+        }
+
+        public static ServiceResult Success(string message)
+        {
+            return new()
+            {
+                IsSuccess = true,
+                SuccessMessage = message
+            };
+        }
     }
 
     public interface IServiceResult

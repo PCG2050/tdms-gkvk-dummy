@@ -21,6 +21,9 @@ namespace Application.Interface
         Task<List<User>> GetOrganizationTrainers();
         Task<User> GetCurrentUserDetailsAsync();
         Task<PaginatedResult<TrainerDetailsDto>> GetPaginatedOrganizationTrainers(int pageNumber = Constants.PAGINATION_PAGE_NUMBER_DEFAULT, int pageSize = Constants.PAGINATION_PAGE_SIZE_DEFAULT);
+
+        Task<PaginatedResult<UnitHeadDetailsDto>> GetPaginatedOrganizationUnitHeads(int pageNumber = Constants.PAGINATION_PAGE_NUMBER_DEFAULT, int pageSize = Constants.PAGINATION_PAGE_SIZE_DEFAULT);
+
         Task<ServiceResult> UpdatedAccountStatus(int id, bool activate = true);
         Task<ServiceResult> ForgotPasswordAsync(ForgotPasswordDto dto);
         Task<ServiceResult> ResetPasswordAsync(ResetPasswordDto dto);

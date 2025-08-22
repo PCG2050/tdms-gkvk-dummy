@@ -8,12 +8,26 @@ namespace Application.Models
 {
     public class OrgUnitLocationDetailsDto
     {
+        
         public int UnitId { get; set; }
         public string UnitName { get; set; }
         public ICollection<LocationDto> Location { get; set; } = [];
     }
     public class LocationDto
+    {     
+        public int DistrictId { get; set; }
+        public string DistrictName { get; set; }
+        public int StateId { get; set; }
+        public string StateName { get; set; }
+    }
+
+   
+
+    public class OrgUnitLocationIdDetailsDto
     {
+        public int OrgUnitLocationId { get; set; }
+        public int UnitId { get; set; }
+        public string UnitName { get; set; }
         public int DistrictId { get; set; }
         public string DistrictName { get; set; }
         public int StateId { get; set; }

@@ -12,10 +12,15 @@ namespace Application.Interface
     public interface IOrganizationUnitService
     {
         Task<IEnumerable<OrganizationUnitLocation>> GetOrganizationUnits();
-        Task<IEnumerable<OrgUnitLocationDetailsDto>> GetOrganizationUnitsDetails();
+        Task<IEnumerable<OrgUnitLocationIdDetailsDto>> GetOrganizationUnitsDetails();
         Task<OrganizationUnitLocation> AddUnitToOrganization(OrganizationUnitLocationDto addUnitLocationDto);
         Task RemoveUnitFromOrganization(OrganizationUnitLocationDto organizationUnitLocationDto);
         Task<ServiceResult> MapExistingTrainersAsync(ExistingTrainerAssignmentDto trainerAssignment);
-        Task<ServiceResult> UnMapTrainerFromUnitLocationAsync(ExistingTrainerAssignmentDto trainerAssignment);
+        Task<ServiceResult> UnMapTrainerFromUnitLocationAsync(ExistingTrainerAssignmentDto trainerAssignment);       
+
+        Task<List<ServiceResult>> MapExistingUnitHeadsBulkAsync(BulkUnitHeadAssignmentDto unitHeadAssignments);
+
+        Task<List<ServiceResult>> UnMapExistingUnitHeadsBulkAsync(BulkUnitHeadAssignmentDto unitHeadAssignments);
+        
     }
 }

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Application.Interface.Repository
 {
-    public interface IUserRepository:IPagination<TrainerDetailsDto>
+    public interface IUserRepository
     {
         Task<User?> GetByIdAsync(int id);
         Task<User?> GetByEmailAsync(string email);
@@ -21,5 +21,12 @@ namespace Application.Interface.Repository
         Task SetPasswordResetTokenAsync(int userId, string token, DateTimeOffset expiresAt);
         Task<User?> GetByPasswordResetTokenAsync(string token);
         Task ClearPasswordResetTokenAsync(int userId);
+        // NEW: separate pagination
+        Task<PaginatedResult<TrainerDetailsDto>> GetPaginatedItemsAsync(
+            int organizationId, int pageNumber = 1, QueryFilter? queryFilter = null, int pageSize = 10);
+
+        Task<PaginatedResult<UnitHeadDetailsDto>> GetPaginatedUnitHeadsAsync(
+            int organizationId, int pageNumber = 1, QueryFilter? queryFilter = null, int pageSize = 10);
+
     }
 }

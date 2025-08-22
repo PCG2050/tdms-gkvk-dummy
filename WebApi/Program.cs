@@ -52,7 +52,7 @@ namespace WebApi
             builder.Services.Configure<SendGridSettings>(builder.Configuration.GetSection("SendGridMail"));
             builder.Services.AddTransient<IEmailService, SendGridEmailService>();
 
-            builder.Services.AddHttpContextAccessor();//For IHttpContextAccessor in infracture
+            builder.Services.AddHttpContextAccessor();//For IHttpContextAccessor in infrastructure
             builder.Services.AddScoped<ICurrentUserService,CurrentUserService>();
             builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
             builder.Services.AddScoped<ITokenService, AuthTokenService>();
@@ -70,6 +70,8 @@ namespace WebApi
             builder.Services.AddScoped<IUnitService, UnitService>();
             builder.Services.AddScoped<IOrganizationUnitRepository, OrganizationUnitRepository>();
             builder.Services.AddScoped<IOrganizationUnitService, OrganizationUnitService>();
+            builder.Services.AddScoped<IUnitHeadAssignmentRepository, UnitHeadAssignmentRepository>();
+            builder.Services.AddScoped<IUnitHeadAssignmentService, UnitHeadAssignmentService>();
             builder.Services.AddScoped<ITrainerAssignmentRepository, TrainerAssignmentRepository>();
             builder.Services.AddScoped<ITrainerAssignmentService, TrainerAssignmentService>();
             builder.Services.AddScoped<IEntityPermissionService, EntityPermissionService>();

@@ -68,7 +68,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost("{id}/users")]
-        [Authorize(Roles = RoleString.SuperAdmin)]
+        [Authorize(Roles = $"{RoleString.SuperAdmin}, {RoleString.Admin},{RoleString.UnitHead}")]
         public async Task<ActionResult<UserDto>> CreateUsers(int id,UserRegisterDto user)
         {
             try

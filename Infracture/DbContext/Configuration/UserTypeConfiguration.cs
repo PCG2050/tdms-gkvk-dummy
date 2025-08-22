@@ -38,18 +38,17 @@ namespace Infrastructure.DbContext.Configuration
                 .HasForeignKey(u => u.TrainerId);
 
             builder
+               .HasMany(u => u.UnitHeadAssignments)
+               .WithOne(u => u.UnitHead)
+               .HasForeignKey(u => u.UnitHeadId);
+
+            builder
                 .Property(x => x.EmployementType)
                 .HasConversion<string>();
 
             builder
                 .Property(u => u.Gender)
                 .HasConversion<string>();
-
-            // ADD this new hierarchical relationship:
-            builder.HasOne(e => e.Supervisor)
-                .WithMany(u => u.Subordinates)
-                .HasForeignKey(e => e.SupervisorId)
-                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
