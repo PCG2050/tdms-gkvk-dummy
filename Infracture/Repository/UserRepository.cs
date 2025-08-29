@@ -165,70 +165,7 @@ namespace Infrastructure.Repository
 
             result.Items = trainersDtoQuery;
             return result;
-        }
-
-
-
-        public async Task<PaginatedResult<UnitHeadDetailsDto>> GetPaginatedUnitHeadsAsync(int organizationId, int pageNumber = 1, QueryFilter? queryFilter = null, int pageSize = 10)
-        {
-            var query = _context.Users.Where(x =>
-                x.OrganizationId == organizationId && x.Role == Role.UNITHEAD);
-
-
-            var result = new PaginatedResult<UnitHeadDetailsDto>
-            {
-                PageNumber = pageNumber,
-                PageSize = pageSize,
-                TotalItems = await query.AsNoTracking().CountAsync()
-            };
-
-
-            int offset = (pageNumber - 1) * pageSize;
-            var unitHeadsDtoQuery = await query
-                                    .OrderBy(u => u.Id) // Essential for consistent pagination results
-                                    .Skip(offset)
-                                    .Take(pageSize)
-                                    .Select(u => new UnitHeadDetailsDto
-                                    {
-                                        UserId = u.Id,
-                                        FirstName = u.FirstName,
-                                        LastName = u.LastName,
-                                        Email = u.Email,
-                                        Phone = u.Phone,
-                                        Units = u.UnitHeadAssignments
-                                            .Select(ta => ta.UnitLocation.Unit) // Select the Unit entity first
-                                            .Distinct() // Get unique units if a trainer is assigned to multiple locations within the same unit                                        
-                                            .Select(unit => new UnitHeadUnitDto
-                                            {
-                                                UnitId = unit.Id,
-                                                Name = unit.Name,
-                                                Locations = u.UnitHeadAssignments
-                                                    .Where(ta => ta.UnitLocation.UnitId == unit.Id) // Filter assignments for this specific unit
-                                                    .Select(ta => ta.UnitLocation)
-                                                    .Distinct() // Get unique locations within this unit
-                                                    .Select(ul => new UnitHeadLocationDto
-                                                    {
-                                                        StateId = ul.District.State.Id, // Access State via District
-                                                        StateName = ul.District.State.Name,
-                                                        Districts = u.UnitHeadAssignments
-                                                            .Where(ta => ta.UnitLocation.Id == ul.Id) // Filter assignments for this specific location
-                                                            .Select(ta => ta.UnitLocation.District)
-                                                            .Distinct()
-                                                            .Select(d => new UnitHeadDistrictDto
-                                                            {
-                                                                DistrictId = d.Id,
-                                                                DistrictName = d.Name
-                                                            })
-                                                            .ToList()
-                                                    })
-                                                    .ToList()
-                                            })
-                                            .ToList()
-                                    }).ToListAsync();
-            result.Items = unitHeadsDtoQuery;
-            return result;
-        }
-
+        }   
         public async Task<List<FlatUnitHeadDetailsDto>> GetDetailedPaginatedUnitHeadsAsync(int organizationId)
         {
             var unitHeads = await _context.Users
