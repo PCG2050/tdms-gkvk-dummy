@@ -37,6 +37,13 @@ namespace Infrastructure.Repository
                               select trainer).AnyAsync();
         }
 
+       //First => CHeck Trainer LInked to unit
+       // Check the trainer details for the location
+       // ?? Trainer assignment Update
+       //  get the deteils of the trainers as per the unitHead
+       // 
+
+
         public Task DeleteAsync(int id)
         {
             throw new NotImplementedException();
@@ -59,6 +66,9 @@ namespace Infrastructure.Repository
             throw new NotImplementedException();
         }
 
+
+     
+        
         public async Task<List<TrainerUnitWithLocationsDto>> GetAssignmentsDetailsByTrainerAsync(int trainerId)
         {
            var trainerAssignments = await _context.UnitTrainers
@@ -84,5 +94,13 @@ namespace Infrastructure.Repository
             }).ToListAsync();
             return trainerAssignments;
         }
+
+
+        public async Task<bool> HasAssignmentsForUnitLocationAsync(int unitLocationId)
+        {
+            return await _context.UnitTrainers
+                .AnyAsync(ta => ta.UnitLocationId == unitLocationId);
+        }
     }
+
 }

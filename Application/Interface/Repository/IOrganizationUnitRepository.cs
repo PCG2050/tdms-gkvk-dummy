@@ -1,4 +1,5 @@
-﻿using Domain.Entities.Junction;
+﻿using Application.Models;
+using Domain.Entities.Junction;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,11 +12,21 @@ namespace Application.Interface.Repository
     {
         Task<OrganizationUnitLocation?> GetByOrganizationUnitDistrictAsync(int orgId, int unitId, int districtId);
         Task<IEnumerable<OrganizationUnitLocation>> GetByOrganizationIdAsync(int organizationId);
+
+        Task<OrganizationUnitLocation?> GetByOrganizationUnitLocationsIdAsync(int id);
+
         Task<IEnumerable<OrganizationUnitLocation>> GetByUnitIdAsync(int unitId);
         Task<IEnumerable<OrganizationUnitLocation>> GetByDistrictIdAsync(int districtId);
         IQueryable<OrganizationUnitLocation> GetQueryable();
         Task<bool> ExistsAsync(int orgId, int unitId, int districtId);
         Task SaveAsync(OrganizationUnitLocation entity);
         Task DeleteAsync(OrganizationUnitLocation entity);
+
+        // New methods for Admin UnitLocation management
+        Task<PaginatedResult<OrgUnitLocationIdDetailsDto>> GetPaginatedUnitLocationsCreatedByAsync(int createdById, int pageNumber = 1, int pageSize = 10);
+        Task<List<OrganizationUnitLocation>> GetUnitLocationsCreatedByAsync(int createdById);
+
+        // Additional methods for PATCH operations
+        Task<OrganizationUnitLocation?> GetByIdAsync(int id);
     }
 }

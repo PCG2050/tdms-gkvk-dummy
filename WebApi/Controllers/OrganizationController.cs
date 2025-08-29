@@ -19,6 +19,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<OrganizationDto>> GetOrganization(int id)
         {
             var organization = await _organizationService.GetOrganizationAsync(id);

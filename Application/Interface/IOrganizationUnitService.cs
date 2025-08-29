@@ -18,9 +18,23 @@ namespace Application.Interface
         Task<ServiceResult> MapExistingTrainersAsync(ExistingTrainerAssignmentDto trainerAssignment);
         Task<ServiceResult> UnMapTrainerFromUnitLocationAsync(ExistingTrainerAssignmentDto trainerAssignment);       
 
-        Task<List<ServiceResult>> MapExistingUnitHeadsBulkAsync(BulkUnitHeadAssignmentDto unitHeadAssignments);
+        Task<List<ServiceResult>> MapExistingUnitHeadsByLocationBulkAsync(BulkUnitHeadAssignmentByLocationDto request);
 
-        Task<List<ServiceResult>> UnMapExistingUnitHeadsBulkAsync(BulkUnitHeadAssignmentDto unitHeadAssignments);
-        
+        Task<ServiceResult> SyncUnitHeadAssignmentsByLocationAsync(BulkUnitHeadAssignmentByLocationDto request);
+
+
+        // New methods for Admin to get UnitLocations they created
+        Task<PaginatedResult<OrgUnitLocationIdDetailsDto>> GetUnitLocationsCreatedByAdmin(int adminId, int pageNumber = 1, int pageSize = 10);
+        Task<List<OrgUnitLocationIdDetailsDto>> GetAllUnitLocationsCreatedByAdmin(int adminId);
+
+        // New methods for PATCH operations
+        Task<OrgUnitLocationIdDetailsDto?> GetOrganizationUnitLocationById(int id);
+        Task<ServiceResult<OrgUnitLocationIdDetailsDto>> UpdateOrganizationUnitLocationAsync(OrganizationUnitLocationUpdateDto updateDto);
+        //Task<List<ServiceResult<OrgUnitLocationIdDetailsDto>>> BulkUpdateOrganizationUnitLocationsAsync(BulkOrganizationUnitLocationUpdateDto bulkUpdateDto);
+        Task<ServiceResult> RemoveUnitFromOrganizationById(int id);
+
+
+
+
     }
 }

@@ -17,7 +17,18 @@ namespace Application.Interface.Repository
             Task DeleteAsync(int id);
             Task DeleteAsync(UnitHeadAssignment unitLocationUnitHead);
             Task<bool> AssignmentExistsAsync(ExistingUnitHeadAssignmentDto UnitHeadAssignment);
+
+            Task<bool> AssignmentExistsByLocationAsync(int unitLocationId, int unitHeadId);
             Task<List<UnitWithLocationsDto>> GetAssignmentsDetailsByUnitHeadAsync(int unitHeadId);
-        
+
+
+        Task<List<UnitHeadAssignment>> GetByUnitHeadIdAsync(int unitHeadId);
+        Task AddRangeAsync(IEnumerable<UnitHeadAssignment> assignments);
+        Task DeleteRangeAsync(IEnumerable<UnitHeadAssignment> assignments);
+
+
+        // New method for checking assignments before deletion
+        Task<bool> HasAssignmentsForUnitLocationAsync(int unitLocationId);
+
     }
 }

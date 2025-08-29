@@ -13,10 +13,9 @@ namespace Application.Models
         public int DistrictId { get; set; }
     }
 
-    public class BulkUnitHeadAssignmentDto
+    public class BulkUnitHeadAssignmentByLocationDto
     {
         public int UnitHeadId { get; set; }
-        public int UnitId { get; set; }
-        public List<int> DistrictIds { get; set; } = new();
+        public List<int> OrganizationUnitLocationIds {get;set; }     
     }
 }

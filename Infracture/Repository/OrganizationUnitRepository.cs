@@ -1,7 +1,9 @@
 ﻿using Application.Interface.Repository;
+using Application.Models;
 using Domain.Entities.Junction;
 using Infrastructure.DbContext;
 using Microsoft.EntityFrameworkCore;
+using SendGrid.Helpers.Mail;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,8 +12,15 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Repository
 {
-    public class OrganizationUnitRepository(TdmsDbContext _dbContext) : IOrganizationUnitRepository
+    public class OrganizationUnitRepository : IOrganizationUnitRepository
     {
+        private readonly TdmsDbContext _dbContext;
+
+        public OrganizationUnitRepository(TdmsDbContext dbContext)
+        {
+            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+        }
+
         public async Task DeleteAsync(OrganizationUnitLocation entity)
         {
             _dbContext.OrganizationUnitLocations.Remove(entity);
@@ -32,6 +41,15 @@ namespace Infrastructure.Repository
         {
             return await _dbContext.OrganizationUnitLocations.Where(x => x.OrganizationId == organizationId)
                 .ToListAsync();
+        }
+
+
+        public async Task<OrganizationUnitLocation?> GetByOrganizationUnitLocationsIdAsync(int id)
+        {
+            return await _dbContext.OrganizationUnitLocations
+                .Include(x => x.Unit)
+                .Include(x => x.District)
+                .FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<OrganizationUnitLocation?> GetByOrganizationUnitDistrictAsync(int orgId, int unitId, int districtId)
@@ -59,6 +77,67 @@ namespace Infrastructure.Repository
             _dbContext.OrganizationUnitLocations.Add(entity);                   
             
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<OrganizationUnitLocation?> GetByIdAsync(int id)
+        {
+            return await _dbContext.OrganizationUnitLocations
+                .Include(x => x.Unit)
+                .Include(x => x.District)
+                    .ThenInclude(d => d.State)
+                .FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        // NEW: Get paginated UnitLocations created by a specific user (Admin)
+        public async Task<PaginatedResult<OrgUnitLocationIdDetailsDto>> GetPaginatedUnitLocationsCreatedByAsync(int createdById, int pageNumber = 1, int pageSize = 10)
+        {
+            var query = _dbContext.OrganizationUnitLocations
+                .Where(x => x.CreatedById == createdById)
+                .Include(x => x.Unit)
+                .Include(x => x.District)
+                    .ThenInclude(d => d.State);
+
+            var result = new PaginatedResult<OrgUnitLocationIdDetailsDto>
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+            };
+
+            result.TotalItems = await query.AsNoTracking().CountAsync();
+            int offset = (pageNumber - 1) * pageSize;
+
+            var unitLocationsDtoQuery = await query
+                .OrderBy(x => x.Id)
+                .Skip(offset)
+                .Take(pageSize)
+                .Select(x => new OrgUnitLocationIdDetailsDto
+                {
+                    OrgUnitLocationId = x.Id,
+                    UnitId = x.Unit.Id,
+                    UnitName = x.Unit.Name,
+                    StateId = x.District.State.Id,
+                    StateName = x.District.State.Name,
+                    DistrictId = x.District.Id,
+                    DistrictName = x.District.Name
+                })
+                .ToListAsync();
+
+            result.Items = unitLocationsDtoQuery;
+            return result;
+        }
+
+        // NEW: Get all UnitLocations created by a specific user (Admin) - non-paginated
+        public async Task<List<OrganizationUnitLocation>> GetUnitLocationsCreatedByAsync(int createdById)
+        {
+            return await _dbContext.OrganizationUnitLocations
+                .Where(x => x.CreatedById == createdById)
+                .Include(x => x.Unit)
+                .Include(x => x.District)
+                    .ThenInclude(d => d.State)
+                .OrderBy(x => x.Unit.Name)
+                .ThenBy(x => x.District.State.Name)
+                .ThenBy(x => x.District.Name)
+                .ToListAsync();
         }
     }
 }

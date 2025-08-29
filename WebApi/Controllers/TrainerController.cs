@@ -22,15 +22,24 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = RoleString.Admin)]
+        [Authorize(Roles = $"{RoleString.Admin},{RoleString.UnitHead}")]
         public async Task<IActionResult> GetTrainersOverview([FromQuery]PaginationRequest paginationRequest)
         {
             var paginatedResult = await _userService.GetPaginatedOrganizationTrainers(paginationRequest.PageNumber, paginationRequest.PageSize);
             return Ok(paginatedResult);
         }
 
+        [HttpGet("Details/all")]
+        [Authorize(Roles = $"{RoleString.Admin},{RoleString.UnitHead}")]
+        public async Task<IActionResult> GetTrainerDetails([FromQuery] PaginationRequest paginationRequest)
+        {
+            var paginationResult = await _userService.GetPaginatedOrgTrainers(paginationRequest.PageNumber, paginationRequest.PageSize);
+            return Ok(paginationResult);
+        }
+
+
         [HttpGet("{trainerId}/units")]
-        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.Admin}")]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.Admin},{RoleString.UnitHead}")]
         public async Task<IActionResult> GetTrainerUnits(int trainerId)
         {
             var result = await _assignmentService.GetTrainerUnits(trainerId);

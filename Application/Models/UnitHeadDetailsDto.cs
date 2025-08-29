@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Application.Models
+﻿namespace Application.Models
 {
     public class UnitHeadDetailsDto
     {
@@ -12,6 +6,7 @@ namespace Application.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
+        public string? Phone { get; set; }
         public List<UnitHeadUnitDto> Units { get; set; } = new List<UnitHeadUnitDto>();
     }
 
@@ -25,7 +20,7 @@ namespace Application.Models
     public class UnitHeadLocationDto
     {
         public int StateId { get; set; }
-        public string StateName { get; set; } 
+        public string StateName { get; set; }
         public List<UnitHeadDistrictDto> Districts { get; set; } = new List<UnitHeadDistrictDto>();
     }
 
@@ -34,4 +29,30 @@ namespace Application.Models
         public int DistrictId { get; set; }
         public string DistrictName { get; set; }
     }
+
+    public class FlatUnitHeadDetailsDto
+    {
+        public int UserId { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Email { get; set; }
+
+        public string Phone { get; set; }
+        public List<UnitLocationDetailsDto> UnitLocationDetails { get; set; } = new List<UnitLocationDetailsDto>();
+
+    }
+
+    public class UnitLocationDetailsDto
+    {
+        public int UnitLocationId { get; set; }
+        public int UnitId { get; set; }
+        public string UnitName { get; set; }
+        public int StateId { get; set; }
+        public string StateName { get; set; }
+        public int DistrictId { get; set; }
+        public string DistrictName { get; set; }
+    }
+
+
+
 }

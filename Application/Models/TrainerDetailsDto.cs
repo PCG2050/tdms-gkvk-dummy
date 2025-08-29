@@ -34,4 +34,16 @@ namespace Application.Models
         public int DistrictId { get; set; }
         public string DistrictName { get; set; }
     }
+
+    public class FlatTrainerDetailsDto
+    {
+        public int UserId { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+
+        public string Email { get; set; }
+        public int UnitLocationId { get; set; }
+        public UnitLocationDetailsDto UnitLocationDetails { get; set; }
+    }
+
 }

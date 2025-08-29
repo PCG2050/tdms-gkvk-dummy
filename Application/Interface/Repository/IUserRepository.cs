@@ -1,11 +1,6 @@
 ﻿using Application.Models;
 using Domain.Entities;
 using Domain.Entities.Enum;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Interface.Repository
 {
@@ -21,12 +16,18 @@ namespace Application.Interface.Repository
         Task SetPasswordResetTokenAsync(int userId, string token, DateTimeOffset expiresAt);
         Task<User?> GetByPasswordResetTokenAsync(string token);
         Task ClearPasswordResetTokenAsync(int userId);
-        // NEW: separate pagination
+
         Task<PaginatedResult<TrainerDetailsDto>> GetPaginatedItemsAsync(
             int organizationId, int pageNumber = 1, QueryFilter? queryFilter = null, int pageSize = 10);
 
         Task<PaginatedResult<UnitHeadDetailsDto>> GetPaginatedUnitHeadsAsync(
             int organizationId, int pageNumber = 1, QueryFilter? queryFilter = null, int pageSize = 10);
 
+        Task<List<FlatUnitHeadDetailsDto>> GetDetailedPaginatedUnitHeadsAsync(int organizationId);
+
+        Task<PaginatedResult<FlatTrainerDetailsDto>> GetDetailedPaginatedTrainersAsync(
+            int organizaitonId, int pageNumber = 1, QueryFilter? queryFilter = null, int pageSize = 10);
+
+        Task<List<User>> GetTrainersCreatedByAsync(int createdById);
     }
 }

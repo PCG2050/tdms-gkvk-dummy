@@ -2,7 +2,6 @@
 {
     public class OrganizationUnitLocation:AuditableBaseEntity
     {
-      
         public int OrganizationId { get; set; }
         public int UnitId { get; set; }
         public int DistrictId { get; set; }

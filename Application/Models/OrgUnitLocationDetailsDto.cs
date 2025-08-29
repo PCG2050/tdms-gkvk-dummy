@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 namespace Application.Models
 {
     public class OrgUnitLocationDetailsDto
-    {
-        
+    {        
         public int UnitId { get; set; }
         public string UnitName { get; set; }
+
         public ICollection<LocationDto> Location { get; set; } = [];
     }
     public class LocationDto
@@ -19,9 +19,7 @@ namespace Application.Models
         public string DistrictName { get; set; }
         public int StateId { get; set; }
         public string StateName { get; set; }
-    }
-
-   
+    }  
 
     public class OrgUnitLocationIdDetailsDto
     {

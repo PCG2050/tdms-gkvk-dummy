@@ -3,6 +3,7 @@ using Application.Interface.Repository;
 using Application.Models;
 using Domain.Entities.Enum;
 using Domain.Entities.Junction;
+using Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -61,30 +62,7 @@ namespace Infrastructure.Services
             if (orgUnits == null || !orgUnits.Any()) return [];
             else return orgUnits;
         }
-
-        //public async Task<IEnumerable<OrgUnitLocationDetailsDto>> GetOrganizationUnitsDetails()
-        //{
-
-        //    return await _organizationUnit.GetQueryable()
-        //        .Where(x => x.OrganizationId == _currentUser.OrganizationId && x.CreatedById == _currentUser.UserId) 
-        //        .Include(x => x.Unit)
-        //        .Include(x => x.District)
-        //        .ThenInclude(x => x.State)
-        //        .GroupBy(x => new { x.Unit.Id, x.Unit.Name })
-        //            .Select(g => new OrgUnitLocationDetailsDto
-        //            {                         
-        //                UnitId = g.Key.Id,
-        //                UnitName = g.Key.Name,
-        //                Location = g.Select(x => new LocationDto
-        //                {                           
-        //                    StateId = x.District.State.Id,
-        //                    StateName = x.District.State.Name,
-        //                    DistrictId = x.District.Id,
-        //                    DistrictName = x.District.Name
-        //                }).Distinct().ToList()
-        //            })
-        //        .ToListAsync();
-        //}
+  
         public async Task<IEnumerable<OrgUnitLocationIdDetailsDto>> GetOrganizationUnitsDetails()
         {
             return await _organizationUnit.GetQueryable()
@@ -118,7 +96,7 @@ namespace Infrastructure.Services
         }
         public async Task<ServiceResult> MapExistingTrainersAsync(ExistingTrainerAssignmentDto trainerAssignment)
         {
-            var unitLocation =  await _organizationUnit.GetByOrganizationUnitDistrictAsync(_currentUser.OrganizationId, trainerAssignment.UnitId, trainerAssignment.DistrictId);
+            var unitLocation = await _organizationUnit.GetByOrganizationUnitDistrictAsync(_currentUser.OrganizationId, trainerAssignment.UnitId, trainerAssignment.DistrictId);
             if (unitLocation is null)
                 return ServiceResult.Failure("This Unit mapping does not exist");
             var trainer = await _userService.GetUserByIdAsync(trainerAssignment.TrainerId);
@@ -129,16 +107,16 @@ namespace Infrastructure.Services
                 return ServiceResult.Failure("The trainer is already assigned to this Unit");
             var newAssignment = new TrainerAssignment
             {
-                TrainerId = trainerAssignment.TrainerId,                
+                TrainerId = trainerAssignment.TrainerId,
                 UnitLocationId = unitLocation.Id,
                 CreatedAt = DateTimeOffset.UtcNow,
                 CreatedById = _currentUser.UserId
-                
-                
+
+
             };
             await _trainerAssignment.AddAsync(newAssignment);
             return ServiceResult.Success();
-          
+
         }
         public async Task<ServiceResult> UnMapTrainerFromUnitLocationAsync(ExistingTrainerAssignmentDto trainerAssignment)
         {
@@ -152,128 +130,347 @@ namespace Infrastructure.Services
             return ServiceResult.Success();
         }
 
-     
 
-        public async Task<List<ServiceResult>> MapExistingUnitHeadsBulkAsync(BulkUnitHeadAssignmentDto request)
+
+        public async Task<List<ServiceResult>> MapExistingUnitHeadsByLocationBulkAsync(BulkUnitHeadAssignmentByLocationDto request)
         {
             var results = new List<ServiceResult>();
 
+            // Get the UnitHead
             var unitHead = await _userService.GetUserByIdAsync(request.UnitHeadId);
             if (unitHead is null)
                 return [ServiceResult.Failure($"UnitHead {request.UnitHeadId} does not exist")];
 
-            foreach (var districtId in request.DistrictIds)
+            foreach (var locationId in request.OrganizationUnitLocationIds)
             {
                 try
                 {
-                    var unitLocation = await _organizationUnit
-                        .GetByOrganizationUnitDistrictAsync(_currentUser.OrganizationId, request.UnitId, districtId);
-
+                    var unitLocation = await _organizationUnit.GetByOrganizationUnitLocationsIdAsync(locationId);
                     if (unitLocation is null)
                     {
-                       
-                        unitLocation = new OrganizationUnitLocation
-                        {
-                            
-                            UnitId = request.UnitId,
-                            DistrictId = districtId,
-                            OrganizationId = _currentUser.OrganizationId,
-                            CreatedAt = DateTimeOffset.UtcNow,
-                            CreatedById = _currentUser.UserId
-                        };
-                        await _organizationUnit.SaveAsync(unitLocation);                    
-                      
+                        results.Add(ServiceResult.Failure($"OrgUnitLocation {locationId} does not exist"));
+                        continue;
                     }
-                    var alreadyExists = await _unitHeadAssignment.AssignmentExistsAsync(
-                        new ExistingUnitHeadAssignmentDto
-                        {
-                            UnitHeadId = request.UnitHeadId,
-                            UnitId = request.UnitId,
-                            DistrictId = districtId
-                        });
+
+                    // ✅ Validation: Only assign if created by same admin
+                    if (unitLocation.CreatedById != unitHead.CreatedById)
+                    {
+                        results.Add(ServiceResult.Failure(
+                            $"UnitHead {request.UnitHeadId} cannot be assigned to OrgUnitLocation {locationId} because they were created by different admins"));
+                        continue;
+                    }
+
+                    // ✅ Check if already assigned
+                    var alreadyExists = await _unitHeadAssignment.AssignmentExistsByLocationAsync(
+                        unitLocation.Id, request.UnitHeadId);
 
                     if (alreadyExists)
                     {
                         results.Add(ServiceResult.Failure(
-                            $"UnitHead {request.UnitHeadId} is already assigned to Unit {request.UnitId}, District {districtId}"));
+                            $"UnitHead {request.UnitHeadId} is already assigned to OrgUnitLocation {locationId}"));
                         continue;
                     }
 
+                    // ✅ Create assignment
                     var newAssignment = new UnitHeadAssignment
                     {
                         UnitHeadId = request.UnitHeadId,
-                        UnitLocationId = unitLocation.Id, 
+                        UnitLocationId = unitLocation.Id,
                         CreatedAt = DateTimeOffset.UtcNow,
                         CreatedById = _currentUser.UserId
                     };
 
                     await _unitHeadAssignment.AddAsync(newAssignment);
                     results.Add(ServiceResult.Success(
-                        $"Successfully assigned UnitHead {request.UnitHeadId} to Unit {request.UnitId}, District {districtId}"));
+                        $"Successfully assigned UnitHead {request.UnitHeadId} to OrgUnitLocation {locationId}"));
                 }
                 catch (Exception ex)
                 {
                     results.Add(ServiceResult.Failure(
-                        $"Error assigning UnitHead {request.UnitHeadId} to Unit {request.UnitId}, District {districtId}: {ex.Message}"));
+                        $"Error assigning UnitHead {request.UnitHeadId} to OrgUnitLocation {locationId}: {ex.Message}"));
                 }
             }
+
             return results;
+        }
+
+     
+
+        public async Task<ServiceResult> SyncUnitHeadAssignmentsByLocationAsync(BulkUnitHeadAssignmentByLocationDto request)
+        {
+            var unitHead = await _userService.GetUserByIdAsync(request.UnitHeadId);
+            if (unitHead is null)
+                return ServiceResult.Failure($"UnitHead {request.UnitHeadId} does not exist");
+
+            // Current assignments
+            var existingAssignments = await _unitHeadAssignment.GetByUnitHeadIdAsync(request.UnitHeadId);
+            var existingIds = existingAssignments.Select(x => x.UnitLocationId).ToList();
+            var newIds = request.OrganizationUnitLocationIds ?? new List<int>();
+
+            // Find what to add / remove
+            var toAddIds = newIds.Except(existingIds).ToList();
+            var toRemove = existingAssignments.Where(x => !newIds.Contains(x.UnitLocationId)).ToList();
+
+            // ---- ADD ----
+            var newAssignments = new List<UnitHeadAssignment>();
+            foreach (var locationId in toAddIds)
+            {
+                var unitLocation = await _organizationUnit.GetByOrganizationUnitLocationsIdAsync(locationId);
+                if (unitLocation is null) continue;
+
+                // Validation: Only allow if the UnitHead was created by same admin as UnitLocation
+                if (unitLocation.CreatedById != unitHead.CreatedById)
+                    continue;
+
+                newAssignments.Add(new UnitHeadAssignment
+                {
+                    UnitHeadId = request.UnitHeadId,
+                    UnitLocationId = locationId,
+                    CreatedAt = DateTimeOffset.UtcNow,
+                    CreatedById = _currentUser.UserId
+                });
+            }
+
+            if (newAssignments.Any())
+                await _unitHeadAssignment.AddRangeAsync(newAssignments);
+
+            // ---- REMOVE ----
+            if (toRemove.Any())
+                await _unitHeadAssignment.DeleteRangeAsync(toRemove);
+
+            return ServiceResult.Success("Assignments synced successfully");
         }
 
 
 
-        public async Task<List<ServiceResult>> UnMapExistingUnitHeadsBulkAsync(BulkUnitHeadAssignmentDto request)
+
+
+
+        //public async Task<List<ServiceResult>> UnMapExistingUnitHeadsBulkAsync(BulkUnitHeadAssignmentByLocationDto request)
+        //{
+        //    var results = new List<ServiceResult>();
+
+        //    // validate unit head first
+        //    var unitHead = await _userService.GetUserByIdAsync(request.UnitHeadId);
+        //    if (unitHead is null)
+        //        return [ServiceResult.Failure($"UnitHead {request.UnitHeadId} does not exist")];
+
+        //    foreach (var districtId in request.DistrictIds)
+        //    {
+        //        try
+        //        {
+        //            // find the unit location for org + unit + district
+        //            var unitLocation = await _organizationUnit
+        //                .GetByOrganizationUnitDistrictAsync(_currentUser.OrganizationId, request.UnitId, districtId);
+
+        //            if (unitLocation is null)
+        //            {
+        //                results.Add(ServiceResult.Failure(
+        //                    $"No UnitLocation found for Unit {request.UnitId}, District {districtId}"));
+        //                continue;
+        //            }
+
+        //            // check assignment exists
+        //            var existingAssignment = await _unitHeadAssignment
+        //                .GetByUnitHeadLocationAsync(unitLocation.Id, request.UnitHeadId);
+
+        //            if (existingAssignment is null)
+        //            {
+        //                results.Add(ServiceResult.Failure(
+        //                    $"UnitHead {request.UnitHeadId} is not assigned to Unit {request.UnitId}, District {districtId}"));
+        //                continue;
+        //            }
+
+        //            // remove assignment
+        //            await _unitHeadAssignment.DeleteAsync(existingAssignment);
+
+
+        //            results.Add(ServiceResult.Success(
+        //                $"Successfully unassigned UnitHead {request.UnitHeadId} from Unit {request.UnitId}, District {districtId}"));
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            results.Add(ServiceResult.Failure(
+        //                $"Error unassigning UnitHead {request.UnitHeadId} from Unit {request.UnitId}, District {districtId}: {ex.Message}"));
+        //        }
+        //    }
+
+        //    return results;
+        //}     
+        // NEW: Get paginated UnitLocations created by a specific Admin
+        public async Task<PaginatedResult<OrgUnitLocationIdDetailsDto>> GetUnitLocationsCreatedByAdmin(int adminId, int pageNumber = 1, int pageSize = 10)
         {
-            var results = new List<ServiceResult>();
+            // Check permissions: only the Admin themselves or SuperAdmin can access this
+            if (_currentUser.UserId != adminId && _currentUser.Role != Role.SUPERADMIN)
+                throw new UnauthorizedAccessException("You don't have permission to access this data");
 
-            // validate unit head first
-            var unitHead = await _userService.GetUserByIdAsync(request.UnitHeadId);
-            if (unitHead is null)
-                return [ServiceResult.Failure($"UnitHead {request.UnitHeadId} does not exist")];
+            // Verify the user is actually an Admin
+            var admin = await _userService.GetUserByIdAsync(adminId);
+            if (admin == null || admin.Role != Role.ADMIN)
+                throw new InvalidOperationException("User is not an Admin");
 
-            foreach (var districtId in request.DistrictIds)
+            return await _organizationUnit.GetPaginatedUnitLocationsCreatedByAsync(adminId, pageNumber, pageSize);
+        }
+
+        // NEW: Get all UnitLocations created by a specific Admin (non-paginated)
+        public async Task<List<OrgUnitLocationIdDetailsDto>> GetAllUnitLocationsCreatedByAdmin(int adminId)
+        {
+            // Check permissions: only the Admin themselves or SuperAdmin can access this
+            if (_currentUser.UserId != adminId && _currentUser.Role != Role.SUPERADMIN)
+                throw new UnauthorizedAccessException("You don't have permission to access this data");
+
+            // Verify the user is actually an Admin
+            var admin = await _userService.GetUserByIdAsync(adminId);
+            if (admin == null || admin.Role != Role.ADMIN)
+                throw new InvalidOperationException("User is not an Admin");
+
+            var unitLocations = await _organizationUnit.GetUnitLocationsCreatedByAsync(adminId);
+
+            // Convert to OrgUnitLocationIdDetailsDto
+            return unitLocations.Select(ul => new OrgUnitLocationIdDetailsDto
             {
-                try
-                {
-                    // find the unit location for org + unit + district
-                    var unitLocation = await _organizationUnit
-                        .GetByOrganizationUnitDistrictAsync(_currentUser.OrganizationId, request.UnitId, districtId);
+                OrgUnitLocationId = ul.Id,
+                UnitId = ul.UnitId,
+                UnitName = ul.Unit?.Name ?? "Unknown Unit",
+                StateId = ul.District?.State?.Id ?? 0,
+                StateName = ul.District?.State?.Name ?? "Unknown State",
+                DistrictId = ul.DistrictId,
+                DistrictName = ul.District?.Name ?? "Unknown District"
+            }).ToList();
+        }
 
-                    if (unitLocation is null)
-                    {
-                        results.Add(ServiceResult.Failure(
-                            $"No UnitLocation found for Unit {request.UnitId}, District {districtId}"));
-                        continue;
-                    }
+        // NEW: Get organization unit location by ID
+        public async Task<OrgUnitLocationIdDetailsDto?> GetOrganizationUnitLocationById(int id)
+        {
+            var role = _currentUser.Role;
+            if (role == Role.UNDEFINED)
+                throw new UnauthorizedAccessException($"{role} does not have access to this action");
 
-                    // check assignment exists
-                    var existingAssignment = await _unitHeadAssignment
-                        .GetByUnitHeadLocationAsync(unitLocation.Id, request.UnitHeadId);
+            var unitLocation = await _organizationUnit.GetByIdAsync(id);
+            if (unitLocation == null) return null;
 
-                    if (existingAssignment is null)
-                    {
-                        results.Add(ServiceResult.Failure(
-                            $"UnitHead {request.UnitHeadId} is not assigned to Unit {request.UnitId}, District {districtId}"));
-                        continue;
-                    }
+            // Check if user has access to this unit location
+            if (role == Role.ADMIN && unitLocation.CreatedById != _currentUser.UserId)
+                throw new UnauthorizedAccessException("You can only access unit locations you created");
 
-                    // remove assignment
-                    await _unitHeadAssignment.DeleteAsync(existingAssignment);
-                   
+            return new OrgUnitLocationIdDetailsDto
+            {
+                OrgUnitLocationId = unitLocation.Id,
+                UnitId = unitLocation.UnitId,
+                UnitName = unitLocation.Unit?.Name ?? "Unknown Unit",
+                StateId = unitLocation.District?.State?.Id ?? 0,
+                StateName = unitLocation.District?.State?.Name ?? "Unknown State",
+                DistrictId = unitLocation.DistrictId,
+                DistrictName = unitLocation.District?.Name ?? "Unknown District"
+            };
+        }
 
-                    results.Add(ServiceResult.Success(
-                        $"Successfully unassigned UnitHead {request.UnitHeadId} from Unit {request.UnitId}, District {districtId}"));
-                }
-                catch (Exception ex)
-                {
-                    results.Add(ServiceResult.Failure(
-                        $"Error unassigning UnitHead {request.UnitHeadId} from Unit {request.UnitId}, District {districtId}: {ex.Message}"));
-                }
+        // NEW: Update organization unit location
+        public async Task<ServiceResult<OrgUnitLocationIdDetailsDto>> UpdateOrganizationUnitLocationAsync(OrganizationUnitLocationUpdateDto updateDto)
+        {
+            var role = _currentUser.Role;
+            if (role != Role.ADMIN)
+                throw new UnauthorizedAccessException($"{role} does not have access to update unit locations");
+
+            var existingUnitLocation = await _organizationUnit.GetByIdAsync(updateDto.Id);
+            if (existingUnitLocation == null)
+                return ServiceResult<OrgUnitLocationIdDetailsDto>.Failure("Unit location not found", ServiceErrorStatus.NOTFOUND);
+
+            // Check if admin created this unit location
+            if (existingUnitLocation.CreatedById != _currentUser.UserId)
+                throw new UnauthorizedAccessException("You can only update unit locations you created");
+
+            // Update fields if provided
+            bool hasChanges = false;
+
+            if (updateDto.UnitId.HasValue && updateDto.UnitId.Value != existingUnitLocation.UnitId)
+            {
+                existingUnitLocation.UnitId = updateDto.UnitId.Value;
+                hasChanges = true;
             }
 
-            return results;
-        }     
-     
-       
+            if (updateDto.DistrictId.HasValue && updateDto.DistrictId.Value != existingUnitLocation.DistrictId)
+            {
+                // Check if the new combination doesn't create a duplicate
+                if (await _organizationUnit.ExistsAsync(existingUnitLocation.OrganizationId,
+                    updateDto.UnitId ?? existingUnitLocation.UnitId, updateDto.DistrictId.Value))
+                {
+                    return ServiceResult<OrgUnitLocationIdDetailsDto>.Failure(
+                        "A unit location with this unit and district combination already exists",
+                        ServiceErrorStatus.INVALIDOPERATION);
+                }
+                existingUnitLocation.DistrictId = updateDto.DistrictId.Value;
+                hasChanges = true;
+            }
+
+            if (hasChanges)
+            {
+                existingUnitLocation.UpdatedAt = DateTimeOffset.UtcNow;
+                existingUnitLocation.UpdatedById = _currentUser.UserId;
+                await _organizationUnit.SaveAsync(existingUnitLocation);
+            }
+
+            // Return updated details
+            var updatedDetails = await GetOrganizationUnitLocationById(updateDto.Id);
+            return ServiceResult<OrgUnitLocationIdDetailsDto>.Success(updatedDetails!);
+        }
+
+        // NEW: Bulk update organization unit locations
+        //public async Task<List<ServiceResult<OrgUnitLocationIdDetailsDto>>> BulkUpdateOrganizationUnitLocationsAsync(BulkOrganizationUnitLocationUpdateDto bulkUpdateDto)
+        //{
+        //    var results = new List<ServiceResult<OrgUnitLocationIdDetailsDto>>();
+
+        //    foreach (var updateDto in bulkUpdateDto.Updates)
+        //    {
+        //        try
+        //        {
+        //            var result = await UpdateOrganizationUnitLocationAsync(updateDto);
+        //            results.Add(result);
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            results.Add(ServiceResult<OrgUnitLocationIdDetailsDto>.Failure(
+        //                $"Error updating unit location {updateDto.Id}: {ex.Message}",
+        //                ServiceErrorStatus.INVALIDOPERATION));
+
+        //            // If not continuing on error, break the loop
+        //            if (!bulkUpdateDto.ContinueOnError)
+        //                break;
+        //        }
+        //    }
+
+        //    return results;
+        //}
+
+        // NEW: Remove unit location by ID
+        public async Task<ServiceResult> RemoveUnitFromOrganizationById(int id)
+        {
+            var role = _currentUser.Role;
+            if (role != Role.ADMIN)
+                throw new UnauthorizedAccessException($"{role} does not have access to delete unit locations");
+
+            var unitLocation = await _organizationUnit.GetByIdAsync(id);
+            if (unitLocation == null)
+                return ServiceResult.Failure("Unit location not found", ServiceErrorStatus.NOTFOUND);
+
+            // Check if admin created this unit location
+            if (unitLocation.CreatedById != _currentUser.UserId)
+                throw new UnauthorizedAccessException("You can only delete unit locations you created");
+
+            // Check if there are any assignments that would be affected
+            var hasTrainerAssignments = await _trainerAssignment.HasAssignmentsForUnitLocationAsync(id);
+            var hasUnitHeadAssignments = await _unitHeadAssignment.HasAssignmentsForUnitLocationAsync(id);
+
+            if (hasTrainerAssignments || hasUnitHeadAssignments)
+            {
+                return ServiceResult.Failure(
+                    "Cannot delete unit location as it has active trainer or unit head assignments. Please remove assignments first.",
+                    ServiceErrorStatus.INVALIDOPERATION);
+            }
+
+            await _organizationUnit.DeleteAsync(unitLocation);
+            return ServiceResult.Success();
+        }
+
     }
 }

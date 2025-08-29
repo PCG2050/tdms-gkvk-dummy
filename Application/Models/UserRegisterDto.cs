@@ -11,9 +11,17 @@ namespace Application.Models
         public string Phone { get; set; } = string.Empty;
         public int? OrganizationId { get; set; }
         public Role Role { get; set; }
+        public DateOnly? DateOfBirth { get; set; }
+        public DateOnly? DateOfJoining { get; set; }
+        public EmployementType? EmploymentType { get; set; } 
+        public Gender? Gender { get; set; }
+        public string? Qualification { get; set; }
+
+        public List<int>? OrganizationUnitLocationIds { get; set; } = new();
     }
     public class UserUpdateDto
     {
+
         public int Id { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
@@ -22,5 +30,14 @@ namespace Application.Models
         public string? Phone { get; set; }
         public int? OrganizationId { get; set; }
         public Role? Role { get; set; }
+        public DateOnly? DateOfBirth { get; set; }
+        public DateOnly? DateOfJoining { get; set; }
+        public EmployementType? EmploymentType { get; set; }
+        public Gender? Gender { get; set; }
+        public string? Qualification { get; set; }
+        public List<int>? OrganizationUnitLocationIds { get; set; } = new();
     }
+
+  
+
 }

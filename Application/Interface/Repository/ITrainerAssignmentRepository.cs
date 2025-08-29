@@ -18,5 +18,8 @@ namespace Application.Interface.Repository
         Task DeleteAsync(TrainerAssignment unitLocationTrainer);
         Task<bool> AssignmentExistsAsync(ExistingTrainerAssignmentDto trainerAssignment);
         Task<List<TrainerUnitWithLocationsDto>> GetAssignmentsDetailsByTrainerAsync(int trainerId);
+
+        // New method for checking assignments before deletion
+        Task<bool> HasAssignmentsForUnitLocationAsync(int unitLocationId);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Application.Interface.Repository;
 using Application.Models;
+using Domain.Entities.Enum;
 using Domain.Entities.Junction;
 using Infrastructure.DbContext;
 using Microsoft.EntityFrameworkCore;
@@ -49,6 +50,12 @@ namespace Infrastructure.Repository
             await _context.SaveChangesAsync();
         }
 
+        public async Task<bool> AssignmentExistsByLocationAsync(int unitLocationId, int unitHeadId)
+        {
+            return await _context.UnitHeadAssignments
+                .AnyAsync(x => x.UnitLocationId == unitLocationId && x.UnitHeadId == unitHeadId);
+        }
+
         public async Task<UnitHeadAssignment?> GetByUnitHeadLocationAsync(int unitLocationId, int unitHeadId)
         {
           
@@ -56,9 +63,11 @@ namespace Infrastructure.Repository
             && x.UnitHeadId == unitHeadId);
         }
 
-        public Task<UnitHeadAssignment> UpdateAsync(UnitHeadAssignment unitLocationUnitHead)
+        public async Task<UnitHeadAssignment> UpdateAsync(UnitHeadAssignment unitLocationUnitHead)
         {
-            throw new NotImplementedException();
+          _context.UnitHeadAssignments.Update(unitLocationUnitHead);
+            await _context.SaveChangesAsync();
+            return unitLocationUnitHead;
         }
 
         public async Task<List<UnitWithLocationsDto>> GetAssignmentsDetailsByUnitHeadAsync(int unitHeadId)
@@ -86,6 +95,76 @@ namespace Infrastructure.Repository
                  }).ToList()
              }).ToListAsync();
             return unitHeadAssignments;
+        }
+
+
+    public async Task<PaginatedResult<UnitHeadFlatDto>> GetPaginatedUnitHeadsAsync(int organizationId,int pageNumber = 1,QueryFilter? queryFilter = null,int pageSize = 10)
+        {
+            var query = _context.Users
+                .Where(x => x.OrganizationId == organizationId && x.Role == Role.UNITHEAD);
+
+            var result = new PaginatedResult<UnitHeadFlatDto>
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalItems = await query.AsNoTracking().CountAsync()
+            };
+
+            int offset = (pageNumber - 1) * pageSize;
+
+            var unitHeadsDtoQuery = await query
+                .OrderBy(u => u.Id)
+                .Skip(offset)
+                .Take(pageSize)
+                .SelectMany(u => u.UnitHeadAssignments.Select(assignment => new UnitHeadFlatDto
+                {
+                    UserId = u.Id,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    Email = u.Email,
+                    
+
+                    UnitId = assignment.UnitLocation.Unit.Id,
+                    UnitName = assignment.UnitLocation.Unit.Name,
+
+                    StateId = assignment.UnitLocation.District.State.Id,
+                    StateName = assignment.UnitLocation.District.State.Name,
+
+                    DistrictId = assignment.UnitLocation.District.Id,
+                    DistrictName = assignment.UnitLocation.District.Name
+                }))
+                .ToListAsync();
+
+            result.Items = unitHeadsDtoQuery;
+            return result;
+        }
+
+
+
+
+        public async Task<List<UnitHeadAssignment>> GetByUnitHeadIdAsync(int unitHeadId)
+        {
+            return await _context.UnitHeadAssignments.Where(x => x.UnitHeadId == unitHeadId)
+                .ToListAsync();
+        }
+
+        public async Task AddRangeAsync(IEnumerable<UnitHeadAssignment> assignments)
+        {
+            await _context.UnitHeadAssignments.AddRangeAsync(assignments);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteRangeAsync(IEnumerable<UnitHeadAssignment> assignments)
+        {
+            _context.UnitHeadAssignments.RemoveRange(assignments);
+            await _context.SaveChangesAsync();
+        }
+
+
+        public async Task<bool> HasAssignmentsForUnitLocationAsync(int unitLocationId)
+        {
+            return await _context.UnitHeadAssignments
+                .AnyAsync(ta => ta.UnitLocationId == unitLocationId);
         }
     }
 }
