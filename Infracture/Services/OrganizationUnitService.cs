@@ -246,58 +246,7 @@ namespace Infrastructure.Services
 
 
 
-        //public async Task<List<ServiceResult>> UnMapExistingUnitHeadsBulkAsync(BulkUnitHeadAssignmentByLocationDto request)
-        //{
-        //    var results = new List<ServiceResult>();
-
-        //    // validate unit head first
-        //    var unitHead = await _userService.GetUserByIdAsync(request.UnitHeadId);
-        //    if (unitHead is null)
-        //        return [ServiceResult.Failure($"UnitHead {request.UnitHeadId} does not exist")];
-
-        //    foreach (var districtId in request.DistrictIds)
-        //    {
-        //        try
-        //        {
-        //            // find the unit location for org + unit + district
-        //            var unitLocation = await _organizationUnit
-        //                .GetByOrganizationUnitDistrictAsync(_currentUser.OrganizationId, request.UnitId, districtId);
-
-        //            if (unitLocation is null)
-        //            {
-        //                results.Add(ServiceResult.Failure(
-        //                    $"No UnitLocation found for Unit {request.UnitId}, District {districtId}"));
-        //                continue;
-        //            }
-
-        //            // check assignment exists
-        //            var existingAssignment = await _unitHeadAssignment
-        //                .GetByUnitHeadLocationAsync(unitLocation.Id, request.UnitHeadId);
-
-        //            if (existingAssignment is null)
-        //            {
-        //                results.Add(ServiceResult.Failure(
-        //                    $"UnitHead {request.UnitHeadId} is not assigned to Unit {request.UnitId}, District {districtId}"));
-        //                continue;
-        //            }
-
-        //            // remove assignment
-        //            await _unitHeadAssignment.DeleteAsync(existingAssignment);
-
-
-        //            results.Add(ServiceResult.Success(
-        //                $"Successfully unassigned UnitHead {request.UnitHeadId} from Unit {request.UnitId}, District {districtId}"));
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            results.Add(ServiceResult.Failure(
-        //                $"Error unassigning UnitHead {request.UnitHeadId} from Unit {request.UnitId}, District {districtId}: {ex.Message}"));
-        //        }
-        //    }
-
-        //    return results;
-        //}     
-        // NEW: Get paginated UnitLocations created by a specific Admin
+       
         public async Task<PaginatedResult<OrgUnitLocationIdDetailsDto>> GetUnitLocationsCreatedByAdmin(int adminId, int pageNumber = 1, int pageSize = 10)
         {
             // Check permissions: only the Admin themselves or SuperAdmin can access this
@@ -415,32 +364,6 @@ namespace Infrastructure.Services
             return ServiceResult<OrgUnitLocationIdDetailsDto>.Success(updatedDetails!);
         }
 
-        // NEW: Bulk update organization unit locations
-        //public async Task<List<ServiceResult<OrgUnitLocationIdDetailsDto>>> BulkUpdateOrganizationUnitLocationsAsync(BulkOrganizationUnitLocationUpdateDto bulkUpdateDto)
-        //{
-        //    var results = new List<ServiceResult<OrgUnitLocationIdDetailsDto>>();
-
-        //    foreach (var updateDto in bulkUpdateDto.Updates)
-        //    {
-        //        try
-        //        {
-        //            var result = await UpdateOrganizationUnitLocationAsync(updateDto);
-        //            results.Add(result);
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            results.Add(ServiceResult<OrgUnitLocationIdDetailsDto>.Failure(
-        //                $"Error updating unit location {updateDto.Id}: {ex.Message}",
-        //                ServiceErrorStatus.INVALIDOPERATION));
-
-        //            // If not continuing on error, break the loop
-        //            if (!bulkUpdateDto.ContinueOnError)
-        //                break;
-        //        }
-        //    }
-
-        //    return results;
-        //}
 
         // NEW: Remove unit location by ID
         public async Task<ServiceResult> RemoveUnitFromOrganizationById(int id)
