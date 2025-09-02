@@ -37,12 +37,18 @@ namespace Infrastructure.Repository
                               select trainer).AnyAsync();
         }
 
-       //First => CHeck Trainer LInked to unit
-       // Check the trainer details for the location
-       // ?? Trainer assignment Update
-       //  get the deteils of the trainers as per the unitHead
-       // 
+        //First => CHeck Trainer LInked to unit
+        // Check the trainer details for the location
+        // ?? Trainer assignment Update
+        //  get the deteils of the trainers as per the unitHead
+        // 
 
+        public async Task<List<TrainerAssignment>> GetByTrainerIdAsync(int trainerId)
+        {
+            return await _context.UnitTrainers
+                .Where(ut => ut.TrainerId == trainerId)
+                .ToListAsync();
+        }
 
         public Task DeleteAsync(int id)
         {

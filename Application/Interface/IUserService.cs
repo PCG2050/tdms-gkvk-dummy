@@ -9,6 +9,8 @@ namespace Application.Interface
 
         Task<ServiceResult> DeleteUnitHeadAsync(int userId, int currentUserId);
 
+        Task<ServiceResult> DeleteTrainerAsync(int trainerId);
+
         Task<User?> ValidateUserAsync(string email, string password);
         Task<User?> GetUserByIdAsync(int id);
         Task<User?> GetUserByEmailAsync(string email);
@@ -25,7 +27,7 @@ namespace Application.Interface
         Task<PaginatedResult<UnitHeadDetailsDto>> GetPaginatedOrganizationUnitHeads(int pageNumber = Constants.PAGINATION_PAGE_NUMBER_DEFAULT, int pageSize = Constants.PAGINATION_PAGE_SIZE_DEFAULT);
 
         Task<List<FlatUnitHeadDetailsDto>> GetPaginatedOrgUnitHeads();
-
+        Task<List<FlatUnitHeadDetailsDto>> GetPaginatedTrainers();
         Task<ServiceResult> UpdatedAccountStatus(int id, bool activate = true);
         Task<ServiceResult> ForgotPasswordAsync(ForgotPasswordDto dto);
         Task<ServiceResult> ResetPasswordAsync(ResetPasswordDto dto);

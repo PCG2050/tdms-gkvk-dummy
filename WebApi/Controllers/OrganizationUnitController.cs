@@ -124,7 +124,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost("trainers")]
-        [Authorize(Roles = RoleString.Admin)]
+        [Authorize(Roles = RoleString.UnitHead)]
         public async Task<ActionResult> MapExistingTrainers(ExistingTrainerAssignmentDto trainerAssignment)
         {
             var result = await _organizationUnit.MapExistingTrainersAsync(trainerAssignment);
@@ -133,7 +133,7 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete("trainers")]
-        [Authorize(Roles = RoleString.Admin)]
+        [Authorize(Roles = RoleString.UnitHead)]
         public async Task<ActionResult> UnMapExistingTrainers(ExistingTrainerAssignmentDto trainerAssignment)
         {
             var result = await _organizationUnit.UnMapTrainerFromUnitLocationAsync(trainerAssignment);
@@ -149,17 +149,6 @@ namespace WebApi.Controllers
             var results = await _organizationUnit.SyncUnitHeadAssignmentsByLocationAsync(unitHeadsAssignments);         
             return Ok(results);
         }
-
-      
-
-        //[HttpPost("unitHeads/bulkremap")]
-        //[Authorize(Roles = RoleString.Admin)]
-        //public async Task<ActionResult> ReMapExistingUnitHeadsBulk(BulkUnitHeadAssignmentByLocationDto unitHeadAssignmentDto)
-        //{
-        //    var results = await _organizationUnit.UnMapExistingUnitHeadsBulkAsync(unitHeadAssignmentDto);
-        //        return Ok(results);
-        //}
-
 
 
     }

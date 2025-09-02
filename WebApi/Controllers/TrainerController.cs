@@ -14,11 +14,14 @@ namespace WebApi.Controllers
     {
         private readonly ITrainerAssignmentService _assignmentService;
         private readonly IUserService _userService;
+        private readonly ICurrentUserService _currentUser;
+      
 
-        public TrainerController(ITrainerAssignmentService assignmentService, IUserService userService)
+        public TrainerController(ITrainerAssignmentService assignmentService, IUserService userService, ICurrentUserService currentUser)
         {
             _assignmentService = assignmentService;
             _userService = userService;
+            _currentUser = currentUser;
         }
 
         [HttpGet]
@@ -29,12 +32,13 @@ namespace WebApi.Controllers
             return Ok(paginatedResult);
         }
 
-        [HttpGet("Details/all")]
+        [HttpGet("PaginatedDetails/all")]
         [Authorize(Roles = $"{RoleString.Admin},{RoleString.UnitHead}")]
         public async Task<IActionResult> GetTrainerDetails([FromQuery] PaginationRequest paginationRequest)
         {
             var paginationResult = await _userService.GetPaginatedOrgTrainers(paginationRequest.PageNumber, paginationRequest.PageSize);
             return Ok(paginationResult);
+            
         }
 
 
@@ -45,6 +49,28 @@ namespace WebApi.Controllers
             var result = await _assignmentService.GetTrainerUnits(trainerId);
             if(!result.IsSuccess)return ServiceResponseToActionResult.Error(result.ErrorMessage,result.ErrorStatus);
             return Ok(result.Data);
+           
         }
+
+        //new one
+        [HttpGet("all")]
+        [Authorize(Roles = RoleString.UnitHead)]
+        public async Task<IActionResult> GetTrainersDetails()
+        {
+            var paginatedResult = await _userService.GetPaginatedTrainers();
+            return Ok(paginatedResult);
+        }
+
+        [HttpDelete("{trainerId}")]
+        [Authorize(Roles = RoleString.UnitHead)]
+        public async Task<IActionResult> DeleteTrainer(int trainerId)
+        {
+            var result = await _userService.DeleteTrainerAsync(trainerId);
+            if (!result.IsSuccess)
+                return BadRequest(result.ErrorMessage);
+
+            return Ok(result);
+        }
+
     }
 }

@@ -4,6 +4,7 @@ using Application.Interface.Repository;
 using Application.Models;
 using Domain.Entities;
 using Domain.Entities.Enum;
+using Domain.Entities.Junction;
 using Infrastructure.Settings;
 using Microsoft.Extensions.Options;
 using System.Security.Cryptography;
@@ -18,6 +19,7 @@ namespace Infrastructure.Services
         private readonly IEmailService _emailService;
         private readonly EmailSettings _emailSettings;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignment;
+        private readonly ITrainerAssignmentRepository _trainerAssignment;
 
 
         public UserService(IUserRepository userRepository, IPasswordHasher passwordHasher, ICurrentUserService currentUser, IEmailService emailService, IOptions<EmailSettings> emailOptions, IUnitHeadAssignmentRepository unitHeadAssignmentRepository)
@@ -88,7 +90,7 @@ namespace Infrastructure.Services
             if (cRole == Role.SUPERADMIN
                 || cId == user.Id //Update there own profile
                 || user.Role == Role.UNITHEAD && (cId == user.Id || (cRole == Role.ADMIN && cOrg == user.OrganizationId))
-                || user.Role == Role.TRAINER && (cId == user.Id || (cRole == Role.ADMIN && cOrg == user.OrganizationId)))
+                || user.Role == Role.TRAINER && (cId == user.Id || (cRole == Role.UNITHEAD && cOrg == user.OrganizationId)))
             {
                 if (updateDto.Password is not null) user.PasswordHash = _passwordHasher.HashPassword(updateDto.Password);
                 if (updateDto.FirstName is not null) user.FirstName = updateDto.FirstName;
@@ -126,6 +128,28 @@ namespace Infrastructure.Services
             return ServiceResult.Success("User deleted successfully");
         }
 
+        public async Task<ServiceResult> DeleteTrainerAsync(int trainerId)
+        {
+            var trainer = await _userRepository.GetByIdAsync(trainerId);
+            if (trainer is null)
+                return ServiceResult.Failure($"Trainer {trainerId} not found", ServiceErrorStatus.NOTFOUND);
+
+            if (trainer.Role != Role.TRAINER)
+                return ServiceResult.Failure("This user is not a trainer", ServiceErrorStatus.FORBIDDEN);
+
+            // 🔎 Check if trainer is mapped to any units
+            var assignments = await _trainerAssignment.GetByTrainerIdAsync(trainerId);
+
+            if (assignments.Any())
+                return ServiceResult.Failure(
+                    "Trainer cannot be deleted because they are still mapped to unit(s)",
+                    ServiceErrorStatus.INVALIDOPERATION
+                );
+
+            // ✅ Delete trainer
+            await _userRepository.DeleteAsync(trainer);
+            return ServiceResult.Success("Trainer deleted successfully");
+        }
 
 
         public Task<List<User>> GetOrganizationUnitTrainers(int unitId)
@@ -143,7 +167,7 @@ namespace Infrastructure.Services
 
         public async Task<PaginatedResult<FlatTrainerDetailsDto>> GetPaginatedOrgTrainers(int pageNumber = Constants.PAGINATION_PAGE_SIZE_DEFAULT, int PageSize = Constants.PAGINATION_PAGE_SIZE_DEFAULT)
         {
-            var userResult = await _userRepository.GetDetailedPaginatedTrainersAsync(_currentUser.OrganizationId, pageNumber, null, PageSize);
+            var userResult = await _userRepository.GetPaginatedTrainerDetailsWithLocationAsync(_currentUser.OrganizationId, pageNumber, null, PageSize);
             return userResult;
         }
 
@@ -156,10 +180,16 @@ namespace Infrastructure.Services
         //new one with flatdto
         public async Task<List<FlatUnitHeadDetailsDto>> GetPaginatedOrgUnitHeads()
         {
-            var userResult = await _userRepository.GetDetailedPaginatedUnitHeadsAsync(_currentUser.OrganizationId);
+            var userResult = await _userRepository.GetDetailedPaginatedUnitHeadsAsync(_currentUser.OrganizationId, _currentUser.UserId);
             return userResult;
         }
 
+
+        public async Task<List<FlatUnitHeadDetailsDto>> GetPaginatedTrainers()
+        {
+            var userResult = await _userRepository.GetDetailedPaginatedTrainersAsync(_currentUser.OrganizationId);
+            return userResult;
+        }
 
 
 

@@ -2,6 +2,7 @@
 using Application.Models;
 using Domain.Entities;
 using Domain.Entities.Enum;
+using Domain.Entities.Junction;
 using Infrastructure.DbContext;
 using Microsoft.EntityFrameworkCore;
 
@@ -121,7 +122,7 @@ namespace Infrastructure.Repository
 
 
 
-        public async Task<PaginatedResult<FlatTrainerDetailsDto>> GetDetailedPaginatedTrainersAsync(int organizationId, int pageNumber = 1, QueryFilter? queryFilter = null, int pageSize = 10)
+        public async Task<PaginatedResult<FlatTrainerDetailsDto>> GetPaginatedTrainerDetailsWithLocationAsync(int organizationId, int pageNumber = 1, QueryFilter? queryFilter = null, int pageSize = 10)
         {
             var query = _context.Users
                 .Where(x => x.OrganizationId == organizationId && x.Role == Role.UNITHEAD);
@@ -145,10 +146,10 @@ namespace Infrastructure.Repository
                     FirstName = u.FirstName,
                     LastName = u.LastName,
                     Email = u.Email,
-
-                    UnitLocationId = assignment.UnitLocationId,
+                    
                     UnitLocationDetails = new UnitLocationDetailsDto
                     {
+                        UnitLocationId = assignment.UnitLocationId,
                         UnitId = assignment.UnitLocation.UnitId,
                         UnitName = assignment.UnitLocation.Unit.Name,
 
@@ -229,10 +230,10 @@ namespace Infrastructure.Repository
             return result;
         }
 
-        public async Task<List<FlatUnitHeadDetailsDto>> GetDetailedPaginatedUnitHeadsAsync(int organizationId)
+        public async Task<List<FlatUnitHeadDetailsDto>> GetDetailedPaginatedUnitHeadsAsync(int organizationId, int adminId)
         {
             var unitHeads = await _context.Users
-                .Where(u => u.OrganizationId == organizationId && u.Role == Role.UNITHEAD)
+                 .Where(u => u.OrganizationId == organizationId && u.Role == Role.UNITHEAD && u.CreatedById == adminId)
                 .OrderBy(u => u.Id)
                 .Select(u => new FlatUnitHeadDetailsDto
                 {
@@ -260,7 +261,47 @@ namespace Infrastructure.Repository
             return unitHeads;
         }
 
+        public async Task<List<FlatUnitHeadDetailsDto>> GetDetailedPaginatedTrainersAsync(int organizationId)
+        {
+            var trainers = await _context.Users
+                 .Where(u => u.OrganizationId == organizationId && u.Role == Role.TRAINER)
+                .OrderBy(u => u.Id)
+                .Select(u => new FlatUnitHeadDetailsDto
+                {
+                    UserId = u.Id,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    Email = u.Email,
+                    Phone = u.Phone,
+                    Gender = u.Gender,
+                    EmployementType = u.EmployementType,
+                    DateOfBirth = u.DateOfBirth,                   
+                    DateOfJoining = u.DateOfJoining,
+                    IsDeactivated = u.IsDeactivated,
+                    UnitLocationDetails = u.TrainerAssignments
+                        .Select(a => new UnitLocationDetailsDto
+                        {
+                            UnitLocationId = a.UnitLocationId,
+                            UnitId = a.UnitLocation.UnitId,
+                            UnitName = a.UnitLocation.Unit.Name,
+                            StateId = a.UnitLocation.District.State.Id,
+                            StateName = a.UnitLocation.District.State.Name,
+                            DistrictId = a.UnitLocation.District.Id,
+                            DistrictName = a.UnitLocation.District.Name
+                        })
+                        .Distinct()
+                        .ToList()
+                })
+                .ToListAsync();
 
+            return trainers;
+        }
+
+     
+
+        public DateOnly? DateOfJoining { get; set; }
+        public bool? IsPhoneConfirmed { get; set; }
+        public bool? IsDeactivated { get; set; }
 
 
         public async Task SetPasswordResetTokenAsync(int userId, string token, DateTimeOffset expiresAt)
@@ -309,6 +350,8 @@ namespace Infrastructure.Repository
                 .OrderBy(u => u.FirstName)
                 .ToListAsync();
 
-        }
+        }              
+
+       
     }
 }

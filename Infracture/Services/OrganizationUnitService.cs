@@ -3,15 +3,7 @@ using Application.Interface.Repository;
 using Application.Models;
 using Domain.Entities.Enum;
 using Domain.Entities.Junction;
-using Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Services
 {
@@ -22,7 +14,7 @@ namespace Infrastructure.Services
         private readonly IUserService _userService;
         private readonly ITrainerAssignmentRepository _trainerAssignment;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignment;
-     
+
 
         public OrganizationUnitService(IOrganizationUnitRepository organizationUnit, ICurrentUserService currentUser,
                                        IUserService userService, ITrainerAssignmentRepository trainerAssignment, IUnitHeadAssignmentRepository unitHeadAssignment)
@@ -34,7 +26,7 @@ namespace Infrastructure.Services
             _unitHeadAssignment = unitHeadAssignment;
         }
 
-        
+
 
         public async Task<OrganizationUnitLocation> AddUnitToOrganization(OrganizationUnitLocationDto addUnitLocationDto)
         {
@@ -57,12 +49,12 @@ namespace Infrastructure.Services
         {
             // Based on the OrgId in user token
             var role = _currentUser.Role;
-            if (role == Role.UNDEFINED) throw new UnauthorizedAccessException($"{role} does not have access to the action {nameof(this.AddUnitToOrganization)} at {this.GetType()}");
-            var orgUnits = await _organizationUnit.GetByOrganizationIdAsync(_currentUser.OrganizationId);
+            if (role != Role.ADMIN) throw new UnauthorizedAccessException($"{role} does not have access to the action {nameof(this.AddUnitToOrganization)} at {this.GetType()}");
+            var orgUnits = await _organizationUnit.GetByOrganizationIdAsync(_currentUser.OrganizationId, _currentUser.UserId);
             if (orgUnits == null || !orgUnits.Any()) return [];
             else return orgUnits;
         }
-  
+
         public async Task<IEnumerable<OrgUnitLocationIdDetailsDto>> GetOrganizationUnitsDetails()
         {
             return await _organizationUnit.GetQueryable()
@@ -72,9 +64,9 @@ namespace Infrastructure.Services
                 .Include(x => x.District)
                     .ThenInclude(x => x.State)
                 .Select(x => new OrgUnitLocationIdDetailsDto
-                 
+
                 {
-                    OrgUnitLocationId = x.Id,                     
+                    OrgUnitLocationId = x.Id,
                     UnitId = x.Unit.Id,
                     UnitName = x.Unit.Name,
                     StateId = x.District.State.Id,
@@ -91,7 +83,7 @@ namespace Infrastructure.Services
             var role = _currentUser.Role;
             if (role != Role.ADMIN) throw new UnauthorizedAccessException($"{role} does not have access to the action {nameof(this.AddUnitToOrganization)} at {this.GetType()}");
             var mapping = await _organizationUnit.GetByOrganizationUnitDistrictAsync(_currentUser.OrganizationId, organizationUnitLocationDto.UnitId, organizationUnitLocationDto.DistrictId);
-            if(mapping != null)
+            if (mapping != null)
                 await _organizationUnit.DeleteAsync(mapping);
         }
         public async Task<ServiceResult> MapExistingTrainersAsync(ExistingTrainerAssignmentDto trainerAssignment)
@@ -194,7 +186,7 @@ namespace Infrastructure.Services
             return results;
         }
 
-     
+
 
         public async Task<ServiceResult> SyncUnitHeadAssignmentsByLocationAsync(BulkUnitHeadAssignmentByLocationDto request)
         {
@@ -241,62 +233,6 @@ namespace Infrastructure.Services
             return ServiceResult.Success("Assignments synced successfully");
         }
 
-
-
-
-
-
-        //public async Task<List<ServiceResult>> UnMapExistingUnitHeadsBulkAsync(BulkUnitHeadAssignmentByLocationDto request)
-        //{
-        //    var results = new List<ServiceResult>();
-
-        //    // validate unit head first
-        //    var unitHead = await _userService.GetUserByIdAsync(request.UnitHeadId);
-        //    if (unitHead is null)
-        //        return [ServiceResult.Failure($"UnitHead {request.UnitHeadId} does not exist")];
-
-        //    foreach (var districtId in request.DistrictIds)
-        //    {
-        //        try
-        //        {
-        //            // find the unit location for org + unit + district
-        //            var unitLocation = await _organizationUnit
-        //                .GetByOrganizationUnitDistrictAsync(_currentUser.OrganizationId, request.UnitId, districtId);
-
-        //            if (unitLocation is null)
-        //            {
-        //                results.Add(ServiceResult.Failure(
-        //                    $"No UnitLocation found for Unit {request.UnitId}, District {districtId}"));
-        //                continue;
-        //            }
-
-        //            // check assignment exists
-        //            var existingAssignment = await _unitHeadAssignment
-        //                .GetByUnitHeadLocationAsync(unitLocation.Id, request.UnitHeadId);
-
-        //            if (existingAssignment is null)
-        //            {
-        //                results.Add(ServiceResult.Failure(
-        //                    $"UnitHead {request.UnitHeadId} is not assigned to Unit {request.UnitId}, District {districtId}"));
-        //                continue;
-        //            }
-
-        //            // remove assignment
-        //            await _unitHeadAssignment.DeleteAsync(existingAssignment);
-
-
-        //            results.Add(ServiceResult.Success(
-        //                $"Successfully unassigned UnitHead {request.UnitHeadId} from Unit {request.UnitId}, District {districtId}"));
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            results.Add(ServiceResult.Failure(
-        //                $"Error unassigning UnitHead {request.UnitHeadId} from Unit {request.UnitId}, District {districtId}: {ex.Message}"));
-        //        }
-        //    }
-
-        //    return results;
-        //}     
         // NEW: Get paginated UnitLocations created by a specific Admin
         public async Task<PaginatedResult<OrgUnitLocationIdDetailsDto>> GetUnitLocationsCreatedByAdmin(int adminId, int pageNumber = 1, int pageSize = 10)
         {
@@ -308,9 +244,9 @@ namespace Infrastructure.Services
             var admin = await _userService.GetUserByIdAsync(adminId);
             if (admin == null || admin.Role != Role.ADMIN)
                 throw new InvalidOperationException("User is not an Admin");
-
             return await _organizationUnit.GetPaginatedUnitLocationsCreatedByAsync(adminId, pageNumber, pageSize);
         }
+        
 
         // NEW: Get all UnitLocations created by a specific Admin (non-paginated)
         public async Task<List<OrgUnitLocationIdDetailsDto>> GetAllUnitLocationsCreatedByAdmin(int adminId)
@@ -414,33 +350,6 @@ namespace Infrastructure.Services
             var updatedDetails = await GetOrganizationUnitLocationById(updateDto.Id);
             return ServiceResult<OrgUnitLocationIdDetailsDto>.Success(updatedDetails!);
         }
-
-        // NEW: Bulk update organization unit locations
-        //public async Task<List<ServiceResult<OrgUnitLocationIdDetailsDto>>> BulkUpdateOrganizationUnitLocationsAsync(BulkOrganizationUnitLocationUpdateDto bulkUpdateDto)
-        //{
-        //    var results = new List<ServiceResult<OrgUnitLocationIdDetailsDto>>();
-
-        //    foreach (var updateDto in bulkUpdateDto.Updates)
-        //    {
-        //        try
-        //        {
-        //            var result = await UpdateOrganizationUnitLocationAsync(updateDto);
-        //            results.Add(result);
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            results.Add(ServiceResult<OrgUnitLocationIdDetailsDto>.Failure(
-        //                $"Error updating unit location {updateDto.Id}: {ex.Message}",
-        //                ServiceErrorStatus.INVALIDOPERATION));
-
-        //            // If not continuing on error, break the loop
-        //            if (!bulkUpdateDto.ContinueOnError)
-        //                break;
-        //        }
-        //    }
-
-        //    return results;
-        //}
 
         // NEW: Remove unit location by ID
         public async Task<ServiceResult> RemoveUnitFromOrganizationById(int id)

@@ -1,4 +1,6 @@
-﻿namespace Application.Models
+﻿using Domain.Entities.Enum;
+
+namespace Application.Models
 {
     public class UnitHeadDetailsDto
     {
@@ -36,8 +38,14 @@
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
-
-        public string Phone { get; set; }
+        public string Phone { get; set; }       
+        public Gender? Gender { get; set; }
+        public DateOnly? DateOfBirth { get; set; }
+        public EmployementType? EmployementType { get; set; }
+        public string? Qualification { get; set; } = null;
+        public DateOnly? DateOfJoining { get; set; }
+        public bool? IsPhoneConfirmed { get; set; }        
+        public bool? IsDeactivated { get; set; } 
         public List<UnitLocationDetailsDto> UnitLocationDetails { get; set; } = new List<UnitLocationDetailsDto>();
 
     }

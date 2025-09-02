@@ -3,12 +3,6 @@ using Application.Models;
 using Domain.Entities.Junction;
 using Infrastructure.DbContext;
 using Microsoft.EntityFrameworkCore;
-using SendGrid.Helpers.Mail;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Repository
 {
@@ -37,9 +31,9 @@ namespace Infrastructure.Repository
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<OrganizationUnitLocation>> GetByOrganizationIdAsync(int organizationId)
+        public async Task<IEnumerable<OrganizationUnitLocation>> GetByOrganizationIdAsync(int organizationId, int adminId)
         {
-            return await _dbContext.OrganizationUnitLocations.Where(x => x.OrganizationId == organizationId)
+            return await _dbContext.OrganizationUnitLocations.Where(x => x.OrganizationId == organizationId && x.CreatedById == adminId)
                 .ToListAsync();
         }
 
@@ -62,7 +56,7 @@ namespace Infrastructure.Repository
 
         public async Task<IEnumerable<OrganizationUnitLocation>> GetByUnitIdAsync(int unitId)
         {
-            return await _dbContext.OrganizationUnitLocations.Where(x=> x.UnitId ==unitId)
+            return await _dbContext.OrganizationUnitLocations.Where(x => x.UnitId == unitId)
                 .ToListAsync();
         }
 
@@ -73,10 +67,15 @@ namespace Infrastructure.Repository
 
         public async Task SaveAsync(OrganizationUnitLocation entity)
         {
-           
-            _dbContext.OrganizationUnitLocations.Add(entity);                   
-            
+            if (_dbContext.Entry<OrganizationUnitLocation>(entity).State == Microsoft.EntityFrameworkCore.EntityState.Detached)
+                await _dbContext.AddAsync(entity);
+            else
+                _dbContext.Update(entity);
             await _dbContext.SaveChangesAsync();
+
+            //_dbContext.OrganizationUnitLocations.Add(entity);                   
+
+            //await _dbContext.SaveChangesAsync();
         }
 
         public async Task<OrganizationUnitLocation?> GetByIdAsync(int id)

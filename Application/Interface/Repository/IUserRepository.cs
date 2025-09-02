@@ -23,9 +23,11 @@ namespace Application.Interface.Repository
         Task<PaginatedResult<UnitHeadDetailsDto>> GetPaginatedUnitHeadsAsync(
             int organizationId, int pageNumber = 1, QueryFilter? queryFilter = null, int pageSize = 10);
 
-        Task<List<FlatUnitHeadDetailsDto>> GetDetailedPaginatedUnitHeadsAsync(int organizationId);
+        Task<List<FlatUnitHeadDetailsDto>> GetDetailedPaginatedUnitHeadsAsync(int organizationId, int adminId);
 
-        Task<PaginatedResult<FlatTrainerDetailsDto>> GetDetailedPaginatedTrainersAsync(
+        Task<List<FlatUnitHeadDetailsDto>> GetDetailedPaginatedTrainersAsync(int organizationId);
+
+        Task<PaginatedResult<FlatTrainerDetailsDto>> GetPaginatedTrainerDetailsWithLocationAsync(
             int organizaitonId, int pageNumber = 1, QueryFilter? queryFilter = null, int pageSize = 10);
 
         Task<List<User>> GetTrainersCreatedByAsync(int createdById);

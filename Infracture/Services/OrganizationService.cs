@@ -2,7 +2,6 @@
 using Application.Models;
 using Domain.Entities;
 using Domain.Entities.Enum;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Application.Interface
 {
@@ -27,10 +26,10 @@ namespace Application.Interface
             if (_currentUser.Role != Domain.Entities.Enum.Role.SUPERADMIN)
                 throw new UnauthorizedAccessException("");
             var result = await GenerateContainersAsync(organizationCreateDto.StorageContainerName);
-            if (!result.IsSuccess) return ServiceResult<Organization>.Failure(result.ErrorMessage,result.ErrorStatus);
-            var organization  = new Organization
+            if (!result.IsSuccess) return ServiceResult<Organization>.Failure(result.ErrorMessage, result.ErrorStatus);
+            var organization = new Organization
             {
-                Name= organizationCreateDto.Name,
+                Name = organizationCreateDto.Name,
                 CreatedAt = DateTime.UtcNow,
                 CreatedById = _currentUser.UserId,
                 DistrictId = organizationCreateDto.DistrictId,
@@ -54,10 +53,9 @@ namespace Application.Interface
             else if (registerDto.Role == Domain.Entities.Enum.Role.UNITHEAD
                 && _currentUser.Role != Domain.Entities.Enum.Role.ADMIN) throw new UnauthorizedAccessException("Not authorized to creat a user with this role");
             else if (registerDto.Role == Domain.Entities.Enum.Role.TRAINER
-                && (_currentUser.Role != Domain.Entities.Enum.Role.ADMIN
-                    || _currentUser.Role != Domain.Entities.Enum.Role.UNITHEAD)) throw new UnauthorizedAccessException("Not authorized to creat a user with this role");
-            else if(registerDto.Role == Domain.Entities.Enum.Role.UNDEFINED)throw new ArgumentException($"Role {registerDto.Role} is not valid");
-                var organization = await _organizationRepository.GetOrganizationAsync(organizationId);
+                && (_currentUser.Role != Domain.Entities.Enum.Role.UNITHEAD)) throw new UnauthorizedAccessException("Not authorized to creat a user with this role");
+            else if (registerDto.Role == Domain.Entities.Enum.Role.UNDEFINED) throw new ArgumentException($"Role {registerDto.Role} is not valid");
+            var organization = await _organizationRepository.GetOrganizationAsync(organizationId);
             if (organization is null)
                 throw new InvalidOperationException("Organization does not exist");
             var existingUser = await _userRepository.GetByEmailAsync(registerDto.Email);
@@ -97,7 +95,7 @@ namespace Application.Interface
                 if (!result.IsSuccess) return ServiceResult<Organization>.Failure(result.ErrorMessage, result.ErrorStatus);
                 organization.StorageContainerName = updateDto.StorageContainerName;
             }
-            
+
             if (!string.IsNullOrWhiteSpace(updateDto.Name) && !string.Equals(organization.Name, updateDto.Name, StringComparison.OrdinalIgnoreCase))
             {
                 var nameExists = await _organizationRepository.HasOrganizationWithNameAsync(updateDto.Name);
@@ -105,8 +103,8 @@ namespace Application.Interface
                     return ServiceResult<Organization>.Failure("An organization with this name already exists", ServiceErrorStatus.INVALIDOPERATION);
 
                 organization.Name = updateDto.Name;
-            }              
-            
+            }
+
             if (updateDto.Pincode is not null) organization.PinCode = updateDto.Pincode;
             if (updateDto.DistrictId.HasValue && organization.DistrictId != updateDto.DistrictId.Value) organization.DistrictId = updateDto.DistrictId.Value;
             await _organizationRepository.UpdateAsync(organization);
@@ -127,7 +125,7 @@ namespace Application.Interface
             if (_currentUser.Role != Domain.Entities.Enum.Role.SUPERADMIN) throw new UnauthorizedAccessException();
             return await _organizationRepository.GetPaginatedItemsAsync(page, pageSize);
         }
-        
+
 
         public async Task<List<UserDto>> GetAdminsByOrganizationIdAsync(int organizationId)
         {

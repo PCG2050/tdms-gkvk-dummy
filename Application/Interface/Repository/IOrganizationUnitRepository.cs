@@ -1,17 +1,12 @@
 ﻿using Application.Models;
 using Domain.Entities.Junction;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Interface.Repository
 {
     public interface IOrganizationUnitRepository
     {
         Task<OrganizationUnitLocation?> GetByOrganizationUnitDistrictAsync(int orgId, int unitId, int districtId);
-        Task<IEnumerable<OrganizationUnitLocation>> GetByOrganizationIdAsync(int organizationId);
+        Task<IEnumerable<OrganizationUnitLocation>> GetByOrganizationIdAsync(int organizationId, int adminId);
 
         Task<OrganizationUnitLocation?> GetByOrganizationUnitLocationsIdAsync(int id);
 
