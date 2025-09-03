@@ -25,7 +25,7 @@ namespace Application.Interface.Repository
 
         Task<List<FlatUnitHeadDetailsDto>> GetDetailedPaginatedUnitHeadsAsync(int organizationId, int adminId);
 
-        Task<List<FlatUnitHeadDetailsDto>> GetDetailedPaginatedTrainersAsync(int organizationId);
+        Task<List<FlatUnitHeadDetailsDto>> GetDetailedPaginatedTrainersAsync(int organizationId, int unitHeadId);
 
         Task<PaginatedResult<FlatTrainerDetailsDto>> GetPaginatedTrainerDetailsWithLocationAsync(
             int organizaitonId, int pageNumber = 1, QueryFilter? queryFilter = null, int pageSize = 10);

@@ -15,7 +15,7 @@ namespace Domain.Entities
         public Gender Gender { get; set; }
         public DateOnly DateOfBirth { get; set; }
         public EmployementType EmployementType { get; set; }
-        public string? Qualification { get; set; } = null;
+        public string? Qualification { get; set; } 
         public DateOnly DateOfJoining { get; set; }
         public string Phone { get; set; }
         public bool IsPhoneConfirmed { get; set; }

@@ -11,25 +11,4 @@ namespace Application.Models
         public string StateName { get; set; }
     }
 
-    public class TrainerWithAssignmentsDto
-    {
-
-        public int UserId { get; set; }
-        public string FirstName { get; set; } = null!;
-        public string LastName { get; set; } = null!;
-        public string Email { get; set; } = null!;
-
-        // All the trainer’s assignments
-        public List<TrainerWithUnitDto> Assignments { get; set; } = new();
-    }
-    public class TrainerWithUnitDto
-    {
-        public int UnitId { get; set; }
-
-        public string UnitName { get; set; }
-
-        public List<UnitLocationDto> Locations { get; set; } = new();
-    }
-
-
 }

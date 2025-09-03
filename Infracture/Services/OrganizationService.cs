@@ -44,16 +44,15 @@ namespace Application.Interface
         {
             return await _organizationRepository.GetOrganizationAsync(id);
 
-        }
-
+        }        
         public async Task<User> CreateUser(UserRegisterDto registerDto, int organizationId)
         {
             if (registerDto.Role == Domain.Entities.Enum.Role.ADMIN
                 && _currentUser.Role != Domain.Entities.Enum.Role.SUPERADMIN) throw new UnauthorizedAccessException("Not authorized to creat a user with this role");
             else if (registerDto.Role == Domain.Entities.Enum.Role.UNITHEAD
-                && _currentUser.Role != Domain.Entities.Enum.Role.ADMIN) throw new UnauthorizedAccessException("Not authorized to creat a user with this role");
+                && _currentUser.Role != Domain.Entities.Enum.Role.ADMIN) throw new UnauthorizedAccessException("Not authorized to create a user with this role");
             else if (registerDto.Role == Domain.Entities.Enum.Role.TRAINER
-                && (_currentUser.Role != Domain.Entities.Enum.Role.UNITHEAD)) throw new UnauthorizedAccessException("Not authorized to creat a user with this role");
+                && (_currentUser.Role != Domain.Entities.Enum.Role.UNITHEAD)) throw new UnauthorizedAccessException("Not authorized to create a user with this role");
             else if (registerDto.Role == Domain.Entities.Enum.Role.UNDEFINED) throw new ArgumentException($"Role {registerDto.Role} is not valid");
             var organization = await _organizationRepository.GetOrganizationAsync(organizationId);
             if (organization is null)
@@ -72,7 +71,12 @@ namespace Application.Interface
                 CreatedById = _currentUser.UserId,
                 CreatedAt = DateTimeOffset.UtcNow,
                 Phone = registerDto.Phone,
-                Role = registerDto.Role
+                Role = registerDto.Role    
+
+
+                
+              
+
             };
 
             await _userRepository.SaveAsync(user);
@@ -101,8 +105,8 @@ namespace Application.Interface
                 var nameExists = await _organizationRepository.HasOrganizationWithNameAsync(updateDto.Name);
                 if (nameExists)
                     return ServiceResult<Organization>.Failure("An organization with this name already exists", ServiceErrorStatus.INVALIDOPERATION);
-
-                organization.Name = updateDto.Name;
+               
+                    organization.Name = updateDto.Name;
             }
 
             if (updateDto.Pincode is not null) organization.PinCode = updateDto.Pincode;

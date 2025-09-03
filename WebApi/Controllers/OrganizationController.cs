@@ -68,6 +68,8 @@ namespace WebApi.Controllers
             return Ok(organizationResult.Data);
         }
 
+        //Create all users endpoint
+
         [HttpPost("{id}/users")]
         [Authorize(Roles = $"{RoleString.SuperAdmin}, {RoleString.Admin},{RoleString.UnitHead}")]
         public async Task<ActionResult<UserDto>> CreateUsers(int id,UserRegisterDto user)

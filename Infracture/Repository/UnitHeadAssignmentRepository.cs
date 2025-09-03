@@ -27,7 +27,7 @@ namespace Infrastructure.Repository
             return unitLocationUnitHead;
         }
 
-        public async Task<bool> AssignmentExistsAsync(ExistingUnitHeadAssignmentDto unitHeadAssignment)
+        public async Task<bool> UnitHeadAssignmentExistsAsync(ExistingUnitHeadAssignmentDto unitHeadAssignment)
         {
 
 
@@ -38,6 +38,7 @@ namespace Infrastructure.Repository
                           && unitHead.UnitHeadId == unitHeadAssignment.UnitHeadId
                           select unitHead).AnyAsync();
         }
+
 
         public Task DeleteAsync(int id)
         {

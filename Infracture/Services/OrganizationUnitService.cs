@@ -124,67 +124,67 @@ namespace Infrastructure.Services
 
 
 
-        public async Task<List<ServiceResult>> MapExistingUnitHeadsByLocationBulkAsync(BulkUnitHeadAssignmentByLocationDto request)
-        {
-            var results = new List<ServiceResult>();
+        //public async Task<List<ServiceResult>> MapExistingUnitHeadsByLocationBulkAsync(BulkUnitHeadAssignmentByLocationDto request)
+        //{
+        //    var results = new List<ServiceResult>();
 
-            // Get the UnitHead
-            var unitHead = await _userService.GetUserByIdAsync(request.UnitHeadId);
-            if (unitHead is null)
-                return [ServiceResult.Failure($"UnitHead {request.UnitHeadId} does not exist")];
+        //    // Get the UnitHead
+        //    var unitHead = await _userService.GetUserByIdAsync(request.UnitHeadId);
+        //    if (unitHead is null)
+        //        return [ServiceResult.Failure($"UnitHead {request.UnitHeadId} does not exist")];
 
-            foreach (var locationId in request.OrganizationUnitLocationIds)
-            {
-                try
-                {
-                    var unitLocation = await _organizationUnit.GetByOrganizationUnitLocationsIdAsync(locationId);
-                    if (unitLocation is null)
-                    {
-                        results.Add(ServiceResult.Failure($"OrgUnitLocation {locationId} does not exist"));
-                        continue;
-                    }
+        //    foreach (var locationId in request.OrganizationUnitLocationIds)
+        //    {
+        //        try
+        //        {
+        //            var unitLocation = await _organizationUnit.GetByOrganizationUnitLocationsIdAsync(locationId);
+        //            if (unitLocation is null)
+        //            {
+        //                results.Add(ServiceResult.Failure($"OrgUnitLocation {locationId} does not exist"));
+        //                continue;
+        //            }
 
-                    // ✅ Validation: Only assign if created by same admin
-                    if (unitLocation.CreatedById != unitHead.CreatedById)
-                    {
-                        results.Add(ServiceResult.Failure(
-                            $"UnitHead {request.UnitHeadId} cannot be assigned to OrgUnitLocation {locationId} because they were created by different admins"));
-                        continue;
-                    }
+        //            // ✅ Validation: Only assign if created by same admin
+        //            if (unitLocation.CreatedById != unitHead.CreatedById)
+        //            {
+        //                results.Add(ServiceResult.Failure(
+        //                    $"UnitHead {request.UnitHeadId} cannot be assigned to OrgUnitLocation {locationId} because they were created by different admins"));
+        //                continue;
+        //            }
 
-                    // ✅ Check if already assigned
-                    var alreadyExists = await _unitHeadAssignment.AssignmentExistsByLocationAsync(
-                        unitLocation.Id, request.UnitHeadId);
+        //            // ✅ Check if already assigned
+        //            var alreadyExists = await _unitHeadAssignment.AssignmentExistsByLocationAsync(
+        //                unitLocation.Id, request.UnitHeadId);
 
-                    if (alreadyExists)
-                    {
-                        results.Add(ServiceResult.Failure(
-                            $"UnitHead {request.UnitHeadId} is already assigned to OrgUnitLocation {locationId}"));
-                        continue;
-                    }
+        //            if (alreadyExists)
+        //            {
+        //                results.Add(ServiceResult.Failure(
+        //                    $"UnitHead {request.UnitHeadId} is already assigned to OrgUnitLocation {locationId}"));
+        //                continue;
+        //            }
 
-                    // ✅ Create assignment
-                    var newAssignment = new UnitHeadAssignment
-                    {
-                        UnitHeadId = request.UnitHeadId,
-                        UnitLocationId = unitLocation.Id,
-                        CreatedAt = DateTimeOffset.UtcNow,
-                        CreatedById = _currentUser.UserId
-                    };
+        //            // ✅ Create assignment
+        //            var newAssignment = new UnitHeadAssignment
+        //            {
+        //                UnitHeadId = request.UnitHeadId,
+        //                UnitLocationId = unitLocation.Id,
+        //                CreatedAt = DateTimeOffset.UtcNow,
+        //                CreatedById = _currentUser.UserId
+        //            };
 
-                    await _unitHeadAssignment.AddAsync(newAssignment);
-                    results.Add(ServiceResult.Success(
-                        $"Successfully assigned UnitHead {request.UnitHeadId} to OrgUnitLocation {locationId}"));
-                }
-                catch (Exception ex)
-                {
-                    results.Add(ServiceResult.Failure(
-                        $"Error assigning UnitHead {request.UnitHeadId} to OrgUnitLocation {locationId}: {ex.Message}"));
-                }
-            }
+        //            await _unitHeadAssignment.AddAsync(newAssignment);
+        //            results.Add(ServiceResult.Success(
+        //                $"Successfully assigned UnitHead {request.UnitHeadId} to OrgUnitLocation {locationId}"));
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            results.Add(ServiceResult.Failure(
+        //                $"Error assigning UnitHead {request.UnitHeadId} to OrgUnitLocation {locationId}: {ex.Message}"));
+        //        }
+        //    }
 
-            return results;
-        }
+        //    return results;
+        //}
 
 
 
@@ -231,6 +231,55 @@ namespace Infrastructure.Services
                 await _unitHeadAssignment.DeleteRangeAsync(toRemove);
 
             return ServiceResult.Success("Assignments synced successfully");
+        }
+
+        public async Task<ServiceResult> SyncTrainerAssignmentsByLocationAsync(BulkTrainerAssignmentByLocationDto request)
+        {
+            var trainer = await _userService.GetUserByIdAsync(request.TrainerId);
+            if (trainer is null)
+                return ServiceResult.Failure($"Trainer {request.TrainerId} does not exist");
+
+            // Verify trainer role
+            if (trainer.Role != Role.TRAINER)
+                return ServiceResult.Failure($"User {request.TrainerId} is not a trainer");
+
+            // Current assignments
+            var existingAssignments = await _trainerAssignment.GetByTrainerIdAsync(request.TrainerId);
+            var existingIds = existingAssignments.Select(x => x.UnitLocationId).ToList();
+            var newIds = request.OrganizationUnitLocationIds ?? new List<int>();
+
+            // Find what to add / remove
+            var toAddIds = newIds.Except(existingIds).ToList();
+            var toRemove = existingAssignments.Where(x => !newIds.Contains(x.UnitLocationId)).ToList();
+
+            // ---- ADD ----
+            var newAssignments = new List<TrainerAssignment>();
+            foreach (var locationId in toAddIds)
+            {
+                var unitLocation = await _organizationUnit.GetByOrganizationUnitLocationsIdAsync(locationId);
+                if (unitLocation is null) continue;
+
+                // Validation: Only allow if the Trainer was created by same user as UnitLocation
+                if (unitLocation.CreatedById != trainer.CreatedById)
+                    continue;
+
+                newAssignments.Add(new TrainerAssignment
+                {
+                    TrainerId = request.TrainerId,
+                    UnitLocationId = locationId,
+                    CreatedAt = DateTimeOffset.UtcNow,
+                    CreatedById = _currentUser.UserId
+                });
+            }
+
+            if (newAssignments.Any())
+                await _trainerAssignment.AddRangeAsync(newAssignments);
+
+            // ---- REMOVE ----
+            if (toRemove.Any())
+                await _trainerAssignment.DeleteRangeAsync(toRemove);
+
+            return ServiceResult.Success("Trainer assignments synced successfully");
         }
 
         // NEW: Get paginated UnitLocations created by a specific Admin

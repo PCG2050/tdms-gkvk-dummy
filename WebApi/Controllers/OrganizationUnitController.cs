@@ -150,6 +150,32 @@ namespace WebApi.Controllers
             return Ok(results);
         }
 
+        // NEW: Trainer bulk assignment - similar to UnitHead bulk
+        [HttpPost("trainers/bulk")]
+        [Authorize(Roles = RoleString.UnitHead)]
+        public async Task<ActionResult> SyncTrainerAssignmentsBulk(BulkTrainerAssignmentByLocationDto trainerAssignments)
+        {
+            try
+            {
+                var result = await _organizationUnit.SyncTrainerAssignmentsByLocationAsync(trainerAssignments);
+                if (!result.IsSuccess)
+                    return BadRequest(new { message = result.ErrorMessage });
+
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return Problem(detail: ex.Message, title: "An error occurred while syncing trainer assignments");
+            }
+        }
 
     }
 }

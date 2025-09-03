@@ -22,7 +22,7 @@ namespace Infrastructure.Services
         private readonly ITrainerAssignmentRepository _trainerAssignment;
 
 
-        public UserService(IUserRepository userRepository, IPasswordHasher passwordHasher, ICurrentUserService currentUser, IEmailService emailService, IOptions<EmailSettings> emailOptions, IUnitHeadAssignmentRepository unitHeadAssignmentRepository)
+        public UserService(IUserRepository userRepository, IPasswordHasher passwordHasher, ICurrentUserService currentUser, IEmailService emailService, IOptions<EmailSettings> emailOptions, IUnitHeadAssignmentRepository unitHeadAssignmentRepository, ITrainerAssignmentRepository trainerAssignmentRepository )
         {
             _userRepository = userRepository;
             _passwordHasher = passwordHasher;
@@ -128,28 +128,7 @@ namespace Infrastructure.Services
             return ServiceResult.Success("User deleted successfully");
         }
 
-        public async Task<ServiceResult> DeleteTrainerAsync(int trainerId)
-        {
-            var trainer = await _userRepository.GetByIdAsync(trainerId);
-            if (trainer is null)
-                return ServiceResult.Failure($"Trainer {trainerId} not found", ServiceErrorStatus.NOTFOUND);
-
-            if (trainer.Role != Role.TRAINER)
-                return ServiceResult.Failure("This user is not a trainer", ServiceErrorStatus.FORBIDDEN);
-
-            // 🔎 Check if trainer is mapped to any units
-            var assignments = await _trainerAssignment.GetByTrainerIdAsync(trainerId);
-
-            if (assignments.Any())
-                return ServiceResult.Failure(
-                    "Trainer cannot be deleted because they are still mapped to unit(s)",
-                    ServiceErrorStatus.INVALIDOPERATION
-                );
-
-            // ✅ Delete trainer
-            await _userRepository.DeleteAsync(trainer);
-            return ServiceResult.Success("Trainer deleted successfully");
-        }
+   
 
 
         public Task<List<User>> GetOrganizationUnitTrainers(int unitId)
@@ -187,7 +166,7 @@ namespace Infrastructure.Services
 
         public async Task<List<FlatUnitHeadDetailsDto>> GetPaginatedTrainers()
         {
-            var userResult = await _userRepository.GetDetailedPaginatedTrainersAsync(_currentUser.OrganizationId);
+            var userResult = await _userRepository.GetDetailedPaginatedTrainersAsync(_currentUser.OrganizationId, _currentUser.UserId);
             return userResult;
         }
 
@@ -317,5 +296,71 @@ namespace Infrastructure.Services
                 }).ToList()
             }).ToList();
         }
+
+        //Trainers methods
+        public async Task<List<TrainerWithAssignmentsDto>> GetTrainersWithAssignmentsCreatedByCurrentUserAsync()
+        {
+            var currentUserId = _currentUser.UserId;
+            var trainers = await _userRepository.GetTrainersCreatedByAsync(currentUserId);
+
+            return trainers.Select(trainer => new TrainerWithAssignmentsDto
+            {
+                TrainerId = trainer.Id,
+                FirstName = trainer.FirstName,
+                LastName = trainer.LastName,
+                Email = trainer.Email,
+                Phone = trainer.Phone,
+                Gender = trainer.Gender,
+                EmployementType = trainer.EmployementType,
+                DateOfBirth = trainer.DateOfBirth,
+                DateOfJoining = trainer.DateOfJoining,
+                IsDeactivated = trainer.IsDeactivated,
+                AssignedLocationIds = trainer.TrainerAssignments.Select(ta => ta.UnitLocationId).ToList(),
+                UnitLocationDetails = trainer.TrainerAssignments
+                    .Select(ta => new UnitLocationDetailsDto
+                    {
+                        UnitLocationId = ta.UnitLocationId,
+                        UnitId = ta.UnitLocation.UnitId,
+                        UnitName = ta.UnitLocation.Unit.Name,
+                        StateId = ta.UnitLocation.District.State.Id,
+                        StateName = ta.UnitLocation.District.State.Name,
+                        DistrictId = ta.UnitLocation.District.Id,
+                        DistrictName = ta.UnitLocation.District.Name
+                    })
+                    .ToList()
+            }).ToList();
+        }
+
+        public async Task<ServiceResult> DeleteTrainerAsync(int trainerId)
+        {
+            var trainer = await _userRepository.GetByIdAsync(trainerId);
+            if (trainer is null)
+                return ServiceResult.Failure($"Trainer {trainerId} not found", ServiceErrorStatus.NOTFOUND);
+
+            if (trainer.Role != Role.TRAINER)
+                return ServiceResult.Failure("This user is not a trainer", ServiceErrorStatus.FORBIDDEN);
+
+            // 🔐 Check ownership - only the unit head who created the trainer can delete
+            if (trainer.CreatedById != _currentUser.UserId)
+                return ServiceResult.Failure("You can only delete trainers you created", ServiceErrorStatus.FORBIDDEN);
+
+            // 🔎 Check if trainer is mapped to any units
+            var assignments = await _trainerAssignment.GetByTrainerIdAsync(trainerId);
+
+            
+            if (assignments.Any())
+                return ServiceResult.Failure(
+                    "Trainer cannot be deleted because they are still mapped to unit(s). Please remove assignments first.",
+                    ServiceErrorStatus.INVALIDOPERATION
+                );
+
+            // ✅ Delete trainer
+            await _userRepository.DeleteAsync(trainer);
+            return ServiceResult.Success("Trainer deleted successfully");
+        }
+
+
+
+
     }
 }

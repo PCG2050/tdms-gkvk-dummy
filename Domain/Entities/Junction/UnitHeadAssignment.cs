@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Domain.Entities.Junction
@@ -11,6 +12,7 @@ namespace Domain.Entities.Junction
         public int UnitLocationId { get; set; }
         public int UnitHeadId { get; set; }
         public OrganizationUnitLocation UnitLocation { get; set; } = null!;
+        [JsonIgnore]
         public User UnitHead { get; set; } = null!;
     }
 }

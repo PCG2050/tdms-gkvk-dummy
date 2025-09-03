@@ -18,7 +18,12 @@ namespace Infrastructure.Services
             _currentUser = currentUser;
         }
 
-       
+        //public async Task<ServiceResult<List<UnitHeadFlatDto>> GetAllUnitHeadsDetails()
+        //{
+        //    if (_currentUser.Role != Role.ADMIN) return ServiceResult<List<UnitHeadFlatDto>>.Failure("Current user does not have necessary permission to access this.");
+        //    var unitHeads = await _userRepository.Get
+
+        //}
 
         //Old method
         public async Task<ServiceResult<List<UnitWithLocationsDto>>> GetUnitHeadUnits(int unitHeadId)

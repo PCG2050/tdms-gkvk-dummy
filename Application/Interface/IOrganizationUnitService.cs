@@ -18,7 +18,7 @@ namespace Application.Interface
         Task<ServiceResult> MapExistingTrainersAsync(ExistingTrainerAssignmentDto trainerAssignment);
         Task<ServiceResult> UnMapTrainerFromUnitLocationAsync(ExistingTrainerAssignmentDto trainerAssignment);       
 
-        Task<List<ServiceResult>> MapExistingUnitHeadsByLocationBulkAsync(BulkUnitHeadAssignmentByLocationDto request);
+        //Task<List<ServiceResult>> MapExistingUnitHeadsByLocationBulkAsync(BulkUnitHeadAssignmentByLocationDto request);
 
         Task<ServiceResult> SyncUnitHeadAssignmentsByLocationAsync(BulkUnitHeadAssignmentByLocationDto request);
 
@@ -33,6 +33,8 @@ namespace Application.Interface
         //Task<List<ServiceResult<OrgUnitLocationIdDetailsDto>>> BulkUpdateOrganizationUnitLocationsAsync(BulkOrganizationUnitLocationUpdateDto bulkUpdateDto);
         Task<ServiceResult> RemoveUnitFromOrganizationById(int id);
 
+        //bulk assignments trainers
+        Task<ServiceResult> SyncTrainerAssignmentsByLocationAsync(BulkTrainerAssignmentByLocationDto request);
 
 
 

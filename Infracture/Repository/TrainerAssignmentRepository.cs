@@ -107,6 +107,24 @@ namespace Infrastructure.Repository
             return await _context.UnitTrainers
                 .AnyAsync(ta => ta.UnitLocationId == unitLocationId);
         }
+
+        // New methods to TrainerAssignmentRepository class
+
+       
+
+        public async Task AddRangeAsync(IEnumerable<TrainerAssignment> assignments)
+        {
+            await _context.UnitTrainers.AddRangeAsync(assignments);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteRangeAsync(IEnumerable<TrainerAssignment> assignments)
+        {
+            _context.UnitTrainers.RemoveRange(assignments);
+            await _context.SaveChangesAsync();
+        }
+
+
     }
 
 }

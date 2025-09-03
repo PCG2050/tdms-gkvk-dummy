@@ -16,7 +16,7 @@ namespace Application.Interface.Repository
             Task<UnitHeadAssignment> UpdateAsync(UnitHeadAssignment unitLocationUnitHead);
             Task DeleteAsync(int id);
             Task DeleteAsync(UnitHeadAssignment unitLocationUnitHead);
-            Task<bool> AssignmentExistsAsync(ExistingUnitHeadAssignmentDto UnitHeadAssignment);
+            Task<bool> UnitHeadAssignmentExistsAsync(ExistingUnitHeadAssignmentDto UnitHeadAssignment);
 
             Task<bool> AssignmentExistsByLocationAsync(int unitLocationId, int unitHeadId);
             Task<List<UnitWithLocationsDto>> GetAssignmentsDetailsByUnitHeadAsync(int unitHeadId);
@@ -29,6 +29,8 @@ namespace Application.Interface.Repository
 
         // New method for checking assignments before deletion
         Task<bool> HasAssignmentsForUnitLocationAsync(int unitLocationId);
+
+        
 
     }
 }
