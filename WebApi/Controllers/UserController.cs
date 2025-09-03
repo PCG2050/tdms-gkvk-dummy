@@ -120,21 +120,64 @@ namespace WebApi.Controllers
             return NoContent();
         }
 
-        // Anyone with a token can reset
-        [HttpPost("reset-password")]
+        [HttpPost("verify-reset-otp")]
         [AllowAnonymous]
-        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
+        public async Task<IActionResult> VerifyPasswordResetOTP([FromBody] VerifyOTPDto dto)
         {
-            var result = await _userService.ResetPasswordAsync(dto);
+            var result = await _userService.VerifyPasswordResetOTPAsync(dto);
+
             if (!result.IsSuccess)
                 return ServiceResponseToActionResult.Error(result.ErrorMessage, result.ErrorStatus);
 
-            return NoContent();
+            var otpResult = result.Data;
+
+            if (!otpResult.IsValid)
+            {
+                return BadRequest(new
+                {
+                    message = otpResult.ErrorMessage,
+                    remainingAttempts = otpResult.RemainingAttempts,
+                    isBlocked = otpResult.IsBlocked,
+                    success = false
+                });
+            }
+
+            return Ok(new
+            {
+                message = "OTP verified successfully. You can now reset your password.",
+                success = true,
+                verified = true
+            });
+        }
+        
+
+        [HttpPost("reset-password")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetPasswordWithOTP([FromBody] ResetPasswordWithOTPDto dto)
+        {
+            var result = await _userService.ResetPasswordWithOTPAsync(dto);
+
+            if (!result.IsSuccess)
+                return ServiceResponseToActionResult.Error(result.ErrorMessage, result.ErrorStatus);
+
+            return Ok(new
+            {
+                message = "Password reset successfully. You can now login with your new password.",
+                success = true
+            });
         }
 
-       
-     
-     
+        //Request new OTP if previous was not sent or blocked
+        [HttpPost("resend-reset-otp")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResendPasswordResetOTP([FromBody] ForgotPasswordDto dto)
+        {            
+            return await ForgotPassword(dto);
+        }
+
+
+
+
 
 
 

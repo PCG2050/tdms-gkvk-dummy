@@ -13,9 +13,8 @@ namespace Application.Interface.Repository
         Task SaveAsync(User user);
         Task DeleteAsync(User user);
         Task<List<User>> GetUsersByOrganizationAndRoleAsync(int organizationId, Role role);
-        Task SetPasswordResetTokenAsync(int userId, string token, DateTimeOffset expiresAt);
-        Task<User?> GetByPasswordResetTokenAsync(string token);
-        Task ClearPasswordResetTokenAsync(int userId);
+        //Task SetPasswordResetTokenAsync(int userId, string token, DateTimeOffset expiresAt);
+      
 
         Task<PaginatedResult<TrainerDetailsDto>> GetPaginatedItemsAsync(
             int organizationId, int pageNumber = 1, QueryFilter? queryFilter = null, int pageSize = 10);
@@ -31,5 +30,15 @@ namespace Application.Interface.Repository
             int organizaitonId, int pageNumber = 1, QueryFilter? queryFilter = null, int pageSize = 10);
 
         Task<List<User>> GetTrainersCreatedByAsync(int createdById);
+
+        Task SetPasswordResetOTPAsync(int userId, string otp, DateTimeOffset expiresAt);
+        Task<User?> GetByEmailForPasswordResetAsync(string email);
+        Task<bool> ValidatePasswordResetOTPAsync(int userId, string otp);
+        Task ClearPasswordResetOTPAsync(int userId);
+        Task<User?> GetUserWithValidOTPAsync(int userId, string otp);
+
+       
+
+
     }
 }

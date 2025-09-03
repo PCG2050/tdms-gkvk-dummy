@@ -16,6 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Resend;
 using Scalar.AspNetCore;
 using System.Reflection;
 using System.Text;
@@ -49,12 +50,23 @@ namespace WebApi
                                       policy.AllowAnyMethod();
                                   });
             });
+            //Email Configuration
             builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
-            builder.Services.Configure<SendGridSettings>(builder.Configuration.GetSection("SendGridMail"));
-            builder.Services.AddTransient<IEmailService, SendGridEmailService>();
+            builder.Services.Configure<ResendSettings>(builder.Configuration.GetSection("ResendMail"));
+            // Configure Resend client - Updated to match documentation
+            builder.Services.AddSingleton<IResend>(provider =>
+            {
+                var apiKey = builder.Configuration["ResendMail:ApiKey"];
+                if (string.IsNullOrEmpty(apiKey))
+                    throw new InvalidOperationException("ResendMail:ApiKey is not configured");
 
-            builder.Services.AddHttpContextAccessor();//For IHttpContextAccessor in infrastructure
-            builder.Services.AddScoped<PasswordService>();
+                return ResendClient.Create(apiKey);
+            });
+            builder.Services.AddTransient<IEmailService, ResendEmailService>();
+          
+
+            builder.Services.AddHttpContextAccessor();//For IHttpContextAccessor in infrastructure          
+            builder.Services.AddScoped<IOTPService, OTPService>();
             builder.Services.AddScoped<ICurrentUserService,CurrentUserService>();
             builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
             builder.Services.AddScoped<ITokenService, AuthTokenService>();
@@ -77,6 +89,8 @@ namespace WebApi
             builder.Services.AddScoped<ITrainerAssignmentRepository, TrainerAssignmentRepository>();
             builder.Services.AddScoped<ITrainerAssignmentService, TrainerAssignmentService>();
             builder.Services.AddScoped<IEntityPermissionService, EntityPermissionService>();
+
+            //Tables
             builder.Services.AddScoped<IFtiTrainingProgrammeRepository, FtiTrainingProgrammeRepository>();
             builder.Services.AddScoped<IFtiTrainingProgrammeService, FtiTrainingProgrammeService>();
             builder.Services.AddScoped<IFtiOtherActivitiesRepository, FtiOtherActivitiesRepository>();
@@ -95,9 +109,13 @@ namespace WebApi
 
             builder.Services.AddScoped<IAticAdvisoryServiceRepository, AticAdvisoryServiceRepository>();
             builder.Services.AddScoped<IAticSalesRepository, AticSalesRepository>();
+
             builder.Services.AddScoped<IAsmVisitRepository, AsmVisitRepository>();
+
             builder.Services.AddScoped<IDeuCourseRepository, DeuCourseRepository>();
+
             builder.Services.AddScoped<INaepDetailsRepository, NaepDetailsRepository>();
+
             builder.Services.AddScoped<IEeuOftRepository, EeuOftRepository>();
             builder.Services.AddScoped<IEeuFldRepository, EeuFldRepository>();
             builder.Services.AddScoped<IEeuTrainingProgrammeRepository, EeuTrainingProgrammeRepository>();
@@ -110,6 +128,7 @@ namespace WebApi
             builder.Services.AddScoped<IEeuOftService, EeuOftService>();
             builder.Services.AddScoped<IEeuFldService, EeuFldService>();
             builder.Services.AddScoped<IEeuTrainingProgrammeService, EeuTrainingProgrammeService>();
+            
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(o=>

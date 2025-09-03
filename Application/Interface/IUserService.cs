@@ -29,8 +29,13 @@ namespace Application.Interface
         Task<List<FlatUnitHeadDetailsDto>> GetPaginatedOrgUnitHeads();
         Task<List<FlatUnitHeadDetailsDto>> GetPaginatedTrainers();
         Task<ServiceResult> UpdatedAccountStatus(int id, bool activate = true);
+
         Task<ServiceResult> ForgotPasswordAsync(ForgotPasswordDto dto);
-        Task<ServiceResult> ResetPasswordAsync(ResetPasswordDto dto);
+
+      
+        Task<ServiceResult<OTPVerificationResult>> VerifyPasswordResetOTPAsync(VerifyOTPDto dto);
+
+        Task<ServiceResult> ResetPasswordWithOTPAsync(ResetPasswordWithOTPDto dto);
 
 
         //New method for unitheads to get trainers they created

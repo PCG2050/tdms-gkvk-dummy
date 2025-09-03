@@ -8,6 +8,11 @@ namespace Infrastructure.Settings
 {
     public class EmailSettings
     {
-        public string ResetPasswordUrlBase { get; set; } = string.Empty;
+        public int OTPExpiryMinutes { get; set; }
+        public int MaxOTPAttempts { get; set; }
+
+        public int OTPResendDelayMinutes { get; set; }
+   
+
     }
 }

@@ -20,9 +20,18 @@ namespace Infrastructure.Services
         private readonly EmailSettings _emailSettings;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignment;
         private readonly ITrainerAssignmentRepository _trainerAssignment;
+        private readonly IUserSessionRepository _sessionRepository;   
 
 
-        public UserService(IUserRepository userRepository, IPasswordHasher passwordHasher, ICurrentUserService currentUser, IEmailService emailService, IOptions<EmailSettings> emailOptions, IUnitHeadAssignmentRepository unitHeadAssignmentRepository, ITrainerAssignmentRepository trainerAssignment)
+
+        public UserService(IUserRepository userRepository, 
+            IPasswordHasher passwordHasher, 
+            ICurrentUserService currentUser, 
+            IEmailService emailService, 
+            IOptions<EmailSettings> emailOptions, 
+            IUnitHeadAssignmentRepository unitHeadAssignmentRepository, 
+            ITrainerAssignmentRepository trainerAssignment,
+            IUserSessionRepository sessionRepository)
         {
             _userRepository = userRepository;
             _passwordHasher = passwordHasher;
@@ -31,6 +40,7 @@ namespace Infrastructure.Services
             _emailSettings = emailOptions.Value;
             _unitHeadAssignment = unitHeadAssignmentRepository;
             _trainerAssignment = trainerAssignment;
+            _sessionRepository = sessionRepository;
         }
 
         public async Task<User> CreateUserAsync(UserRegisterDto registerDto)
@@ -213,47 +223,6 @@ namespace Infrastructure.Services
             return ServiceResult.Success();
         }
 
-        // NEW: Forgot Password
-        public async Task<ServiceResult> ForgotPasswordAsync(ForgotPasswordDto dto)
-        {
-            if (string.IsNullOrWhiteSpace(dto.Email))
-                return ServiceResult.Failure("Email is required", ServiceErrorStatus.INVALIDOPERATION);
-
-            var user = await _userRepository.GetByEmailAsync(dto.Email);
-
-            // Always return success (avoid user enumeration)
-            if (user == null) return ServiceResult.Success();
-
-            var tokenBytes = RandomNumberGenerator.GetBytes(48);
-            var token = Convert.ToBase64String(tokenBytes)
-                .Replace("+", "-").Replace("/", "_").Replace("=", "");
-
-
-            var expiresAt = DateTimeOffset.UtcNow.AddHours(1);
-            await _userRepository.SetPasswordResetTokenAsync(user.Id, token, expiresAt);
-
-            var resetLink = $"{_emailSettings.ResetPasswordUrlBase}{token}";
-            await _emailService.SendPasswordResetEmailAsync(user.Email, resetLink);
-
-            return ServiceResult.Success();
-        }
-
-        // NEW: Reset Password
-        public async Task<ServiceResult> ResetPasswordAsync(ResetPasswordDto dto)
-        {
-            if (string.IsNullOrWhiteSpace(dto.Token) || string.IsNullOrWhiteSpace(dto.NewPassword))
-                return ServiceResult.Failure("Token and new password are required", ServiceErrorStatus.INVALIDOPERATION);
-
-            var user = await _userRepository.GetByPasswordResetTokenAsync(dto.Token);
-            if (user == null)
-                return ServiceResult.Failure("Invalid or expired token", ServiceErrorStatus.INVALIDOPERATION);
-
-            user.PasswordHash = _passwordHasher.HashPassword(dto.NewPassword);
-            await _userRepository.SaveAsync(user);
-            await _userRepository.ClearPasswordResetTokenAsync(user.Id);
-
-            return ServiceResult.Success();
-        }
 
         public async Task<List<TrainerDetailsDto>> GetAllTrainersCreatedByUnitHead(int unitHeadId)
         {
@@ -360,6 +329,154 @@ namespace Infrastructure.Services
             return ServiceResult.Success("Trainer deleted successfully");
         }
 
+        public async Task<ServiceResult> ForgotPasswordAsync(ForgotPasswordDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Email))
+                return ServiceResult.Failure("Email is required", ServiceErrorStatus.INVALIDOPERATION);
+
+            var user = await _userRepository.GetByEmailForPasswordResetAsync(dto.Email);
+
+            // Always return success to prevent user enumeration
+            if (user == null)
+            {
+                // Add a small delay to mimic processing time
+                await Task.Delay(500);
+                return ServiceResult.Success("If an account with this email exists, you will receive an OTP shortly.");
+            }
+
+            if (user.IsDeactivated)
+            {
+                // Don't reveal account status
+                return ServiceResult.Success("If an account with this email exists, you will receive an OTP shortly.");
+            }
+
+            // Generate 6-digit OTP
+            var otp = GenerateSecureOTP();
+            var expiresAt = DateTimeOffset.UtcNow.AddMinutes(_emailSettings.OTPExpiryMinutes); 
+
+            await _userRepository.SetPasswordResetOTPAsync(user.Id, otp, expiresAt);
+
+            try
+            {
+                await _emailService.SendPasswordResetOTPAsync(user.Email, otp, user.FirstName);
+            }
+            catch (Exception ex)
+            {
+                
+                //logging Considered : _logger.LogError(ex, "Failed to send OTP email to {Email}", user.Email);
+
+                // Clear the OTP since email failed
+                await _userRepository.ClearPasswordResetOTPAsync(user.Id);
+
+                return ServiceResult.Failure("Failed to send OTP. Please try again later.", ServiceErrorStatus.INVALIDOPERATION);
+            }
+
+            return ServiceResult.Success("If an account with this email exists, you will receive an OTP shortly.");
+        }
+
+        public async Task<ServiceResult<OTPVerificationResult>> VerifyPasswordResetOTPAsync(VerifyOTPDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.OTP))
+                return ServiceResult<OTPVerificationResult>.Failure("Email and OTP are required", ServiceErrorStatus.INVALIDOPERATION);
+
+            var user = await _userRepository.GetByEmailForPasswordResetAsync(dto.Email);
+            if (user == null)
+            {
+                await Task.Delay(500); // Prevent timing attacks
+                return ServiceResult<OTPVerificationResult>.Success(
+                    OTPVerificationResult.Failure("Invalid email or OTP"));
+            }
+
+            // Check if OTP exists
+            if (string.IsNullOrEmpty(user.PasswordResetOTP))
+            {
+                return ServiceResult<OTPVerificationResult>.Success(
+                    OTPVerificationResult.Failure("No OTP found. Please request a new one."));
+            }
+
+            // Check if too many attempts
+            if (user.PasswordResetOTPAttempts >= _emailSettings.MaxOTPAttempts)
+            {
+                return ServiceResult<OTPVerificationResult>.Success(
+                    OTPVerificationResult.Failure("Too many attempts. Please request a new OTP.", 0, true));
+            }
+
+            // Check if OTP is expired
+            if (!user.PasswordResetOTPExpiresAt.HasValue || DateTimeOffset.UtcNow > user.PasswordResetOTPExpiresAt.Value)
+            {
+                return ServiceResult<OTPVerificationResult>.Success(
+                    OTPVerificationResult.Failure("OTP has expired. Please request a new one."));
+            }
+
+            // Validate OTP
+            var isValid = await _userRepository.ValidatePasswordResetOTPAsync(user.Id, dto.OTP);
+
+            if (!isValid)
+            {
+                var remainingAttempts = _emailSettings.MaxOTPAttempts - user.PasswordResetOTPAttempts - 1;
+                var message = remainingAttempts > 0
+                    ? $"Invalid OTP. {remainingAttempts} attempts remaining."
+                    : "Too many failed attempts. Please request a new OTP.";
+
+                return ServiceResult<OTPVerificationResult>.Success(
+                    OTPVerificationResult.Failure(message, remainingAttempts, remainingAttempts <= 0));
+            }
+
+            return ServiceResult<OTPVerificationResult>.Success(OTPVerificationResult.Success());
+        }
+
+        public async Task<ServiceResult> ResetPasswordWithOTPAsync(ResetPasswordWithOTPDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Email) ||
+                string.IsNullOrWhiteSpace(dto.OTP) ||
+                string.IsNullOrWhiteSpace(dto.NewPassword))
+            {
+                return ServiceResult.Failure("All fields are required", ServiceErrorStatus.INVALIDOPERATION);
+            }
+
+            var user = await _userRepository.GetByEmailForPasswordResetAsync(dto.Email);
+            if (user == null)
+            {
+                await Task.Delay(500);
+                return ServiceResult.Failure("Invalid request", ServiceErrorStatus.INVALIDOPERATION);
+            }
+
+            // Verify OTP one more time
+            var verifyResult = await VerifyPasswordResetOTPAsync(new VerifyOTPDto
+            {
+                Email = dto.Email,
+                OTP = dto.OTP
+            });
+
+            if (!verifyResult.IsSuccess || !verifyResult.Data.IsValid)
+            {
+                return ServiceResult.Failure(verifyResult.Data?.ErrorMessage ?? "Invalid OTP", ServiceErrorStatus.INVALIDOPERATION);
+            }
+
+            // Reset password
+            user.PasswordHash = _passwordHasher.HashPassword(dto.NewPassword);
+            await _userRepository.SaveAsync(user);
+
+            // Clear OTP data
+            await _userRepository.ClearPasswordResetOTPAsync(user.Id);
+
+            //Invalidate all existing sessions for security
+            await _sessionRepository.DeleteAllUserSessionsAsync(user.Id);
+
+            return ServiceResult.Success("Password reset successfully");
+        }
+
+        private string GenerateSecureOTP()
+        {
+            using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
+            var bytes = new byte[4];
+            rng.GetBytes(bytes);
+
+            var number = Math.Abs(BitConverter.ToInt32(bytes, 0));
+            var otp = (number % 900000) + 100000; // Ensures 6-digit number (100000-999999)
+
+            return otp.ToString();
+        }
 
 
 

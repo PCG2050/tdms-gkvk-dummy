@@ -28,8 +28,16 @@ namespace Domain.Entities
         public ICollection<UnitHeadAssignment> UnitHeadAssignments { get; set; } = [];
         public ICollection<UserSession> UserSessions { get; set; } = [];
 
-        public string? PasswordResetToken { get; set; }
-        public DateTimeOffset? PasswordResetTokenExpiresAt { get; set; }
+        //public string? PasswordResetToken { get; set; }
+        //public DateTimeOffset? PasswordResetTokenExpiresAt { get; set; }
+        // Replace the existing token fields with OTP fields
+        public string? PasswordResetOTP { get; set; }
+        public DateTimeOffset? PasswordResetOTPExpiresAt { get; set; }
+        public int PasswordResetOTPAttempts { get; set; } = 0;
+        public DateTimeOffset? PasswordResetOTPLastAttempt { get; set; }
+
+        // Optional: Track last successful OTP for additional security
+        public string? LastUsedPasswordResetOTP { get; set; }
     }
 }
     

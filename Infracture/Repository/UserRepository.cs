@@ -304,35 +304,35 @@ namespace Infrastructure.Repository
         public bool? IsDeactivated { get; set; }
 
 
-        public async Task SetPasswordResetTokenAsync(int userId, string token, DateTimeOffset expiresAt)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
-            if (user == null) return;
+        //public async Task SetPasswordResetTokenAsync(int userId, string token, DateTimeOffset expiresAt)
+        //{
+        //    var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        //    if (user == null) return;
 
-            user.PasswordResetToken = token;
-            user.PasswordResetTokenExpiresAt = expiresAt;
-            await _context.SaveChangesAsync();
-        }
+        //    user.PasswordResetToken = token;
+        //    user.PasswordResetTokenExpiresAt = expiresAt;
+        //    await _context.SaveChangesAsync();
+        //}
 
-        public async Task<User?> GetByPasswordResetTokenAsync(string token)
-        {
-            var now = DateTimeOffset.UtcNow;
-            return await _context.Users.FirstOrDefaultAsync(u =>
-            u.PasswordResetToken == token &&
-            u.PasswordResetTokenExpiresAt != null &&
-            u.PasswordResetTokenExpiresAt > now &&
-            !u.IsDeactivated);
-        }
+        //public async Task<User?> GetByPasswordResetTokenAsync(string token)
+        //{
+        //    var now = DateTimeOffset.UtcNow;
+        //    return await _context.Users.FirstOrDefaultAsync(u =>
+        //    u.PasswordResetToken == token &&
+        //    u.PasswordResetTokenExpiresAt != null &&
+        //    u.PasswordResetTokenExpiresAt > now &&
+        //    !u.IsDeactivated);
+        //}
 
-        public async Task ClearPasswordResetTokenAsync(int userId)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
-            if (user == null) return;
-            user.PasswordResetTokenExpiresAt = null;
-            user.PasswordResetToken = null;
-            await _context.SaveChangesAsync();
+        //public async Task ClearPasswordResetTokenAsync(int userId)
+        //{
+        //    var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        //    if (user == null) return;
+        //    user.PasswordResetTokenExpiresAt = null;
+        //    user.PasswordResetToken = null;
+        //    await _context.SaveChangesAsync();
 
-        }
+        //}
 
 
         //new method 
@@ -349,8 +349,96 @@ namespace Infrastructure.Repository
                             .ThenInclude(d => d.State)
                 .OrderBy(u => u.FirstName)
                 .ToListAsync();
-        }              
+        }
 
        
+
+        public async Task SetPasswordResetOTPAsync(int userId, string otp, DateTimeOffset expiresAt)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null) return;
+
+            user.PasswordResetOTP = otp;
+            user.PasswordResetOTPExpiresAt = expiresAt;
+            user.PasswordResetOTPAttempts = 0; // Reset attempts when new OTP is generated
+            user.PasswordResetOTPLastAttempt = null;
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<User?> GetByEmailForPasswordResetAsync(string email)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u =>
+                u.Email == email && !u.IsDeactivated);
+        }
+
+        public async Task<bool> ValidatePasswordResetOTPAsync(int userId, string otp)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null) return false;
+
+            // Check if OTP exists and not expired
+            if (string.IsNullOrEmpty(user.PasswordResetOTP) ||
+                !user.PasswordResetOTPExpiresAt.HasValue ||
+                DateTimeOffset.UtcNow > user.PasswordResetOTPExpiresAt.Value)
+            {
+                return false;
+            }
+
+            // Check for too many attempts (rate limiting)
+            const int maxAttempts = 5;
+            if (user.PasswordResetOTPAttempts >= maxAttempts)
+            {
+                return false;
+            }
+
+            // Update attempt tracking
+            user.PasswordResetOTPAttempts++;
+            user.PasswordResetOTPLastAttempt = DateTimeOffset.UtcNow;
+
+            var isValid = string.Equals(otp.Trim(), user.PasswordResetOTP.Trim(), StringComparison.Ordinal);
+
+            if (!isValid)
+            {
+                await _context.SaveChangesAsync(); // Save failed attempt
+                return false;
+            }
+
+            // OTP is valid - don't clear it yet, wait for password reset completion
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task ClearPasswordResetOTPAsync(int userId)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null) return;
+
+            // Store the used OTP for security tracking
+            user.LastUsedPasswordResetOTP = user.PasswordResetOTP;
+
+            // Clear OTP data
+            user.PasswordResetOTP = null;
+            user.PasswordResetOTPExpiresAt = null;
+            user.PasswordResetOTPAttempts = 0;
+            user.PasswordResetOTPLastAttempt = null;
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<User?> GetUserWithValidOTPAsync(int userId, string otp)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u =>
+                u.Id == userId &&
+                !u.IsDeactivated &&
+                u.PasswordResetOTP == otp &&
+                u.PasswordResetOTPExpiresAt.HasValue &&
+                u.PasswordResetOTPExpiresAt > DateTimeOffset.UtcNow &&
+                u.PasswordResetOTPAttempts < 5); // Max attempts check
+
+            return user;
+        }
+
+
     }
 }
