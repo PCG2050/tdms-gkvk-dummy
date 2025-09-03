@@ -11,9 +11,7 @@ namespace Domain.Entities.Junction
     {
         public int UnitLocationId { get; set; }
         public int TrainerId { get; set; } 
-        public OrganizationUnitLocation UnitLocation { get; set; } = null!;
-
-        [JsonIgnore]
+        public OrganizationUnitLocation UnitLocation { get; set; } = null!;               
         public User Trainer { get; set; } = null!;
 
         

@@ -70,8 +70,24 @@ namespace WebApi.Controllers
 
                     await _assignmentService.SyncTrainerAssignmentsByLocationAsync(request);
                 }
+                var trainerResponseDto = new UserWithAssignmentsResponseDto
+                {
+                    Id = user.Id,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                    Phone = user.Phone,
+                    Role = user.Role,
+                    OrganizationId = user.OrganizationId,
+                    IsDeactivated = user.IsDeactivated,
+                    DateOfBirth = user.DateOfBirth,
+                    DateOfJoining = user.DateOfJoining,
+                    EmploymentType = user.EmployementType,
+                    Gender = user.Gender,
+                    OrganizationUnitLocationIds = registerDto.OrganizationUnitLocationIds ?? new List<int>()
+                };
 
-                return Ok(user);
+                return Ok();
             }
             catch (InvalidOperationException e)
             {
@@ -139,29 +155,7 @@ namespace WebApi.Controllers
 
             return Ok(result);
         }
-
-        //// NEW: Bulk sync trainer assignments
-        //[HttpPost("assignments/sync")]
-        //[Authorize(Roles = RoleString.UnitHead)]
-        //public async Task<IActionResult> SyncTrainerAssignments(BulkTrainerAssignmentByLocationDto request)
-        //{
-        //    try
-        //    {
-        //        var result = await _assignmentService.SyncTrainerAssignmentsByLocationAsync(request);
-        //        if (!result.IsSuccess)
-        //            return BadRequest(result.ErrorMessage);
-
-        //        return Ok(result);
-        //    }
-        //    catch (UnauthorizedAccessException ex)
-        //    {
-        //        return Forbid(ex.Message);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Problem(detail: ex.Message, title: "An error occurred while syncing trainer assignments");
-        //    }
-        //}
+   
 
     }
 }

@@ -22,7 +22,7 @@ namespace Infrastructure.Services
         private readonly ITrainerAssignmentRepository _trainerAssignment;
 
 
-        public UserService(IUserRepository userRepository, IPasswordHasher passwordHasher, ICurrentUserService currentUser, IEmailService emailService, IOptions<EmailSettings> emailOptions, IUnitHeadAssignmentRepository unitHeadAssignmentRepository, ITrainerAssignmentRepository trainerAssignmentRepository )
+        public UserService(IUserRepository userRepository, IPasswordHasher passwordHasher, ICurrentUserService currentUser, IEmailService emailService, IOptions<EmailSettings> emailOptions, IUnitHeadAssignmentRepository unitHeadAssignmentRepository, ITrainerAssignmentRepository trainerAssignment)
         {
             _userRepository = userRepository;
             _passwordHasher = passwordHasher;
@@ -30,6 +30,7 @@ namespace Infrastructure.Services
             _emailService = emailService;
             _emailSettings = emailOptions.Value;
             _unitHeadAssignment = unitHeadAssignmentRepository;
+            _trainerAssignment = trainerAssignment;
         }
 
         public async Task<User> CreateUserAsync(UserRegisterDto registerDto)

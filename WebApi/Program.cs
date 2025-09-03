@@ -13,6 +13,7 @@ using Infrastructure.Services.DataTables;
 using Infrastructure.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
@@ -53,6 +54,7 @@ namespace WebApi
             builder.Services.AddTransient<IEmailService, SendGridEmailService>();
 
             builder.Services.AddHttpContextAccessor();//For IHttpContextAccessor in infrastructure
+            builder.Services.AddScoped<PasswordService>();
             builder.Services.AddScoped<ICurrentUserService,CurrentUserService>();
             builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
             builder.Services.AddScoped<ITokenService, AuthTokenService>();

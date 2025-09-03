@@ -72,8 +72,6 @@ namespace Application.Interface
                 CreatedAt = DateTimeOffset.UtcNow,
                 Phone = registerDto.Phone,
                 Role = registerDto.Role    
-
-
                 
               
 

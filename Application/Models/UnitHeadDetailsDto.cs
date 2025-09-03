@@ -60,9 +60,4 @@ namespace Application.Models
         public int DistrictId { get; set; }
         public string DistrictName { get; set; }
     }
-
-
-
-
-
 }

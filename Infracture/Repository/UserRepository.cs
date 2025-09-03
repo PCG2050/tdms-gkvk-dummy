@@ -349,7 +349,6 @@ namespace Infrastructure.Repository
                             .ThenInclude(d => d.State)
                 .OrderBy(u => u.FirstName)
                 .ToListAsync();
-
         }              
 
        
