@@ -49,6 +49,24 @@ namespace Infrastructure.DbContext.Configuration
             builder
                 .Property(u => u.Gender)
                 .HasConversion<string>();
+
+            builder
+                .Property(u => u.DateOfBirth)
+                .HasConversion(
+                v => v.ToDateTime(TimeOnly.MinValue),
+                v => DateOnly.FromDateTime(v)
+                )
+                .HasColumnType("date");
+
+            builder
+                .Property(u => u.DateOfJoining)
+                .HasConversion(
+                v => v.ToDateTime(TimeOnly.MinValue),
+                v => DateOnly.FromDateTime(v)
+                )
+                .HasColumnType("date");   
+            
+           
         }
     }
 }

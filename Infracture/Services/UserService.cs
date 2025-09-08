@@ -57,7 +57,22 @@ namespace Infrastructure.Services
                 PasswordHash = _passwordHasher.HashPassword(registerDto.Password),
                 FirstName = registerDto.FirstName,
                 LastName = registerDto.LastName,
-                OrganizationId = registerDto.OrganizationId
+                OrganizationId = registerDto.OrganizationId,
+                DateOfBirth = registerDto.Role == Role.TRAINER
+                              ? registerDto.DateOfBirth ?? throw new InvalidOperationException("Date of Birth required for trainers")
+                              :registerDto.DateOfBirth ?? default,
+                DateOfJoining = registerDto.Role == Role.TRAINER
+                    ? registerDto.DateOfJoining ?? throw new InvalidOperationException("Date of Joining required for trainers")
+                    : registerDto.DateOfJoining ?? default,
+                Gender = registerDto.Role == Role.TRAINER
+                    ? registerDto.Gender ?? throw new InvalidOperationException("Gender required for trainers")
+                    : registerDto.Gender ?? Gender.OTHER,
+                EmployementType = registerDto.Role == Role.TRAINER
+                    ? registerDto.EmploymentType ?? throw new InvalidOperationException("Employment Type required for trainers")
+                    : registerDto.EmploymentType ?? EmployementType.TEMPORARY, 
+                Qualification = registerDto.Role == Role.TRAINER
+                    ? registerDto.Qualification ?? throw new InvalidOperationException("Qualification required for trainers")
+                    : registerDto.Qualification
             };
             user.CreatedById = _currentUser.UserId;
             user.CreatedAt = DateTimeOffset.UtcNow;
@@ -111,6 +126,11 @@ namespace Infrastructure.Services
                     user.Phone = updateDto.Phone;
                     user.IsPhoneConfirmed = false;
                 }
+                if (updateDto.DateOfBirth is not null) user.DateOfBirth = updateDto.DateOfBirth.Value;
+                if (updateDto.DateOfJoining is not null) user.DateOfJoining = updateDto.DateOfJoining.Value;
+                if (updateDto.Gender is not null) user.Gender = updateDto.Gender.Value;
+                if (updateDto.EmploymentType is not null) user.EmployementType = updateDto.EmploymentType.Value;
+                if (updateDto.Qualification is not null) user.Qualification = updateDto.Qualification;
                 await _userRepository.SaveAsync(user);
                 return ServiceResult.Success();
             }
@@ -455,6 +475,7 @@ namespace Infrastructure.Services
 
             // Reset password
             user.PasswordHash = _passwordHasher.HashPassword(dto.NewPassword);
+            user.UpdatedAt = DateTime.Now;
             await _userRepository.SaveAsync(user);
 
             // Clear OTP data
