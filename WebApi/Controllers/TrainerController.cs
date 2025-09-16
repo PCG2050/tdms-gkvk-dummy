@@ -1,16 +1,14 @@
 ﻿using Application.Interface;
 using Application.Models;
 using Domain.Entities.Enum;
-using Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]s")]
-    public class TrainerController:ControllerBase
+    public class TrainerController : ControllerBase
     {
         private readonly ITrainerAssignmentService _assignmentService;
         private readonly IUserService _userService;
@@ -84,6 +82,7 @@ namespace WebApi.Controllers
                     DateOfJoining = user.DateOfJoining,
                     EmploymentType = user.EmployementType,
                     Gender = user.Gender,
+                    Qualification = user.Qualification,
                     OrganizationUnitLocationIds = registerDto.OrganizationUnitLocationIds ?? new List<int>()
                 };
 
@@ -155,7 +154,7 @@ namespace WebApi.Controllers
 
             return Ok(result);
         }
-   
+
 
     }
 }

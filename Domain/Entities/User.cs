@@ -1,7 +1,6 @@
 ﻿using Domain.Entities.Enum;
 using Domain.Entities.FTI;
 using Domain.Entities.Junction;
-using System.Text.Json.Serialization;
 namespace Domain.Entities
 {
     public class User:AuditableBaseEntity
@@ -28,19 +27,16 @@ namespace Domain.Entities
 
         public ICollection<UnitHeadAssignment> UnitHeadAssignments { get; set; } = [];
         public ICollection<UserSession> UserSessions { get; set; } = [];
-       
-        // Replace the existing token fields with OTP fields
 
-       [JsonIgnore]
+        //public string? PasswordResetToken { get; set; }
+        //public DateTimeOffset? PasswordResetTokenExpiresAt { get; set; }
+        // Replace the existing token fields with OTP fields
         public string? PasswordResetOTP { get; set; }
-        [JsonIgnore]
         public DateTimeOffset? PasswordResetOTPExpiresAt { get; set; }
-        [JsonIgnore]
         public int PasswordResetOTPAttempts { get; set; } = 0;
-        [JsonIgnore]
         public DateTimeOffset? PasswordResetOTPLastAttempt { get; set; }
 
-        [JsonIgnore]
+        // Optional: Track last successful OTP for additional security
         public string? LastUsedPasswordResetOTP { get; set; }
     }
 }

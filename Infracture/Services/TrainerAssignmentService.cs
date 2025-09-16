@@ -3,18 +3,17 @@ using Application.Interface.Repository;
 using Application.Models;
 using Domain.Entities.Enum;
 using Domain.Entities.Junction;
-using Infrastructure.Repository;
 
 namespace Infrastructure.Services
 {
-    public class TrainerAssignmentService:ITrainerAssignmentService
+    public class TrainerAssignmentService : ITrainerAssignmentService
     {
         private readonly ITrainerAssignmentRepository _trainerAssignment;
         private readonly ICurrentUserService _currentUser;
         private readonly IUserRepository _userRepository;
         private readonly IOrganizationUnitRepository _organizationUnit;
 
-        public TrainerAssignmentService(ITrainerAssignmentRepository trainerAssignment, ICurrentUserService currentUser, IOrganizationUnitRepository organizationUnit,IUserRepository userRepository)
+        public TrainerAssignmentService(ITrainerAssignmentRepository trainerAssignment, ICurrentUserService currentUser, IOrganizationUnitRepository organizationUnit, IUserRepository userRepository)
         {
             _trainerAssignment = trainerAssignment;
             _currentUser = currentUser;
@@ -24,7 +23,7 @@ namespace Infrastructure.Services
         public async Task<ServiceResult<List<TrainerUnitWithLocationsDto>>> GetTrainerUnits(int trainerId)
         {
             if (_currentUser.UserId != trainerId && _currentUser.Role != Role.UNITHEAD) return ServiceResult<List<TrainerUnitWithLocationsDto>>.Failure("Current user does not have necessary permission to access this.");
-            var trainerAssignments = await _trainerAssignment.GetAssignmentsDetailsByTrainerAsync(trainerId);                
+            var trainerAssignments = await _trainerAssignment.GetAssignmentsDetailsByTrainerAsync(trainerId);
             return ServiceResult<List<TrainerUnitWithLocationsDto>>.Success(trainerAssignments);
         }
 
@@ -35,7 +34,7 @@ namespace Infrastructure.Services
             if (trainer is null)
                 return ServiceResult.Failure($"Trainer {request.TrainerId} does not exist");
 
-            
+
 
             // Verify trainer role
             if (trainer.Role != Role.TRAINER)
@@ -98,6 +97,7 @@ namespace Infrastructure.Services
                 DateOfBirth = trainer.DateOfBirth,
                 DateOfJoining = trainer.DateOfJoining,
                 IsDeactivated = trainer.IsDeactivated,
+                Qualification = trainer.Qualification,
                 AssignedLocationIds = trainer.TrainerAssignments.Select(ta => ta.UnitLocationId).ToList(),
                 UnitLocationDetails = trainer.TrainerAssignments
                     .Select(ta => new UnitLocationDetailsDto

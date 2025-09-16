@@ -16,8 +16,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Resend;
 using Scalar.AspNetCore;
 using System.Reflection;
@@ -32,20 +30,11 @@ namespace WebApi
         {
             var builder = WebApplication.CreateBuilder(args);
 
-           //Configure JSON options for better data handling
-            builder.Services.AddControllers()
-                .AddJsonOptions(options =>
-                 {
-                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-                 });
+            // Add services to the container.
 
+            builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
-
-            builder.Services.AddHttpContextAccessor();//For IHttpContextAccessor in infrastructure
-
             builder.Services.AddDbContext<TdmsDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DatabaseContext")));
             builder.Services.AddScoped<IRouteService, RouteService>();
@@ -75,33 +64,29 @@ namespace WebApi
             });
             builder.Services.AddTransient<IEmailService, ResendEmailService>();
           
-                              
-           
-            builder.Services.AddScoped<ICurrentUserService,CurrentUserService>();
+
+            builder.Services.AddHttpContextAccessor();//For IHttpContextAccessor in infrastructure          
             builder.Services.AddScoped<IOTPService, OTPService>();
+            builder.Services.AddScoped<ICurrentUserService,CurrentUserService>();
             builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
             builder.Services.AddScoped<ITokenService, AuthTokenService>();
             builder.Services.AddScoped<IAuthService, AuthService>();           
             builder.Services.AddScoped<IAzureStorageService, AzureStorageService>();
-
-            //Repository Layer
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserSessionRepository, UserSessionRepository>();
-            builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>(); 
-            builder.Services.AddScoped<IStateRepository, StateRepository>();
-            builder.Services.AddScoped<IDistrictRepository, DistrictRepository>();           
-            builder.Services.AddScoped<IUnitRepository, UnitRepository>();           
-            builder.Services.AddScoped<IOrganizationUnitRepository, OrganizationUnitRepository>();
-            builder.Services.AddScoped<IUnitHeadAssignmentRepository, UnitHeadAssignmentRepository>();
-            builder.Services.AddScoped<ITrainerAssignmentRepository, TrainerAssignmentRepository>();
-
-            //Service layer
+            builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
             builder.Services.AddScoped<IOrganizationService, OrganizationService>();
             builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IStateRepository, StateRepository>();
+            builder.Services.AddScoped<IDistrictRepository, DistrictRepository>();
             builder.Services.AddScoped<ILocationService, LocationService>();
+            builder.Services.AddScoped<IUnitRepository, UnitRepository>();
             builder.Services.AddScoped<IUnitService, UnitService>();
+            builder.Services.AddScoped<IOrganizationUnitRepository, OrganizationUnitRepository>();
             builder.Services.AddScoped<IOrganizationUnitService, OrganizationUnitService>();
+            builder.Services.AddScoped<IUnitHeadAssignmentRepository, UnitHeadAssignmentRepository>();
             builder.Services.AddScoped<IUnitHeadAssignmentService, UnitHeadAssignmentService>();
+            builder.Services.AddScoped<ITrainerAssignmentRepository, TrainerAssignmentRepository>();
             builder.Services.AddScoped<ITrainerAssignmentService, TrainerAssignmentService>();
             builder.Services.AddScoped<IEntityPermissionService, EntityPermissionService>();
 
@@ -174,8 +159,10 @@ namespace WebApi
             }
             app.UseCors(MyAllowSpecificOrigins);
             app.UseHttpsRedirection();
-            app.UseAuthentication();
+
             app.UseAuthorization();
+
+
             app.MapControllers();
 
             app.Run();

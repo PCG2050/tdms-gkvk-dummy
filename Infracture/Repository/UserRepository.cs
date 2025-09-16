@@ -17,7 +17,7 @@ namespace Infrastructure.Repository
             _context = context;
         }
 
-        public async Task<User?> GetByIdAsync(int id)   
+        public async Task<User?> GetByIdAsync(int id)
         {
             return await _context.Users.FindAsync(id);
         }

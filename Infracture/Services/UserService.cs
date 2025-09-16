@@ -4,10 +4,8 @@ using Application.Interface.Repository;
 using Application.Models;
 using Domain.Entities;
 using Domain.Entities.Enum;
-using Domain.Entities.Junction;
 using Infrastructure.Settings;
 using Microsoft.Extensions.Options;
-using System.Security.Cryptography;
 
 namespace Infrastructure.Services
 {
@@ -20,16 +18,16 @@ namespace Infrastructure.Services
         private readonly EmailSettings _emailSettings;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignment;
         private readonly ITrainerAssignmentRepository _trainerAssignment;
-        private readonly IUserSessionRepository _sessionRepository;   
+        private readonly IUserSessionRepository _sessionRepository;
 
 
 
-        public UserService(IUserRepository userRepository, 
-            IPasswordHasher passwordHasher, 
-            ICurrentUserService currentUser, 
-            IEmailService emailService, 
-            IOptions<EmailSettings> emailOptions, 
-            IUnitHeadAssignmentRepository unitHeadAssignmentRepository, 
+        public UserService(IUserRepository userRepository,
+            IPasswordHasher passwordHasher,
+            ICurrentUserService currentUser,
+            IEmailService emailService,
+            IOptions<EmailSettings> emailOptions,
+            IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
             ITrainerAssignmentRepository trainerAssignment,
             IUserSessionRepository sessionRepository)
         {
@@ -57,22 +55,7 @@ namespace Infrastructure.Services
                 PasswordHash = _passwordHasher.HashPassword(registerDto.Password),
                 FirstName = registerDto.FirstName,
                 LastName = registerDto.LastName,
-                OrganizationId = registerDto.OrganizationId,
-                DateOfBirth = registerDto.Role == Role.TRAINER
-                              ? registerDto.DateOfBirth ?? throw new InvalidOperationException("Date of Birth required for trainers")
-                              :registerDto.DateOfBirth ?? default,
-                DateOfJoining = registerDto.Role == Role.TRAINER
-                    ? registerDto.DateOfJoining ?? throw new InvalidOperationException("Date of Joining required for trainers")
-                    : registerDto.DateOfJoining ?? default,
-                Gender = registerDto.Role == Role.TRAINER
-                    ? registerDto.Gender ?? throw new InvalidOperationException("Gender required for trainers")
-                    : registerDto.Gender ?? Gender.OTHER,
-                EmployementType = registerDto.Role == Role.TRAINER
-                    ? registerDto.EmploymentType ?? throw new InvalidOperationException("Employment Type required for trainers")
-                    : registerDto.EmploymentType ?? EmployementType.TEMPORARY, 
-                Qualification = registerDto.Role == Role.TRAINER
-                    ? registerDto.Qualification ?? throw new InvalidOperationException("Qualification required for trainers")
-                    : registerDto.Qualification
+                OrganizationId = registerDto.OrganizationId
             };
             user.CreatedById = _currentUser.UserId;
             user.CreatedAt = DateTimeOffset.UtcNow;
@@ -131,6 +114,10 @@ namespace Infrastructure.Services
                 if (updateDto.Gender is not null) user.Gender = updateDto.Gender.Value;
                 if (updateDto.EmploymentType is not null) user.EmployementType = updateDto.EmploymentType.Value;
                 if (updateDto.Qualification is not null) user.Qualification = updateDto.Qualification;
+                if (updateDto.ProfileImageUrl is not null) user.ProfileImageUrl = updateDto.ProfileImageUrl; 
+
+                user.UpdatedById = _currentUser.UserId;
+                user.UpdatedAt = DateTimeOffset.UtcNow;
                 await _userRepository.SaveAsync(user);
                 return ServiceResult.Success();
             }
@@ -159,7 +146,7 @@ namespace Infrastructure.Services
             return ServiceResult.Success("User deleted successfully");
         }
 
-   
+
 
 
         public Task<List<User>> GetOrganizationUnitTrainers(int unitId)
@@ -337,7 +324,7 @@ namespace Infrastructure.Services
             // 🔎 Check if trainer is mapped to any units
             var assignments = await _trainerAssignment.GetByTrainerIdAsync(trainerId);
 
-            
+
             if (assignments.Any())
                 return ServiceResult.Failure(
                     "Trainer cannot be deleted because they are still mapped to unit(s). Please remove assignments first.",
@@ -372,7 +359,7 @@ namespace Infrastructure.Services
 
             // Generate 6-digit OTP
             var otp = GenerateSecureOTP();
-            var expiresAt = DateTimeOffset.UtcNow.AddMinutes(_emailSettings.OTPExpiryMinutes); 
+            var expiresAt = DateTimeOffset.UtcNow.AddMinutes(_emailSettings.OTPExpiryMinutes);
 
             await _userRepository.SetPasswordResetOTPAsync(user.Id, otp, expiresAt);
 
@@ -382,7 +369,7 @@ namespace Infrastructure.Services
             }
             catch (Exception ex)
             {
-                
+
                 //logging Considered : _logger.LogError(ex, "Failed to send OTP email to {Email}", user.Email);
 
                 // Clear the OTP since email failed

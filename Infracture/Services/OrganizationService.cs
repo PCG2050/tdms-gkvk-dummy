@@ -44,7 +44,7 @@ namespace Application.Interface
         {
             return await _organizationRepository.GetOrganizationAsync(id);
 
-        }        
+        }
         public async Task<User> CreateUser(UserRegisterDto registerDto, int organizationId)
         {
             if (registerDto.Role == Domain.Entities.Enum.Role.ADMIN
@@ -71,9 +71,9 @@ namespace Application.Interface
                 CreatedById = _currentUser.UserId,
                 CreatedAt = DateTimeOffset.UtcNow,
                 Phone = registerDto.Phone,
-                Role = registerDto.Role    
-                
-              
+                Role = registerDto.Role,
+                Qualification = registerDto.Qualification
+
 
             };
 
@@ -103,8 +103,8 @@ namespace Application.Interface
                 var nameExists = await _organizationRepository.HasOrganizationWithNameAsync(updateDto.Name);
                 if (nameExists)
                     return ServiceResult<Organization>.Failure("An organization with this name already exists", ServiceErrorStatus.INVALIDOPERATION);
-               
-                    organization.Name = updateDto.Name;
+
+                organization.Name = updateDto.Name;
             }
 
             if (updateDto.Pincode is not null) organization.PinCode = updateDto.Pincode;

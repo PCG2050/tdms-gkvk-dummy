@@ -148,7 +148,7 @@ namespace WebApi.Controllers
         {
             try
             {
-              
+                // Absolute minimal test exactly like documentation
                 var resp = await _resend.EmailSendAsync(new EmailMessage()
                 {
                     From = "Acme <onboarding@resend.dev>",

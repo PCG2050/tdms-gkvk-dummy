@@ -1,5 +1,6 @@
 ﻿using Application.Enums;
 using Application.Interface;
+using Application.Interface.Repository;
 using Application.Models;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
@@ -18,12 +19,16 @@ namespace Infrastructure.Services
         const string CONTAINER_NAME_PATTERN = "^[a-z](?!.*--)[a-z0-9-]{1,61}[a-z0-9]$";
         private readonly BlobServiceClient _blobServiceClient;
         private readonly ILogger<AzureStorageService> _logger;
+        private readonly IOrganizationRepository _organizationRepository;
 
-        public AzureStorageService(IConfiguration configuration, ILogger<AzureStorageService> logger)
+        public AzureStorageService(IConfiguration configuration, 
+            ILogger<AzureStorageService> logger,
+            IOrganizationRepository organizationRepository)
         {
             var connectionString = configuration.GetConnectionString("AzureStorage");
             _blobServiceClient = new BlobServiceClient(connectionString);
             _logger = logger;   
+            _organizationRepository = organizationRepository;
         }
         public async Task<bool> ContainerExistsAsync(string containerName)
         {
@@ -73,9 +78,187 @@ namespace Infrastructure.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex,"AzureStorageSASResult.GenerateToken ");
-                return null;
+                return ServiceResult<AzureStorageSASResult>.Failure("Failure to generate SAS Token");
             }
         }
+
+        public BlobSasTokenResponse GenerateBlobSasTokenAsync(string containerName, BlobSasTokenRequest request)
+        {
+            try
+            {
+                var blobClient = _blobServiceClient.GetBlobContainerClient(containerName).GetBlobClient(request.BlobName);
+
+                if (!blobClient.CanGenerateSasUri)
+                    throw new InvalidOperationException("Cannot generate SAS URI for this blob");
+
+                var sasBuilder = new BlobSasBuilder
+                {
+                    BlobContainerName = containerName,
+                    BlobName = request.BlobName,
+                    Resource = "b",
+                    ExpiresOn = DateTimeOffset.UtcNow.AddMinutes(request.ExpiryInMinutes)
+                };
+
+                // Set permissions based on operation type
+                switch (request.OperationType)
+                {
+                    case BlobOperationType.Upload:
+                        sasBuilder.SetPermissions(BlobSasPermissions.Create | BlobSasPermissions.Write);
+                        break;
+                    case BlobOperationType.Read:
+                        sasBuilder.SetPermissions(BlobSasPermissions.Read);
+                        break;
+                    case BlobOperationType.Delete:
+                        sasBuilder.SetPermissions(BlobSasPermissions.Delete);
+                        break;
+                    case BlobOperationType.ReadWrite:
+                        sasBuilder.SetPermissions(BlobSasPermissions.Read | BlobSasPermissions.Write | BlobSasPermissions.Create);
+                        break;
+                }
+
+                var sasUri = blobClient.GenerateSasUri(sasBuilder);
+
+                return new BlobSasTokenResponse
+                {
+                    SasToken = sasUri.Query.TrimStart('?'),
+                    BlobUrl = sasUri.ToString(),
+                    ExpiresAt = sasBuilder.ExpiresOn.DateTime
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to generate blob SAS token for {ContainerName}/{BlobName}",
+                    containerName, request.BlobName);
+                throw;
+            }
+        }
+
+        public async Task<string> UploadBlobAsync(string containerName, string blobName, Stream fileStream, string contentType)
+        {
+            try
+            {
+                var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
+                var blobClient = containerClient.GetBlobClient(blobName);
+
+                var blobUploadOptions = new BlobUploadOptions
+                {
+                    HttpHeaders = new BlobHttpHeaders
+                    {
+                        ContentType = contentType
+                    }
+                };
+
+                await blobClient.UploadAsync(fileStream, blobUploadOptions);
+                return blobClient.Uri.ToString();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to upload blob {BlobName} to container {ContainerName}",
+                    blobName, containerName);
+                throw;
+            }
+        }
+
+        public async Task<bool> DeleteBlobAsync(string containerName, string blobName)
+        {
+            try
+            {
+                var blobClient = _blobServiceClient.GetBlobContainerClient(containerName).GetBlobClient(blobName);
+                var response = await blobClient.DeleteIfExistsAsync();
+                return response.Value;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to delete blob {BlobName} from container {ContainerName}",
+                    blobName, containerName);
+                return false;
+            }
+        }
+        public async Task<Stream> DownloadBlobAsync(string containerName, string blobName)
+        {
+            try
+            {
+                var blobClient = _blobServiceClient.GetBlobContainerClient(containerName).GetBlobClient(blobName);
+                var response = await blobClient.DownloadStreamingAsync();
+                return response.Value.Content;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to download blob {BlobName} from container {ContainerName}",
+                    blobName, containerName);
+                throw;
+            }
+        }
+        public ServiceResult<BlobSasTokenResponse> GenerateProfileImageUploadToken(int organizationId, int userId, string fileExtension)
+        {
+            try
+            {
+                var organization = _organizationRepository.GetOrganizationAsync(organizationId).Result;
+                if (organization == null)
+                    return ServiceResult<BlobSasTokenResponse>.Failure("Organization not found");
+
+                var containerName = $"{organization.StorageContainerName}-public";
+                var blobName = GenerateProfileImageBlobName(userId, fileExtension);
+
+                var request = new BlobSasTokenRequest
+                {
+                    ContainerName = containerName,
+                    BlobName = blobName,
+                    OperationType = BlobOperationType.Upload,
+                    ExpiryInMinutes = 30
+                };
+
+                var token = GenerateBlobSasTokenAsync(containerName, request);
+                return ServiceResult<BlobSasTokenResponse>.Success(token);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to generate profile image upload token for user {UserId}", userId);
+                return ServiceResult<BlobSasTokenResponse>.Failure("Failed to generate upload token");
+            }
+        }
+
+        public ServiceResult<BlobSasTokenResponse> GenerateVideoUploadToken(int organizationId, int userId, string fileExtension)
+        {
+            try
+            {
+                var organization = _organizationRepository.GetOrganizationAsync(organizationId).Result;
+                if (organization == null)
+                    return ServiceResult<BlobSasTokenResponse>.Failure("Organization not found");
+
+                var containerName = $"{organization.StorageContainerName}-public";
+                var blobName = GenerateVideoBlobName(userId, "training", fileExtension);
+
+                var request = new BlobSasTokenRequest
+                {
+                    ContainerName = containerName,
+                    BlobName = blobName,
+                    OperationType = BlobOperationType.Upload,
+                    ExpiryInMinutes = 60
+                };
+
+                var token = GenerateBlobSasTokenAsync(containerName, request);
+                return ServiceResult<BlobSasTokenResponse>.Success(token);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to generate video upload token for user {UserId}", userId);
+                return ServiceResult<BlobSasTokenResponse>.Failure("Failed to generate upload token");
+            }
+        }
+
+        public string GenerateProfileImageBlobName(int userId, string fileExtension)
+        {
+            var timestamp = DateTimeOffset.UtcNow.ToString("yyyyMMdd_HHmmss");
+            return $"profiles/{userId}/profile_{timestamp}.{fileExtension.TrimStart('.')}";
+        }
+
+        public string GenerateVideoBlobName(int userId, string videoType, string fileExtension)
+        {
+            var timestamp = DateTimeOffset.UtcNow.ToString("yyyyMMdd_HHmmss");
+            return $"videos/{userId}/{videoType}/{videoType}_{timestamp}.{fileExtension.TrimStart('.')}";
+        }
+
 
         private BlobContainerSasPermissions GetRoleBasedPermissions(Role role)
         {
@@ -92,6 +275,7 @@ namespace Infrastructure.Services
                     return BlobContainerSasPermissions.Read;
             }
         }
+
 
         public async Task<ServiceResult> CreateStorageContainer(string containerName,ContainerType containerType)
         {

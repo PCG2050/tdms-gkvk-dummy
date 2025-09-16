@@ -1,5 +1,4 @@
 ﻿using Domain.Entities.Enum;
-using System.ComponentModel.DataAnnotations;
 
 namespace Application.Models
 {
@@ -11,6 +10,8 @@ namespace Application.Models
         public string Password { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
         public int? OrganizationId { get; set; }
+
+        public string? ProfileImageUrl { get; set; } = string.Empty;
         public Role Role { get; set; }
         public DateOnly? DateOfBirth { get; set; }
         public DateOnly? DateOfJoining { get; set; }
@@ -34,16 +35,12 @@ namespace Application.Models
         public DateOnly? DateOfBirth { get; set; }
         public DateOnly? DateOfJoining { get; set; }
         public EmployementType? EmploymentType { get; set; }
+        public string? ProfileImageUrl { get; set; }
         public Gender? Gender { get; set; }
         public string? Qualification { get; set; }
         public List<int>? OrganizationUnitLocationIds { get; set; } = new();
-    } 
+    }
+
+  
 
 }
-
-
-
-
-
-
-

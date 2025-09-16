@@ -9,16 +9,10 @@ namespace Infrastructure.Services
 {
     public class CurrentUserService : ICurrentUserService
     {
-        private readonly IHttpContextAccessor _httpcontextAccessor;
+        private readonly IHttpContextAccessor _contextAccessor;
         private readonly TdmsDbContext _context;
 
-        public CurrentUserService(IHttpContextAccessor httpcontextAccessor, TdmsDbContext context)
-        {
-            _httpcontextAccessor = httpcontextAccessor;
-            _context = context;
-        }
-
-        public ClaimsPrincipal? User => _httpcontextAccessor.HttpContext.User;
+        public ClaimsPrincipal? User => _contextAccessor.HttpContext.User;
         public int UserId {
             get
                 {
@@ -45,15 +39,11 @@ namespace Infrastructure.Services
                 throw new InvalidOperationException("Organization Id is missing from token");
             }
         }
-
-        public bool IsAuthenticated
+        public CurrentUserService(IHttpContextAccessor contextAccessor, TdmsDbContext context)
         {
-            get
-            {
-                return _httpcontextAccessor?.HttpContext?.User?.Identity?.IsAuthenticated ?? false;
-            }
+            _contextAccessor = contextAccessor;
+            _context = context;
         }
-     
 
         public async Task<IReadOnlyCollection<int>> MappedUnitLocationIds()
         {

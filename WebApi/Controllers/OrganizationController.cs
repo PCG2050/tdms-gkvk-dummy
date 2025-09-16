@@ -32,7 +32,7 @@ namespace WebApi.Controllers
             });
         }
 
-        [Authorize(Roles =RoleString.SuperAdmin)]
+        [Authorize]
         [HttpGet]
         [ProducesResponseType(typeof(PaginatedResult<OrganizationDto>),200)]
         public async Task<IActionResult> GetOrganizations([FromQuery]PaginationRequest request)

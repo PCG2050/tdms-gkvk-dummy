@@ -11,7 +11,9 @@ namespace Application.Enums
         Read,
         Write,
         Delete,
-        List
+        List,
+        Upload,
+        ReadWrite
     }
     public enum ContainerType
     {

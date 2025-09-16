@@ -1,9 +1,4 @@
 ﻿using Domain.Entities.Enum;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Models
 {
@@ -26,6 +21,7 @@ namespace Application.Models
         public DateOnly DateOfBirth { get; set; }
         public DateOnly DateOfJoining { get; set; }
         public bool IsDeactivated { get; set; }
+        public string? Qualification { get; set; }
 
         // List of currently assigned location IDs
         public List<int> AssignedLocationIds { get; set; } = new List<int>();
@@ -34,5 +30,5 @@ namespace Application.Models
         public List<UnitLocationDetailsDto> UnitLocationDetails { get; set; } = new List<UnitLocationDetailsDto>();
     }
 
- 
+
 }

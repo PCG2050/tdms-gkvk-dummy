@@ -16,16 +16,22 @@ namespace WebApi.Controllers
         private readonly IOrganizationService _organizationService;
         private readonly ICurrentUserService _currentUserService;
         private readonly IOrganizationUnitService _organizationUnitService;
+        private readonly IAzureStorageService _azureStorageService;
 
 
-        public UserController(ILogger<UserController> logger, IUserService userService, IOrganizationService organizationService, ICurrentUserService currentUserService, IOrganizationUnitService organizationUnitService)
+        public UserController(ILogger<UserController> logger, 
+            IUserService userService, 
+            IOrganizationService organizationService, 
+            ICurrentUserService currentUserService, 
+            IOrganizationUnitService organizationUnitService,
+            IAzureStorageService azureStorageService)
         {
             _logger = logger;
             _userService = userService;
             _organizationService = organizationService;
             _currentUserService = currentUserService;
             _organizationUnitService = organizationUnitService;
-
+            _azureStorageService = azureStorageService;
         }
         [HttpPost]
         [Authorize(Roles = $"{RoleString.Admin},{RoleString.UnitHead}")]
@@ -60,7 +66,7 @@ namespace WebApi.Controllers
             });
         }
         [HttpGet("profile/{userId}")]
-        [Authorize(Roles = $"{RoleString.Admin},{RoleString.SuperAdmin}")]
+        [Authorize(Roles = $"{RoleString.Admin},{RoleString.SuperAdmin},{RoleString.UnitHead},{RoleString.Trainer}")]
         public async Task<ActionResult> UserProfile(int userId)
         {
             var user = await _userService.GetUserByIdAsync(userId);
@@ -175,11 +181,64 @@ namespace WebApi.Controllers
             return await ForgotPassword(dto);
         }
 
+        [HttpPost("profile/upload-image")]
+        [Authorize]
+        public async Task<IActionResult> UploadProfileImage([FromForm] IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                    return BadRequest("No file uploaded");
 
+                // Validate file type and size
+                var allowedTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/webp" };
+                if (!allowedTypes.Contains(file.ContentType))
+                    return BadRequest("Invalid file type. Only JPEG, PNG, GIF, and WebP are allowed.");
 
+                const int maxSizeInBytes = 5 * 1024 * 1024; // 5MB
+                if (file.Length > maxSizeInBytes)
+                    return BadRequest("File size exceeds 5MB limit.");
 
+                var userId = _currentUserService.UserId;
+                var organizationId = _currentUserService.OrganizationId;
 
+                var organization = await _organizationService.GetOrganizationAsync(organizationId);
+                if (organization == null || string.IsNullOrEmpty(organization.StorageContainerName))
+                {
+                    return BadRequest("Invalid organization or storage container name is missing.");
+                }
 
+                var containerName = $"{organization.StorageContainerName}-public";
+
+                var fileExtension = Path.GetExtension(file.FileName).TrimStart('.');
+                var blobName = $"profiles/{userId}/profile_{DateTimeOffset.UtcNow:yyyyMMdd_HHmmss}.{fileExtension}";
+
+                using var stream = file.OpenReadStream();
+                var blobUrl = await _azureStorageService.UploadBlobAsync(containerName, blobName, stream, file.ContentType);
+
+                // Update user profile with new image URL
+                var updateDto = new UserUpdateDto
+                {
+                    Id = userId,
+                    ProfileImageUrl = blobUrl
+                };
+
+                var updateResult = await _userService.UpdateUserAsync(updateDto);
+                if (!updateResult.IsSuccess)
+                    return ServiceResponseToActionResult.Error(updateResult.ErrorMessage, updateResult.ErrorStatus);
+
+                return Ok(new
+                {
+                    profileImageUrl = blobUrl,
+                    message = "Profile image uploaded successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to upload profile image for user {UserId}", _currentUserService.UserId);
+                return BadRequest("Failed to upload profile image");
+            }
+        }
 
     }
 }
