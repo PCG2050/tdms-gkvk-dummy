@@ -1,4 +1,5 @@
 ﻿using Domain.Entities.Enum;
+using System.ComponentModel.DataAnnotations;
 
 namespace Application.Models
 {
@@ -39,8 +40,13 @@ namespace Application.Models
         public Gender? Gender { get; set; }
         public string? Qualification { get; set; }
         public List<int>? OrganizationUnitLocationIds { get; set; } = new();
-    }
-
-  
+    } 
 
 }
+
+
+
+
+
+
+

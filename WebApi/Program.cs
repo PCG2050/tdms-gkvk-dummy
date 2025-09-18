@@ -10,6 +10,7 @@ using Infrastructure.Repository;
 using Infrastructure.Repository.DataTables;
 using Infrastructure.Services;
 using Infrastructure.Services.DataTables;
+using Infrastructure.Services.DataTables.Infrastructure.Services;
 using Infrastructure.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,8 @@ using Resend;
 using Scalar.AspNetCore;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using WebApi.Services;
 
 namespace WebApi
@@ -30,11 +33,20 @@ namespace WebApi
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+           //Configure JSON options for better data handling
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+                 {
+                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                 });
 
-            builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
+
+            builder.Services.AddHttpContextAccessor();//For IHttpContextAccessor in infrastructure
+
             builder.Services.AddDbContext<TdmsDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DatabaseContext")));
             builder.Services.AddScoped<IRouteService, RouteService>();
@@ -64,29 +76,33 @@ namespace WebApi
             });
             builder.Services.AddTransient<IEmailService, ResendEmailService>();
           
-
-            builder.Services.AddHttpContextAccessor();//For IHttpContextAccessor in infrastructure          
-            builder.Services.AddScoped<IOTPService, OTPService>();
+                              
+           
             builder.Services.AddScoped<ICurrentUserService,CurrentUserService>();
+            builder.Services.AddScoped<IOTPService, OTPService>();
             builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
             builder.Services.AddScoped<ITokenService, AuthTokenService>();
             builder.Services.AddScoped<IAuthService, AuthService>();           
             builder.Services.AddScoped<IAzureStorageService, AzureStorageService>();
+
+            //Repository Layer
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserSessionRepository, UserSessionRepository>();
-            builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
+            builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>(); 
+            builder.Services.AddScoped<IStateRepository, StateRepository>();
+            builder.Services.AddScoped<IDistrictRepository, DistrictRepository>();           
+            builder.Services.AddScoped<IUnitRepository, UnitRepository>();           
+            builder.Services.AddScoped<IOrganizationUnitRepository, OrganizationUnitRepository>();
+            builder.Services.AddScoped<IUnitHeadAssignmentRepository, UnitHeadAssignmentRepository>();
+            builder.Services.AddScoped<ITrainerAssignmentRepository, TrainerAssignmentRepository>();
+
+            //Service layer
             builder.Services.AddScoped<IOrganizationService, OrganizationService>();
             builder.Services.AddScoped<IUserService, UserService>();
-            builder.Services.AddScoped<IStateRepository, StateRepository>();
-            builder.Services.AddScoped<IDistrictRepository, DistrictRepository>();
             builder.Services.AddScoped<ILocationService, LocationService>();
-            builder.Services.AddScoped<IUnitRepository, UnitRepository>();
             builder.Services.AddScoped<IUnitService, UnitService>();
-            builder.Services.AddScoped<IOrganizationUnitRepository, OrganizationUnitRepository>();
             builder.Services.AddScoped<IOrganizationUnitService, OrganizationUnitService>();
-            builder.Services.AddScoped<IUnitHeadAssignmentRepository, UnitHeadAssignmentRepository>();
             builder.Services.AddScoped<IUnitHeadAssignmentService, UnitHeadAssignmentService>();
-            builder.Services.AddScoped<ITrainerAssignmentRepository, TrainerAssignmentRepository>();
             builder.Services.AddScoped<ITrainerAssignmentService, TrainerAssignmentService>();
             builder.Services.AddScoped<IEntityPermissionService, EntityPermissionService>();
 
@@ -128,7 +144,10 @@ namespace WebApi
             builder.Services.AddScoped<IEeuOftService, EeuOftService>();
             builder.Services.AddScoped<IEeuFldService, EeuFldService>();
             builder.Services.AddScoped<IEeuTrainingProgrammeService, EeuTrainingProgrammeService>();
-            
+
+            builder.Services.AddScoped<IPublicationRepository, PublicationRepository>();
+            builder.Services.AddScoped<IPublicationService, PublicationService>();
+
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(o=>
@@ -159,10 +178,8 @@ namespace WebApi
             }
             app.UseCors(MyAllowSpecificOrigins);
             app.UseHttpsRedirection();
-
+            app.UseAuthentication();
             app.UseAuthorization();
-
-
             app.MapControllers();
 
             app.Run();

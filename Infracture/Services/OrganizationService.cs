@@ -124,7 +124,7 @@ namespace Application.Interface
 
         public async Task<PaginatedResult<OrganizationDto>> GetPaginatedItemsAsync(int page, int pageSize)
         {
-            if (_currentUser.Role != Domain.Entities.Enum.Role.SUPERADMIN) throw new UnauthorizedAccessException();
+            //if (_currentUser.Role != Domain.Entities.Enum.Role.SUPERADMIN) throw new UnauthorizedAccessException();
             return await _organizationRepository.GetPaginatedItemsAsync(page, pageSize);
         }
 

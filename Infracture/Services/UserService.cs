@@ -55,7 +55,22 @@ namespace Infrastructure.Services
                 PasswordHash = _passwordHasher.HashPassword(registerDto.Password),
                 FirstName = registerDto.FirstName,
                 LastName = registerDto.LastName,
-                OrganizationId = registerDto.OrganizationId
+                OrganizationId = registerDto.OrganizationId,
+                DateOfBirth = registerDto.Role == Role.TRAINER
+                              ? registerDto.DateOfBirth ?? throw new InvalidOperationException("Date of Birth required for trainers")
+                              :registerDto.DateOfBirth ?? default,
+                DateOfJoining = registerDto.Role == Role.TRAINER
+                    ? registerDto.DateOfJoining ?? throw new InvalidOperationException("Date of Joining required for trainers")
+                    : registerDto.DateOfJoining ?? default,
+                Gender = registerDto.Role == Role.TRAINER
+                    ? registerDto.Gender ?? throw new InvalidOperationException("Gender required for trainers")
+                    : registerDto.Gender ?? Gender.OTHER,
+                EmployementType = registerDto.Role == Role.TRAINER
+                    ? registerDto.EmploymentType ?? throw new InvalidOperationException("Employment Type required for trainers")
+                    : registerDto.EmploymentType ?? EmployementType.TEMPORARY, 
+                Qualification = registerDto.Role == Role.TRAINER
+                    ? registerDto.Qualification ?? throw new InvalidOperationException("Qualification required for trainers")
+                    : registerDto.Qualification
             };
             user.CreatedById = _currentUser.UserId;
             user.CreatedAt = DateTimeOffset.UtcNow;
@@ -116,8 +131,8 @@ namespace Infrastructure.Services
                 if (updateDto.Qualification is not null) user.Qualification = updateDto.Qualification;
                 if (updateDto.ProfileImageUrl is not null) user.ProfileImageUrl = updateDto.ProfileImageUrl; 
 
-                user.UpdatedById = _currentUser.UserId;
-                user.UpdatedAt = DateTimeOffset.UtcNow;
+                // user.UpdatedById = _currentUser.UserId;
+                // user.UpdatedAt = DateTimeOffset.UtcNow;
                 await _userRepository.SaveAsync(user);
                 return ServiceResult.Success();
             }
