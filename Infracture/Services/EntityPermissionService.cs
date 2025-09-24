@@ -1,5 +1,4 @@
 ﻿using Application.Interface;
-using Application.Interface.Repository;
 using Application.Interface.Services.Common;
 using Domain.Entities;
 using Domain.Entities.Enum;
@@ -14,12 +13,10 @@ namespace Infrastructure.Services
     public class EntityPermissionService : IEntityPermissionService
     {
         private readonly ICurrentUserService _currentUserService;
-        private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
 
-        public EntityPermissionService(ICurrentUserService currentUserService, ITrainerAssignmentRepository trainerAssignmentRepository)
+        public EntityPermissionService(ICurrentUserService currentUserService)
         {
             _currentUserService = currentUserService;
-            _trainerAssignmentRepository = trainerAssignmentRepository;
         }
         public async Task<bool> CanModify<T>(T entity) where T : ReportEntryBaseEntity
         {
@@ -45,19 +42,6 @@ namespace Infrastructure.Services
             {
                 return false;
             }
-        }
-
-        public async Task<bool> CanUserAccessTableAsync(int userId, int tableDefinitionId)
-        {
-            // Implementation for checking if user can access a specific table
-            // This would check user's unit assignments against table availability
-            return true; // Implement based on your business logic
-        }
-
-        public async Task<bool> CanUserAccessUnitLocationAsync(int userId, int unitLocationId)
-        {
-            var assignments = await _trainerAssignmentRepository.GetByTrainerIdAsync(userId);
-            return assignments.Any(a => a.UnitLocationId == unitLocationId);
         }
     }
 }

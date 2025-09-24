@@ -4,6 +4,7 @@ using Infrastructure.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(TdmsDbContext))]
-    partial class TdmsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250923105646_NominationRewards")]
+    partial class NominationRewards
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -906,54 +909,6 @@ namespace Infrastructure.Migrations
                     b.ToTable("FtiTrainingPrograms");
                 });
 
-            modelBuilder.Entity("Domain.Entities.GenericTables.ExtensionLiterature", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AmountPerCopy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
-
-                    b.Property<int?>("CreatedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateOnly?>("Date")
-                        .HasColumnType("date");
-
-                    b.Property<string>("NumberOfCopies")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("PublicationId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TotalAmount")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<int?>("UpdatedById")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("PublicationId");
-
-                    b.HasIndex("UpdatedById");
-
-                    b.ToTable("ExtensionLiteratures");
-                });
-
             modelBuilder.Entity("Domain.Entities.GenericTables.NominationReward", b =>
                 {
                     b.Property<int>("Id")
@@ -1386,195 +1341,6 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UpdatedById");
 
                     b.ToTable("NominationRewardOrganicFarmers");
-                });
-
-            modelBuilder.Entity("Domain.Entities.GenericTables.Publication", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Attachements")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("CategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
-
-                    b.Property<int?>("CreatedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateOnly>("EndDate")
-                        .HasColumnType("date");
-
-                    b.Property<int?>("Funds")
-                        .HasColumnType("int");
-
-                    b.Property<string>("MJASFormat")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ModeId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ModePublication")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("OrganizationId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("OtherPublication")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateOnly?>("PermissionLetterDate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("PermissionLetterUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PublicationCover")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateOnly?>("PublicationDate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("PublicationISBN")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("PublicationImpact")
-                        .HasColumnType("int");
-
-                    b.Property<string>("PublicationIssue")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PublicationJournalTitle")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("PublicationNAAS")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("PublicationPagesFrom")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("PublicationPagesTo")
-                        .HasColumnType("int");
-
-                    b.Property<string>("PublicationTitle")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("PublicationUniNumber")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("PublicationVolume")
-                        .HasColumnType("int");
-
-                    b.Property<string>("PublicationWebLink")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PublicationWhole")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("PublicationYear")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("RegionId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("SourceId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SponsorDetails")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateOnly>("StartDate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UnitLocationId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<int?>("UpdatedById")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("ModeId");
-
-                    b.HasIndex("OrganizationId");
-
-                    b.HasIndex("RegionId");
-
-                    b.HasIndex("SourceId");
-
-                    b.HasIndex("UnitLocationId");
-
-                    b.HasIndex("UpdatedById");
-
-                    b.ToTable("Publications");
-                });
-
-            modelBuilder.Entity("Domain.Entities.GenericTables.PublisherDetails", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
-
-                    b.Property<int?>("CreatedById")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("PublicationId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("PublisherAddress")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PublisherBrochure")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PublisherInstitutionName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PublisherName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<int?>("UpdatedById")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("PublicationId")
-                        .IsUnique()
-                        .HasFilter("[PublicationId] IS NOT NULL");
-
-                    b.HasIndex("UpdatedById");
-
-                    b.ToTable("PublisherDetails");
                 });
 
             modelBuilder.Entity("Domain.Entities.IBTVA.IbtavOtherActivity", b =>
@@ -3932,30 +3698,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("UpdatedBy");
                 });
 
-            modelBuilder.Entity("Domain.Entities.GenericTables.ExtensionLiterature", b =>
-                {
-                    b.HasOne("Domain.Entities.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Domain.Entities.GenericTables.Publication", "Publication")
-                        .WithMany("ExtensionLiteratures")
-                        .HasForeignKey("PublicationId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Domain.Entities.User", "UpdatedBy")
-                        .WithMany()
-                        .HasForeignKey("UpdatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("Publication");
-
-                    b.Navigation("UpdatedBy");
-                });
-
             modelBuilder.Entity("Domain.Entities.GenericTables.NominationReward", b =>
                 {
                     b.HasOne("Domain.Entities.MasterData.Contribution", "Contribution")
@@ -4177,91 +3919,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("NominationReward");
-
-                    b.Navigation("UpdatedBy");
-                });
-
-            modelBuilder.Entity("Domain.Entities.GenericTables.Publication", b =>
-                {
-                    b.HasOne("Domain.Entities.MasterData.PublicationCategory", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Domain.Entities.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Domain.Entities.MasterData.Mode", "Mode")
-                        .WithMany()
-                        .HasForeignKey("ModeId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Domain.Entities.Organization", "Organization")
-                        .WithMany()
-                        .HasForeignKey("OrganizationId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.MasterData.Region", "Region")
-                        .WithMany()
-                        .HasForeignKey("RegionId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Domain.Entities.MasterData.ParticipatedSource", "Source")
-                        .WithMany()
-                        .HasForeignKey("SourceId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
-                        .WithMany()
-                        .HasForeignKey("UnitLocationId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.User", "UpdatedBy")
-                        .WithMany()
-                        .HasForeignKey("UpdatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("Category");
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("Mode");
-
-                    b.Navigation("Organization");
-
-                    b.Navigation("Region");
-
-                    b.Navigation("Source");
-
-                    b.Navigation("UnitLocation");
-
-                    b.Navigation("UpdatedBy");
-                });
-
-            modelBuilder.Entity("Domain.Entities.GenericTables.PublisherDetails", b =>
-                {
-                    b.HasOne("Domain.Entities.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Domain.Entities.GenericTables.Publication", "Publication")
-                        .WithOne()
-                        .HasForeignKey("Domain.Entities.GenericTables.PublisherDetails", "PublicationId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Domain.Entities.User", "UpdatedBy")
-                        .WithMany()
-                        .HasForeignKey("UpdatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("Publication");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -4695,11 +4352,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("NominationRewardOrganicEntrepreneurs");
 
                     b.Navigation("NominationRewardOrganicFarmers");
-                });
-
-            modelBuilder.Entity("Domain.Entities.GenericTables.Publication", b =>
-                {
-                    b.Navigation("ExtensionLiteratures");
                 });
 
             modelBuilder.Entity("Domain.Entities.Organization", b =>

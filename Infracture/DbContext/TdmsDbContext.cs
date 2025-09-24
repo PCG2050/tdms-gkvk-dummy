@@ -6,13 +6,15 @@ using Domain.Entities.DEU;
 using Domain.Entities.EEU;
 using Domain.Entities.FIU;
 using Domain.Entities.FTI;
+using Domain.Entities.GenericTables;
 using Domain.Entities.IBTVA;
 using Domain.Entities.Junction;
-using Domain.Entities.Publications;
+using Domain.Entities.MasterData;
 using Domain.Entities.STU;
 using Infrastructure.DbContext.Configuration;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -45,14 +47,6 @@ namespace Infrastructure.DbContext
 
         public DbSet<FtiTrainingProgram> FtiTrainingPrograms { get; set; }
         public DbSet<FtiOtherActivity> FtiOtherActivities { get; set; }
-        #region Publicaitons
-        public DbSet<Category> Categories { get; set; }
-        public DbSet<Source> Sources { get; set; }
-        public DbSet<Mode> Modes { get; set; }
-        public DbSet<Region> Regions { get; set; }
-        public DbSet<ExtensionLiterature> ExtensionLiteratures { get; set; }
-        public DbSet<Publication> Publications { get; set; }
-        #endregion
         #region STU
         public DbSet<StuTrainingProgramme> StuTrainingProgrammes { get; set; }
         public DbSet<StuSponsoredTrainingProgramme> StuSponsoredTrainingProgrammes { get; set; }
@@ -90,6 +84,88 @@ namespace Infrastructure.DbContext
         public DbSet<OrganizationUnitLocation> OrganizationUnitLocations { get; set; }
         public DbSet<TrainerAssignment> UnitTrainers { get; set; }
         public DbSet<UnitHeadAssignment> UnitHeadAssignments { get; set; }
+        #endregion
+        #region MasterDataTables
+        public DbSet<ProgramType> ProgramTypes { get; set; }
+        public DbSet<ProgramCategory> ProgramCategories { get; set; }
+        public DbSet<ProjectCategory> ProjectCategories { get; set; }
+        public DbSet<EventName> EventNames { get; set; }
+        public DbSet<InfoType>InfoTypes { get; set; }
+
+        public DbSet<Collaborator> Collaborators { get; set; }
+
+        public DbSet<CollaborativeProgramOption> CollaborativeProgramOptions { get; set; }
+        public DbSet<VillageAdoptiveProgram> VillageAdoptivePrograms { get; set; }
+
+        public DbSet<TargetFarmer> TargetFarmers { get; set; }
+        public DbSet<Theme> Themes { get; set; }
+        public DbSet<ThematicArea> ThematicAreas { get; set; }
+        public DbSet<SponsoredOrganization> SponsoredOrganizations { get; set; }
+        public DbSet<Mode> Modes { get; set; }
+        public DbSet<Region> Regions { get; set; }
+        public DbSet<SourceOfFund> SourcesOfFunds { get; set; }
+        public DbSet<Status> Statuses { get; set; }       
+        public DbSet<Participant> Participants { get; set; }
+        public DbSet<ParticipatedSource> ParticipatedSources { get; set; }
+
+        public DbSet<ParticipantDealer> ParticipantDealer { get; set; }
+        public DbSet<ResourceType> ResourceTypes { get; set; }
+        public DbSet<Responsibility> Responsibilities { get; set; }
+
+        public DbSet<TypeOfAid> TypeOfAids { get; set; }
+
+        public DbSet<OFTResult> OFTResults { get; set; }
+
+        public DbSet<FLDResult> FLDResults { get; set; }
+
+        public DbSet<PublicationCategory> PublicationCategories { get; set; }
+
+        public DbSet<KannadaMagazine> KannadaMagazines { get; set; }
+
+
+        public DbSet<EnglishMagazine> EnglishMagazines { get; set; }
+        public DbSet<KannadaNewsPaper> KannadaNewsPapers { get; set; }
+        public  DbSet<EnglishNewsPaper> EnglishNewsPapers { get; set; }
+
+        public DbSet<ExtensionWork> ExtensionWorks { get; set; }
+        public DbSet<NominationType> NominationTypes { get; set; }
+        public DbSet<NominationCategory> NominationCategories { get; set; }
+        public DbSet<Position> Positions { get; set; }
+        public DbSet<Contribution> Contributions { get; set; }
+
+        public DbSet<ServicesCategory> ServicesCategories { get; set; }
+
+        public DbSet<RelatedTo> RelatedTos { get; set; }
+        public DbSet<Particular> Particulars { get; set; }
+
+        public DbSet<ModeOutreach> ModeOutreaches { get; set; }
+
+        public DbSet<ServiceCategory> ServiceCategories { get; set; }
+
+        public DbSet<ServiceTheme> ServiceThemes { get; set; }
+
+        public DbSet<QuantityUnit> QuantityUnits { get; set; }
+        public  DbSet<Visitor> Visitors { get; set; }
+
+        public DbSet<FIUActivity> FIUActivities { get; set; }
+
+        #endregion
+        #region GenericTables
+        #region Publications
+        public DbSet<Publication> Publications { get; set; }
+        public DbSet<PublisherDetails> PublisherDetails { get; set; }
+        public DbSet<ExtensionLiterature> ExtensionLiteratures { get; set; }
+        #endregion
+
+        #region NominationRewards
+        public DbSet<NominationReward> NominationRewards { get; set; }
+        public DbSet<NominationRewardIFSFarmer> NominationRewardIFSFarmers { get; set; }
+        public DbSet<NominationRewardFarmerInnovation> NominationRewardFarmerInnovations { get; set; }
+        public DbSet<NominationRewardOrganicFarmer> NominationRewardOrganicFarmers { get; set; }
+        public DbSet<NominationRewardIFSEnterpreneur> NominationRewardIFSEntrepreneurs { get; set; }
+        public DbSet<NominationRewardEntrepreneurInnovation> NominationRewardEntrepreneurInnovations { get; set; }
+        public DbSet<NominationRewardOrganicEntrepreneur> NominationRewardOrganicEntrepreneurs { get; set; }
+        #endregion
         #endregion
 
         // Get current user ID directly from HTTP context to avoid circular dependency
@@ -162,71 +238,29 @@ namespace Infrastructure.DbContext
                 }
             }
         }
+      
+
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Publication configurations
             modelBuilder.Entity<Publication>(entity =>
             {
-                entity.HasKey(e => e.Id);
+                entity.HasOne<PublisherDetails>()
+                      .WithOne(p => p.Publication)
+                      .HasForeignKey<PublisherDetails>(p => p.PublicationId)
+                      .OnDelete(DeleteBehavior.SetNull);
 
-                // Configure relationships
-                entity.HasOne(p => p.Category)
-                    .WithMany(c => c.Publications)
-                    .HasForeignKey(p => p.CategoryId)
-                    .OnDelete(DeleteBehavior.SetNull);
-
-                entity.HasOne(p => p.Mode)
-                    .WithMany(m => m.Publications)
-                    .HasForeignKey(p => p.ModeId)
-                    .OnDelete(DeleteBehavior.SetNull);
-
-                entity.HasOne(p => p.Region)
-                    .WithMany(r => r.Publications)
-                    .HasForeignKey(p => p.RegionId)
-                    .OnDelete(DeleteBehavior.SetNull);
-
-                entity.HasOne(p => p.Source)
-                    .WithMany(s => s.Publications)
-                    .HasForeignKey(p => p.SourceId)
-                    .OnDelete(DeleteBehavior.SetNull);
-
-                entity.HasOne(p => p.ExtensionLiterature)
-                    .WithMany(el => el.Publications)
-                    .HasForeignKey(p => p.ExtensionLiteratureId)
-                    .OnDelete(DeleteBehavior.SetNull);
+                entity.HasMany(p => p.ExtensionLiteratures)
+                      .WithOne(e => e.Publication)
+                      .HasForeignKey(e => e.PublicationId)
+                      .OnDelete(DeleteBehavior.SetNull);
             });
 
-            // Master data configurations
-            modelBuilder.Entity<Category>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                entity.HasIndex(e => e.CategoryName).IsUnique();
-                entity.Property(e => e.CategoryName).HasMaxLength(100).IsRequired();
-            });
 
-            modelBuilder.Entity<Source>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                entity.HasIndex(e => e.SourceName).IsUnique();
-                entity.Property(e => e.SourceName).HasMaxLength(100).IsRequired();
-            });
 
-            modelBuilder.Entity<Mode>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                entity.HasIndex(e => e.ModeName).IsUnique();
-                entity.Property(e => e.ModeName).HasMaxLength(50).IsRequired();
-            });
-
-            modelBuilder.Entity<Region>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                entity.HasIndex(e => e.RegionName).IsUnique();
-                entity.Property(e => e.RegionName).HasMaxLength(100).IsRequired();
-            });
 
             modelBuilder.Entity<TrainerAssignment>()
                 .HasOne(t => t.CreatedBy)

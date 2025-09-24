@@ -10,19 +10,18 @@ using Infrastructure.Repository;
 using Infrastructure.Repository.DataTables;
 using Infrastructure.Services;
 using Infrastructure.Services.DataTables;
-using Infrastructure.Services.DataTables.Infrastructure.Services;
 using Infrastructure.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Resend;
 using Scalar.AspNetCore;
 using System.Reflection;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using WebApi.Services;
 
 namespace WebApi
@@ -144,10 +143,7 @@ namespace WebApi
             builder.Services.AddScoped<IEeuOftService, EeuOftService>();
             builder.Services.AddScoped<IEeuFldService, EeuFldService>();
             builder.Services.AddScoped<IEeuTrainingProgrammeService, EeuTrainingProgrammeService>();
-
-            builder.Services.AddScoped<IPublicationRepository, PublicationRepository>();
-            builder.Services.AddScoped<IPublicationService, PublicationService>();
-
+            
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(o=>
