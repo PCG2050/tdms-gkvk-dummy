@@ -14,6 +14,7 @@ namespace WebApi.Controllers.DataTables.DEU
     {
         public DeuCourseController(IDeuCourseService service) : base(service)
         {
+
         }
     }
 }

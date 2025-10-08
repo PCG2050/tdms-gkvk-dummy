@@ -1,5 +1,7 @@
 ﻿using Application.Interface;
+using Application.Interface.Repository;
 using Application.Models;
+using Domain.Entities.Enum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,11 +13,16 @@ namespace WebApi.Controllers
     {
         private readonly IAuthService _authService;
         private readonly ICurrentUserService _currentUserService;
+        private readonly IUserRepository _userRepository;
+        private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
+        
 
-        public AuthController(IAuthService authService, ICurrentUserService currentUserService)
+        public AuthController(IAuthService authService, ICurrentUserService currentUserService,IUserRepository userRepository, ITrainerAssignmentRepository trainerAssignmentRepository)
         {
             _authService = authService;
             _currentUserService = currentUserService;
+            _userRepository = userRepository;
+            _trainerAssignmentRepository = trainerAssignmentRepository;
         }
         /// <summary>
         /// Authenticate user and create session with device tracking
@@ -48,6 +55,83 @@ namespace WebApi.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        /// <summary>
+        /// Trainer-specific login that returns unit assignments along with tokens
+        /// </summary>
+        [HttpPost("trainer-login")]
+        public async Task<IActionResult> TrainerLogin(LoginRequestDto request)
+        {
+            try
+            {
+                var deviceInfo = GetDeviceInfo();
+
+                // First, perform regular authentication
+                var tokenResponse = await _authService.LoginAsync(request, deviceInfo);
+
+                // Verify trainer
+                var user = await _userRepository.GetByEmailAsync(request.Email);
+                if (user == null)
+                    return Unauthorized(new { message = "Invalid credentials" });
+
+                if (user.Role != Role.TRAINER)
+                    return Unauthorized(new { message = "This endpoint is only for trainers" });
+
+                // Get trainer assignments with full details
+                var assignments = await _trainerAssignmentRepository.GetByTrainerIdAsync(user.Id);
+
+                // Flatten into UnitLocationDetailsDto
+                var unitLocationDetails = assignments.Select(a => new UnitLocationDetailsDto
+                {
+                    UnitLocationId = a.UnitLocationId,
+                    UnitId = a.UnitLocation.Unit.Id,
+                    UnitName = a.UnitLocation.Unit.Name,
+                    StateId = a.UnitLocation.District.State.Id,
+                    StateName = a.UnitLocation.District.State.Name,
+                    DistrictId = a.UnitLocation.District.Id,
+                    DistrictName = a.UnitLocation.District.Name
+                }).ToList();
+
+                // Build TrainerWithAssignmentsDto (your existing DTO)
+                var trainerDetails = new TrainerWithAssignmentsDto
+                {
+                    TrainerId = user.Id,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                    Phone = user.Phone ?? string.Empty,
+                    Gender = user.Gender,
+                    EmployementType = user.EmployementType,
+                    DateOfBirth = user.DateOfBirth,
+                    DateOfJoining = user.DateOfJoining,
+                    IsDeactivated = user.IsDeactivated,
+                    Qualification = user.Qualification,
+                    AssignedLocationIds = assignments.Select(a => a.UnitLocationId).ToList(),
+                    UnitLocationDetails = unitLocationDetails
+                };
+
+                // Wrap with tokens
+                var response = new TrainerLoginResponseDto
+                {
+                    AccessToken = tokenResponse.AccessToken,
+                    RefreshToken = tokenResponse.RefreshToken,                   
+                    TrainerDetails = trainerDetails
+                };
+
+                return Ok(response);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+
+
 
         /// <summary>
         /// REQUIRED HEADERS: Same as login endpoint

@@ -19,20 +19,22 @@ namespace Infrastructure.Services
         }
 
         public ClaimsPrincipal? User => _httpcontextAccessor.HttpContext.User;
-        public int UserId {
+        public int UserId
+        {
             get
-                {
-                    var id = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                    if (id is not null && Int32.TryParse(id,out int userId)) return userId;
-                    throw new InvalidOperationException("User Id is missing from token");
-                }
+            {
+                var id = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (id is not null && Int32.TryParse(id, out int userId)) return userId;
+                throw new InvalidOperationException("User Id is missing from token");
             }
+        }
 
-        public Role Role {
+        public Role Role
+        {
             get
             {
                 var role = User?.FindFirst(ClaimTypes.Role)?.Value;
-                if(role is not null && Enum.TryParse<Role>(role, true, out Role parsedRole)) return parsedRole;
+                if (role is not null && Enum.TryParse<Role>(role, true, out Role parsedRole)) return parsedRole;
                 return Role.UNDEFINED;
             }
         }
@@ -53,7 +55,7 @@ namespace Infrastructure.Services
                 return _httpcontextAccessor?.HttpContext?.User?.Identity?.IsAuthenticated ?? false;
             }
         }
-     
+
 
         public async Task<IReadOnlyCollection<int>> MappedUnitLocationIds()
         {
@@ -61,9 +63,9 @@ namespace Infrastructure.Services
             {
                 int userId = this.UserId;
                 var unitLocations = await _context.UnitTrainers.Where(x => x.TrainerId == userId).Select(x => x.UnitLocationId).ToArrayAsync();
-                return unitLocations??[];
+                return unitLocations ?? [];
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return [];
             }

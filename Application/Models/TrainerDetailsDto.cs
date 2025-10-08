@@ -6,6 +6,17 @@ using System.Threading.Tasks;
 
 namespace Application.Models
 {
+    public class TrainerLoginResponseDto
+    {
+        public string AccessToken { get; set; } = default!;
+        public string RefreshToken { get; set; } = default!;
+        //public DateTime ExpiresAt { get; set; }
+
+        // Reuse your existing DTO with all trainer details & assigned locations
+        public TrainerWithAssignmentsDto TrainerDetails { get; set; } = default!;
+    }
+
+
     public class TrainerDetailsDto
     {
         public int UserId { get; set; }

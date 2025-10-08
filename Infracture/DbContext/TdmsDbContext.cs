@@ -7,10 +7,14 @@ using Domain.Entities.EEU;
 using Domain.Entities.FIU;
 using Domain.Entities.FTI;
 using Domain.Entities.GenericTables;
+using Domain.Entities.GenericTables.ConsultingAndSocialMediaService;
+using Domain.Entities.GenericTables.Service;
 using Domain.Entities.IBTVA;
 using Domain.Entities.Junction;
+using Domain.Entities.KVK;
 using Domain.Entities.MasterData;
 using Domain.Entities.STU;
+using Domain.Entities.TableOtherActivity;
 using Infrastructure.DbContext.Configuration;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Http;
@@ -29,12 +33,11 @@ namespace Infrastructure.DbContext
 {
     public class TdmsDbContext : Microsoft.EntityFrameworkCore.DbContext
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
       
 
-        public TdmsDbContext(DbContextOptions<TdmsDbContext> options, IHttpContextAccessor  httpContextAccessor) : base(options)
+        public TdmsDbContext(DbContextOptions<TdmsDbContext> options) : base(options)
         {
-            _httpContextAccessor = httpContextAccessor;
+            
           
         }
         public DbSet<State> States { get; set; }
@@ -53,14 +56,53 @@ namespace Infrastructure.DbContext
         public DbSet<StuOtherActivity> StuOtherActivities { get; set; }
         public DbSet<DaesiProgramme> DaesiProgrammes { get; set; }
         public DbSet<DaesiOtherActivity> DaesiOtherActivities { get; set; }
+        public DbSet<STUProgramDetails> STUProgramDetails { get; set; }
+        public DbSet<STUParticipantDemographics> STUParticipantDemographics { get; set; }
+        public DbSet<STUProgramContentAndResources> STUProgramContentAndResources { get; set; }
+        public DbSet<STUResourcePerson> STUResourcePersons { get; set; }
+        public DbSet<STUTopicsCoveredInClass> STUTopicsCoveredInClass { get; set; }
+        public DbSet<STUTeachingAidsDeveloped> STUTeachingAidsDeveloped { get; set; }
+        public DbSet<STUAdvisoryServices> STUAdvisoryServices { get; set; }
+        public DbSet<STUReport> STUReports { get; set; }
+        public DbSet<STURecommendation> STURecommendations { get; set; }
+
         #endregion
         #region FIU
         public DbSet<FiuProgrammeType> FiuProgrammeTypes {  get; set; }
         public DbSet<FiuProgramme> FiuProgrammes { get; set; }
+
+        public DbSet<FIUProgramActivity> FIUProgramActivities { get; set; }
+
+        public DbSet<FIUOtherActivity> FIUOtherActivities { get; set; }
+
+
+
+        #endregion
+        #region FTI
+        public DbSet<FTIProgramDetails> FTIProgramDetails { get; set; }
+        public DbSet<FTIParticipantDemographics> FTIParticipantDemographics { get; set; }
+        public DbSet<FTIProgramContentAndResources> FTIProgramContentAndResources { get; set; }
+        public DbSet<FTIResourcePerson> FTIResourcePersons { get; set; }
+        public DbSet<FTITopicsCoveredInClass> FTITopicsCoveredInClass { get; set; }
+        public DbSet<FTITeachingAidsDeveloped> FTITeachingAidsDeveloped { get; set; }
+        public DbSet<FTIAdvisoryServices> FTIAdvisoryServices { get; set; }
+        public DbSet<FTIReport> FTIReports { get; set; }
+        public DbSet<FTIRecommendation> FTIRecommendations { get; set; }
+
         #endregion
         #region IBT&VA
         public DbSet<IbtvaProgramme> IbtvaProgrammes { get; set; }
         public DbSet<IbtavOtherActivity> IbtavOtherActivities { get; set; }
+
+        public DbSet<IbtvaProgramDetails> IbtvaProgramDetails { get; set; }
+        public DbSet<IbtvaParticipantDemographics> IbtvaParticipantDemographics { get; set; }
+        public DbSet<IbtvaProgramContentAndResources> IbtvaProgramContentAndResources { get; set; }
+        public DbSet<IbtvaResourcePerson> IbtvaResourcePersons { get; set; }
+        public DbSet<IbtvaTopicsCoveredInClass> IbtvaTopicsCoveredInClass { get; set; }
+        public DbSet<IbtvaTeachingAidsDeveloped> IbtvaTeachingAidsDeveloped { get; set; }
+        public DbSet<IbtvaAdvisoryServices> IbtvaAdvisoryServices { get; set; }
+        public DbSet<IbtvaReport> IbtvaReports { get; set; }
+        public DbSet<IbtvaRecommendation> IbtvaRecommendations { get; set; }
         #endregion
         #region ATIC
         public DbSet<AticSales> AticSales { get; set; }
@@ -70,6 +112,17 @@ namespace Infrastructure.DbContext
         #region DEU
         public DbSet<DeuCourse> DeuCourses { get; set; }
         public DbSet<DeuOtherActivity> DeuOtherActivities { get; set; }
+
+        public DbSet<DeuProgramDetails> DeuProgramDetails { get; set; }
+        public DbSet<DeuParticipantDemographics> DeuParticipantDemographics { get; set; }
+        public DbSet<DeuProgramContentAndResources> DeuProgramContentAndResources { get; set; }
+        public DbSet<DeuResourcePerson> DeuResourcePersons { get; set; }
+        public DbSet<DeuTopicsCoveredInClass> DeuTopicsCoveredInClass { get; set; }
+        public DbSet<DeuTeachingAidsDeveloped> DeuTeachingAidsDeveloped { get; set; }
+        public DbSet<DeuAdvisoryServices> DeuAdvisoryServices { get; set; }
+        public DbSet<DeuReport> DeuReports { get; set; }
+        public DbSet<DeuRecommendation> DeuRecommendations { get; set; }
+
         #endregion
         #region ASM
         public DbSet<AsmVisit> AsmVisits {  get; set; }
@@ -79,7 +132,30 @@ namespace Infrastructure.DbContext
         public DbSet<EeuFLD> EeuFLDs { get; set; }
         public DbSet<EeuTrainingProgramme> EeuTrainingProgrammes { get; set; }
         public DbSet<EeuOtherActivity> EeuOtherActivities { get; set; }
+
+        public DbSet<EeuProgramDetails> EeuProgramDetails { get; set; }
+        public DbSet<EeuParticipantDemographics> EeuParticipantDemographics { get; set; }
+        public DbSet<EeuProgramContentAndResources> EeuProgramContentAndResources { get; set; }
+        public DbSet<EeuResourcePerson> EeuResourcePersons { get; set; }
+        public DbSet<EeuTopicsCoveredInClass> EeuTopicsCoveredInClass { get; set; }
+        public DbSet<EeuTeachingAidsDeveloped> EeuTeachingAidsDeveloped { get; set; }
+        public DbSet<EeuAdvisoryServices> EeuAdvisoryServices { get; set; }
+        public DbSet<EeuReport> EeuReports { get; set; }
+        public DbSet<EeuRecommendation> EeuRecommendations { get; set; }
         #endregion
+        #region  KVK 
+        public DbSet<TableKVKProgramDetails> KVKProgramDetails { get; set; }
+        public DbSet<KvkParticipantDemographics> KvkParticipantDemographics { get; set; }
+        public DbSet<KvkProgramContentAndResources> KvkProgramContentAndResources { get; set; }
+        public DbSet<KvkResourcePerson> KvkResourcePersons { get; set; }
+        public DbSet<KvkTopicsCoveredInClass> KvkTopicsCoveredInClass { get; set; }
+        public DbSet<KvkTeachingAidsDeveloped> KvkTeachingAidsDeveloped { get; set; }
+        public DbSet<KvkAdvisoryServices> KvkAdvisoryServices { get; set; }
+        public DbSet<KvkReport> KvkReports { get; set; }
+        public DbSet<KvkRecommendation> KvkRecommendations { get; set; }
+
+        #endregion
+
         #region Juntions
         public DbSet<OrganizationUnitLocation> OrganizationUnitLocations { get; set; }
         public DbSet<TrainerAssignment> UnitTrainers { get; set; }
@@ -133,7 +209,7 @@ namespace Infrastructure.DbContext
         public DbSet<Position> Positions { get; set; }
         public DbSet<Contribution> Contributions { get; set; }
 
-        public DbSet<ServicesCategory> ServicesCategories { get; set; }
+        public DbSet<ConsultancyServicesCategory> ConsultancyServicesCategories { get; set; }
 
         public DbSet<RelatedTo> RelatedTos { get; set; }
         public DbSet<Particular> Particulars { get; set; }
@@ -166,98 +242,108 @@ namespace Infrastructure.DbContext
         public DbSet<NominationRewardEntrepreneurInnovation> NominationRewardEntrepreneurInnovations { get; set; }
         public DbSet<NominationRewardOrganicEntrepreneur> NominationRewardOrganicEntrepreneurs { get; set; }
         #endregion
+
+        #region ConsultingAndSocialMediaService
+
+        public DbSet<TableConsultingAndSocialMediaService> TableConsultingAndSocialMediaServices { get; set; }
+        public DbSet<TableModeAndOutreach>? TableModeAndOutreaches { get; set; }
+
         #endregion
 
+        #region tblService
+        public DbSet<TblService> Services { get; set; }
+        public DbSet<TableHostel> TableHostels { get; set; }
+        public DbSet<RevolvingFundStatus> RevolvingFundStatuses { get; set; }
+
+        #endregion
+
+        #region OtherActivity
+        public DbSet<TableOtherActivity> OtherActivities { get; set; }
+        #endregion
+
+        #endregion
+
+        
+
+
+
         // Get current user ID directly from HTTP context to avoid circular dependency
-        private int? GetCurrentUserId()
-        {
-            var httpContext = _httpContextAccessor?.HttpContext;
-            if (httpContext?.User?.Identity?.IsAuthenticated != true)               
-            return null;
-             
-            var userIdClaim = httpContext.User.FindFirst("UserId")?.Value
-                           ?? httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            return int.TryParse(userIdClaim, out var userId) ? userId : null;
-        }
+        //private int? GetCurrentUserId()
+        //{
+        //    var httpContext = _httpContextAccessor?.HttpContext;
+        //    if (httpContext?.User?.Identity?.IsAuthenticated != true)               
+        //    return null;
+
+        //    var userIdClaim = httpContext.User.FindFirst("UserId")?.Value
+        //                   ?? httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        //    return int.TryParse(userIdClaim, out var userId) ? userId : null;
+        //}
 
         //Override SaveChanges to automatically handle audit fields
-        public override int SaveChanges()
-        {
-            UpdateAuditFields();
-            return base.SaveChanges();
-        }
-        
-        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-        {
-            UpdateAuditFields();
-            return base.SaveChangesAsync(cancellationToken);
-        }
+        //public override int SaveChanges()
+        //{
+        //    UpdateAuditFields();
+        //    return base.SaveChanges();
+        //}
 
-        private void UpdateAuditFields()
-        {
-            var currentUserId = GetCurrentUserId();
-            var now = DateTimeOffset.UtcNow;
-            foreach (var entry in ChangeTracker.Entries<AuditableBaseEntity>())
-            {
-                switch (entry.State)
-                {
-                    case EntityState.Added:
-                        entry.Entity.CreatedAt = now;
-                        entry.Entity.CreatedById = currentUserId;
-                        break;
+        //public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        //{
+        //    UpdateAuditFields();
+        //    return base.SaveChangesAsync(cancellationToken);
+        //}
 
-                    case EntityState.Modified:
-                        entry.Entity.UpdatedAt = now;
-                        entry.Entity.UpdatedById = currentUserId;
+        //private void UpdateAuditFields()
+        //{
+        //    var currentUserId = GetCurrentUserId();
+        //    var now = DateTimeOffset.UtcNow;
+        //    foreach (var entry in ChangeTracker.Entries<AuditableBaseEntity>())
+        //    {
+        //        switch (entry.State)
+        //        {
+        //            case EntityState.Added:
+        //                entry.Entity.CreatedAt = now;
+        //                entry.Entity.CreatedById = currentUserId;
+        //                break;
 
-                        //Prevent modification of CreatedAt and createdById
-                        entry.Property(x => x.CreatedAt).IsModified = false;
-                        entry.Property(x => x.CreatedById).IsModified = false;
+        //            case EntityState.Modified:
+        //                entry.Entity.UpdatedAt = now;
+        //                entry.Entity.UpdatedById = currentUserId;
 
-                        //mark updatedAt and UpdateId as modified
-                        entry.Property(x => x.UpdatedAt).IsModified = true;
-                        entry.Property(x => x.UpdatedById).IsModified = true;
-                        break;
-                }
-            }
-            foreach (var entry in ChangeTracker.Entries<BaseEntity>())
-            {
-                switch (entry.State)
-                {
-                    case EntityState.Added:
-                        entry.Entity.CreatedAt = now;
-                        break;
+        //                //Prevent modification of CreatedAt and createdById
+        //                entry.Property(x => x.CreatedAt).IsModified = false;
+        //                entry.Property(x => x.CreatedById).IsModified = false;
 
-                    case EntityState.Modified:
-                        entry.Entity.UpdatedAt = now;
-                        //prevent Modification of CreatedAt
+        //                //mark updatedAt and UpdateId as modified
+        //                entry.Property(x => x.UpdatedAt).IsModified = true;
+        //                entry.Property(x => x.UpdatedById).IsModified = true;
+        //                break;
+        //        }
+        //    }
+        //    foreach (var entry in ChangeTracker.Entries<BaseEntity>())
+        //    {
+        //        switch (entry.State)
+        //        {
+        //            case EntityState.Added:
+        //                entry.Entity.CreatedAt = now;
+        //                break;
 
-                        entry.Property(x => x.CreatedAt).IsModified = false;
-                        entry.Property(x => x.UpdatedAt).IsModified = true;
-                        break;
-                }
-            }
-        }
-      
+        //            case EntityState.Modified:
+        //                entry.Entity.UpdatedAt = now;
+        //                //prevent Modification of CreatedAt
+
+        //                entry.Property(x => x.CreatedAt).IsModified = false;
+        //                entry.Property(x => x.UpdatedAt).IsModified = true;
+        //                break;
+        //        }
+        //    }
+        //}
+
 
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<Publication>(entity =>
-            {
-                entity.HasOne<PublisherDetails>()
-                      .WithOne(p => p.Publication)
-                      .HasForeignKey<PublisherDetails>(p => p.PublicationId)
-                      .OnDelete(DeleteBehavior.SetNull);
-
-                entity.HasMany(p => p.ExtensionLiteratures)
-                      .WithOne(e => e.Publication)
-                      .HasForeignKey(e => e.PublicationId)
-                      .OnDelete(DeleteBehavior.SetNull);
-            });
+            base.OnModelCreating(modelBuilder);      
 
 
 
@@ -286,6 +372,9 @@ namespace Infrastructure.DbContext
                 .HasForeignKey(u => u.UpdatedById)
                 .OnDelete(DeleteBehavior.Restrict);
 
+
+
+
             foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
             {
                 relationship.DeleteBehavior = DeleteBehavior.NoAction;
@@ -294,6 +383,7 @@ namespace Infrastructure.DbContext
             new UserTypeConfiguration().Configure(modelBuilder.Entity<User>());
             new AticSalesTypeConfiguration().Configure(modelBuilder.Entity<AticSales>());
             new DeuCourseTypeConfiguration().Configure(modelBuilder.Entity<DeuCourse>());
+            
 
             //Configuring Defaults for createdAt only (UpdatedAt will be handled by savechanges override) 
             foreach (var entityType in modelBuilder.Model.GetEntityTypes()

@@ -131,8 +131,8 @@ namespace Infrastructure.Services
                 if (updateDto.Qualification is not null) user.Qualification = updateDto.Qualification;
                 if (updateDto.ProfileImageUrl is not null) user.ProfileImageUrl = updateDto.ProfileImageUrl; 
 
-                // user.UpdatedById = _currentUser.UserId;
-                // user.UpdatedAt = DateTimeOffset.UtcNow;
+                 user.UpdatedById = _currentUser.UserId;
+                 user.UpdatedAt = DateTimeOffset.Now;
                 await _userRepository.SaveAsync(user);
                 return ServiceResult.Success();
             }

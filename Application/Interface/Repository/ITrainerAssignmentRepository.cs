@@ -21,7 +21,7 @@ namespace Application.Interface.Repository
 
         // New method for checking assignments before deletion
         Task<bool> HasAssignmentsForUnitLocationAsync(int unitLocationId);
-
+        
         //new ones
         Task<List<TrainerAssignment>> GetByTrainerIdAsync(int trainerId);
         Task AddRangeAsync(IEnumerable<TrainerAssignment> assignments);

@@ -178,7 +178,7 @@ namespace Domain.Entities.MasterData
             public string Name { get; set; } = default!;
         }
 
-        public class ServicesCategory : BaseEntity
+        public class ConsultancyServicesCategory : BaseEntity
         {
             public string Name { get; set; } = default!;
         }

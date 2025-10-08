@@ -32,16 +32,16 @@ namespace WebApi
         {
             var builder = WebApplication.CreateBuilder(args);
 
-           //Configure JSON options for better data handling
+           //Configure JSON options for better data handlingServer
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
                  {
                      options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                     //options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                      options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                  });
 
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openappi
             builder.Services.AddOpenApi();
 
             builder.Services.AddHttpContextAccessor();//For IHttpContextAccessor in infrastructure

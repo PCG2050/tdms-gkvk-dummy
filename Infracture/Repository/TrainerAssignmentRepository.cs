@@ -40,8 +40,13 @@ namespace Infrastructure.Repository
         public async Task<List<TrainerAssignment>> GetByTrainerIdAsync(int trainerId)
         {
             return await _context.UnitTrainers
-                .Where(ut => ut.TrainerId == trainerId)
-                .ToListAsync();
+                                    .Include(ut => ut.UnitLocation)
+                                        .ThenInclude(ul => ul.Unit)
+                                    .Include(ut => ut.UnitLocation)
+                                        .ThenInclude(ul => ul.District)
+                                            .ThenInclude(d => d.State)
+                                    .Where(ut => ut.TrainerId == trainerId)
+                                    .ToListAsync();
         }
 
         public async Task DeleteAsync(int id)

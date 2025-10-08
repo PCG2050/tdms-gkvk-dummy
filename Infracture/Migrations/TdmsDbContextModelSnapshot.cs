@@ -254,6 +254,75 @@ namespace Infrastructure.Migrations
                     b.ToTable("AticSales");
                 });
 
+            modelBuilder.Entity("Domain.Entities.DEU.DeuAdvisoryServices", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DeuProgramDetailsId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfAnsweredWhatsappQueries")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfBeneficiaries")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfEmailsSent")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfFaceToFaceDiscussions")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfFacebookSMS")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfGroupDiscussions")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfNewspaperCoverage")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfPhoneCalls")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfSMSSentToRegisteredFarmers")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfWhatsappGroups")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfWhatsappSMS")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("DeuProgramDetailsId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("DeuAdvisoryServices");
+                });
+
             modelBuilder.Entity("Domain.Entities.DEU.DeuCourse", b =>
                 {
                     b.Property<int>("Id")
@@ -375,6 +444,610 @@ namespace Infrastructure.Migrations
                     b.ToTable("DeuOtherActivities");
                 });
 
+            modelBuilder.Entity("Domain.Entities.DEU.DeuParticipantDemographics", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DeuProgramDetailsId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Female_GEN")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Female_OBC")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Female_SC")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Female_ST")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("GEN_Female_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("GEN_Male_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Male_GEN")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Male_OBC")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Male_SC")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Male_ST")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OBC_Female_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OBC_Male_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ParticipantId")
+                        .HasMaxLength(200)
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SC_Female_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SC_Male_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ST_Female_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ST_Male_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Total")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("DeuProgramDetailsId");
+
+                    b.HasIndex("ParticipantId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("DeuParticipantDemographics");
+                });
+
+            modelBuilder.Entity("Domain.Entities.DEU.DeuProgramContentAndResources", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("DeuProgramDetailsId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("DeuProgramDetailsId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("DeuProgramContentAndResources");
+                });
+
+            modelBuilder.Entity("Domain.Entities.DEU.DeuProgramDetails", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Attachements")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("BatchNo")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CategoryOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Copi")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Duration")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("Funds")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("FundsSanctionLetterDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FundsSanctionLetterUploadFile")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Location")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int?>("Mode")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("OrganizerBroucherFile")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OrganizerInstitutionAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OrganizerInstitutionName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ProgramTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ProposalDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ProposalUploadFile")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("RegionId")
+                        .HasMaxLength(150)
+                        .HasColumnType("int");
+
+                    b.Property<string>("RegionOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("SourceId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SourceOfFundId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SponsoredOrganization")
+                        .HasMaxLength(200)
+                        .HasColumnType("int");
+
+                    b.Property<string>("SponsoredOrganizationName")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("StatusId")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TPNo")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ThematicAreaId")
+                        .HasMaxLength(150)
+                        .HasColumnType("int");
+
+                    b.Property<string>("ThematicAreaOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("ThemeId")
+                        .HasMaxLength(150)
+                        .HasColumnType("int");
+
+                    b.Property<string>("ThemeOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<decimal>("TotalOutlayRs")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("TypeId")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<string>("TypeOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("UnitLocationId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UniversitySanctionLetterDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UniversitySanctionLetterUploadFile")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.HasIndex("ProgramTypeId");
+
+                    b.HasIndex("RegionId");
+
+                    b.HasIndex("SourceId");
+
+                    b.HasIndex("SourceOfFundId");
+
+                    b.HasIndex("StatusId");
+
+                    b.HasIndex("ThematicAreaId");
+
+                    b.HasIndex("ThemeId");
+
+                    b.HasIndex("TypeId");
+
+                    b.HasIndex("UnitLocationId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("DeuProgramDetails");
+                });
+
+            modelBuilder.Entity("Domain.Entities.DEU.DeuRecommendation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ActionTaken")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DeuProgramDetailsId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImpactOutcome")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("ProblemsIdentified")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Recommendation")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("SignificantAchievement")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("SuccessStories")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("DeuProgramDetailsId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("DeuRecommendations");
+                });
+
+            modelBuilder.Entity("Domain.Entities.DEU.DeuReport", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DeuProgramDetailsId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PhotosGeotaggedPhotoOrUploadPhoto")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("ProgressReportReportingYear")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("SignificantOutcome")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UploadPhoto")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("UploadVideo")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("DeuProgramDetailsId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("DeuReports");
+                });
+
+            modelBuilder.Entity("Domain.Entities.DEU.DeuResourcePerson", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Designation")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<int>("DeuProgramContentAndResourcesId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("InstitutionOrDepartment")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("ResourceType")
+                        .HasMaxLength(150)
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Responsibility")
+                        .HasMaxLength(250)
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("DeuProgramContentAndResourcesId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("DeuResourcePersons");
+                });
+
+            modelBuilder.Entity("Domain.Entities.DEU.DeuTeachingAidsDeveloped", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DeuProgramContentAndResourcesId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Number")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Other")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Purpose")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<int?>("TypeOfAidId")
+                        .HasMaxLength(200)
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("DeuProgramContentAndResourcesId");
+
+                    b.HasIndex("TypeOfAidId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("DeuTeachingAidsDeveloped");
+                });
+
+            modelBuilder.Entity("Domain.Entities.DEU.DeuTopicsCoveredInClass", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DeuProgramContentAndResourcesId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PhotoUpload")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Title")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("DeuProgramContentAndResourcesId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("DeuTopicsCoveredInClass");
+                });
+
             modelBuilder.Entity("Domain.Entities.District", b =>
                 {
                     b.Property<int>("Id")
@@ -403,6 +1076,75 @@ namespace Infrastructure.Migrations
                     b.HasIndex("StateId");
 
                     b.ToTable("Districts");
+                });
+
+            modelBuilder.Entity("Domain.Entities.EEU.EeuAdvisoryServices", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EeuProgramDetailsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfAnsweredWhatsappQueries")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfBeneficiaries")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfEmailsSent")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfFaceToFaceDiscussions")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfFacebookSMS")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfGroupDiscussions")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfNewspaperCoverage")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfPhoneCalls")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfSMSSentToRegisteredFarmers")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfWhatsappGroups")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfWhatsappSMS")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("EeuProgramDetailsId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("EeuAdvisoryServices");
                 });
 
             modelBuilder.Entity("Domain.Entities.EEU.EeuFLD", b =>
@@ -623,6 +1365,628 @@ namespace Infrastructure.Migrations
                     b.ToTable("EeuOtherActivities");
                 });
 
+            modelBuilder.Entity("Domain.Entities.EEU.EeuParticipantDemographics", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EeuProgramDetailsId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Female_GEN")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Female_OBC")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Female_SC")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Female_ST")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("GEN_Female_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("GEN_Male_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Male_GEN")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Male_OBC")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Male_SC")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Male_ST")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OBC_Female_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OBC_Male_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ParticipantId")
+                        .HasMaxLength(200)
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SC_Female_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SC_Male_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ST_Female_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ST_Male_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Total")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("EeuProgramDetailsId");
+
+                    b.HasIndex("ParticipantId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("EeuParticipantDemographics");
+                });
+
+            modelBuilder.Entity("Domain.Entities.EEU.EeuProgramContentAndResources", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("EeuProgramDetailsId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("EeuProgramDetailsId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("EeuProgramContentAndResources");
+                });
+
+            modelBuilder.Entity("Domain.Entities.EEU.EeuProgramDetails", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Attachements")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("BatchNo")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CategoryOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Copi")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Duration")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("Funds")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("FundsSanctionLetterDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FundsSanctionLetterUploadFile")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Location")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int?>("Mode")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("OrganizerBroucherFile")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OrganizerInstitutionAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OrganizerInstitutionName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ProgramTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ProposalDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ProposalUploadFile")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("RegionId")
+                        .HasMaxLength(150)
+                        .HasColumnType("int");
+
+                    b.Property<string>("RegionOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("SourceId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SourceOfFundId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SponsoredOrganization")
+                        .HasMaxLength(200)
+                        .HasColumnType("int");
+
+                    b.Property<string>("SponsoredOrganizationName")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("StatusId")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TPNo")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ThematicAreaId")
+                        .HasMaxLength(150)
+                        .HasColumnType("int");
+
+                    b.Property<string>("ThematicAreaOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("ThemeId")
+                        .HasMaxLength(150)
+                        .HasColumnType("int");
+
+                    b.Property<string>("ThemeOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<decimal>("TotalOutlayRs")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("TypeId")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<string>("TypeOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("UnitLocationId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UniversitySanctionLetterDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UniversitySanctionLetterUploadFile")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.HasIndex("ProgramTypeId");
+
+                    b.HasIndex("RegionId");
+
+                    b.HasIndex("SourceId");
+
+                    b.HasIndex("SourceOfFundId");
+
+                    b.HasIndex("StatusId");
+
+                    b.HasIndex("ThematicAreaId");
+
+                    b.HasIndex("ThemeId");
+
+                    b.HasIndex("TypeId");
+
+                    b.HasIndex("UnitLocationId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("EeuProgramDetails");
+                });
+
+            modelBuilder.Entity("Domain.Entities.EEU.EeuRecommendation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ActionTaken")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EeuProgramDetailsId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImpactOutcome")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("ProblemsIdentified")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Recommendation")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("SignificantAchievement")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("SuccessStories")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("EeuProgramDetailsId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("EeuRecommendations");
+                });
+
+            modelBuilder.Entity("Domain.Entities.EEU.EeuReport", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EeuProgramDetailsId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PhotosGeotaggedPhotoOrUploadPhoto")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("ProgressReportReportingYear")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("SignificantOutcome")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UploadPhoto")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("UploadVideo")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("EeuProgramDetailsId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("EeuReports");
+                });
+
+            modelBuilder.Entity("Domain.Entities.EEU.EeuResourcePerson", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Designation")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<int>("EeuProgramContentAndResourcesId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("InstitutionOrDepartment")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("ResourceType")
+                        .HasMaxLength(150)
+                        .HasColumnType("int");
+
+                    b.Property<int>("Responsibility")
+                        .HasMaxLength(250)
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("EeuProgramContentAndResourcesId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("EeuResourcePersons");
+                });
+
+            modelBuilder.Entity("Domain.Entities.EEU.EeuTeachingAidsDeveloped", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EeuProgramContentAndResourcesId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Number")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Other")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Purpose")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<int?>("TypeOfAidId")
+                        .HasMaxLength(200)
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("EeuProgramContentAndResourcesId");
+
+                    b.HasIndex("TypeOfAidId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("EeuTeachingAidsDeveloped");
+                });
+
+            modelBuilder.Entity("Domain.Entities.EEU.EeuTopicsCoveredInClass", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EeuProgramContentAndResourcesId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PhotoUpload")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Title")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("EeuProgramContentAndResourcesId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("EeuTopicsCoveredInClass");
+                });
+
             modelBuilder.Entity("Domain.Entities.EEU.EeuTrainingProgramme", b =>
                 {
                     b.Property<int>("Id")
@@ -684,6 +2048,88 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UpdatedById");
 
                     b.ToTable("EeuTrainingProgrammes");
+                });
+
+            modelBuilder.Entity("Domain.Entities.FIU.FIUOtherActivity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UploadMediaUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("FIUOtherActivities");
+                });
+
+            modelBuilder.Entity("Domain.Entities.FIU.FIUProgramActivity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("FIUActivitiesId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Number")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UploadMediaUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("FIUActivitiesId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("FIUProgramActivities");
                 });
 
             modelBuilder.Entity("Domain.Entities.FIU.FiuProgramme", b =>
@@ -783,6 +2229,691 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UpdatedById");
 
                     b.ToTable("FiuProgrammeTypes");
+                });
+
+            modelBuilder.Entity("Domain.Entities.FTI.FTIAdvisoryServices", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FTIProgramDetailsID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfAnsweredWhatsappQueries")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfBeneficiaries")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfEmailsSent")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfFaceToFaceDiscussions")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfFacebookSMS")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfGroupDiscussions")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfNewspaperCoverage")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfPhoneCalls")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfSMSSentToRegisteredFarmers")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfWhatsappGroups")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfWhatsappSMS")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("FTIProgramDetailsID");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("FTIAdvisoryServices");
+                });
+
+            modelBuilder.Entity("Domain.Entities.FTI.FTIParticipantDemographics", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FTIProgramDetailsID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Female_GEN")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Female_OBC")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Female_SC")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Female_ST")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("GEN_Female_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("GEN_Male_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Male_GEN")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Male_OBC")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Male_SC")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Male_ST")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OBC_Female_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OBC_Male_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Participant")
+                        .HasMaxLength(200)
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SC_Female_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SC_Male_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ST_Female_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ST_Male_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Total")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("FTIProgramDetailsID");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("FTIParticipantDemographics");
+                });
+
+            modelBuilder.Entity("Domain.Entities.FTI.FTIProgramContentAndResources", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("FTIProgramDetailsID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("FTIProgramDetailsID");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("FTIProgramContentAndResources");
+                });
+
+            modelBuilder.Entity("Domain.Entities.FTI.FTIProgramDetails", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal?>("AreaHa")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("BatchNo")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CategoryOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("CollaboratorId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CollaboratorOther")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Duration")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime?>("FundsSanctionLetterDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FundsSanctionLetterUploadFile")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Location")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int?>("Mode")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<string>("OrganizerAddress")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("OrganizerFileUpload")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("OrganizerInstitutionName")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("PaperPosterAbstract")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("PaperPosterAbstractDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaperPosterAbstractLink")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("ParticipatedAs")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Participation")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("ParticipationFileLink")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("ProgramTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ProposalDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ProposalUploadFile")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("Region")
+                        .HasMaxLength(150)
+                        .HasColumnType("int");
+
+                    b.Property<string>("RegionOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("SD")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<string>("SourceOfInformation")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int>("SponsoredOrganization")
+                        .HasMaxLength(200)
+                        .HasColumnType("int");
+
+                    b.Property<string>("SponsoredOrganizationName")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateOnly?>("StartDate")
+                        .HasColumnType("date");
+
+                    b.Property<int?>("Status")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TPNo")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ThematicAreaId")
+                        .HasMaxLength(150)
+                        .HasColumnType("int");
+
+                    b.Property<string>("ThematicAreaOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("Theme")
+                        .HasMaxLength(150)
+                        .HasColumnType("int");
+
+                    b.Property<string>("ThemeOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("TitleOfThesisOrProjectOrPaperOrOthers")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<decimal?>("TotalOutlayRs")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("TypeId")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<string>("TypeOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("UniversitySanctionLetterDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UniversitySanctionLetterUploadFile")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UploadVideo")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("CollaboratorId");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("ThematicAreaId");
+
+                    b.HasIndex("TypeId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("FTIProgramDetails");
+                });
+
+            modelBuilder.Entity("Domain.Entities.FTI.FTIRecommendation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ActionTaken")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FTIProgramDetailsID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImpactOutcome")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("ProblemsIdentified")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Recommendation")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("SignificantAchievement")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("SuccessStories")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("FTIProgramDetailsID");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("FTIRecommendations");
+                });
+
+            modelBuilder.Entity("Domain.Entities.FTI.FTIReport", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("FTIProgramDetailsID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PhotosGeotaggedPhotoOrUploadPhoto")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("ProgressReportReportingYear")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("SignificantOutcome")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UploadPhoto")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("UploadVideo")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("FTIProgramDetailsID");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("FTIReports");
+                });
+
+            modelBuilder.Entity("Domain.Entities.FTI.FTIResourcePerson", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Designation")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<int>("FTIProgramContentAndResourcesID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("InstitutionOrDepartment")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("ResourceType")
+                        .HasMaxLength(150)
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Responsibility")
+                        .HasMaxLength(250)
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("FTIProgramContentAndResourcesID");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("FTIResourcePersons");
+                });
+
+            modelBuilder.Entity("Domain.Entities.FTI.FTITeachingAidsDeveloped", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FTIProgramContentAndResourcesID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Number")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Other")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Purpose")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("TypeOfAidDeveloped")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("FTIProgramContentAndResourcesID");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("FTITeachingAidsDeveloped");
+                });
+
+            modelBuilder.Entity("Domain.Entities.FTI.FTITopicsCoveredInClass", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("FTIProgramContentAndResourcesID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PhotoUpload")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Title")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("FTIProgramContentAndResourcesID");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("FTITopicsCoveredInClass");
                 });
 
             modelBuilder.Entity("Domain.Entities.FTI.FtiOtherActivity", b =>
@@ -904,6 +3035,214 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UpdatedById");
 
                     b.ToTable("FtiTrainingPrograms");
+                });
+
+            modelBuilder.Entity("Domain.Entities.GenericTables.ConsultingAndSocialMediaService.TableConsultingAndSocialMediaService", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CountOfAnsweredQueries")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ExtensionActivityId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FaceToFace")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FacebookPostCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Female_GEN")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Female_OBC")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Female_SC")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Female_ST")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GroupDiscussion")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Location")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int>("Male_GEN")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Male_OBC")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Male_SC")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Male_ST")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ModeOrOutreachId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ModeOutreachId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfBeneficiaries")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfEmailSent")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfNewspaperCoverage")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfPressCoverage")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfPressMeet")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfPressVisit")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfSms")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfTweets")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfWhatsappGroup")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfWhatsappMessage")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ParticularsId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ParticularsOthers")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int>("PhoneCalls")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PublishedDocUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Publisher")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("RelatedToDisciplineOther")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int>("RelatedToId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("WeblinkOrApplink")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("ExtensionActivityId");
+
+                    b.HasIndex("ModeOutreachId");
+
+                    b.HasIndex("ParticularsId");
+
+                    b.HasIndex("RelatedToId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("TableConsultingAndSocialMediaServices");
+                });
+
+            modelBuilder.Entity("Domain.Entities.GenericTables.ConsultingAndSocialMediaService.TableModeAndOutreach", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ConsultingServiceId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Gender")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("MobileNo")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<int?>("TableConsultingAndSocialMediaService")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("TableConsultingAndSocialMediaService");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("TableModeAndOutreaches");
                 });
 
             modelBuilder.Entity("Domain.Entities.GenericTables.ExtensionLiterature", b =>
@@ -1568,13 +3907,294 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("PublicationId")
-                        .IsUnique()
-                        .HasFilter("[PublicationId] IS NOT NULL");
+                    b.HasIndex("PublicationId");
 
                     b.HasIndex("UpdatedById");
 
                     b.ToTable("PublisherDetails");
+                });
+
+            modelBuilder.Entity("Domain.Entities.GenericTables.Service.RevolvingFundStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<double>("ClosingBalance")
+                        .HasColumnType("float");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Expenditure")
+                        .HasColumnType("float");
+
+                    b.Property<double>("OpeningBalance")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Receipt")
+                        .HasColumnType("float");
+
+                    b.Property<int>("ServiceId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TblServiceId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("TblServiceId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("RevolvingFundStatuses");
+                });
+
+            modelBuilder.Entity("Domain.Entities.GenericTables.Service.TableHostel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<double>("AmountGenerated")
+                        .HasColumnType("float");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<int>("Female_GEN")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Female_OBC")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Female_SC")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Female_ST")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Male_GEN")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Male_OBC")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Male_SC")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Male_ST")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NumberOfDaysStayed")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Purpose")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int>("ServiceId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TblServiceId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("VillageOrTaluk")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("TblServiceId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("TableHostels");
+                });
+
+            modelBuilder.Entity("Domain.Entities.GenericTables.Service.TblService", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<double>("AmountGenerated")
+                        .HasColumnType("float");
+
+                    b.Property<decimal>("AmountReleased")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Component")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CropPlantProductName")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Number")
+                        .HasColumnType("int");
+
+                    b.Property<string>("OtherCategory")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("OtherSourceOfFund")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("OtherTheme")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("QuantityUnitId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RentedTo")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int?>("SourceOfFundId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ThemeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TitleOfActivityConducted")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Variety")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("QuantityUnitId");
+
+                    b.HasIndex("SourceOfFundId");
+
+                    b.HasIndex("ThemeId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("Services");
+                });
+
+            modelBuilder.Entity("Domain.Entities.GenericTables.Service.VisitorDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly?>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("MobileNo")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Purpose")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PurposeOfVisit")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ServiceId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TblServiceId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("TblServiceId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("VisitorDetail");
                 });
 
             modelBuilder.Entity("Domain.Entities.IBTVA.IbtavOtherActivity", b =>
@@ -1629,6 +4249,406 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UpdatedById");
 
                     b.ToTable("IbtavOtherActivities");
+                });
+
+            modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaAdvisoryServices", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IbtvaProgramDetailsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfAnsweredWhatsappQueries")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfBeneficiaries")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfEmailsSent")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfFaceToFaceDiscussions")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfFacebookSMS")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfGroupDiscussions")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfNewspaperCoverage")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfPhoneCalls")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfSMSSentToRegisteredFarmers")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfWhatsappGroups")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoOfWhatsappSMS")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("IbtvaProgramDetailsId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("IbtvaAdvisoryServices");
+                });
+
+            modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaParticipantDemographics", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Female_GEN")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Female_OBC")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Female_SC")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Female_ST")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("GEN_Female_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("GEN_Male_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IbtvaProgramDetailsId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Male_GEN")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Male_OBC")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Male_SC")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Male_ST")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OBC_Female_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OBC_Male_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ParticipantId")
+                        .HasMaxLength(200)
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SC_Female_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SC_Male_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ST_Female_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ST_Male_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Total")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("IbtvaProgramDetailsId");
+
+                    b.HasIndex("ParticipantId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("IbtvaParticipantDemographics");
+                });
+
+            modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaProgramContentAndResources", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("IbtvaProgramDetailsId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("IbtvaProgramDetailsId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("IbtvaProgramContentAndResources");
+                });
+
+            modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaProgramDetails", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Attachements")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("BatchNo")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CategoryOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Copi")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Duration")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("Funds")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("FundsSanctionLetterDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FundsSanctionLetterUploadFile")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Location")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int?>("Mode")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("OrganizerBroucherFile")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OrganizerInstitutionAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OrganizerInstitutionName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ProgramTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ProposalDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ProposalUploadFile")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("RegionId")
+                        .HasMaxLength(150)
+                        .HasColumnType("int");
+
+                    b.Property<string>("RegionOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("SourceId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SourceOfFundId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SponsoredOrganization")
+                        .HasMaxLength(200)
+                        .HasColumnType("int");
+
+                    b.Property<string>("SponsoredOrganizationName")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("StatusId")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TPNo")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ThematicAreaId")
+                        .HasMaxLength(150)
+                        .HasColumnType("int");
+
+                    b.Property<string>("ThematicAreaOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("ThemeId")
+                        .HasMaxLength(150)
+                        .HasColumnType("int");
+
+                    b.Property<string>("ThemeOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<decimal?>("TotalOutlayRs")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("TypeId")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<string>("TypeOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("UnitLocationId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UniversitySanctionLetterDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UniversitySanctionLetterUploadFile")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.HasIndex("ProgramTypeId");
+
+                    b.HasIndex("RegionId");
+
+                    b.HasIndex("SourceId");
+
+                    b.HasIndex("SourceOfFundId");
+
+                    b.HasIndex("StatusId");
+
+                    b.HasIndex("ThematicAreaId");
+
+                    b.HasIndex("ThemeId");
+
+                    b.HasIndex("TypeId");
+
+                    b.HasIndex("UnitLocationId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("IbtvaProgramDetails");
                 });
 
             modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaProgramme", b =>
@@ -1689,6 +4709,297 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UpdatedById");
 
                     b.ToTable("IbtvaProgrammes");
+                });
+
+            modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaRecommendation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ActionTaken")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IbtvaProgramDetailsId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImpactOutcome")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("ProblemsIdentified")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Recommendation")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("SignificantAchievement")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("SuccessStories")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("IbtvaProgramDetailsId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("IbtvaRecommendations");
+                });
+
+            modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaReport", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("IbtvaProgramDetailsId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PhotosGeotaggedPhotoOrUploadPhoto")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("ProgressReportReportingYear")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("SignificantOutcome")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UploadPhoto")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("UploadVideo")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("IbtvaProgramDetailsId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("IbtvaReports");
+                });
+
+            modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaResourcePerson", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Designation")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<int>("IbtvaProgramContentAndResourcesId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("InstitutionOrDepartment")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("ResourceType")
+                        .HasMaxLength(150)
+                        .HasColumnType("int");
+
+                    b.Property<int>("Responsibility")
+                        .HasMaxLength(250)
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("IbtvaProgramContentAndResourcesId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("IbtvaResourcePersons");
+                });
+
+            modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaTeachingAidsDeveloped", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IbtvaProgramContentAndResourcesId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Number")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Other")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Purpose")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<int?>("TypeOfAidId")
+                        .HasMaxLength(200)
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("IbtvaProgramContentAndResourcesId");
+
+                    b.HasIndex("TypeOfAidId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("IbtvaTeachingAidsDeveloped");
+                });
+
+            modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaTopicsCoveredInClass", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("IbtvaProgramContentAndResourcesId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PhotoUpload")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Title")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("IbtvaProgramContentAndResourcesId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("IbtvaTopicsCoveredInClass");
                 });
 
             modelBuilder.Entity("Domain.Entities.Junction.OrganizationUnitLocation", b =>
@@ -1819,6 +5130,677 @@ namespace Infrastructure.Migrations
                     b.ToTable("UnitHeadAssignments");
                 });
 
+            modelBuilder.Entity("Domain.Entities.KVK.KvkAdvisoryServices", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int>("KVKProgramDetailsId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfAnsweredWhatsappQueries")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfBeneficiaries")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfEmailsSent")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfFaceToFaceDiscussions")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfFacebookSMS")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfGroupDiscussions")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfNewspaperCoverage")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfPhoneCalls")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfSMSSentToRegisteredFarmers")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfWhatsappGroups")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfWhatsappSMS")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("KVKProgramDetailsId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("KvkAdvisoryServices");
+                });
+
+            modelBuilder.Entity("Domain.Entities.KVK.KvkParticipantDemographics", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Female_GEN")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Female_OBC")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Female_SC")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Female_ST")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("GEN_Female_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("GEN_Male_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int>("KVKProgramDetailsId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Male_GEN")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Male_OBC")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Male_SC")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Male_ST")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OBC_Female_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OBC_Male_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Participant")
+                        .HasMaxLength(200)
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SC_Female_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SC_Male_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ST_Female_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ST_Male_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Total")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("KVKProgramDetailsId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("KvkParticipantDemographics");
+                });
+
+            modelBuilder.Entity("Domain.Entities.KVK.KvkProgramContentAndResources", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("KVKProgramDetailsId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("KVKProgramDetailsId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("KvkProgramContentAndResources");
+                });
+
+            modelBuilder.Entity("Domain.Entities.KVK.KvkRecommendation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ActionTaken")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImpactOutcome")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("KVKProgramDetailsId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProblemsIdentified")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Recommendation")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("SignificantAchievement")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("SuccessStories")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("KVKProgramDetailsId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("KvkRecommendations");
+                });
+
+            modelBuilder.Entity("Domain.Entities.KVK.KvkReport", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("KVKProgramDetailsId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PhotosGeotaggedPhotoOrUploadPhoto")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("ProgressReportReportingYear")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("SignificantOutcome")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UploadPhoto")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("UploadVideo")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("KVKProgramDetailsId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("KvkReports");
+                });
+
+            modelBuilder.Entity("Domain.Entities.KVK.KvkResourcePerson", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Designation")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("InstitutionOrDepartment")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("ProgramContentAndResourcesId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ResourceType")
+                        .HasMaxLength(150)
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Responsibility")
+                        .HasMaxLength(250)
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("ProgramContentAndResourcesId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("KvkResourcePersons");
+                });
+
+            modelBuilder.Entity("Domain.Entities.KVK.KvkTeachingAidsDeveloped", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Number")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Other")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("ProgramContentAndResourcesId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Purpose")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("TypeOfAidDeveloped")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("ProgramContentAndResourcesId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("KvkTeachingAidsDeveloped");
+                });
+
+            modelBuilder.Entity("Domain.Entities.KVK.KvkTopicsCoveredInClass", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PhotoUpload")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("ProgramContentAndResourcesId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("ProgramContentAndResourcesId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("KvkTopicsCoveredInClass");
+                });
+
+            modelBuilder.Entity("Domain.Entities.KVK.TableKVKProgramDetails", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal?>("AreaHa")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("BatchNo")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CategoryOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Duration")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("FundsSanctionLetterDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FundsSanctionLetterUploadFile")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Location")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int?>("Mode")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<string>("OrganizerAddress")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("OrganizerFileUpload")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("OrganizerInstitutionName")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("PaperPosterAbstract")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("PaperPosterAbstractDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaperPosterAbstractLink")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("ParticipatedAs")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Participation")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("ParticipationFileLink")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("ProgramTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ProposalDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ProposalUploadFile")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("Region")
+                        .HasMaxLength(150)
+                        .HasColumnType("int");
+
+                    b.Property<string>("RegionOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("SD")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<string>("SourceOfInformation")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int?>("SponsoredOrganization")
+                        .HasMaxLength(200)
+                        .HasColumnType("int");
+
+                    b.Property<string>("SponsoredOrganizationName")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("Status")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TPNo")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ThematicArea")
+                        .HasMaxLength(150)
+                        .HasColumnType("int");
+
+                    b.Property<string>("ThematicAreaOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("Theme")
+                        .HasMaxLength(150)
+                        .HasColumnType("int");
+
+                    b.Property<string>("ThemeOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("TitleOfThesisOrProjectOrPaperOrOthers")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<decimal?>("TotalOutlayRs")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("Type")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<string>("TypeOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("UniversitySanctionLetterDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UniversitySanctionLetterUploadFile")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UploadVideo")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("KVKProgramDetails");
+                });
+
             modelBuilder.Entity("Domain.Entities.MasterData.CollaborativeProgramOption", b =>
                 {
                     b.Property<int>("Id")
@@ -1867,6 +5849,31 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Collaborators");
+                });
+
+            modelBuilder.Entity("Domain.Entities.MasterData.ConsultancyServicesCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ConsultancyServicesCategories");
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.Contribution", b =>
@@ -2644,31 +6651,6 @@ namespace Infrastructure.Migrations
                     b.ToTable("ServiceThemes");
                 });
 
-            modelBuilder.Entity("Domain.Entities.MasterData.ServicesCategory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ServicesCategories");
-                });
-
             modelBuilder.Entity("Domain.Entities.MasterData.SourceOfFund", b =>
                 {
                     b.Property<int>("Id")
@@ -3062,6 +7044,677 @@ namespace Infrastructure.Migrations
                     b.ToTable("DaesiProgrammes");
                 });
 
+            modelBuilder.Entity("Domain.Entities.STU.STUAdvisoryServices", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfAnsweredWhatsappQueries")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfBeneficiaries")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfEmailsSent")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfFaceToFaceDiscussions")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfFacebookSMS")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfGroupDiscussions")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfNewspaperCoverage")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfPhoneCalls")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfSMSSentToRegisteredFarmers")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfWhatsappGroups")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoOfWhatsappSMS")
+                        .HasColumnType("int");
+
+                    b.Property<int>("STUProgramDetailsID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("STUProgramDetailsID");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("STUAdvisoryServices");
+                });
+
+            modelBuilder.Entity("Domain.Entities.STU.STUParticipantDemographics", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Female_GEN")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Female_OBC")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Female_SC")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Female_ST")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("GEN_Female_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("GEN_Male_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Male_GEN")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Male_OBC")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Male_SC")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Male_ST")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OBC_Female_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OBC_Male_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Participant")
+                        .HasMaxLength(200)
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SC_Female_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SC_Male_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int>("STUProgramDetailsID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ST_Female_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ST_Male_StayedInHostel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Total")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("STUProgramDetailsID");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("STUParticipantDemographics");
+                });
+
+            modelBuilder.Entity("Domain.Entities.STU.STUProgramContentAndResources", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("STUProgramDetailsID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("STUProgramDetailsID");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("STUProgramContentAndResources");
+                });
+
+            modelBuilder.Entity("Domain.Entities.STU.STUProgramDetails", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal?>("AreaHa")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("BatchNo")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CategoryOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Duration")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("FundsSanctionLetterDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FundsSanctionLetterUploadFile")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Location")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int?>("Mode")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<string>("OrganizerAddress")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("OrganizerFileUpload")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("OrganizerInstitutionName")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("PaperPosterAbstract")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("PaperPosterAbstractDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaperPosterAbstractLink")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("ParticipatedAs")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Participation")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("ParticipationFileLink")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("ProgramTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ProposalDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ProposalUploadFile")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("Region")
+                        .HasMaxLength(150)
+                        .HasColumnType("int");
+
+                    b.Property<string>("RegionOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("SD")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<string>("SourceOfInformation")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int?>("SponsoredOrganization")
+                        .HasMaxLength(200)
+                        .HasColumnType("int");
+
+                    b.Property<string>("SponsoredOrganizationName")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("Status")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TPNo")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ThematicArea")
+                        .HasMaxLength(150)
+                        .HasColumnType("int");
+
+                    b.Property<string>("ThematicAreaOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("Theme")
+                        .HasMaxLength(150)
+                        .HasColumnType("int");
+
+                    b.Property<string>("ThemeOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("TitleOfThesisOrProjectOrPaperOrOthers")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<decimal?>("TotalOutlayRs")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("Type")
+                        .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<string>("TypeOther")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("UniversitySanctionLetterDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UniversitySanctionLetterUploadFile")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UploadVideo")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("STUProgramDetails");
+                });
+
+            modelBuilder.Entity("Domain.Entities.STU.STURecommendation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ActionTaken")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImpactOutcome")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("ProblemsIdentified")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Recommendation")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("STUProgramDetailsID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SignificantAchievement")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("SuccessStories")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("STUProgramDetailsID");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("STURecommendations");
+                });
+
+            modelBuilder.Entity("Domain.Entities.STU.STUReport", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PhotosGeotaggedPhotoOrUploadPhoto")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("ProgressReportReportingYear")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<int>("STUProgramDetailsID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SignificantOutcome")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UploadPhoto")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("UploadVideo")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("STUProgramDetailsID");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("STUReports");
+                });
+
+            modelBuilder.Entity("Domain.Entities.STU.STUResourcePerson", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Designation")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("InstitutionOrDepartment")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("ResourceType")
+                        .HasMaxLength(150)
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Responsibility")
+                        .HasMaxLength(250)
+                        .HasColumnType("int");
+
+                    b.Property<int>("STUProgramContentAndResourcesID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("STUProgramContentAndResourcesID");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("STUResourcePersons");
+                });
+
+            modelBuilder.Entity("Domain.Entities.STU.STUTeachingAidsDeveloped", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Number")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Other")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Purpose")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<int>("STUProgramContentAndResourcesID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TypeOfAidDeveloped")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("STUProgramContentAndResourcesID");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("STUTeachingAidsDeveloped");
+                });
+
+            modelBuilder.Entity("Domain.Entities.STU.STUTopicsCoveredInClass", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PhotoUpload")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("STUProgramContentAndResourcesID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("STUProgramContentAndResourcesID");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("STUTopicsCoveredInClass");
+                });
+
             modelBuilder.Entity("Domain.Entities.STU.StuOtherActivity", b =>
                 {
                     b.Property<int>("Id")
@@ -3269,6 +7922,50 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("States");
+                });
+
+            modelBuilder.Entity("Domain.Entities.TableOtherActivity.TableOtherActivity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UploadPath")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("OtherActivities");
                 });
 
             modelBuilder.Entity("Domain.Entities.Unit", b =>
@@ -3599,6 +8296,31 @@ namespace Infrastructure.Migrations
                     b.Navigation("UpdatedBy");
                 });
 
+            modelBuilder.Entity("Domain.Entities.DEU.DeuAdvisoryServices", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.DEU.DeuProgramDetails", "ProgramDetails")
+                        .WithMany("AdvisoryServices")
+                        .HasForeignKey("DeuProgramDetailsId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
             modelBuilder.Entity("Domain.Entities.DEU.DeuCourse", b =>
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
@@ -3665,6 +8387,290 @@ namespace Infrastructure.Migrations
                     b.Navigation("UpdatedBy");
                 });
 
+            modelBuilder.Entity("Domain.Entities.DEU.DeuParticipantDemographics", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.DEU.DeuProgramDetails", "ProgramDetails")
+                        .WithMany()
+                        .HasForeignKey("DeuProgramDetailsId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.MasterData.ParticipantDealer", "Participant")
+                        .WithMany()
+                        .HasForeignKey("ParticipantId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Participant");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.DEU.DeuProgramContentAndResources", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.DEU.DeuProgramDetails", "ProgramDetails")
+                        .WithMany()
+                        .HasForeignKey("DeuProgramDetailsId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.DEU.DeuProgramDetails", b =>
+                {
+                    b.HasOne("Domain.Entities.MasterData.ProgramCategory", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.MasterData.ProgramType", "ProgramType")
+                        .WithMany()
+                        .HasForeignKey("ProgramTypeId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.Region", "Region")
+                        .WithMany()
+                        .HasForeignKey("RegionId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.ParticipatedSource", "Source")
+                        .WithMany()
+                        .HasForeignKey("SourceId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.SourceOfFund", "SourceOfFund")
+                        .WithMany()
+                        .HasForeignKey("SourceOfFundId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.Status", "Status")
+                        .WithMany()
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.ThematicArea", "ThematicArea")
+                        .WithMany()
+                        .HasForeignKey("ThematicAreaId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.Theme", "Theme")
+                        .WithMany()
+                        .HasForeignKey("ThemeId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.InfoType", "Type")
+                        .WithMany()
+                        .HasForeignKey("TypeId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
+                        .WithMany()
+                        .HasForeignKey("UnitLocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Category");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Organization");
+
+                    b.Navigation("ProgramType");
+
+                    b.Navigation("Region");
+
+                    b.Navigation("Source");
+
+                    b.Navigation("SourceOfFund");
+
+                    b.Navigation("Status");
+
+                    b.Navigation("ThematicArea");
+
+                    b.Navigation("Theme");
+
+                    b.Navigation("Type");
+
+                    b.Navigation("UnitLocation");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.DEU.DeuRecommendation", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.DEU.DeuProgramDetails", "ProgramDetails")
+                        .WithMany("Recommendations")
+                        .HasForeignKey("DeuProgramDetailsId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.DEU.DeuReport", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.DEU.DeuProgramDetails", "ProgramDetails")
+                        .WithMany("Reports")
+                        .HasForeignKey("DeuProgramDetailsId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.DEU.DeuResourcePerson", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.DEU.DeuProgramContentAndResources", "ProgramContentAndResources")
+                        .WithMany("ResourcePersons")
+                        .HasForeignKey("DeuProgramContentAndResourcesId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramContentAndResources");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.DEU.DeuTeachingAidsDeveloped", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.DEU.DeuProgramContentAndResources", "ProgramContentAndResources")
+                        .WithMany("TeachingAids")
+                        .HasForeignKey("DeuProgramContentAndResourcesId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.MasterData.TypeOfAid", "TypeOfAid")
+                        .WithMany()
+                        .HasForeignKey("TypeOfAidId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramContentAndResources");
+
+                    b.Navigation("TypeOfAid");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.DEU.DeuTopicsCoveredInClass", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.DEU.DeuProgramContentAndResources", "ProgramContentAndResources")
+                        .WithMany("TopicsCovered")
+                        .HasForeignKey("DeuProgramContentAndResourcesId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramContentAndResources");
+
+                    b.Navigation("UpdatedBy");
+                });
+
             modelBuilder.Entity("Domain.Entities.District", b =>
                 {
                     b.HasOne("Domain.Entities.State", "State")
@@ -3674,6 +8680,31 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("State");
+                });
+
+            modelBuilder.Entity("Domain.Entities.EEU.EeuAdvisoryServices", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.EEU.EeuProgramDetails", "ProgramDetails")
+                        .WithMany("AdvisoryServices")
+                        .HasForeignKey("EeuProgramDetailsId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
                 });
 
             modelBuilder.Entity("Domain.Entities.EEU.EeuFLD", b =>
@@ -3775,6 +8806,290 @@ namespace Infrastructure.Migrations
                     b.Navigation("UpdatedBy");
                 });
 
+            modelBuilder.Entity("Domain.Entities.EEU.EeuParticipantDemographics", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.EEU.EeuProgramDetails", "ProgramDetails")
+                        .WithMany()
+                        .HasForeignKey("EeuProgramDetailsId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.MasterData.ParticipantDealer", "Participant")
+                        .WithMany()
+                        .HasForeignKey("ParticipantId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Participant");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.EEU.EeuProgramContentAndResources", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.DEU.DeuProgramDetails", "ProgramDetails")
+                        .WithMany()
+                        .HasForeignKey("EeuProgramDetailsId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.EEU.EeuProgramDetails", b =>
+                {
+                    b.HasOne("Domain.Entities.MasterData.ProgramCategory", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.MasterData.ProgramType", "ProgramType")
+                        .WithMany()
+                        .HasForeignKey("ProgramTypeId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.Region", "Region")
+                        .WithMany()
+                        .HasForeignKey("RegionId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.ParticipatedSource", "Source")
+                        .WithMany()
+                        .HasForeignKey("SourceId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.SourceOfFund", "SourceOfFund")
+                        .WithMany()
+                        .HasForeignKey("SourceOfFundId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.Status", "Status")
+                        .WithMany()
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.ThematicArea", "ThematicArea")
+                        .WithMany()
+                        .HasForeignKey("ThematicAreaId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.Theme", "Theme")
+                        .WithMany()
+                        .HasForeignKey("ThemeId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.InfoType", "Type")
+                        .WithMany()
+                        .HasForeignKey("TypeId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
+                        .WithMany()
+                        .HasForeignKey("UnitLocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Category");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Organization");
+
+                    b.Navigation("ProgramType");
+
+                    b.Navigation("Region");
+
+                    b.Navigation("Source");
+
+                    b.Navigation("SourceOfFund");
+
+                    b.Navigation("Status");
+
+                    b.Navigation("ThematicArea");
+
+                    b.Navigation("Theme");
+
+                    b.Navigation("Type");
+
+                    b.Navigation("UnitLocation");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.EEU.EeuRecommendation", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.EEU.EeuProgramDetails", "ProgramDetails")
+                        .WithMany("Recommendations")
+                        .HasForeignKey("EeuProgramDetailsId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.EEU.EeuReport", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.EEU.EeuProgramDetails", "ProgramDetails")
+                        .WithMany("Reports")
+                        .HasForeignKey("EeuProgramDetailsId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.EEU.EeuResourcePerson", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.EEU.EeuProgramContentAndResources", "ProgramContentAndResources")
+                        .WithMany("ResourcePersons")
+                        .HasForeignKey("EeuProgramContentAndResourcesId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramContentAndResources");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.EEU.EeuTeachingAidsDeveloped", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.EEU.EeuProgramContentAndResources", "ProgramContentAndResources")
+                        .WithMany("TeachingAids")
+                        .HasForeignKey("EeuProgramContentAndResourcesId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.MasterData.TypeOfAid", "TypeOfAid")
+                        .WithMany()
+                        .HasForeignKey("TypeOfAidId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramContentAndResources");
+
+                    b.Navigation("TypeOfAid");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.EEU.EeuTopicsCoveredInClass", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.EEU.EeuProgramContentAndResources", "ProgramContentAndResources")
+                        .WithMany("TopicsCovered")
+                        .HasForeignKey("EeuProgramContentAndResourcesId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramContentAndResources");
+
+                    b.Navigation("UpdatedBy");
+                });
+
             modelBuilder.Entity("Domain.Entities.EEU.EeuTrainingProgramme", b =>
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
@@ -3804,6 +9119,47 @@ namespace Infrastructure.Migrations
                     b.Navigation("Organization");
 
                     b.Navigation("UnitLocation");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.FIU.FIUOtherActivity", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.FIU.FIUProgramActivity", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.FIUActivity", "FIUActivities")
+                        .WithMany()
+                        .HasForeignKey("FIUActivitiesId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("FIUActivities");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -3862,6 +9218,251 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("CreatedBy");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.FTI.FTIAdvisoryServices", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.FTI.FTIProgramDetails", "ProgramDetails")
+                        .WithMany("AdvisoryServices")
+                        .HasForeignKey("FTIProgramDetailsID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.FTI.FTIParticipantDemographics", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.FTI.FTIProgramDetails", "ProgramDetails")
+                        .WithMany()
+                        .HasForeignKey("FTIProgramDetailsID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.FTI.FTIProgramContentAndResources", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.FTI.FTIProgramDetails", "ProgramDetails")
+                        .WithMany()
+                        .HasForeignKey("FTIProgramDetailsID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.FTI.FTIProgramDetails", b =>
+                {
+                    b.HasOne("Domain.Entities.MasterData.ProgramCategory", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.Collaborator", "Collaborator")
+                        .WithMany()
+                        .HasForeignKey("CollaboratorId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.ThematicArea", "ThematicArea")
+                        .WithMany()
+                        .HasForeignKey("ThematicAreaId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.InfoType", "Type")
+                        .WithMany()
+                        .HasForeignKey("TypeId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Collaborator");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ThematicArea");
+
+                    b.Navigation("Type");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.FTI.FTIRecommendation", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.FTI.FTIProgramDetails", "ProgramDetails")
+                        .WithMany("Recommendations")
+                        .HasForeignKey("FTIProgramDetailsID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.FTI.FTIReport", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.FTI.FTIProgramDetails", "ProgramDetails")
+                        .WithMany("Reports")
+                        .HasForeignKey("FTIProgramDetailsID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.FTI.FTIResourcePerson", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.FTI.FTIProgramContentAndResources", "ProgramContentAndResources")
+                        .WithMany("ResourcePersons")
+                        .HasForeignKey("FTIProgramContentAndResourcesID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramContentAndResources");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.FTI.FTITeachingAidsDeveloped", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.FTI.FTIProgramContentAndResources", "ProgramContentAndResources")
+                        .WithMany("TeachingAids")
+                        .HasForeignKey("FTIProgramContentAndResourcesID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramContentAndResources");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.FTI.FTITopicsCoveredInClass", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.FTI.FTIProgramContentAndResources", "ProgramContentAndResources")
+                        .WithMany("TopicsCovered")
+                        .HasForeignKey("FTIProgramContentAndResourcesID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramContentAndResources");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -3928,6 +9529,84 @@ namespace Infrastructure.Migrations
                     b.Navigation("Organization");
 
                     b.Navigation("UnitLocation");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.GenericTables.ConsultingAndSocialMediaService.TableConsultingAndSocialMediaService", b =>
+                {
+                    b.HasOne("Domain.Entities.MasterData.ConsultancyServicesCategory", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.ExtensionWork", "ExtensionActivity")
+                        .WithMany()
+                        .HasForeignKey("ExtensionActivityId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.ModeOutreach", "ModeOutreach")
+                        .WithMany()
+                        .HasForeignKey("ModeOutreachId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.Particular", "Particulars")
+                        .WithMany()
+                        .HasForeignKey("ParticularsId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.RelatedTo", "RelatedTo")
+                        .WithMany()
+                        .HasForeignKey("RelatedToId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Category");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ExtensionActivity");
+
+                    b.Navigation("ModeOutreach");
+
+                    b.Navigation("Particulars");
+
+                    b.Navigation("RelatedTo");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.GenericTables.ConsultingAndSocialMediaService.TableModeAndOutreach", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.GenericTables.ConsultingAndSocialMediaService.TableConsultingAndSocialMediaService", "ConsultingService")
+                        .WithMany("TableModeAndOutreaches")
+                        .HasForeignKey("TableConsultingAndSocialMediaService")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("ConsultingService");
+
+                    b.Navigation("CreatedBy");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -4250,8 +9929,8 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Domain.Entities.GenericTables.Publication", "Publication")
-                        .WithOne()
-                        .HasForeignKey("Domain.Entities.GenericTables.PublisherDetails", "PublicationId")
+                        .WithMany()
+                        .HasForeignKey("PublicationId")
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
@@ -4262,6 +9941,123 @@ namespace Infrastructure.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("Publication");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.GenericTables.Service.RevolvingFundStatus", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.GenericTables.Service.TblService", "TblService")
+                        .WithMany("RevolvingFundStatuses")
+                        .HasForeignKey("TblServiceId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("TblService");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.GenericTables.Service.TableHostel", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.GenericTables.Service.TblService", "TblService")
+                        .WithMany("Hostels")
+                        .HasForeignKey("TblServiceId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("TblService");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.GenericTables.Service.TblService", b =>
+                {
+                    b.HasOne("Domain.Entities.MasterData.ConsultancyServicesCategory", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.QuantityUnit", "QuantityUnit")
+                        .WithMany()
+                        .HasForeignKey("QuantityUnitId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.SourceOfFund", "SourceOfFund")
+                        .WithMany()
+                        .HasForeignKey("SourceOfFundId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.ServiceTheme", "Theme")
+                        .WithMany()
+                        .HasForeignKey("ThemeId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Category");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("QuantityUnit");
+
+                    b.Navigation("SourceOfFund");
+
+                    b.Navigation("Theme");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.GenericTables.Service.VisitorDetail", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.GenericTables.Service.TblService", "TblService")
+                        .WithMany("VisitorDetails")
+                        .HasForeignKey("TblServiceId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("TblService");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -4299,6 +10095,183 @@ namespace Infrastructure.Migrations
                     b.Navigation("UpdatedBy");
                 });
 
+            modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaAdvisoryServices", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.IBTVA.IbtvaProgramDetails", "ProgramDetails")
+                        .WithMany("AdvisoryServices")
+                        .HasForeignKey("IbtvaProgramDetailsId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaParticipantDemographics", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.IBTVA.IbtvaProgramDetails", "ProgramDetails")
+                        .WithMany()
+                        .HasForeignKey("IbtvaProgramDetailsId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.MasterData.ParticipantDealer", "Participant")
+                        .WithMany()
+                        .HasForeignKey("ParticipantId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Participant");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaProgramContentAndResources", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.IBTVA.IbtvaProgramDetails", "ProgramDetails")
+                        .WithMany()
+                        .HasForeignKey("IbtvaProgramDetailsId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaProgramDetails", b =>
+                {
+                    b.HasOne("Domain.Entities.MasterData.ProgramCategory", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.MasterData.ProgramType", "ProgramType")
+                        .WithMany()
+                        .HasForeignKey("ProgramTypeId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.Region", "Region")
+                        .WithMany()
+                        .HasForeignKey("RegionId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.ParticipatedSource", "Source")
+                        .WithMany()
+                        .HasForeignKey("SourceId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.SourceOfFund", "SourceOfFund")
+                        .WithMany()
+                        .HasForeignKey("SourceOfFundId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.Status", "Status")
+                        .WithMany()
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.ThematicArea", "ThematicArea")
+                        .WithMany()
+                        .HasForeignKey("ThematicAreaId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.Theme", "Theme")
+                        .WithMany()
+                        .HasForeignKey("ThemeId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.InfoType", "Type")
+                        .WithMany()
+                        .HasForeignKey("TypeId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
+                        .WithMany()
+                        .HasForeignKey("UnitLocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Category");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Organization");
+
+                    b.Navigation("ProgramType");
+
+                    b.Navigation("Region");
+
+                    b.Navigation("Source");
+
+                    b.Navigation("SourceOfFund");
+
+                    b.Navigation("Status");
+
+                    b.Navigation("ThematicArea");
+
+                    b.Navigation("Theme");
+
+                    b.Navigation("Type");
+
+                    b.Navigation("UnitLocation");
+
+                    b.Navigation("UpdatedBy");
+                });
+
             modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaProgramme", b =>
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
@@ -4328,6 +10301,138 @@ namespace Infrastructure.Migrations
                     b.Navigation("Organization");
 
                     b.Navigation("UnitLocation");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaRecommendation", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.IBTVA.IbtvaProgramDetails", "ProgramDetails")
+                        .WithMany("Recommendations")
+                        .HasForeignKey("IbtvaProgramDetailsId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaReport", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.IBTVA.IbtvaProgramDetails", "ProgramDetails")
+                        .WithMany("Reports")
+                        .HasForeignKey("IbtvaProgramDetailsId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaResourcePerson", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.IBTVA.IbtvaProgramContentAndResources", "ProgramContentAndResources")
+                        .WithMany("ResourcePersons")
+                        .HasForeignKey("IbtvaProgramContentAndResourcesId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramContentAndResources");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaTeachingAidsDeveloped", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.IBTVA.IbtvaProgramContentAndResources", "ProgramContentAndResources")
+                        .WithMany("TeachingAids")
+                        .HasForeignKey("IbtvaProgramContentAndResourcesId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.MasterData.TypeOfAid", "TypeOfAid")
+                        .WithMany()
+                        .HasForeignKey("TypeOfAidId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramContentAndResources");
+
+                    b.Navigation("TypeOfAid");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaTopicsCoveredInClass", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.IBTVA.IbtvaProgramContentAndResources", "ProgramContentAndResources")
+                        .WithMany("TopicsCovered")
+                        .HasForeignKey("IbtvaProgramContentAndResourcesId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramContentAndResources");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -4437,6 +10542,223 @@ namespace Infrastructure.Migrations
                     b.Navigation("UpdatedBy");
                 });
 
+            modelBuilder.Entity("Domain.Entities.KVK.KvkAdvisoryServices", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.KVK.TableKVKProgramDetails", "ProgramDetails")
+                        .WithMany("AdvisoryServices")
+                        .HasForeignKey("KVKProgramDetailsId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.KVK.KvkParticipantDemographics", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.KVK.TableKVKProgramDetails", "ProgramDetails")
+                        .WithMany()
+                        .HasForeignKey("KVKProgramDetailsId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.KVK.KvkProgramContentAndResources", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.KVK.TableKVKProgramDetails", "ProgramDetails")
+                        .WithMany()
+                        .HasForeignKey("KVKProgramDetailsId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.KVK.KvkRecommendation", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.KVK.TableKVKProgramDetails", "ProgramDetails")
+                        .WithMany("Recommendations")
+                        .HasForeignKey("KVKProgramDetailsId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.KVK.KvkReport", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.KVK.TableKVKProgramDetails", "ProgramDetails")
+                        .WithMany("Reports")
+                        .HasForeignKey("KVKProgramDetailsId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.KVK.KvkResourcePerson", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.KVK.KvkProgramContentAndResources", "ProgramContentAndResources")
+                        .WithMany("ResourcePersons")
+                        .HasForeignKey("ProgramContentAndResourcesId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramContentAndResources");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.KVK.KvkTeachingAidsDeveloped", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.KVK.KvkProgramContentAndResources", "ProgramContentAndResources")
+                        .WithMany("TeachingAids")
+                        .HasForeignKey("ProgramContentAndResourcesId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramContentAndResources");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.KVK.KvkTopicsCoveredInClass", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.KVK.KvkProgramContentAndResources", "ProgramContentAndResources")
+                        .WithMany("TopicsCovered")
+                        .HasForeignKey("ProgramContentAndResourcesId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramContentAndResources");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.KVK.TableKVKProgramDetails", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("UpdatedBy");
+                });
+
             modelBuilder.Entity("Domain.Entities.Organization", b =>
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
@@ -4521,6 +10843,223 @@ namespace Infrastructure.Migrations
                     b.Navigation("Organization");
 
                     b.Navigation("UnitLocation");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.STU.STUAdvisoryServices", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.STU.STUProgramDetails", "ProgramDetails")
+                        .WithMany("AdvisoryServices")
+                        .HasForeignKey("STUProgramDetailsID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.STU.STUParticipantDemographics", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.STU.STUProgramDetails", "ProgramDetails")
+                        .WithMany()
+                        .HasForeignKey("STUProgramDetailsID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.STU.STUProgramContentAndResources", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.STU.STUProgramDetails", "ProgramDetails")
+                        .WithMany()
+                        .HasForeignKey("STUProgramDetailsID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.STU.STUProgramDetails", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.STU.STURecommendation", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.STU.STUProgramDetails", "ProgramDetails")
+                        .WithMany("Recommendations")
+                        .HasForeignKey("STUProgramDetailsID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.STU.STUReport", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.STU.STUProgramDetails", "ProgramDetails")
+                        .WithMany("Reports")
+                        .HasForeignKey("STUProgramDetailsID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramDetails");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.STU.STUResourcePerson", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.STU.STUProgramContentAndResources", "ProgramContentAndResources")
+                        .WithMany("ResourcePersons")
+                        .HasForeignKey("STUProgramContentAndResourcesID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramContentAndResources");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.STU.STUTeachingAidsDeveloped", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.STU.STUProgramContentAndResources", "ProgramContentAndResources")
+                        .WithMany("TeachingAids")
+                        .HasForeignKey("STUProgramContentAndResourcesID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramContentAndResources");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.STU.STUTopicsCoveredInClass", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.STU.STUProgramContentAndResources", "ProgramContentAndResources")
+                        .WithMany("TopicsCovered")
+                        .HasForeignKey("STUProgramContentAndResourcesID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProgramContentAndResources");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -4624,6 +11163,23 @@ namespace Infrastructure.Migrations
                     b.Navigation("UpdatedBy");
                 });
 
+            modelBuilder.Entity("Domain.Entities.TableOtherActivity.TableOtherActivity", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("UpdatedBy");
+                });
+
             modelBuilder.Entity("Domain.Entities.Unit", b =>
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
@@ -4682,6 +11238,65 @@ namespace Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Domain.Entities.DEU.DeuProgramContentAndResources", b =>
+                {
+                    b.Navigation("ResourcePersons");
+
+                    b.Navigation("TeachingAids");
+
+                    b.Navigation("TopicsCovered");
+                });
+
+            modelBuilder.Entity("Domain.Entities.DEU.DeuProgramDetails", b =>
+                {
+                    b.Navigation("AdvisoryServices");
+
+                    b.Navigation("Recommendations");
+
+                    b.Navigation("Reports");
+                });
+
+            modelBuilder.Entity("Domain.Entities.EEU.EeuProgramContentAndResources", b =>
+                {
+                    b.Navigation("ResourcePersons");
+
+                    b.Navigation("TeachingAids");
+
+                    b.Navigation("TopicsCovered");
+                });
+
+            modelBuilder.Entity("Domain.Entities.EEU.EeuProgramDetails", b =>
+                {
+                    b.Navigation("AdvisoryServices");
+
+                    b.Navigation("Recommendations");
+
+                    b.Navigation("Reports");
+                });
+
+            modelBuilder.Entity("Domain.Entities.FTI.FTIProgramContentAndResources", b =>
+                {
+                    b.Navigation("ResourcePersons");
+
+                    b.Navigation("TeachingAids");
+
+                    b.Navigation("TopicsCovered");
+                });
+
+            modelBuilder.Entity("Domain.Entities.FTI.FTIProgramDetails", b =>
+                {
+                    b.Navigation("AdvisoryServices");
+
+                    b.Navigation("Recommendations");
+
+                    b.Navigation("Reports");
+                });
+
+            modelBuilder.Entity("Domain.Entities.GenericTables.ConsultingAndSocialMediaService.TableConsultingAndSocialMediaService", b =>
+                {
+                    b.Navigation("TableModeAndOutreaches");
+                });
+
             modelBuilder.Entity("Domain.Entities.GenericTables.NominationReward", b =>
                 {
                     b.Navigation("NominationRewardEntrepreneurInnovations");
@@ -4702,9 +11317,72 @@ namespace Infrastructure.Migrations
                     b.Navigation("ExtensionLiteratures");
                 });
 
+            modelBuilder.Entity("Domain.Entities.GenericTables.Service.TblService", b =>
+                {
+                    b.Navigation("Hostels");
+
+                    b.Navigation("RevolvingFundStatuses");
+
+                    b.Navigation("VisitorDetails");
+                });
+
+            modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaProgramContentAndResources", b =>
+                {
+                    b.Navigation("ResourcePersons");
+
+                    b.Navigation("TeachingAids");
+
+                    b.Navigation("TopicsCovered");
+                });
+
+            modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaProgramDetails", b =>
+                {
+                    b.Navigation("AdvisoryServices");
+
+                    b.Navigation("Recommendations");
+
+                    b.Navigation("Reports");
+                });
+
+            modelBuilder.Entity("Domain.Entities.KVK.KvkProgramContentAndResources", b =>
+                {
+                    b.Navigation("ResourcePersons");
+
+                    b.Navigation("TeachingAids");
+
+                    b.Navigation("TopicsCovered");
+                });
+
+            modelBuilder.Entity("Domain.Entities.KVK.TableKVKProgramDetails", b =>
+                {
+                    b.Navigation("AdvisoryServices");
+
+                    b.Navigation("Recommendations");
+
+                    b.Navigation("Reports");
+                });
+
             modelBuilder.Entity("Domain.Entities.Organization", b =>
                 {
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("Domain.Entities.STU.STUProgramContentAndResources", b =>
+                {
+                    b.Navigation("ResourcePersons");
+
+                    b.Navigation("TeachingAids");
+
+                    b.Navigation("TopicsCovered");
+                });
+
+            modelBuilder.Entity("Domain.Entities.STU.STUProgramDetails", b =>
+                {
+                    b.Navigation("AdvisoryServices");
+
+                    b.Navigation("Recommendations");
+
+                    b.Navigation("Reports");
                 });
 
             modelBuilder.Entity("Domain.Entities.State", b =>

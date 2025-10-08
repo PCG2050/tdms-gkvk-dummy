@@ -15,16 +15,19 @@ namespace Domain.Entities.GenericTables
     {
 
         public int? CategoryId { get; set; }
+        [JsonIgnore]
         public PublicationCategory? Category { get; set; }
         public string? OtherPublication { get; set; }
         public string? Title { get; set; }
 
         public int? ModeId { get; set; }
+        [JsonIgnore]
         public Mode? Mode { get; set; }
 
         public string? ModePublication { get; set; }
 
         public int? RegionId { get; set; }
+        [JsonIgnore]
         public Region? Region { get; set; }
         public string? MJASFormat { get; set; }
         public string? PublicationTitle { get; set; }
@@ -45,6 +48,7 @@ namespace Domain.Entities.GenericTables
         public string? PublicationWhole { get; set; }
 
         public int? SourceId { get; set; }
+        [JsonIgnore]
         public ParticipatedSource? Source { get; set; }
 
         public int? Funds { get; set; }
@@ -52,13 +56,14 @@ namespace Domain.Entities.GenericTables
         public DateOnly? PermissionLetterDate { get; set; }
         public string? PermissionLetterUrl { get; set; }
         public DateOnly? PublicationDate { get; set; }
-        [JsonIgnore]
+       
         public ICollection<ExtensionLiterature> ExtensionLiteratures { get; set; } = [];
     }
     public class PublisherDetails : AuditableBaseEntity
     {
  
         public int? PublicationId { get; set; }
+        [JsonIgnore]
         public Publication? Publication { get; set; }
         public string? PublisherBrochure { get; set; }
         public string? PublisherName { get; set; }
@@ -70,6 +75,7 @@ namespace Domain.Entities.GenericTables
     {
  
         public int? PublicationId { get; set; }
+        [JsonIgnore]
         public Publication? Publication { get; set; } 
         public DateOnly? Date { get; set; }
         public string? AmountPerCopy { get; set; }
