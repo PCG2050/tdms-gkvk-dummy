@@ -10,8 +10,9 @@ namespace Application.Interface.Repository
 {
     public interface IUnitHeadAssignmentRepository
     {
-       
-            Task<UnitHeadAssignment?> GetByUnitHeadLocationAsync(int unitLocationId, int unitHeadId);
+
+        Task<List<int>> GetUnitLocationIdsByUnitHeadIdAsync(int unitHeadId);
+        Task<UnitHeadAssignment?> GetByUnitHeadLocationAsync(int unitLocationId, int unitHeadId);
             Task<UnitHeadAssignment> AddAsync(UnitHeadAssignment unitLocationUnitHead);
             Task<UnitHeadAssignment> UpdateAsync(UnitHeadAssignment unitLocationUnitHead);
             Task DeleteAsync(int id);

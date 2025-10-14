@@ -9,6 +9,7 @@ namespace Application.Interface.Repository
 {
     public interface IOrganizationRepository
     {
+        
         Task<Organization?> GetOrganizationAsync(int id);
         Task<bool> HasOrganizationWithNameAsync(string name);
         Task SaveAsync(Organization organization);

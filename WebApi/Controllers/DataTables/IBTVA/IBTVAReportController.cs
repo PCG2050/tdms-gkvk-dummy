@@ -49,15 +49,21 @@ namespace WebApi.Controllers.DataTables.IBTVA
                 .ToListAsync();
 
             // ---------- (B) SERVICES (Bakery & Value-Added Products) ----------
-            var start = new DateTimeOffset(year, month, 1, 0, 0, 0, TimeSpan.Zero);
-            var end = start.AddMonths(1);
+            // 1. Define the start and end as DateTimeOffset (as you did)
+            var startDateTime = new DateTimeOffset(year, month, 1, 0, 0, 0, TimeSpan.Zero);
+            var endDateTime = startDateTime.AddMonths(1);
+
+            // 2. CONVERT these to DateOnly for the comparison (This is the critical step)
+            // Use the ToDateOnly() method on the DateTimeOffset.Date property to get a DateOnly object.
+            var startDateOnly = DateOnly.FromDateTime(startDateTime.Date);
+            var endDateOnly = DateOnly.FromDateTime(endDateTime.Date);
 
             var serviceData = await _context.Services
               .Include(s => s.Theme)
               .Where(s => s.CreatedById == 81 &&
                           s.Component == "IBT&VA" &&
-                          s.Date >= start &&
-                          s.Date < end)
+                          s.Date >= startDateOnly &&
+                          s.Date < endDateOnly)
               .Select(s => new
               {
                   Theme = s.OtherTheme ?? s.Theme.Name,
@@ -126,7 +132,7 @@ namespace WebApi.Controllers.DataTables.IBTVA
                     OngoingPrograms = g.Count(p => p.StartDate.HasValue && p.StartDate.Value <= DateTime.Now &&
                                                    (!p.EndDate.HasValue || p.EndDate.Value == default || p.EndDate.Value >= DateTime.Now)),
                     StartedPrograms = g.Count(p => p.StartDate.HasValue && p.StartDate.Value.Month == month),
-                    TotalParticipants = g.Sum(p => p.Reports !=null ? p.Reports.Count : 0),
+                    //TotalParticipants = g.Sum(p => p.Reports !=null ? p.Reports.Count : 0),
                     UnitId = unitId
                 })
                 .OrderBy(x => x.Category)

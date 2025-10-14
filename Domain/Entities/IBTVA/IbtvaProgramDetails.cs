@@ -61,11 +61,6 @@ namespace Domain.Entities.IBTVA
         [MaxLength(100)]
         public int? Mode { get; set; }
 
-        // Dates
-        public DateTime? StartDate { get; set; }
-        [Required]
-        public DateTime? EndDate { get; set; }
-
         [MaxLength(100)]
         public string? Duration { get; set; }
 
@@ -128,11 +123,5 @@ namespace Domain.Entities.IBTVA
         public DateTime? FundsSanctionLetterDate { get; set; }
         [MaxLength(500)]
         public string? FundsSanctionLetterUploadFile { get; set; }
-
-        public ICollection<IbtvaRecommendation> Recommendations { get; set; }
-
-        public ICollection<IbtvaReport> Reports { get; set; }
-
-        public ICollection<IbtvaAdvisoryServices> AdvisoryServices { get; set; }
     }
 }

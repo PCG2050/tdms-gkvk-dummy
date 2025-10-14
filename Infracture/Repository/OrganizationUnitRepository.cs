@@ -15,6 +15,15 @@ namespace Infrastructure.Repository
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
+        public async Task<List<int>> GetUnitLocationIdsByOrganizationIdAsync(int organizationId)
+        {
+            return await _dbContext.OrganizationUnitLocations
+                .Where(oul => oul.OrganizationId == organizationId)
+                .Select(oul => oul.Id)
+                .Distinct()
+                .ToListAsync();
+
+        }
         public async Task DeleteAsync(OrganizationUnitLocation entity)
         {
             _dbContext.OrganizationUnitLocations.Remove(entity);

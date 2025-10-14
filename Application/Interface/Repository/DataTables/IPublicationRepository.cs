@@ -1,11 +1,5 @@
 ﻿using Application.Models;
-using Domain.Entities.Publications;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Domain.Entities.GenericTables;
 
 namespace Application.Interface.Repository.DataTables
 {
@@ -16,19 +10,22 @@ namespace Application.Interface.Repository.DataTables
         Task<Publication> CreateAsync(Publication publication);
         Task<Publication> UpdateAsync(Publication publication);
         Task DeleteAsync(int id);
+
         Task<PaginatedResult<Publication>> GetPaginatedAsync(
             List<int> unitLocationIds,
             int pageNumber = 1,
             int pageSize = 10,
             DateOnly? startDate = null,
-            DateOnly? endDate = null);
-        Task<bool> ExistsAsync(int id);
+            DateOnly? endDate = null,
+            int? categoryId = null,
+            string? searchTerm = null);
 
-        // Master data methods
-        Task<List<Category>> GetCategoriesAsync();
-        Task<List<Source>> GetSourcesAsync();
-        Task<List<Mode>> GetModesAsync();
-        Task<List<Region>> GetRegionsAsync();
-        Task<List<ExtensionLiterature>> GetExtensionLiteraturesAsync();
+        Task<PaginatedResult<Publication>> GetByStatusAsync(
+            List<int> unitLocationIds,
+            string status,
+            int pageNumber = 1,
+            int pageSize = 10);
+
+        Task<Dictionary<string, int>> GetStatusSummaryAsync(List<int> unitLocationIds);
     }
 }

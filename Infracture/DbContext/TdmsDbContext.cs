@@ -14,12 +14,12 @@ using Domain.Entities.Junction;
 using Domain.Entities.KVK;
 using Domain.Entities.MasterData;
 using Domain.Entities.STU;
-using Domain.Entities.TableOtherActivity;
 using Infrastructure.DbContext.Configuration;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
@@ -51,9 +51,7 @@ namespace Infrastructure.DbContext
         public DbSet<FtiTrainingProgram> FtiTrainingPrograms { get; set; }
         public DbSet<FtiOtherActivity> FtiOtherActivities { get; set; }
         #region STU
-        public DbSet<StuTrainingProgramme> StuTrainingProgrammes { get; set; }
-        public DbSet<StuSponsoredTrainingProgramme> StuSponsoredTrainingProgrammes { get; set; }
-        public DbSet<StuOtherActivity> StuOtherActivities { get; set; }
+       
         public DbSet<DaesiProgramme> DaesiProgrammes { get; set; }
         public DbSet<DaesiOtherActivity> DaesiOtherActivities { get; set; }
         public DbSet<STUProgramDetails> STUProgramDetails { get; set; }
@@ -91,8 +89,8 @@ namespace Infrastructure.DbContext
 
         #endregion
         #region IBT&VA
-        public DbSet<IbtvaProgramme> IbtvaProgrammes { get; set; }
-        public DbSet<IbtavOtherActivity> IbtavOtherActivities { get; set; }
+       
+        
 
         public DbSet<IbtvaProgramDetails> IbtvaProgramDetails { get; set; }
         public DbSet<IbtvaParticipantDemographics> IbtvaParticipantDemographics { get; set; }
@@ -125,7 +123,7 @@ namespace Infrastructure.DbContext
 
         #endregion
         #region ASM
-        public DbSet<AsmVisit> AsmVisits {  get; set; }
+       
         #endregion
         #region EEU
         public DbSet<EeuOFT> EeuOFTs { get; set; }
@@ -231,6 +229,7 @@ namespace Infrastructure.DbContext
         public DbSet<Publication> Publications { get; set; }
         public DbSet<PublisherDetails> PublisherDetails { get; set; }
         public DbSet<ExtensionLiterature> ExtensionLiteratures { get; set; }
+        
         #endregion
 
         #region NominationRewards
@@ -243,9 +242,9 @@ namespace Infrastructure.DbContext
         public DbSet<NominationRewardOrganicEntrepreneur> NominationRewardOrganicEntrepreneurs { get; set; }
         #endregion
 
-        #region ConsultingAndSocialMediaService
+        #region ConsultingAndSocialMediaService           
 
-        public DbSet<TableConsultingAndSocialMediaService> TableConsultingAndSocialMediaServices { get; set; }
+        public DbSet<ConsultingAndSocialMediaService> TableConsultingAndSocialMediaServices { get; set; }
         public DbSet<TableModeAndOutreach>? TableModeAndOutreaches { get; set; }
 
         #endregion
@@ -254,6 +253,7 @@ namespace Infrastructure.DbContext
         public DbSet<TblService> Services { get; set; }
         public DbSet<TableHostel> TableHostels { get; set; }
         public DbSet<RevolvingFundStatus> RevolvingFundStatuses { get; set; }
+        public DbSet<VisitorDetail> VisitorDetails { get; set; }
 
         #endregion
 

@@ -27,6 +27,7 @@ namespace Infrastructure.Repository
                 .FirstOrDefaultAsync(o=> o.Id == id);
         }
 
+      
         public async Task<PaginatedResult<OrganizationDto>> GetPaginatedItemsAsync(int page, int pageSize)
         {
             if (page < 1) page = 1;

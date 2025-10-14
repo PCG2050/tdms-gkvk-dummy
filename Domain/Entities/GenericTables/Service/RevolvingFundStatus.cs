@@ -16,11 +16,15 @@ namespace Domain.Entities.GenericTables.Service
         // Foreign key to Service
         public int ServiceId { get; set; }
         [JsonIgnore]      
-        public TblService? TblService { get; set; }
-        [Range(0, 100000000.00)]
-        public double OpeningBalance { get; set; }
-        public double Receipt { get; set; }
-        public double Expenditure { get; set; }
+        [ForeignKey(nameof(ServiceId))]
+        public TblService? Service { get; set; }
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal OpeningBalance { get; set; }
+
+        public int Receipt { get; set; }
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal Expenditure { get; set; }
+        [Column(TypeName = "decimal(18, 2)")]
         public double ClosingBalance { get; set; }
     }
 }

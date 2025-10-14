@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Domain.Entities.MasterData;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -13,15 +15,15 @@ namespace Domain.Entities.GenericTables.Service
         public int ServiceId { get; set; }
         [JsonIgnore]
         public TblService? TblService { get; set; }
-
+        [ForeignKey(nameof(VisitorId))]
+        public int VisitorId {  get; set; }
+        [JsonIgnore]
+        public Visitor? Visitor { get; set; }
         public string? Name { get; set; }
-
         public int? MobileNo { get; set; }
         public DateOnly? Date { get; set; }
         public string? Location { get; set; }
-
         public string? Purpose { get; set; }
-
         public string? PurposeOfVisit { get; set; }
 
     }

@@ -1,7 +1,9 @@
-﻿using Domain.Entities.MasterData;
+﻿using Domain.Entities.Junction;
+using Domain.Entities.MasterData;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -11,6 +13,19 @@ namespace Domain.Entities.GenericTables.Service
 {
     public class TblService : AuditableBaseEntity
     {
+
+        [Required]
+        public int UnitLocationId { get; set; }
+
+        public int OrganizationId { get; set; }
+        [JsonIgnore]
+        public OrganizationUnitLocation UnitLocation { get; set; } = null!;
+        [JsonIgnore]
+        public Organization Organization { get; set; } = null!;
+
+        public DateOnly? StartDate { get; set; }
+        public DateOnly? EndDate { get; set; }
+
         // Foreign keys
         public int? CategoryId { get; set; }
         [JsonIgnore]
@@ -45,12 +60,14 @@ namespace Domain.Entities.GenericTables.Service
         public QuantityUnit? QuantityUnit { get; set; }
 
         public int Number { get; set; }
-        public double AmountGenerated { get; set; }
+
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal AmountGenerated { get; set; }
 
       
 
         //Training Hall category
-        public DateTime Date { get; set; }
+        public DateOnly? Date { get; set; }
 
         [MaxLength(250)]
         public string? RentedTo { get; set; }
@@ -60,11 +77,25 @@ namespace Domain.Entities.GenericTables.Service
 
         public decimal AmountReleased { get; set; }
 
-        // Navigation
-        public ICollection<TableHostel> Hostels { get; set; }
-        public ICollection<RevolvingFundStatus> RevolvingFundStatuses { get; set; }
+        // ===== STATUS TRACKING FIELDS =====
+        // Status: "Draft", "Pending", "Approved", "Rejected"
+        [MaxLength(50)]
+        public string FormStatus { get; set; } = "Draft";
 
-        public ICollection<VisitorDetail> VisitorDetails { get; set; }
+        [MaxLength(1000)]
+        public string? FormStatusRemarks { get; set; }
+
+        // Approval tracking
+        public DateTimeOffset? ApprovedAt { get; set; }
+        public int? ApprovedById { get; set; }
+
+        [JsonIgnore]
+        public User? ApprovedBy { get; set; }
+
+        // Navigation
+        public ICollection<TableHostel>? Hostels { get; set; }
+        public ICollection<RevolvingFundStatus>? RevolvingFundStatuses { get; set; }
+        public ICollection<VisitorDetail>? VisitorDetails { get; set; }
 
         
     }

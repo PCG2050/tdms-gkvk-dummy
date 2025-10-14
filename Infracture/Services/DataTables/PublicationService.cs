@@ -1,301 +1,522 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Application.Interface;
+using Application.Interface.Repository;
+using Application.Interface.Repository.DataTables;
+using Application.Interface.Services;
+using Application.Interface.Services.Common;
+using Application.Interface.Services.DataTables;
+using Application.Mapper;
+using Application.Models;
+using Application.Models.DataTables;
+using Domain.Entities.Enum;
+using Domain.Entities.GenericTables;
 
 namespace Infrastructure.Services.DataTables
 {
-    using Application.Interface;
-    using Application.Interface.Repository;
-    using Application.Interface.Repository.DataTables;
-    using Application.Interface.Services;
-    using Application.Interface.Services.Common;
-    using Application.Interface.Services.DataTables;
-    using Application.Models;
-    using Application.Models.DataTables.Application.Models.Publications;
-
-    using Domain.Entities.Publications;
-
-    namespace Infrastructure.Services
+    public class PublicationService : IPublicationService
     {
+        private readonly IPublicationRepository _publicationRepository;
+        private readonly IPublisherDetailsRepository _publisherDetailsRepository;
+        private readonly IExtensionLiteratureRepository _extensionLiteratureRepository;
+        private readonly ICurrentUserService _currentUserService;
+        private readonly IEntityPermissionService _entityPermissionService;
+        private readonly PublicationMapper _mapper;
+        private readonly IOrganizationUnitRepository _organizationUnitRepository;
+        private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
+        private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
 
-        public class PublicationService : IPublicationService
+        public PublicationService(
+            IPublicationRepository publicationRepository,
+            IPublisherDetailsRepository publisherDetailsRepository,
+            IExtensionLiteratureRepository extensionLiteratureRepository,
+            ICurrentUserService currentUserService,
+            IEntityPermissionService entityPermissionService,
+            PublicationMapper mapper,
+            IOrganizationUnitRepository organizationUnitRepository,
+            IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
+            ITrainerAssignmentRepository trainerAssignmentRepository
+            )
         {
-            private readonly IPublicationRepository _publicationRepository;
-            private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
-            private readonly ICurrentUserService _currentUserService;
-            private readonly IEntityPermissionService _entityPermissionService;
+            _publicationRepository = publicationRepository;
+            _publisherDetailsRepository = publisherDetailsRepository;
+            _extensionLiteratureRepository = extensionLiteratureRepository;
+            _currentUserService = currentUserService;
+            _entityPermissionService = entityPermissionService;
+            _mapper = mapper;
+            _organizationUnitRepository = organizationUnitRepository;
+            _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
+            _trainerAssignmentRepository = trainerAssignmentRepository;
+        }
 
-            public PublicationService(
-                IPublicationRepository publicationRepository,
-                ITrainerAssignmentRepository trainerAssignmentRepository,
-                ICurrentUserService currentUserService,
-                IEntityPermissionService entityPermissionService)
+        // PHASE 1: Create Publication
+        public async Task<ServiceResult<PublicationDto>> CreatePhase1Async(PublicationCreateDto createDto)
+        {
+            if (!await CanUserAccessUnitLocationAsync(createDto.UnitLocationId))
+                return ServiceResult<PublicationDto>.Failure(
+                    "Access denied to unit location",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            var publication = _mapper.MapToEntity(createDto);
+            publication.CreatedById = _currentUserService.UserId;
+            publication.CreatedAt = DateTimeOffset.UtcNow;
+            publication.OrganizationId = _currentUserService.OrganizationId;
+            publication.FormStatus = "Draft";
+
+            var savedPublication = await _publicationRepository.CreateAsync(publication);
+            var publicationWithDetails = await _publicationRepository.GetWithDetailsAsync(savedPublication.Id);
+            var dto = _mapper.MapToDtoWithDetails(publicationWithDetails!);
+
+            return ServiceResult<PublicationDto>.Success(dto);
+        }
+
+        // Get complete publication for editing
+        public async Task<ServiceResult<CompletePublicationDto>> GetCompletePublicationAsync(int id)
+        {
+            var publication = await _publicationRepository.GetWithDetailsAsync(id);
+
+            if (publication == null)
+                return ServiceResult<CompletePublicationDto>.Failure(
+                    "Publication not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            if (!await _entityPermissionService.CanViewForm(publication))
+                return ServiceResult<CompletePublicationDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            var dto = _mapper.MapToCompleteDto(publication);
+            return ServiceResult<CompletePublicationDto>.Success(dto);
+        }
+
+        public async Task<ServiceResult<PublicationDto>> GetByIdAsync(int id)
+        {
+            var publication = await _publicationRepository.GetWithDetailsAsync(id);
+
+            if (publication == null)
+                return ServiceResult<PublicationDto>.Failure(
+                    "Publication not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            if (!await _entityPermissionService.CanViewForm(publication))
+                return ServiceResult<PublicationDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            var dto = _mapper.MapToDtoWithDetails(publication);
+            return ServiceResult<PublicationDto>.Success(dto);
+        }
+
+        public async Task<ServiceResult<PublicationDto>> UpdateAsync(int id, PublicationUpdateDto updateDto)
+        {
+            var publication = await _publicationRepository.GetWithDetailsAsync(id);
+
+            if (publication == null)
+                return ServiceResult<PublicationDto>.Failure(
+                    "Publication not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            if (!await _entityPermissionService.CanModifyForm(publication))
+                return ServiceResult<PublicationDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            if (publication.FormStatus != "Draft")
+                return ServiceResult<PublicationDto>.Failure(
+                    "Cannot edit publications that have been submitted",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            PublicationMapper.MapUpdateDtoToEntity(updateDto, publication);
+            publication.UpdatedById = _currentUserService.UserId;
+            publication.UpdatedAt = DateTimeOffset.UtcNow;
+
+            await _publicationRepository.UpdateAsync(publication);
+
+            var updatedPublication = await _publicationRepository.GetWithDetailsAsync(id);
+            var dto = _mapper.MapToDtoWithDetails(updatedPublication!);
+
+            return ServiceResult<PublicationDto>.Success(dto);
+        }
+
+        public async Task<ServiceResult> DeleteAsync(int id)
+        {
+            var publication = await _publicationRepository.GetByIdAsync(id);
+
+            if (publication == null)
+                return ServiceResult.Failure("Publication not found", ServiceErrorStatus.NOTFOUND);
+
+            if (!await _entityPermissionService.CanModifyForm(publication))
+                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
+
+            if (publication.FormStatus != "Draft")
+                return ServiceResult.Failure(
+                    "Only draft publications can be deleted",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            await _publicationRepository.DeleteAsync(id);
+            return ServiceResult.Success();
+        }
+
+        // PHASE 2: Publisher Details
+        public async Task<ServiceResult<PublisherDetailsDto>> AddPublisherDetailsAsync(
+            int publicationId,
+            PublisherDetailsCreateDto dto)
+        {
+            var publication = await _publicationRepository.GetByIdAsync(publicationId);
+
+            if (publication == null)
+                return ServiceResult<PublisherDetailsDto>.Failure(
+                    "Publication not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            if (!await _entityPermissionService.CanModifyForm(publication))
+                return ServiceResult<PublisherDetailsDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            var publisherDetails = _mapper.MapToEntity(dto);
+            publisherDetails.PublicationId = publicationId;
+            publisherDetails.CreatedById = _currentUserService.UserId;
+            publisherDetails.CreatedAt = DateTimeOffset.UtcNow;
+
+            await _publisherDetailsRepository.CreateAsync(publisherDetails);
+
+            var resultDto = _mapper.MapToDto(publisherDetails);
+            return ServiceResult<PublisherDetailsDto>.Success(resultDto);
+        }
+
+        public async Task<ServiceResult<PublisherDetailsDto>> UpdatePublisherDetailsAsync(
+            int publisherDetailsId,
+            PublisherDetailsCreateDto dto)
+        {
+            var publisherDetails = await _publisherDetailsRepository.GetByIdAsync(publisherDetailsId);
+
+            if (publisherDetails == null)
+                return ServiceResult<PublisherDetailsDto>.Failure(
+                    "Publisher details not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            var publication = await _publicationRepository.GetByIdAsync(publisherDetails.PublicationId);
+            if (publication == null || !await _entityPermissionService.CanModifyForm(publication))
+                return ServiceResult<PublisherDetailsDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            publisherDetails.PublisherBrochure = dto.PublisherBrochure;
+            publisherDetails.PublisherName = dto.PublisherName;
+            publisherDetails.PublisherInstitutionName = dto.PublisherInstitutionName;
+            publisherDetails.PublisherAddress = dto.PublisherAddress;
+            publisherDetails.UpdatedById = _currentUserService.UserId;
+            publisherDetails.UpdatedAt = DateTimeOffset.UtcNow;
+
+            await _publisherDetailsRepository.UpdateAsync(publisherDetails);
+
+            var resultDto = _mapper.MapToDto(publisherDetails);
+            return ServiceResult<PublisherDetailsDto>.Success(resultDto);
+        }
+
+        // PHASE 3: Extension Literature
+        public async Task<ServiceResult<ExtensionLiteratureDto>> AddExtensionLiteratureAsync(
+            int publicationId,
+            ExtensionLiteratureCreateDto dto)
+        {
+            var publication = await _publicationRepository.GetByIdAsync(publicationId);
+
+            if (publication == null)
+                return ServiceResult<ExtensionLiteratureDto>.Failure(
+                    "Publication not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            if (!await _entityPermissionService.    
+                CanModifyForm(publication))
+                return ServiceResult<ExtensionLiteratureDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            var extensionLiterature = _mapper.MapToEntity(dto);
+            extensionLiterature.PublicationId = publicationId;
+            extensionLiterature.CreatedById = _currentUserService.UserId;
+            extensionLiterature.CreatedAt = DateTimeOffset.UtcNow;
+
+            await _extensionLiteratureRepository.CreateAsync(extensionLiterature);
+
+            var resultDto = _mapper.MapToDto(extensionLiterature);
+            return ServiceResult<ExtensionLiteratureDto>.Success(resultDto);
+        }
+
+        public async Task<ServiceResult<ExtensionLiteratureDto>> UpdateExtensionLiteratureAsync(
+            int extensionLiteratureId,
+            ExtensionLiteratureCreateDto dto)
+        {
+            var extensionLiterature = await _extensionLiteratureRepository.GetByIdAsync(extensionLiteratureId);
+
+            if (extensionLiterature == null)
+                return ServiceResult<ExtensionLiteratureDto>.Failure(
+                    "Extension literature not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            var publication = await _publicationRepository.GetByIdAsync(extensionLiterature.PublicationId);
+            if (publication == null || !await _entityPermissionService.CanModifyForm(publication))
+                return ServiceResult<ExtensionLiteratureDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            extensionLiterature.Date = dto.Date;
+            extensionLiterature.AmountPerCopy = dto.AmountPerCopy;
+            extensionLiterature.NumberOfCopies = dto.NumberOfCopies;
+            extensionLiterature.TotalAmount = dto.TotalAmount;
+            extensionLiterature.UpdatedById = _currentUserService.UserId;
+            extensionLiterature.UpdatedAt = DateTimeOffset.UtcNow;
+
+            await _extensionLiteratureRepository.UpdateAsync(extensionLiterature);
+
+            var resultDto = _mapper.MapToDto(extensionLiterature);
+            return ServiceResult<ExtensionLiteratureDto>.Success(resultDto);
+        }
+
+        public async Task<ServiceResult> DeleteExtensionLiteratureAsync(int extensionLiteratureId)
+        {
+            var extensionLiterature = await _extensionLiteratureRepository.GetByIdAsync(extensionLiteratureId);
+
+            if (extensionLiterature == null)
+                return ServiceResult.Failure("Extension literature not found", ServiceErrorStatus.NOTFOUND);
+
+            var publication = await _publicationRepository.GetByIdAsync(extensionLiterature.PublicationId);
+            if (publication == null || !await _entityPermissionService.CanModifyForm(publication))
+                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
+
+            await _extensionLiteratureRepository.DeleteAsync(extensionLiteratureId);
+            return ServiceResult.Success();
+        }
+
+        public async Task<ServiceResult<List<ExtensionLiteratureDto>>> GetExtensionLiteraturesAsync(
+            int publicationId)
+        {
+            var publication = await _publicationRepository.GetByIdAsync(publicationId);
+
+            if (publication == null)
+                return ServiceResult<List<ExtensionLiteratureDto>>.Failure(
+                    "Publication not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            var literatures = await _extensionLiteratureRepository.GetByPublicationIdAsync(publicationId);
+            var dtos = literatures.Select(l => _mapper.MapToDto(l)).ToList();
+
+            return ServiceResult<List<ExtensionLiteratureDto>>.Success(dtos);
+        }
+
+        // SUBMISSION
+        public async Task<ServiceResult> SubmitForApprovalAsync(int publicationId)
+        {
+            var publication = await _publicationRepository.GetByIdAsync(publicationId);
+
+            if (publication == null)
+                return ServiceResult.Failure("Publication not found", ServiceErrorStatus.NOTFOUND);
+
+            if (!await _entityPermissionService.CanModifyForm(publication))
+                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
+
+            if (publication.FormStatus != "Draft")
+                return ServiceResult.Failure("Only draft publications can be submitted", ServiceErrorStatus.INVALIDOPERATION);
+
+            publication.FormStatus = "Pending";
+            publication.UpdatedById = _currentUserService.UserId;
+            publication.UpdatedAt = DateTimeOffset.UtcNow;
+
+            await _publicationRepository.UpdateAsync(publication);
+            return ServiceResult.Success();
+        }
+
+        // PAGINATION
+        // PAGINATION
+        public async Task<PaginatedResult<PublicationDto>> GetPaginatedAsync(
+            int pageNumber = 1,
+            int pageSize = 10,
+            DateOnly? startDate = null,
+            DateOnly? endDate = null,
+            int? categoryId = null,
+            string? searchTerm = null,
+            int? unitLocationId = null)
+        {
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+
+            if (unitLocationId.HasValue && unitLocationIds.Contains(unitLocationId.Value))
             {
-                _publicationRepository = publicationRepository;
-                _trainerAssignmentRepository = trainerAssignmentRepository;
-                _currentUserService = currentUserService;
-                _entityPermissionService = entityPermissionService;
+                unitLocationIds = new List<int> { unitLocationId.Value };
             }
 
-            public async Task<ServiceResult<PublicationDto>> CreateAsync(PublicationCreateDto createDto)
-            {
-                // Validate user can access this unit location
-                if (!await CanUserAccessUnitLocationAsync(createDto.UnitLocationId))
-                    return ServiceResult<PublicationDto>.Failure("Access denied to unit location", ServiceErrorStatus.FORBIDDEN);
+            var result = await _publicationRepository.GetPaginatedAsync(
+                unitLocationIds,
+                pageNumber,
+                pageSize,
+                startDate,
+                endDate,
+                categoryId,
+                searchTerm);
 
-                var publication = MapCreateDtoToEntity(createDto);
-                publication.CreatedById = _currentUserService.UserId;
-                publication.CreatedAt = DateTimeOffset.UtcNow;
-                publication.OrganizationId = _currentUserService.OrganizationId;
+            var dtos = result.Items.Select(p => _mapper.MapToDtoWithDetails(p)).ToList();
 
-                var savedPublication = await _publicationRepository.CreateAsync(publication);
-                var dto = MapEntityToDto(savedPublication);
+            return new PaginatedResult<PublicationDto>(
+                dtos,
+                result.TotalItems,
+                result.PageNumber,
+                result.PageSize);
+        }
 
-                return ServiceResult<PublicationDto>.Success(dto);
-            }
 
-            public async Task<ServiceResult<PublicationDto>> UpdateAsync(int id, PublicationUpdateDto updateDto)
-            {
-                var publication = await _publicationRepository.GetWithDetailsAsync(id);
-                if (publication == null)
-                    return ServiceResult<PublicationDto>.Failure("Publication not found", ServiceErrorStatus.NOTFOUND);
+        public async Task<PaginatedResult<PublicationDto>> GetByStatusAsync(
+       string status,
+       int pageNumber = 1,
+       int pageSize = 10)
+        {
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
 
-                if (!await _entityPermissionService.CanModify(publication))
-                    return ServiceResult<PublicationDto>.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
+            var result = await _publicationRepository.GetByStatusAsync(
+                unitLocationIds,
+                status,
+                pageNumber,
+                pageSize);
 
-                MapUpdateDtoToEntity(updateDto, publication);
-                publication.UpdatedById = _currentUserService.UserId;
-                publication.UpdatedAt = DateTimeOffset.UtcNow;
+            var dtos = result.Items.Select(p => _mapper.MapToDtoWithDetails(p)).ToList();
 
-                await _publicationRepository.UpdateAsync(publication);
-                var dto = MapEntityToDto(publication);
+            return new PaginatedResult<PublicationDto>(
+                dtos,
+                result.TotalItems,
+                result.PageNumber,
+                result.PageSize);
+        }
 
-                return ServiceResult<PublicationDto>.Success(dto);
-            }
 
-            public async Task<ServiceResult> DeleteAsync(int id)
-            {
-                var publication = await _publicationRepository.GetByIdAsync(id);
-                if (publication == null)
-                    return ServiceResult.Failure("Publication not found", ServiceErrorStatus.NOTFOUND);
+        public async Task<Dictionary<string, int>> GetStatusSummaryAsync()
+        {
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+            return await _publicationRepository.GetStatusSummaryAsync(unitLocationIds);
+        }
 
-                if (!await _entityPermissionService.CanModify(publication))
-                    return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
+        // APPROVAL/REJECTION (Unit Head)
+        public async Task<ServiceResult> ApprovePublicationAsync(int publicationId, string? remarks = null)
+        {
+            var publication = await _publicationRepository.GetByIdAsync(publicationId);
 
-                await _publicationRepository.DeleteAsync(id);
-                return ServiceResult.Success();
-            }
+            if (publication == null)
+                return ServiceResult.Failure("Publication not found", ServiceErrorStatus.NOTFOUND);
 
-            public async Task<ServiceResult<PublicationDto>> GetByIdAsync(int id)
-            {
-                var publication = await _publicationRepository.GetWithDetailsAsync(id);
-                if (publication == null)
-                    return ServiceResult<PublicationDto>.Failure("Publication not found", ServiceErrorStatus.NOTFOUND);
+            if (_currentUserService.Role != Role.UNITHEAD && _currentUserService.Role != Role.ADMIN)
+                return ServiceResult.Failure("Only Unit Heads can approve publications", ServiceErrorStatus.FORBIDDEN);
 
-                if (!await _entityPermissionService.CanModify(publication))
-                    return ServiceResult<PublicationDto>.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
+            publication.FormStatus = "Approved";
+            publication.FormStatusRemarks = remarks;
+            publication.ApprovedAt = DateTimeOffset.UtcNow;
+            publication.ApprovedById = _currentUserService.UserId;
+            publication.UpdatedById = _currentUserService.UserId;
+            publication.UpdatedAt = DateTimeOffset.UtcNow;
 
-                var dto = MapEntityToDto(publication);
-                return ServiceResult<PublicationDto>.Success(dto);
-            }
+            await _publicationRepository.UpdateAsync(publication);
+            return ServiceResult.Success();
+        }
 
-            public async Task<ServiceResult<PaginatedResult<PublicationDto>>> GetPaginatedAsync(
-                int? unitLocationId = null,
-                int pageNumber = 1,
-                int pageSize = 10,
-                DateOnly? startDate = null,
-                DateOnly? endDate = null)
-            {
-                // Get user's accessible unit location IDs
-                List<int> accessibleUnitLocationIds;
-                if (unitLocationId.HasValue)
+        public async Task<ServiceResult> RejectPublicationAsync(int publicationId, string remarks)
+        {
+            var publication = await _publicationRepository.GetByIdAsync(publicationId);
+
+            if (publication == null)
+                return ServiceResult.Failure("Publication not found", ServiceErrorStatus.NOTFOUND);
+
+            if (_currentUserService.Role != Role.UNITHEAD && _currentUserService.Role != Role.ADMIN)
+                return ServiceResult.Failure("Only Unit Heads can reject publications", ServiceErrorStatus.FORBIDDEN);
+
+            if (string.IsNullOrWhiteSpace(remarks))
+                return ServiceResult.Failure("Remarks are required for rejection", ServiceErrorStatus.INVALIDOPERATION);
+
+            publication.FormStatus = "Rejected";
+            publication.FormStatusRemarks = remarks;
+            publication.UpdatedById = _currentUserService.UserId;
+            publication.UpdatedAt = DateTimeOffset.UtcNow;
+
+            await _publicationRepository.UpdateAsync(publication);
+            return ServiceResult.Success();
+        }
+
+        public async Task<object> GetGroupedByUnitAsync(PaginationRequest pagination)
+        {
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+
+            var result = await _publicationRepository.GetPaginatedAsync(
+                unitLocationIds,
+                pagination.PageNumber,
+                pagination.PageSize);
+
+            var groupedByUnit = result.Items
+                .GroupBy(p => new
                 {
-                    if (!await CanUserAccessUnitLocationAsync(unitLocationId.Value))
-                        return ServiceResult<PaginatedResult<PublicationDto>>.Failure("Access denied to unit location", ServiceErrorStatus.FORBIDDEN);
+                    UnitId = p.UnitLocation.UnitId,
+                    UnitName = p.UnitLocation.Unit.Name
+                })
+                .Select(g => new
+                {
+                    UnitId = g.Key.UnitId,
+                    UnitName = g.Key.UnitName,
+                    PublicationCount = g.Count(),
+                    Publications = g.Select(p => _mapper.MapToDtoWithDetails(p)).ToList()
+                })
+                .ToList();
 
-                    accessibleUnitLocationIds = new List<int> { unitLocationId.Value };
+            var totalPages = (int)Math.Ceiling(result.TotalItems / (double)result.PageSize);
+
+            return new
+            {
+                units = groupedByUnit,
+                pagination = new
+                {
+                    pageNumber = result.PageNumber,
+                    pageSize = result.PageSize,
+                    totalItems = result.TotalItems,
+                    totalPages,
+                    hasPreviousPage = result.PageNumber > 1,
+                    hasNextPage = result.PageNumber < totalPages
                 }
-                else
-                {
-                    var assignments = await _trainerAssignmentRepository.GetByTrainerIdAsync(_currentUserService.UserId);
-                    accessibleUnitLocationIds = assignments.Select(a => a.UnitLocationId).ToList();
-                }
+            };
+        }
 
-                var paginatedPublications = await _publicationRepository.GetPaginatedAsync(
-                    accessibleUnitLocationIds,
-                    pageNumber,
-                    pageSize,
-                    startDate,
-                    endDate);
 
-                var dtos = paginatedPublications.Items.Select(MapEntityToDto).ToList();
+        // PRIVATE HELPER METHODS
+        //private async Task<bool> CanUserAccessUnitLocationAsync(int unitLocationId)
+        //{
+        //    var accessibleUnitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+        //    return accessibleUnitLocationIds.Contains(unitLocationId);
+        //}
+        private async Task<bool> CanUserAccessUnitLocationAsync(int unitLocationId)
+        {
+            var accessibleUnitLocationIds = await GetAccessibleUnitLocationIdsAsync();
 
-                var result = new PaginatedResult<PublicationDto>
-                {
-                    Items = dtos,
-                    TotalItems = paginatedPublications.TotalItems,
-                    PageNumber = paginatedPublications.PageNumber,
-                    PageSize = paginatedPublications.PageSize,
-                };
+            Console.WriteLine($"DEBUG: unitLocationId={unitLocationId} ({unitLocationId.GetType()})");
+            Console.WriteLine($"DEBUG: accessibleUnitLocationIds={string.Join(", ", accessibleUnitLocationIds)}");
+            Console.WriteLine($"DEBUG: first element type={accessibleUnitLocationIds.FirstOrDefault().GetType()}");
 
-                return ServiceResult<PaginatedResult<PublicationDto>>.Success(result);
-            }
+            bool match = accessibleUnitLocationIds.Contains(unitLocationId);
+            Console.WriteLine($"DEBUG: Contains() returned {match}");
+            return match;
+        }
 
-            // Master data methods
-            public async Task<ServiceResult<List<CategoryDto>>> GetCategoriesAsync()
+
+        private async Task<List<int>> GetAccessibleUnitLocationIdsAsync()
+        {
+            // TODO: Implement based on your TrainerAssignment logic
+            // This is a placeholder - you need to implement this based on your existing logic
+
+         
+            if (_currentUserService.Role == Role.TRAINER)
             {
-                var categories = await _publicationRepository.GetCategoriesAsync();
-                var dtos = categories.Select(c => new CategoryDto { Id = c.Id, CategoryName = c.CategoryName }).ToList();
-                return ServiceResult<List<CategoryDto>>.Success(dtos);
+                return await _trainerAssignmentRepository.GetUnitLocationIdsByTrainerIdAsync(_currentUserService.UserId);
+            }
+            else if (_currentUserService.Role == Role.UNITHEAD)
+            {
+                return await _unitHeadAssignmentRepository.GetUnitLocationIdsByUnitHeadIdAsync(_currentUserService.UserId);
+            }
+            else if (_currentUserService.Role == Role.ADMIN)
+            {
+                return await _organizationUnitRepository.GetUnitLocationIdsByOrganizationIdAsync(_currentUserService.OrganizationId);
             }
 
-            public async Task<ServiceResult<List<SourceDto>>> GetSourcesAsync()
-            {
-                var sources = await _publicationRepository.GetSourcesAsync();
-                var dtos = sources.Select(s => new SourceDto { Id = s.Id, SourceName = s.SourceName }).ToList();
-                return ServiceResult<List<SourceDto>>.Success(dtos);
-            }
-
-            public async Task<ServiceResult<List<ModeDto>>> GetModesAsync()
-            {
-                var modes = await _publicationRepository.GetModesAsync();
-                var dtos = modes.Select(m => new ModeDto { Id = m.Id, ModeName = m.ModeName }).ToList();
-                return ServiceResult<List<ModeDto>>.Success(dtos);
-            }
-
-            public async Task<ServiceResult<List<RegionDto>>> GetRegionsAsync()
-            {
-                var regions = await _publicationRepository.GetRegionsAsync();
-                var dtos = regions.Select(r => new RegionDto { Id = r.Id, RegionName = r.RegionName }).ToList();
-                return ServiceResult<List<RegionDto>>.Success(dtos);
-            }
-
-            public async Task<ServiceResult<List<ExtensionLiteratureDto>>> GetExtensionLiteraturesAsync()
-            {
-                var extensionLiteratures = await _publicationRepository.GetExtensionLiteraturesAsync();
-                var dtos = extensionLiteratures.Select(el => new ExtensionLiteratureDto
-                {
-                    Id = el.Id,
-                    ExtensionDate = el.ExtensionDate,
-                    PublicationName = el.PublicationName,
-                    NumberSold = el.NumberSold,
-                    TotalFarmers = el.TotalFarmers
-                }).ToList();
-                return ServiceResult<List<ExtensionLiteratureDto>>.Success(dtos);
-            }
-
-            // Helper methods
-            private async Task<bool> CanUserAccessUnitLocationAsync(int unitLocationId)
-            {
-                var assignments = await _trainerAssignmentRepository.GetByTrainerIdAsync(_currentUserService.UserId);
-                return assignments.Any(a => a.UnitLocationId == unitLocationId);
-            }
-
-            private Publication MapCreateDtoToEntity(PublicationCreateDto createDto)
-            {
-                return new Publication
-                {
-                    Title = createDto.Title,
-                    PublicationDate = createDto.PublicationDate,
-                    StartDate = createDto.StartDate,
-                    EndDate = createDto.EndDate,
-                    Attachements = createDto.Attachments, // Note: keeping the existing typo for consistency
-                    UnitLocationId = createDto.UnitLocationId,
-                    CategoryId = createDto.CategoryId,
-                    ModeId = createDto.ModeId,
-                    RegionId = createDto.RegionId,
-                    SourceId = createDto.SourceId,
-                    ExtensionLiteratureId = createDto.ExtensionLiteratureId,
-                    MJASFormat = createDto.MJASFormat,
-                    PublicationTitle = createDto.PublicationTitle,
-                    PublicationJournalTitle = createDto.PublicationJournalTitle,
-                    PublicationYear = createDto.PublicationYear,
-                    PublicationVolume = createDto.PublicationVolume,
-                    PublicationIssue = createDto.PublicationIssue,
-                    PublicationPages = createDto.PublicationPages,
-                    PublicationISBN = createDto.PublicationISBN,
-                    PublicationUniNumber = createDto.PublicationUniNumber,
-                    PublicationNAAS = createDto.PublicationNAAS,
-                    PublicationImpact = createDto.PublicationImpact,
-                    PublicationWebLink = createDto.PublicationWebLink,
-                    PublicationCover = createDto.PublicationCover,
-                    PublicationWhole = createDto.PublicationWhole,
-                    Funds = createDto.Funds,
-                    SponsorDetails = createDto.SponsorDetails,
-                    PermissionLetterDate = createDto.PermissionLetterDate,
-                    PermissionLetterUrl = createDto.PermissionLetterUrl,
-                    PublisherBrochure = createDto.PublisherBrochure,
-                    PublisherName = createDto.PublisherName,
-                    PublisherInstitutionName = createDto.PublisherInstitutionName,
-                    PublisherAddress = createDto.PublisherAddress
-                };
-            }
-
-            private void MapUpdateDtoToEntity(PublicationUpdateDto updateDto, Publication entity)
-            {
-                if (updateDto.Title != null) entity.Title = updateDto.Title;
-                if (updateDto.PublicationDate.HasValue) entity.PublicationDate = updateDto.PublicationDate;
-                if (updateDto.StartDate.HasValue) entity.StartDate = updateDto.StartDate.Value;
-                if (updateDto.EndDate.HasValue) entity.EndDate = updateDto.EndDate.Value;
-                if (updateDto.Attachments != null) entity.Attachements = updateDto.Attachments;
-                if (updateDto.CategoryId.HasValue) entity.CategoryId = updateDto.CategoryId;
-                if (updateDto.ModeId.HasValue) entity.ModeId = updateDto.ModeId;
-                if (updateDto.RegionId.HasValue) entity.RegionId = updateDto.RegionId;
-                if (updateDto.SourceId.HasValue) entity.SourceId = updateDto.SourceId;
-                if (updateDto.ExtensionLiteratureId.HasValue) entity.ExtensionLiteratureId = updateDto.ExtensionLiteratureId;
-                if (updateDto.MJASFormat != null) entity.MJASFormat = updateDto.MJASFormat;
-                if (updateDto.PublicationTitle != null) entity.PublicationTitle = updateDto.PublicationTitle;
-                // Add all other fields as needed...
-            }
-
-            private PublicationDto MapEntityToDto(Publication entity)
-            {
-                return new PublicationDto
-                {
-                    Id = entity.Id,
-                    Title = entity.Title,
-                    PublicationDate = entity.PublicationDate,
-                    StartDate = entity.StartDate,
-                    EndDate = entity.EndDate,
-                    Attachments = entity.Attachements,
-                    UnitLocationId = entity.UnitLocationId,
-                    UnitLocationName = $"{entity.UnitLocation?.Unit?.Name} - {entity.UnitLocation?.District?.Name}",
-                    CategoryId = entity.CategoryId,
-                    CategoryName = entity.Category?.CategoryName,
-                    ModeId = entity.ModeId,
-                    ModeName = entity.Mode?.ModeName,
-                    RegionId = entity.RegionId,
-                    RegionName = entity.Region?.RegionName,
-                    SourceId = entity.SourceId,
-                    SourceName = entity.Source?.SourceName,
-                    ExtensionLiteratureId = entity.ExtensionLiteratureId,
-                    ExtensionLiteratureName = entity.ExtensionLiterature?.PublicationName,
-                    MJASFormat = entity.MJASFormat,
-                    PublicationTitle = entity.PublicationTitle,
-                    PublicationJournalTitle = entity.PublicationJournalTitle,
-                    PublicationYear = entity.PublicationYear,
-                    PublicationVolume = entity.PublicationVolume,
-                    PublicationIssue = entity.PublicationIssue,
-                    PublicationPages = entity.PublicationPages,
-                    PublicationISBN = entity.PublicationISBN,
-                    PublicationUniNumber = entity.PublicationUniNumber,
-                    PublicationNAAS = entity.PublicationNAAS,
-                    PublicationImpact = entity.PublicationImpact,
-                    PublicationWebLink = entity.PublicationWebLink,
-                    PublicationCover = entity.PublicationCover,
-                    PublicationWhole = entity.PublicationWhole,
-                    Funds = entity.Funds,
-                    SponsorDetails = entity.SponsorDetails,
-                    PermissionLetterDate = entity.PermissionLetterDate,
-                    PermissionLetterUrl = entity.PermissionLetterUrl,
-                    PublisherBrochure = entity.PublisherBrochure,
-                    PublisherName = entity.PublisherName,
-                    PublisherInstitutionName = entity.PublisherInstitutionName,
-                    PublisherAddress = entity.PublisherAddress
-                };
-            }
+            return new List<int>(); // Placeholder
         }
     }
 }

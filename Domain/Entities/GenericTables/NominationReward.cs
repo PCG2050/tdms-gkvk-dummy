@@ -1,16 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Domain.Entities.Junction;
 using Domain.Entities.MasterData;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Domain.Entities.GenericTables
 {
 
-        public class NominationReward : ReportEntryBaseEntity
+        public class NominationReward : AuditableBaseEntity
         {
-            
+            //Unitlocaiton and Organization References
+            [Required]
+            public int UnitLocationId { get; set; }
+
+            public int OrganizationId { get; set; }
+            [JsonIgnore]
+            [ForeignKey(nameof(UnitLocationId))]
+            public OrganizationUnitLocation UnitLocation { get; set; } = null!;
+            [JsonIgnore]
+            public Organization Organization { get; set; } = null!;
+
+            public DateOnly? StartDate { get; set; }
+            public DateOnly? EndDate { get; set; }
+
             // === Foreign Keys & Navigation Properties ===
             public int? TypeId { get; set; }
             public NominationType? Type { get; set; }
@@ -62,6 +79,21 @@ namespace Domain.Entities.GenericTables
 
             public DateOnly? NominationDate { get; set; }
             public string? NominationLetterPath { get; set; }
+            // ===== STATUS TRACKING FIELDS =====
+            // Status: "Draft", "Pending", "Approved", "Rejected"
+            [MaxLength(50)]
+            public string FormStatus { get; set; } = "Draft";
+
+            [MaxLength(1000)]
+            public string? FormStatusRemarks { get; set; }
+
+            // Approval tracking
+            public DateTimeOffset? ApprovedAt { get; set; }
+            public int? ApprovedById { get; set; }
+
+            [JsonIgnore]
+            public User? ApprovedBy { get; set; }
+            // ==================================
 
             // === Child Collections ===
             public ICollection<NominationRewardIFSFarmer> NominationRewardIFSFarmers { get; set; } = [];

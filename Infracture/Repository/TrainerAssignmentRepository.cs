@@ -19,6 +19,15 @@ namespace Infrastructure.Repository
         {
             _context = context;
         }
+
+        public async Task<List<int>> GetUnitLocationIdsByTrainerIdAsync(int trainerId)
+        {
+            return await _context.UnitTrainers
+                .Where(ta => ta.TrainerId == trainerId)
+                .Select(ta => ta.UnitLocationId)
+                .Distinct()
+                .ToListAsync();
+        }
         public async Task<TrainerAssignment> AddAsync(TrainerAssignment unitLocationTrainer)
         {
             await _context.AddAsync(unitLocationTrainer);
@@ -60,6 +69,8 @@ namespace Infrastructure.Repository
             _context.UnitTrainers.Remove(unitLocationTrainer);
             await _context.SaveChangesAsync();
         }
+
+
 
         public async Task<TrainerAssignment?> GetByTrainerLocationAsync(int unitLocationId, int trainerId)
         {

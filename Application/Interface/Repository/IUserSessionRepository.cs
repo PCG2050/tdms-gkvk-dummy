@@ -1,5 +1,4 @@
-﻿using Domain.Entities;
-
+﻿
 namespace Application.Interface.Repository
 {
     public interface IUserSessionRepository

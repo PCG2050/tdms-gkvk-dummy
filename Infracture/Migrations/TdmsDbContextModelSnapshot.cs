@@ -22,63 +22,6 @@ namespace Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Domain.Entities.ASM.AsmVisit", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Attachements")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
-
-                    b.Property<int?>("CreatedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateOnly>("EndDate")
-                        .HasColumnType("date");
-
-                    b.Property<int>("OrganizationId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("OrganizationName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateOnly>("StartDate")
-                        .HasColumnType("date");
-
-                    b.Property<int>("UnitLocationId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<int?>("UpdatedById")
-                        .HasColumnType("int");
-
-                    b.Property<int>("VisitorCount")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("OrganizationId");
-
-                    b.HasIndex("UnitLocationId");
-
-                    b.HasIndex("UpdatedById");
-
-                    b.ToTable("AsmVisits");
-                });
-
             modelBuilder.Entity("Domain.Entities.ATIC.AticAdvisoryService", b =>
                 {
                     b.Property<int>("Id")
@@ -2069,8 +2012,14 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UnitLocationId")
+                        .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
@@ -2084,6 +2033,10 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.HasIndex("UnitLocationId");
 
                     b.HasIndex("UpdatedById");
 
@@ -2112,6 +2065,12 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("Number")
                         .HasColumnType("int");
 
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UnitLocationId")
+                        .HasColumnType("int");
+
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
 
@@ -2126,6 +2085,10 @@ namespace Infrastructure.Migrations
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("FIUActivitiesId");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.HasIndex("UnitLocationId");
 
                     b.HasIndex("UpdatedById");
 
@@ -3037,7 +3000,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("FtiTrainingPrograms");
                 });
 
-            modelBuilder.Entity("Domain.Entities.GenericTables.ConsultingAndSocialMediaService.TableConsultingAndSocialMediaService", b =>
+            modelBuilder.Entity("Domain.Entities.GenericTables.ConsultingAndSocialMediaService.ConsultingAndSocialMediaService", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -3045,7 +3008,13 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CategoryId")
+                    b.Property<DateTimeOffset?>("ApprovedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("ApprovedById")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CategoryId")
                         .HasColumnType("int");
 
                     b.Property<int>("CountOfAnsweredQueries")
@@ -3061,6 +3030,9 @@ namespace Infrastructure.Migrations
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
+
+                    b.Property<DateOnly?>("EndDate")
+                        .HasColumnType("date");
 
                     b.Property<int?>("ExtensionActivityId")
                         .HasColumnType("int");
@@ -3082,6 +3054,15 @@ namespace Infrastructure.Migrations
 
                     b.Property<int>("Female_ST")
                         .HasColumnType("int");
+
+                    b.Property<string>("FormStatus")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("FormStatusRemarks")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<int>("GroupDiscussion")
                         .HasColumnType("int");
@@ -3138,6 +3119,9 @@ namespace Infrastructure.Migrations
                     b.Property<int>("NoOfWhatsappMessage")
                         .HasColumnType("int");
 
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("ParticularsId")
                         .HasColumnType("int");
 
@@ -3160,12 +3144,18 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<int>("RelatedToId")
+                    b.Property<int?>("RelatedToId")
                         .HasColumnType("int");
+
+                    b.Property<DateOnly?>("StartDate")
+                        .HasColumnType("date");
 
                     b.Property<string>("Title")
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
+
+                    b.Property<int>("UnitLocationId")
+                        .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
@@ -3179,6 +3169,8 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ApprovedById");
+
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("CreatedById");
@@ -3187,9 +3179,13 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ModeOutreachId");
 
+                    b.HasIndex("OrganizationId");
+
                     b.HasIndex("ParticularsId");
 
                     b.HasIndex("RelatedToId");
+
+                    b.HasIndex("UnitLocationId");
 
                     b.HasIndex("UpdatedById");
 
@@ -3225,9 +3221,6 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.Property<int?>("TableConsultingAndSocialMediaService")
-                        .HasColumnType("int");
-
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
 
@@ -3236,9 +3229,9 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedById");
+                    b.HasIndex("ConsultingServiceId");
 
-                    b.HasIndex("TableConsultingAndSocialMediaService");
+                    b.HasIndex("CreatedById");
 
                     b.HasIndex("UpdatedById");
 
@@ -3254,7 +3247,8 @@ namespace Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AmountPerCopy")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -3268,13 +3262,15 @@ namespace Infrastructure.Migrations
                         .HasColumnType("date");
 
                     b.Property<string>("NumberOfCopies")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("PublicationId")
+                    b.Property<int>("PublicationId")
                         .HasColumnType("int");
 
                     b.Property<string>("TotalAmount")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
@@ -3301,8 +3297,11 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Attachements")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTimeOffset?>("ApprovedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("ApprovedById")
+                        .HasColumnType("int");
 
                     b.Property<DateOnly?>("AwardApplicationDate")
                         .HasColumnType("date");
@@ -3342,8 +3341,17 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("DurationDays")
                         .HasColumnType("int");
 
-                    b.Property<DateOnly>("EndDate")
+                    b.Property<DateOnly?>("EndDate")
                         .HasColumnType("date");
+
+                    b.Property<string>("FormStatus")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("FormStatusRemarks")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("InstitutionAddress")
                         .HasColumnType("nvarchar(max)");
@@ -3411,7 +3419,7 @@ namespace Infrastructure.Migrations
                     b.Property<string>("SpecificContributionTitle")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateOnly>("StartDate")
+                    b.Property<DateOnly?>("StartDate")
                         .HasColumnType("date");
 
                     b.Property<int?>("TypeId")
@@ -3427,6 +3435,8 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ApprovedById");
 
                     b.HasIndex("ContributionId");
 
@@ -3735,8 +3745,11 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Attachements")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTimeOffset?>("ApprovedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("ApprovedById")
+                        .HasColumnType("int");
 
                     b.Property<int?>("CategoryId")
                         .HasColumnType("int");
@@ -3749,50 +3762,67 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
-                    b.Property<DateOnly>("EndDate")
+                    b.Property<DateOnly?>("EndDate")
                         .HasColumnType("date");
+
+                    b.Property<string>("FormStatus")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("FormStatusRemarks")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<int?>("Funds")
                         .HasColumnType("int");
 
                     b.Property<string>("MJASFormat")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int?>("ModeId")
                         .HasColumnType("int");
 
                     b.Property<string>("ModePublication")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int>("OrganizationId")
                         .HasColumnType("int");
 
                     b.Property<string>("OtherPublication")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<DateOnly?>("PermissionLetterDate")
                         .HasColumnType("date");
 
                     b.Property<string>("PermissionLetterUrl")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("PublicationCover")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<DateOnly?>("PublicationDate")
                         .HasColumnType("date");
 
                     b.Property<string>("PublicationISBN")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int?>("PublicationImpact")
                         .HasColumnType("int");
 
                     b.Property<string>("PublicationIssue")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("PublicationJournalTitle")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<int?>("PublicationNAAS")
                         .HasColumnType("int");
@@ -3804,7 +3834,8 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("PublicationTitle")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<int?>("PublicationUniNumber")
                         .HasColumnType("int");
@@ -3813,10 +3844,12 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("PublicationWebLink")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("PublicationWhole")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<int?>("PublicationYear")
                         .HasColumnType("int");
@@ -3828,13 +3861,16 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("SponsorDetails")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
-                    b.Property<DateOnly>("StartDate")
+                    b.Property<DateOnly?>("StartDate")
                         .HasColumnType("date");
 
                     b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<int>("UnitLocationId")
                         .HasColumnType("int");
@@ -3846,6 +3882,8 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ApprovedById");
 
                     b.HasIndex("CategoryId");
 
@@ -3882,20 +3920,24 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PublicationId")
+                    b.Property<int>("PublicationId")
                         .HasColumnType("int");
 
                     b.Property<string>("PublisherAddress")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("PublisherBrochure")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("PublisherInstitutionName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
 
                     b.Property<string>("PublisherName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
@@ -3907,7 +3949,8 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("PublicationId");
+                    b.HasIndex("PublicationId")
+                        .IsUnique();
 
                     b.HasIndex("UpdatedById");
 
@@ -3922,8 +3965,8 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<double>("ClosingBalance")
-                        .HasColumnType("float");
+                    b.Property<decimal>("ClosingBalance")
+                        .HasColumnType("decimal(18, 2)");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -3933,19 +3976,16 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
-                    b.Property<double>("Expenditure")
-                        .HasColumnType("float");
+                    b.Property<decimal>("Expenditure")
+                        .HasColumnType("decimal(18, 2)");
 
-                    b.Property<double>("OpeningBalance")
-                        .HasColumnType("float");
+                    b.Property<decimal>("OpeningBalance")
+                        .HasColumnType("decimal(18, 2)");
 
-                    b.Property<double>("Receipt")
-                        .HasColumnType("float");
-
-                    b.Property<int>("ServiceId")
+                    b.Property<int>("Receipt")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TblServiceId")
+                    b.Property<int>("ServiceId")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
@@ -3958,7 +3998,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("TblServiceId");
+                    b.HasIndex("ServiceId");
 
                     b.HasIndex("UpdatedById");
 
@@ -3973,8 +4013,8 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<double>("AmountGenerated")
-                        .HasColumnType("float");
+                    b.Property<decimal>("AmountGenerated")
+                        .HasColumnType("decimal(18, 2)");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -3984,7 +4024,7 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
-                    b.Property<DateOnly>("Date")
+                    b.Property<DateOnly?>("Date")
                         .HasColumnType("date");
 
                     b.Property<int>("Female_GEN")
@@ -4021,6 +4061,9 @@ namespace Infrastructure.Migrations
                     b.Property<int>("ServiceId")
                         .HasColumnType("int");
 
+                    b.Property<DateOnly>("SubmittedDate")
+                        .HasColumnType("date");
+
                     b.Property<int?>("TblServiceId")
                         .HasColumnType("int");
 
@@ -4053,11 +4096,17 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<double>("AmountGenerated")
-                        .HasColumnType("float");
+                    b.Property<decimal>("AmountGenerated")
+                        .HasColumnType("decimal(18, 2)");
 
                     b.Property<decimal>("AmountReleased")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTimeOffset?>("ApprovedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("ApprovedById")
+                        .HasColumnType("int");
 
                     b.Property<int?>("CategoryId")
                         .HasColumnType("int");
@@ -4078,10 +4127,25 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly?>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("EndDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("FormStatus")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("FormStatusRemarks")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<int>("Number")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrganizationId")
                         .HasColumnType("int");
 
                     b.Property<string>("OtherCategory")
@@ -4106,12 +4170,18 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("SourceOfFundId")
                         .HasColumnType("int");
 
+                    b.Property<DateOnly?>("StartDate")
+                        .HasColumnType("date");
+
                     b.Property<int?>("ThemeId")
                         .HasColumnType("int");
 
                     b.Property<string>("TitleOfActivityConducted")
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
+
+                    b.Property<int>("UnitLocationId")
+                        .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
@@ -4125,15 +4195,21 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ApprovedById");
+
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("CreatedById");
+
+                    b.HasIndex("OrganizationId");
 
                     b.HasIndex("QuantityUnitId");
 
                     b.HasIndex("SourceOfFundId");
 
                     b.HasIndex("ThemeId");
+
+                    b.HasIndex("UnitLocationId");
 
                     b.HasIndex("UpdatedById");
 
@@ -4186,6 +4262,9 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("UpdatedById")
                         .HasColumnType("int");
 
+                    b.Property<int>("VisitorId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
@@ -4194,10 +4273,12 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("VisitorDetail");
+                    b.HasIndex("VisitorId");
+
+                    b.ToTable("VisitorDetails");
                 });
 
-            modelBuilder.Entity("Domain.Entities.IBTVA.IbtavOtherActivity", b =>
+            modelBuilder.Entity("Domain.Entities.GenericTables.TableOtherActivity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -4205,12 +4286,11 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ActicityDetails")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTimeOffset?>("ApprovedAt")
+                        .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("Attachements")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("ApprovedById")
+                        .HasColumnType("int");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -4220,14 +4300,32 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
-                    b.Property<DateOnly>("EndDate")
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateOnly?>("EndDate")
                         .HasColumnType("date");
+
+                    b.Property<string>("FormStatus")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("FormStatusRemarks")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<int>("OrganizationId")
                         .HasColumnType("int");
 
-                    b.Property<DateOnly>("StartDate")
+                    b.Property<DateOnly?>("StartDate")
                         .HasColumnType("date");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int>("UnitLocationId")
                         .HasColumnType("int");
@@ -4238,7 +4336,13 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("UpdatedById")
                         .HasColumnType("int");
 
+                    b.Property<string>("UploadPath")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ApprovedById");
 
                     b.HasIndex("CreatedById");
 
@@ -4248,7 +4352,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("IbtavOtherActivities");
+                    b.ToTable("OtherActivities");
                 });
 
             modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaAdvisoryServices", b =>
@@ -4430,7 +4534,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -4438,7 +4541,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
-                        .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
@@ -4492,12 +4594,20 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
+                    b.Property<int>("CurrentPhase")
+                        .HasColumnType("int");
+
                     b.Property<string>("Duration")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("FormStatus")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int?>("Funds")
                         .HasColumnType("int");
@@ -4651,66 +4761,6 @@ namespace Infrastructure.Migrations
                     b.ToTable("IbtvaProgramDetails");
                 });
 
-            modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaProgramme", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Attachements")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
-
-                    b.Property<int?>("CreatedById")
-                        .HasColumnType("int");
-
-                    b.Property<TimeSpan>("Duration")
-                        .HasColumnType("time");
-
-                    b.Property<DateOnly>("EndDate")
-                        .HasColumnType("date");
-
-                    b.Property<int>("OrganizationId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ParticipantCount")
-                        .HasColumnType("int");
-
-                    b.Property<DateOnly>("StartDate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("TrainingTitle")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UnitLocationId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<int?>("UpdatedById")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("OrganizationId");
-
-                    b.HasIndex("UnitLocationId");
-
-                    b.HasIndex("UpdatedById");
-
-                    b.ToTable("IbtvaProgrammes");
-                });
-
             modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaRecommendation", b =>
                 {
                     b.Property<int>("Id")
@@ -4720,7 +4770,6 @@ namespace Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ActionTaken")
-                        .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
@@ -4736,27 +4785,22 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ImpactOutcome")
-                        .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("ProblemsIdentified")
-                        .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("Recommendation")
-                        .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("SignificantAchievement")
-                        .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("SuccessStories")
-                        .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
@@ -4800,17 +4844,14 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("PhotosGeotaggedPhotoOrUploadPhoto")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("ProgressReportReportingYear")
-                        .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
                     b.Property<string>("SignificantOutcome")
-                        .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
@@ -4821,12 +4862,10 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("UploadPhoto")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("UploadVideo")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -4858,7 +4897,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Designation")
-                        .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
@@ -4866,7 +4904,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("InstitutionOrDepartment")
-                        .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
@@ -4875,11 +4912,11 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int>("ResourceType")
+                    b.Property<int?>("ResourceType")
                         .HasMaxLength(150)
                         .HasColumnType("int");
 
-                    b.Property<int>("Responsibility")
+                    b.Property<int?>("Responsibility")
                         .HasMaxLength(250)
                         .HasColumnType("int");
 
@@ -4922,13 +4959,11 @@ namespace Infrastructure.Migrations
                     b.Property<int>("Number")
                         .HasColumnType("int");
 
-                    b.Property<string>("Other")
-                        .IsRequired()
+                    b.Property<string>("OtherTypeOfAid")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Purpose")
-                        .IsRequired()
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
 
@@ -7715,190 +7750,6 @@ namespace Infrastructure.Migrations
                     b.ToTable("STUTopicsCoveredInClass");
                 });
 
-            modelBuilder.Entity("Domain.Entities.STU.StuOtherActivity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ActivityDetails")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Attachements")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
-
-                    b.Property<int?>("CreatedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateOnly>("EndDate")
-                        .HasColumnType("date");
-
-                    b.Property<int>("OrganizationId")
-                        .HasColumnType("int");
-
-                    b.Property<DateOnly>("StartDate")
-                        .HasColumnType("date");
-
-                    b.Property<int>("UnitLocationId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<int?>("UpdatedById")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("OrganizationId");
-
-                    b.HasIndex("UnitLocationId");
-
-                    b.HasIndex("UpdatedById");
-
-                    b.ToTable("StuOtherActivities");
-                });
-
-            modelBuilder.Entity("Domain.Entities.STU.StuSponsoredTrainingProgramme", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Attachements")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
-
-                    b.Property<int?>("CreatedById")
-                        .HasColumnType("int");
-
-                    b.Property<TimeSpan>("Duration")
-                        .HasColumnType("time");
-
-                    b.Property<DateOnly>("EndDate")
-                        .HasColumnType("date");
-
-                    b.Property<int>("OrganizationId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ParticipantCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SponsorOrganization")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateOnly>("StartDate")
-                        .HasColumnType("date");
-
-                    b.Property<int>("TrainingCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TrainingTitle")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UnitLocationId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<int?>("UpdatedById")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("OrganizationId");
-
-                    b.HasIndex("UnitLocationId");
-
-                    b.HasIndex("UpdatedById");
-
-                    b.ToTable("StuSponsoredTrainingProgrammes");
-                });
-
-            modelBuilder.Entity("Domain.Entities.STU.StuTrainingProgramme", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Attachements")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
-
-                    b.Property<int?>("CreatedById")
-                        .HasColumnType("int");
-
-                    b.Property<TimeSpan>("Duration")
-                        .HasColumnType("time");
-
-                    b.Property<DateOnly>("EndDate")
-                        .HasColumnType("date");
-
-                    b.Property<int>("OrganizationId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ParticipantCount")
-                        .HasColumnType("int");
-
-                    b.Property<DateOnly>("StartDate")
-                        .HasColumnType("date");
-
-                    b.Property<int>("TrainingCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TrainingTitle")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UnitLocationId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<int?>("UpdatedById")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("OrganizationId");
-
-                    b.HasIndex("UnitLocationId");
-
-                    b.HasIndex("UpdatedById");
-
-                    b.ToTable("StuTrainingProgrammes");
-                });
-
             modelBuilder.Entity("Domain.Entities.State", b =>
                 {
                     b.Property<int>("Id")
@@ -7922,50 +7773,6 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("States");
-                });
-
-            modelBuilder.Entity("Domain.Entities.TableOtherActivity.TableOtherActivity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
-
-                    b.Property<int?>("CreatedById")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<int?>("UpdatedById")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UploadPath")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("UpdatedById");
-
-                    b.ToTable("OtherActivities");
                 });
 
             modelBuilder.Entity("Domain.Entities.Unit", b =>
@@ -8162,39 +7969,6 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserSessions");
-                });
-
-            modelBuilder.Entity("Domain.Entities.ASM.AsmVisit", b =>
-                {
-                    b.HasOne("Domain.Entities.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Domain.Entities.Organization", "Organization")
-                        .WithMany()
-                        .HasForeignKey("OrganizationId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
-                        .WithMany()
-                        .HasForeignKey("UnitLocationId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.User", "UpdatedBy")
-                        .WithMany()
-                        .HasForeignKey("UpdatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("Organization");
-
-                    b.Navigation("UnitLocation");
-
-                    b.Navigation("UpdatedBy");
                 });
 
             modelBuilder.Entity("Domain.Entities.ATIC.AticAdvisoryService", b =>
@@ -9130,12 +8904,28 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.HasOne("Domain.Entities.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
+                        .WithMany()
+                        .HasForeignKey("UnitLocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
                         .HasForeignKey("UpdatedById")
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("CreatedBy");
+
+                    b.Navigation("Organization");
+
+                    b.Navigation("UnitLocation");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -9152,6 +8942,18 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("FIUActivitiesId")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.HasOne("Domain.Entities.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
+                        .WithMany()
+                        .HasForeignKey("UnitLocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
                         .HasForeignKey("UpdatedById")
@@ -9160,6 +8962,10 @@ namespace Infrastructure.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("FIUActivities");
+
+                    b.Navigation("Organization");
+
+                    b.Navigation("UnitLocation");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -9533,13 +9339,17 @@ namespace Infrastructure.Migrations
                     b.Navigation("UpdatedBy");
                 });
 
-            modelBuilder.Entity("Domain.Entities.GenericTables.ConsultingAndSocialMediaService.TableConsultingAndSocialMediaService", b =>
+            modelBuilder.Entity("Domain.Entities.GenericTables.ConsultingAndSocialMediaService.ConsultingAndSocialMediaService", b =>
                 {
+                    b.HasOne("Domain.Entities.User", "ApprovedBy")
+                        .WithMany()
+                        .HasForeignKey("ApprovedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Domain.Entities.MasterData.ConsultancyServicesCategory", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
@@ -9556,6 +9366,12 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("ModeOutreachId")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.HasOne("Domain.Entities.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("Domain.Entities.MasterData.Particular", "Particulars")
                         .WithMany()
                         .HasForeignKey("ParticularsId")
@@ -9564,6 +9380,11 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.MasterData.RelatedTo", "RelatedTo")
                         .WithMany()
                         .HasForeignKey("RelatedToId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
+                        .WithMany()
+                        .HasForeignKey("UnitLocationId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
@@ -9571,6 +9392,8 @@ namespace Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("UpdatedById")
                         .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("ApprovedBy");
 
                     b.Navigation("Category");
 
@@ -9580,23 +9403,28 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("ModeOutreach");
 
+                    b.Navigation("Organization");
+
                     b.Navigation("Particulars");
 
                     b.Navigation("RelatedTo");
+
+                    b.Navigation("UnitLocation");
 
                     b.Navigation("UpdatedBy");
                 });
 
             modelBuilder.Entity("Domain.Entities.GenericTables.ConsultingAndSocialMediaService.TableModeAndOutreach", b =>
                 {
+                    b.HasOne("Domain.Entities.GenericTables.ConsultingAndSocialMediaService.ConsultingAndSocialMediaService", "ConsultingService")
+                        .WithMany("TableModeAndOutreaches")
+                        .HasForeignKey("ConsultingServiceId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Domain.Entities.GenericTables.ConsultingAndSocialMediaService.TableConsultingAndSocialMediaService", "ConsultingService")
-                        .WithMany("TableModeAndOutreaches")
-                        .HasForeignKey("TableConsultingAndSocialMediaService")
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
@@ -9621,7 +9449,8 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.GenericTables.Publication", "Publication")
                         .WithMany("ExtensionLiteratures")
                         .HasForeignKey("PublicationId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
@@ -9637,6 +9466,11 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.GenericTables.NominationReward", b =>
                 {
+                    b.HasOne("Domain.Entities.User", "ApprovedBy")
+                        .WithMany()
+                        .HasForeignKey("ApprovedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Domain.Entities.MasterData.Contribution", "Contribution")
                         .WithMany()
                         .HasForeignKey("ContributionId")
@@ -9688,6 +9522,8 @@ namespace Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("UpdatedById")
                         .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("ApprovedBy");
 
                     b.Navigation("Contribution");
 
@@ -9862,6 +9698,11 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.GenericTables.Publication", b =>
                 {
+                    b.HasOne("Domain.Entities.User", "ApprovedBy")
+                        .WithMany()
+                        .HasForeignKey("ApprovedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Domain.Entities.MasterData.PublicationCategory", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
@@ -9904,6 +9745,8 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("UpdatedById")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.Navigation("ApprovedBy");
+
                     b.Navigation("Category");
 
                     b.Navigation("CreatedBy");
@@ -9929,9 +9772,10 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Domain.Entities.GenericTables.Publication", "Publication")
-                        .WithMany()
-                        .HasForeignKey("PublicationId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .WithOne("PublisherDetails")
+                        .HasForeignKey("Domain.Entities.GenericTables.PublisherDetails", "PublicationId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
@@ -9952,10 +9796,11 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.GenericTables.Service.TblService", "TblService")
+                    b.HasOne("Domain.Entities.GenericTables.Service.TblService", "Service")
                         .WithMany("RevolvingFundStatuses")
-                        .HasForeignKey("TblServiceId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
@@ -9964,7 +9809,7 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("CreatedBy");
 
-                    b.Navigation("TblService");
+                    b.Navigation("Service");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -9995,6 +9840,11 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.GenericTables.Service.TblService", b =>
                 {
+                    b.HasOne("Domain.Entities.User", "ApprovedBy")
+                        .WithMany()
+                        .HasForeignKey("ApprovedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Domain.Entities.MasterData.ConsultancyServicesCategory", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
@@ -10004,6 +9854,12 @@ namespace Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.HasOne("Domain.Entities.MasterData.QuantityUnit", "QuantityUnit")
                         .WithMany()
@@ -10020,20 +9876,32 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("ThemeId")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
+                        .WithMany()
+                        .HasForeignKey("UnitLocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
                         .HasForeignKey("UpdatedById")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.Navigation("ApprovedBy");
+
                     b.Navigation("Category");
 
                     b.Navigation("CreatedBy");
+
+                    b.Navigation("Organization");
 
                     b.Navigation("QuantityUnit");
 
                     b.Navigation("SourceOfFund");
 
                     b.Navigation("Theme");
+
+                    b.Navigation("UnitLocation");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -10055,15 +9923,28 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("UpdatedById")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.HasOne("Domain.Entities.MasterData.Visitor", "Visitor")
+                        .WithMany()
+                        .HasForeignKey("VisitorId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.Navigation("CreatedBy");
 
                     b.Navigation("TblService");
 
                     b.Navigation("UpdatedBy");
+
+                    b.Navigation("Visitor");
                 });
 
-            modelBuilder.Entity("Domain.Entities.IBTVA.IbtavOtherActivity", b =>
+            modelBuilder.Entity("Domain.Entities.GenericTables.TableOtherActivity", b =>
                 {
+                    b.HasOne("Domain.Entities.User", "ApprovedBy")
+                        .WithMany()
+                        .HasForeignKey("ApprovedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
@@ -10086,6 +9967,8 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("UpdatedById")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.Navigation("ApprovedBy");
+
                     b.Navigation("CreatedBy");
 
                     b.Navigation("Organization");
@@ -10103,7 +9986,7 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Domain.Entities.IBTVA.IbtvaProgramDetails", "ProgramDetails")
-                        .WithMany("AdvisoryServices")
+                        .WithMany()
                         .HasForeignKey("IbtvaProgramDetailsId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
@@ -10272,39 +10155,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("UpdatedBy");
                 });
 
-            modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaProgramme", b =>
-                {
-                    b.HasOne("Domain.Entities.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Domain.Entities.Organization", "Organization")
-                        .WithMany()
-                        .HasForeignKey("OrganizationId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
-                        .WithMany()
-                        .HasForeignKey("UnitLocationId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.User", "UpdatedBy")
-                        .WithMany()
-                        .HasForeignKey("UpdatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("Organization");
-
-                    b.Navigation("UnitLocation");
-
-                    b.Navigation("UpdatedBy");
-                });
-
             modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaRecommendation", b =>
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
@@ -10313,7 +10163,7 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Domain.Entities.IBTVA.IbtvaProgramDetails", "ProgramDetails")
-                        .WithMany("Recommendations")
+                        .WithMany()
                         .HasForeignKey("IbtvaProgramDetailsId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
@@ -10338,7 +10188,7 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Domain.Entities.IBTVA.IbtvaProgramDetails", "ProgramDetails")
-                        .WithMany("Reports")
+                        .WithMany()
                         .HasForeignKey("IbtvaProgramDetailsId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
@@ -11064,122 +10914,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("UpdatedBy");
                 });
 
-            modelBuilder.Entity("Domain.Entities.STU.StuOtherActivity", b =>
-                {
-                    b.HasOne("Domain.Entities.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Domain.Entities.Organization", "Organization")
-                        .WithMany()
-                        .HasForeignKey("OrganizationId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
-                        .WithMany()
-                        .HasForeignKey("UnitLocationId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.User", "UpdatedBy")
-                        .WithMany()
-                        .HasForeignKey("UpdatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("Organization");
-
-                    b.Navigation("UnitLocation");
-
-                    b.Navigation("UpdatedBy");
-                });
-
-            modelBuilder.Entity("Domain.Entities.STU.StuSponsoredTrainingProgramme", b =>
-                {
-                    b.HasOne("Domain.Entities.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Domain.Entities.Organization", "Organization")
-                        .WithMany()
-                        .HasForeignKey("OrganizationId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
-                        .WithMany()
-                        .HasForeignKey("UnitLocationId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.User", "UpdatedBy")
-                        .WithMany()
-                        .HasForeignKey("UpdatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("Organization");
-
-                    b.Navigation("UnitLocation");
-
-                    b.Navigation("UpdatedBy");
-                });
-
-            modelBuilder.Entity("Domain.Entities.STU.StuTrainingProgramme", b =>
-                {
-                    b.HasOne("Domain.Entities.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Domain.Entities.Organization", "Organization")
-                        .WithMany()
-                        .HasForeignKey("OrganizationId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
-                        .WithMany()
-                        .HasForeignKey("UnitLocationId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.User", "UpdatedBy")
-                        .WithMany()
-                        .HasForeignKey("UpdatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("Organization");
-
-                    b.Navigation("UnitLocation");
-
-                    b.Navigation("UpdatedBy");
-                });
-
-            modelBuilder.Entity("Domain.Entities.TableOtherActivity.TableOtherActivity", b =>
-                {
-                    b.HasOne("Domain.Entities.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Domain.Entities.User", "UpdatedBy")
-                        .WithMany()
-                        .HasForeignKey("UpdatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("UpdatedBy");
-                });
-
             modelBuilder.Entity("Domain.Entities.Unit", b =>
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
@@ -11292,7 +11026,7 @@ namespace Infrastructure.Migrations
                     b.Navigation("Reports");
                 });
 
-            modelBuilder.Entity("Domain.Entities.GenericTables.ConsultingAndSocialMediaService.TableConsultingAndSocialMediaService", b =>
+            modelBuilder.Entity("Domain.Entities.GenericTables.ConsultingAndSocialMediaService.ConsultingAndSocialMediaService", b =>
                 {
                     b.Navigation("TableModeAndOutreaches");
                 });
@@ -11315,6 +11049,8 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.GenericTables.Publication", b =>
                 {
                     b.Navigation("ExtensionLiteratures");
+
+                    b.Navigation("PublisherDetails");
                 });
 
             modelBuilder.Entity("Domain.Entities.GenericTables.Service.TblService", b =>
@@ -11333,15 +11069,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("TeachingAids");
 
                     b.Navigation("TopicsCovered");
-                });
-
-            modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaProgramDetails", b =>
-                {
-                    b.Navigation("AdvisoryServices");
-
-                    b.Navigation("Recommendations");
-
-                    b.Navigation("Reports");
                 });
 
             modelBuilder.Entity("Domain.Entities.KVK.KvkProgramContentAndResources", b =>

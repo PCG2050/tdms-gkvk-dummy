@@ -11,8 +11,10 @@ namespace Application.Interface.Repository
 {
     public interface ITrainerAssignmentRepository
     {
+        Task<List<int>> GetUnitLocationIdsByTrainerIdAsync(int trainerId);
         Task<TrainerAssignment?> GetByTrainerLocationAsync(int unitLocationId, int trainerId);
         Task<TrainerAssignment> AddAsync(TrainerAssignment unitLocationTrainer);
+
         Task<TrainerAssignment> UpdateAsync(TrainerAssignment unitLocationTrainer);
         Task DeleteAsync(int id);
         Task DeleteAsync(TrainerAssignment unitLocationTrainer);

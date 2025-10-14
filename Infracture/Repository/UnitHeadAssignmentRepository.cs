@@ -20,6 +20,16 @@ namespace Infrastructure.Repository
         {
             _context = context;
         }
+
+        public async Task<List<int>> GetUnitLocationIdsByUnitHeadIdAsync(int unitHeadId)
+        {
+            return await _context.UnitHeadAssignments
+     .Where(uha => uha.UnitHeadId == unitHeadId)
+     .Select(uha => uha.UnitLocationId) 
+     .Distinct()
+     .ToListAsync();
+
+        }
         public async Task<UnitHeadAssignment> AddAsync(UnitHeadAssignment unitLocationUnitHead)
         {
             await _context.AddAsync(unitLocationUnitHead);

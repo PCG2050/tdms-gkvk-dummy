@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Domain.Entities.IBTVA
@@ -14,22 +15,23 @@ namespace Domain.Entities.IBTVA
         [Required]
         public int? IbtvaProgramContentAndResourcesId { get; set; }
 
+        [JsonIgnore]
         [ForeignKey(nameof(IbtvaProgramContentAndResourcesId))]
-        public IbtvaProgramContentAndResources ProgramContentAndResources { get; set; }
+        public IbtvaProgramContentAndResources? ProgramContentAndResources { get; set; }
 
         [MaxLength(200)]
         public string Name { get; set; }
 
         [MaxLength(150)]
-        public string Designation { get; set; }
+        public string? Designation { get; set; }
 
         [MaxLength(150)]
-        public int ResourceType { get; set; }
+        public int? ResourceType { get; set; }
 
         [MaxLength(250)]
-        public int Responsibility { get; set; }
+        public int? Responsibility { get; set; }
 
         [MaxLength(250)]
-        public string InstitutionOrDepartment { get; set; }
+        public string? InstitutionOrDepartment { get; set; }
     }
 }

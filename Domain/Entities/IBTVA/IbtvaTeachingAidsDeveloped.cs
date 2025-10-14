@@ -15,9 +15,9 @@ namespace Domain.Entities.IBTVA
     {
         [Required]
         public int? IbtvaProgramContentAndResourcesId { get; set; }
-
+        [JsonIgnore]
         [ForeignKey(nameof(IbtvaProgramContentAndResourcesId))]
-        public IbtvaProgramContentAndResources ProgramContentAndResources { get; set; }
+        public IbtvaProgramContentAndResources? ProgramContentAndResources { get; set; }
 
         [MaxLength(200)]
         public int? TypeOfAidId { get; set; }
@@ -25,10 +25,10 @@ namespace Domain.Entities.IBTVA
         public TypeOfAid? TypeOfAid { get; set; }
 
         [MaxLength(200)]
-        public string Other { get; set; }
+        public string? OtherTypeOfAid { get; set; }
 
         [MaxLength(300)]
-        public string Purpose { get; set; }
+        public string? Purpose { get; set; }
 
         public int Number { get; set; }
     }

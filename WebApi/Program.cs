@@ -2,27 +2,45 @@
 using Application.Interface;
 using Application.Interface.Repository;
 using Application.Interface.Repository.DataTables;
+using Application.Interface.Repository.DataTables.IBTVA;
 using Application.Interface.Services;
 using Application.Interface.Services.Common;
 using Application.Interface.Services.DataTables;
+using Application.Interface.Services.DataTables.IBTVA;
+using Application.Mappers;
+using Application.Mappers.IBTVA;
 using Infrastructure.DbContext;
 using Infrastructure.Repository;
 using Infrastructure.Repository.DataTables;
+using Infrastructure.Repository.DataTables.IBTVA;
 using Infrastructure.Services;
 using Infrastructure.Services.DataTables;
+using Infrastructure.Services.DataTables.IBTVA;
 using Infrastructure.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Resend;
 using Scalar.AspNetCore;
+using Serilog;
+using Serilog.Sinks.File;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using WebApi.Services;
+using Application.Mapper;
+using Application.Interface.Repository.DataTables.ConsultSocialMedia;
+using Infrastructure.Repository.DataTables.ConsultSocialMedia;
+using Infrastructure.Repository.DataTables.Publication_Repo;
+using Application.Interface.Services.DataTables.ConsultSocialMedia;
+using Infrastructure.Services.DataTables.ConsultSocialMedia;
+using Application.Interface.Repository.DataTables.TblService;
 
 namespace WebApi
 {
@@ -32,7 +50,14 @@ namespace WebApi
         {
             var builder = WebApplication.CreateBuilder(args);
 
-           //Configure JSON options for better data handlingServer
+            // Configure Serilog
+            Log.Logger = new LoggerConfiguration()
+                .Enrich.FromLogContext()
+                .WriteTo.Console()
+                .CreateLogger();
+            builder.Host.UseSerilog();
+
+            //Configure JSON options for better data handlingServer
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
                  {
@@ -40,6 +65,27 @@ namespace WebApi
                      //options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                      options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                  });
+
+            // API Versioning Configuration
+            //builder.Services.AddApiVersioning(options =>
+            //{
+            //    options.DefaultApiVersion = new ApiVersion(1, 0);
+            //    options.AssumeDefaultVersionWhenUnspecified = true;
+            //    options.ReportApiVersions = true;
+            //    options.ApiVersionReader = new UrlSegmentApiVersionReader();
+            //});
+
+            //builder.Services.AddVersionedApiExplorer(options =>
+            //{
+            //    options.GroupNameFormat = "'v'VVV";
+            //    options.SubstituteApiVersionInUrl = true;
+            //});
+
+            // Mapperly Mapper - Singleton (stateless)
+            builder.Services.AddSingleton<PublicationMapper>();
+            builder.Services.AddSingleton<ConsultingServiceMapper>();
+            builder.Services.AddSingleton<NominationRewardMapper>();
+            builder.Services.AddSingleton<TableOtherActivityMapper>();
 
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openappi
             builder.Services.AddOpenApi();
@@ -121,13 +167,13 @@ namespace WebApi
 
             builder.Services.AddScoped<IIbtvaProgrammeRepository, IbtvaProgrammeRepository>();
             builder.Services.AddScoped<IIbtvaProgrammeService, IbtvaProgrammeService>();
-
             builder.Services.AddScoped<IAticAdvisoryServiceRepository, AticAdvisoryServiceRepository>();
             builder.Services.AddScoped<IAticSalesRepository, AticSalesRepository>();
 
-            builder.Services.AddScoped<IAsmVisitRepository, AsmVisitRepository>();
+         
 
             builder.Services.AddScoped<IDeuCourseRepository, DeuCourseRepository>();
+            builder.Services.AddScoped<IAsmVisitRepository, AsmVisitRepository>();
 
             builder.Services.AddScoped<INaepDetailsRepository, NaepDetailsRepository>();
 
@@ -143,7 +189,48 @@ namespace WebApi
             builder.Services.AddScoped<IEeuOftService, EeuOftService>();
             builder.Services.AddScoped<IEeuFldService, EeuFldService>();
             builder.Services.AddScoped<IEeuTrainingProgrammeService, EeuTrainingProgrammeService>();
-            
+
+            // Mappers
+            builder.Services.AddSingleton<IbtvaProgramMapper>();
+            builder.Services.AddSingleton<ConsultingServiceMapper>();
+            builder.Services.AddSingleton<PublicationMapper>();
+            builder.Services.AddSingleton<TblServiceMapper>();
+
+
+            // Phase 1: Program
+            builder.Services.AddScoped<IIbtvaProgramRepository, IbtvaProgramRepository>();
+            builder.Services.AddScoped<IIbtvaProgramService, IbtvaProgramService>();
+
+            // Phase 2: Demographics
+            //builder.Services.AddScoped<IIbtvaDemographicsRepository, IbtvaDemographicsRepository>();
+            //builder.Services.AddScoped<IIbtvaDemographicsService, IbtvaDemographicsService>();
+
+            // Continue pattern for Phases 3-6...
+
+
+            //Generic Tables
+            builder.Services.AddScoped<IPublicationRepository, PublicationRepository>();
+            builder.Services.AddScoped<IPublisherDetailsRepository, PublisherDetailsRepository>();
+            builder.Services.AddScoped<IExtensionLiteratureRepository, ExtensionLiteratureRepository>();
+            builder.Services.AddScoped<IPublicationService, PublicationService>();
+
+            builder.Services.AddScoped<IConsultingServiceRepository, ConsultingServiceRepository>();
+            builder.Services.AddScoped<IModeAndOutreachRepository, ModeAndOutreachRepository>();
+            builder.Services.AddScoped<IConsultingServiceService,ConsultingServiceService>();
+            builder.Services.AddScoped<INominationRewardRepository,NominationRewardRepository>();
+            builder.Services.AddScoped<INominationRewardService, NominationRewardService>();
+            builder.Services.AddScoped<ITableOtherActivityRepository, TableOtherActivityRepository>();
+            builder.Services.AddScoped<ITableOtherActivityService, TableOtherActivityService>();
+
+            builder.Services.AddScoped<ITblServiceService, TblServiceService>();
+            builder.Services.AddScoped<ITableServiceRepository, TableServiceRepository>();
+            builder.Services.AddScoped<ITableHostelRepository, TableHostelRepository>();
+            builder.Services.AddScoped<IRevolvingFundRepository, RevolvingFundRepository>();
+            builder.Services.AddScoped<IVisitorDetailsRepository, VisitorDetailRepository>();
+
+
+
+
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(o=>
@@ -172,6 +259,7 @@ namespace WebApi
                     .WithTheme(ScalarTheme.DeepSpace);
                 });
             }
+        
             app.UseCors(MyAllowSpecificOrigins);
             app.UseHttpsRedirection();
             app.UseAuthentication();

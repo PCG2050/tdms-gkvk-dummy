@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
@@ -11,14 +9,14 @@ namespace Domain.Entities.GenericTables.Service
 {
     public class TableHostel : AuditableBaseEntity
     {
-     
+        
 
         // Foreign key to Service
         public int ServiceId { get; set; }
         [JsonIgnore]
         public TblService? TblService { get; set; }
 
-        public DateOnly Date { get; set; }
+        public DateOnly? Date { get; set; }
 
         // Male counts
         public int Male_SC { get; set; }
@@ -40,6 +38,10 @@ namespace Domain.Entities.GenericTables.Service
         [MaxLength(250)]
         public string? Purpose { get; set; }
 
-        public double AmountGenerated { get; set; }
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal AmountGenerated { get; set; }
+
+        public DateOnly SubmittedDate { get; set; }
+
     }
 }

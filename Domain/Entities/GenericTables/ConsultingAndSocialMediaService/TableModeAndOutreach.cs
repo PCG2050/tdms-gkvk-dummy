@@ -9,8 +9,8 @@ namespace Domain.Entities.GenericTables.ConsultingAndSocialMediaService
     {
         public int ConsultingServiceId { get; set; }
         
-        [ForeignKey(nameof(TableConsultingAndSocialMediaService))]
-        public TableConsultingAndSocialMediaService? ConsultingService { get; set; }       
+        [ForeignKey(nameof(ConsultingServiceId))]
+        public ConsultingAndSocialMediaService? ConsultingService { get; set; }       
        
 
         [MaxLength(150)]
