@@ -1,21 +1,13 @@
-﻿using Domain.Entities.FTI;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace Domain.Entities.DEU
 {
     public class DeuRecommendation :AuditableBaseEntity
     {
         [Required]
-        public int DeuProgramDetailsId { get; set; }
-
+        public int? DeuProgramDetailsId { get; set; }
+        [JsonIgnore]
         [ForeignKey(nameof(DeuProgramDetailsId))]
-        public DeuProgramDetails ProgramDetails { get; set; }
+        public DeuProgramDetails? ProgramDetails { get; set; }
 
         // Recommendation fields
         [MaxLength(1000)]
@@ -35,5 +27,9 @@ namespace Domain.Entities.DEU
 
         [MaxLength(1000)]
         public string? ImpactOutcome { get; set; }
+
+        public int? UnitLocationId { get; set; }
+
+        public int? OrganizationId { get; set; }
     }
 }

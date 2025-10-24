@@ -12,16 +12,18 @@ namespace Application.Interface.Repository
     {
 
         Task<List<int>> GetUnitLocationIdsByUnitHeadIdAsync(int unitHeadId);
+        Task<bool> IsUnitHeadAssignedToLocationAsync(int unitHeadId, int unitLocationId);       
+        Task<List<int>> GetUnitIdsByUnitHeadIdAsync(int unitHeadId);
+
         Task<UnitHeadAssignment?> GetByUnitHeadLocationAsync(int unitLocationId, int unitHeadId);
-            Task<UnitHeadAssignment> AddAsync(UnitHeadAssignment unitLocationUnitHead);
-            Task<UnitHeadAssignment> UpdateAsync(UnitHeadAssignment unitLocationUnitHead);
-            Task DeleteAsync(int id);
-            Task DeleteAsync(UnitHeadAssignment unitLocationUnitHead);
-            Task<bool> UnitHeadAssignmentExistsAsync(ExistingUnitHeadAssignmentDto UnitHeadAssignment);
+        Task<UnitHeadAssignment> AddAsync(UnitHeadAssignment unitLocationUnitHead);
+        Task<UnitHeadAssignment> UpdateAsync(UnitHeadAssignment unitLocationUnitHead);
+        Task DeleteAsync(int id);
+        Task DeleteAsync(UnitHeadAssignment unitLocationUnitHead);
+        Task<bool> UnitHeadAssignmentExistsAsync(ExistingUnitHeadAssignmentDto UnitHeadAssignment);
 
-            Task<bool> AssignmentExistsByLocationAsync(int unitLocationId, int unitHeadId);
-            Task<List<UnitWithLocationsDto>> GetAssignmentsDetailsByUnitHeadAsync(int unitHeadId);
-
+        Task<bool> AssignmentExistsByLocationAsync(int unitLocationId, int unitHeadId);
+        Task<List<UnitWithLocationsDto>> GetAssignmentsDetailsByUnitHeadAsync(int unitHeadId);
 
         Task<List<UnitHeadAssignment>> GetByUnitHeadIdAsync(int unitHeadId);
         Task AddRangeAsync(IEnumerable<UnitHeadAssignment> assignments);

@@ -1,7 +1,4 @@
-﻿using Domain.Entities.Junction;
-using System.Text.Json.Serialization;
-
-namespace Domain.Entities
+﻿namespace Domain.Entities
 {
     public class Unit:AuditableBaseEntity
     {

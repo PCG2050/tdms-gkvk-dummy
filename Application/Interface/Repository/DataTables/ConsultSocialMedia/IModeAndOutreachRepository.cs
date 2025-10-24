@@ -1,4 +1,4 @@
-﻿using Domain.Entities.GenericTables.ConsultingAndSocialMediaService;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Linq;

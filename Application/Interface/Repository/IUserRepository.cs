@@ -1,6 +1,5 @@
-﻿using Application.Models;
-using Domain.Entities;
-using Domain.Entities.Enum;
+﻿
+
 
 namespace Application.Interface.Repository
 {

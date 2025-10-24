@@ -30,6 +30,9 @@ namespace Domain.Entities.IBTVA
         [MaxLength(300)]
         public string? Purpose { get; set; }
 
-        public int Number { get; set; }
+        public int? Number { get; set; }
+        public int? UnitLocationId { get; set; }
+
+        public int? OrganizationId { get; set; }
     }
 }

@@ -1,14 +1,4 @@
-﻿using Domain.Entities.EEU;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-
-namespace Domain.Entities.IBTVA
+﻿namespace Domain.Entities.IBTVA
 {
     public class IbtvaAdvisoryServices : AuditableBaseEntity
     {
@@ -31,5 +21,8 @@ namespace Domain.Entities.IBTVA
         public int NoOfEmailsSent { get; set; }
         public int NoOfNewspaperCoverage { get; set; }
         public int NoOfBeneficiaries { get; set; }
+        public int? UnitLocationId { get; set; }
+
+        public int? OrganizationId { get; set; }
     }
 }

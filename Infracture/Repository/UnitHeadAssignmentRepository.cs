@@ -24,12 +24,26 @@ namespace Infrastructure.Repository
         public async Task<List<int>> GetUnitLocationIdsByUnitHeadIdAsync(int unitHeadId)
         {
             return await _context.UnitHeadAssignments
-     .Where(uha => uha.UnitHeadId == unitHeadId)
-     .Select(uha => uha.UnitLocationId) 
-     .Distinct()
-     .ToListAsync();
-
+             .Where(uha => uha.UnitHeadId == unitHeadId)
+             .Select(uha => uha.UnitLocationId) 
+             .Distinct()
+             .ToListAsync();
         }
+        public async Task<bool> IsUnitHeadAssignedToLocationAsync(int unitHeadId, int unitLocationId)
+        {
+            return await _context.UnitHeadAssignments
+                .AnyAsync(a => a.UnitHeadId == unitHeadId && a.UnitLocationId == unitLocationId);
+        }
+        public async Task<List<int>> GetUnitIdsByUnitHeadIdAsync(int unitHeadId)
+        {
+            return await _context.UnitHeadAssignments
+                .Include(a => a.UnitLocation)
+                .Where(a => a.UnitHeadId == unitHeadId)
+                .Select(a => a.UnitLocation.UnitId)
+                .Distinct()
+                .ToListAsync();
+        }
+
         public async Task<UnitHeadAssignment> AddAsync(UnitHeadAssignment unitLocationUnitHead)
         {
             await _context.AddAsync(unitLocationUnitHead);

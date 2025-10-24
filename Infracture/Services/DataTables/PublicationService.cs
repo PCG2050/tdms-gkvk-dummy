@@ -499,8 +499,7 @@ namespace Infrastructure.Services.DataTables
 
         private async Task<List<int>> GetAccessibleUnitLocationIdsAsync()
         {
-            // TODO: Implement based on your TrainerAssignment logic
-            // This is a placeholder - you need to implement this based on your existing logic
+           
 
          
             if (_currentUserService.Role == Role.TRAINER)

@@ -14,9 +14,9 @@ namespace Domain.Entities.FTI
     {
         [Required]
         public int? FTIProgramDetailsID { get; set; }
-
+        [JsonIgnore]
         [ForeignKey(nameof(FTIProgramDetailsID))]
-        public FTIProgramDetails ProgramDetails { get; set; }
+        public FTIProgramDetails? ProgramDetails { get; set; }
 
         // Advisory service metrics
         public int? NoOfFacebookSMS { get; set; }

@@ -1,9 +1,4 @@
-﻿using Application.Interface;
-using Application.Interface.Services.Common;
-using Application.Models;
-using Domain.Entities;
-using Infrastructure.Services;
-using Microsoft.AspNetCore.Mvc;
+﻿
 
 namespace WebApi.Controllers.DataTables
 {

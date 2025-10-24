@@ -3,16 +3,16 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Application.Models.DataTables.IBTVA
 {
-    // ==================== PROGRAM DETAILS ====================
-
-    public class IbtvaProgramDetailsCreateDto
+    // ==================== PROGRAM DETAILS (Section A) ====================
+    public class IbtvaProgramDetailsDto
     {
+        public int Id { get; set; }
+
+        // --- Base Fields (same as CreateDto) ---
+        
+        public string? Title { get; set; }
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }
-
-        [Required]
-        public int UnitLocationId { get; set; }
-
         public int? ProgramTypeId { get; set; }
         public int? CategoryId { get; set; }
         public string? CategoryOther { get; set; }
@@ -24,11 +24,80 @@ namespace Application.Models.DataTables.IBTVA
         public string? ThematicAreaOther { get; set; }
         public int? SponsoredOrganization { get; set; }
         public string? SponsoredOrganizationName { get; set; }
+        public int? ModeId { get; set; }
+        public string? Duration { get; set; }
+        public int? RegionId { get; set; }
+        public string? RegionOther { get; set; }
+        public int? TPNo { get; set; }
+        public string? Location { get; set; }
+        public int? SourceOfFundId { get; set; }
+        public int? Funds { get; set; }
+        public int? StatusId { get; set; }
+        public decimal? TotalOutlayRs { get; set; }
+        public string? Copi { get; set; }
+        public int? BatchNo { get; set; }
+        public string? OrganizerBroucherFile { get; set; }
+        public string? OrganizerInstitutionName { get; set; }
+        public string? OrganizerInstitutionAddress { get; set; }
+        public int? SourceId { get; set; }
+        public DateTime? ProposalDate { get; set; }
+        public string? ProposalUploadFile { get; set; }
+        public DateTime? UniversitySanctionLetterDate { get; set; }
+        public string? UniversitySanctionLetterUploadFile { get; set; }
+        public DateTime? FundsSanctionLetterDate { get; set; }
+        public string? FundsSanctionLetterUploadFile { get; set; }
 
+        // --- Derived / Display Fields ---
+
+        public int UnitLocationId { get; set; }
+
+        public string UnitLocationName {get; set; }
+        public string? CategoryName { get; set; }
+        public string? ProgramTypeName { get; set; }
+        public string? ThemeName { get; set; }
+        public string? RegionName { get; set; }
+        public string? ModeName { get; set; }
+        public string? SourceOfFundName { get; set; }
+        public string? UnitName { get; set; }
+        public string? DistrictName { get; set; }
+        public string? StateName { get; set; }
+
+        // --- Metadata ---
+        public string FormStatus { get; set; } = "Draft";
+
+        public string? FormStatusRemarks { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset? UpdatedAt { get; set; }
+        public string? CreatedByName { get; set; }
+
+        public DateTimeOffset? ApprovedAt { get; set; }
+        public int? ApprovedById { get; set; }
+        public string? ApprovedByName { get; set; }
+    }
+    public class IbtvaProgramCreateDto
+    {
+        public DateOnly StartDate { get; set; }
+        public DateOnly EndDate { get; set; }
+        
         [Required]
+        public int UnitLocationId { get; set; }
+        
+        public int? ProgramTypeId { get; set; }
+        public int? CategoryId { get; set; }
+        public string? CategoryOther { get; set; }
+        public int? TypeId { get; set; }
+        public string? TypeOther { get; set; }
+        public int? ThemeId { get; set; }
+        public string? ThemeOther { get; set; }
+        public int? ThematicAreaId { get; set; }
+        public string? ThematicAreaOther { get; set; }
+        public int? SponsoredOrganization { get; set; }
+        public string? SponsoredOrganizationName { get; set; }
+        
+        
         [MaxLength(250)]
-        public string Title { get; set; }
-
+        public string? Title { get; set; }
+        
         public int? Mode { get; set; }
         public string? Duration { get; set; }
         public int? RegionId { get; set; }
@@ -38,10 +107,11 @@ namespace Application.Models.DataTables.IBTVA
         public int? SourceOfFundId { get; set; }
         public int? NoOfCourses { get; set; }
         public string? Attachments { get; set; }
-        public string FormStatus { get; set; } = "Draft";
+
+       
     }
 
-    public class IbtvaProgramDetailsUpdateDto : IUpdateDto
+    public class IbtvaProgramUpdateDto : IUpdateDto
     {
         public int Id { get; set; }
         public DateOnly? StartDate { get; set; }
@@ -67,40 +137,48 @@ namespace Application.Models.DataTables.IBTVA
         public int? SourceOfFundId { get; set; }
         public int? NoOfCourses { get; set; }
         public string? Attachments { get; set; }
-        public string? FormStatus { get; set; }
+
+       
+
     }
 
-    public class IbtvaProgramDetailsDto
-    {
-        public int Id { get; set; }
-        public DateOnly StartDate { get; set; }
-        public DateOnly EndDate { get; set; }
-        public string Title { get; set; }
-        public string Duration { get; set; }
-        public string Location { get; set; }
-        public string FormStatus { get; set; }
-        public DateTimeOffset CreatedAt { get; set; }
-        public string CreatedByName { get; set; }
-        public int? TotalParticipants { get; set; }
-    }
+
+
 
     public class IbtvaProgramDetailsCompleteDto : IbtvaProgramDetailsDto
     {
-        public List<IbtvaParticipantDemographicsDto> Demographics { get; set; }
-        public IbtvaProgramContentDto ProgramContent { get; set; }
-        public IbtvaAdvisoryServicesDto AdvisoryServices { get; set; }
-        public List<IbtvaReportDto> Reports { get; set; }
-        public List<IbtvaRecommendationDto> Recommendations { get; set; }
+        public List<IbtvaParticipantDemographicsDto>? Demographics { get; set; }
+        public List<IbtvaProgramContentDto>? ProgramContent { get; set; }
+        public IbtvaAdvisoryServicesDto? AdvisoryServices { get; set; }
+        public IbtvaReportDto? Reports { get; set; }
+        public IbtvaRecommendationDto? Recommendations { get; set; }
     }
 
-    public class UpdateFormStatusDto
+    // ==================== PARTICIPANT DEMOGRAPHICS (Section B) ====================
+
+    public class IbtvaParticipantDemographicsDto
     {
-        [Required]
-        public string FormStatus { get; set; } // "Draft", "Pending", "Approved", "Rejected"
-        public string? FormStatusRemarks { get; set; }
+        public int Id { get; set; }
+        public int? ParticipantId { get; set; }
+        public int? Male_SC { get; set; }
+        public int? Male_ST { get; set; }
+        public int? Male_OBC { get; set; }
+        public int? Male_GEN { get; set; }
+        public int? SC_Male_StayedInHostel { get; set; }
+        public int? ST_Male_StayedInHostel { get; set; }
+        public int? OBC_Male_StayedInHostel { get; set; }
+        public int? GEN_Male_StayedInHostel { get; set; }
+        public int? Female_SC { get; set; }
+        public int? Female_ST { get; set; }
+        public int? Female_OBC { get; set; }
+        public int? Female_GEN { get; set; }
+        public int? SC_Female_StayedInHostel { get; set; }
+        public int? ST_Female_StayedInHostel { get; set; }
+        public int? OBC_Female_StayedInHostel { get; set; }
+        public int? GEN_Female_StayedInHostel { get; set; }
+        public int? Total { get; set; }
     }
 
-    // ==================== PARTICIPANT DEMOGRAPHICS ====================
 
     public class IbtvaParticipantDemographicsCreateDto
     {
@@ -113,25 +191,25 @@ namespace Application.Models.DataTables.IBTVA
         public int? Male_ST { get; set; }
         public int? Male_OBC { get; set; }
         public int? Male_GEN { get; set; }
-
+        
         // Male hostel
         public int? SC_Male_StayedInHostel { get; set; }
         public int? ST_Male_StayedInHostel { get; set; }
         public int? OBC_Male_StayedInHostel { get; set; }
         public int? GEN_Male_StayedInHostel { get; set; }
-
+        
         // Female counts
         public int? Female_SC { get; set; }
         public int? Female_ST { get; set; }
         public int? Female_OBC { get; set; }
         public int? Female_GEN { get; set; }
-
+        
         // Female hostel
         public int? SC_Female_StayedInHostel { get; set; }
         public int? ST_Female_StayedInHostel { get; set; }
         public int? OBC_Female_StayedInHostel { get; set; }
         public int? GEN_Female_StayedInHostel { get; set; }
-
+        
         public int? Total { get; set; }
     }
 
@@ -158,57 +236,47 @@ namespace Application.Models.DataTables.IBTVA
         public int? Total { get; set; }
     }
 
-    public class IbtvaParticipantDemographicsDto
-    {
-        public int Id { get; set; }
-        public string ParticipantName { get; set; }
-        public int MaleTotal { get; set; }
-        public int FemaleTotal { get; set; }
-        public int Total { get; set; }
-    }
+    
 
-    // ==================== PROGRAM CONTENT ====================
-
+    // ==================== PROGRAM CONTENT (Section C) ====================
+    
     public class IbtvaProgramContentCreateDto
     {
         [Required]
         public int IbtvaProgramDetailsId { get; set; }
-        public string? Title { get; set; }
-        public string? Description { get; set; }
+   
     }
 
     public class IbtvaProgramContentUpdateDto : IUpdateDto
     {
         public int Id { get; set; }
-        public string? Title { get; set; }
-        public string? Description { get; set; }
+       
     }
 
     public class IbtvaProgramContentDto
     {
         public int Id { get; set; }
-        public string Title { get; set; }
-        public string Description { get; set; }
+       
         public List<IbtvaResourcePersonDto> ResourcePersons { get; set; }
         public List<IbtvaTopicsCoveredDto> TopicsCovered { get; set; }
         public List<IbtvaTeachingAidsDto> TeachingAids { get; set; }
     }
 
-    // ==================== RESOURCE PERSONS ====================
-
+    // ==================== RESOURCE PERSONS (Section C - Subsection) ====================
+    
     public class IbtvaResourcePersonCreateDto
     {
         [Required]
         public int IbtvaProgramContentAndResourcesId { get; set; }
-
+        
         [Required]
         [MaxLength(200)]
         public string Name { get; set; }
-
+        
         public string? Designation { get; set; }
         public int? ResourceType { get; set; }
         public int? Responsibility { get; set; }
-        public string? TopicsCovered { get; set; }
+        public string? InstitutionOrDepartment { get; set; }
     }
 
     public class IbtvaResourcePersonUpdateDto : IUpdateDto
@@ -218,7 +286,7 @@ namespace Application.Models.DataTables.IBTVA
         public string? Designation { get; set; }
         public int? ResourceType { get; set; }
         public int? Responsibility { get; set; }
-        public string? TopicsCovered { get; set; }
+        public string? InstitutionOrDepartment { get; set; }
     }
 
     public class IbtvaResourcePersonDto
@@ -230,70 +298,72 @@ namespace Application.Models.DataTables.IBTVA
         public string Responsibility { get; set; }
     }
 
-    // ==================== TOPICS COVERED ====================
-
+    // ==================== TOPICS COVERED (Section C - Subsection) ====================
+    
     public class IbtvaTopicsCoveredCreateDto
     {
         [Required]
         public int IbtvaProgramContentAndResourcesId { get; set; }
-
-        [Required]
-        public string TopicName { get; set; }
-
-        public string? Description { get; set; }
+        
+        public DateTime? Date { get; set; }
+        public string? Title { get; set; }
+        public string? PhotoUpload { get; set; }
     }
 
     public class IbtvaTopicsCoveredUpdateDto : IUpdateDto
     {
         public int Id { get; set; }
-        public string? TopicName { get; set; }
-        public string? Description { get; set; }
+        public DateTime? Date { get; set; }
+        public string? Title { get; set; }
+        public string? PhotoUpload { get; set; }
     }
 
     public class IbtvaTopicsCoveredDto
     {
         public int Id { get; set; }
-        public string TopicName { get; set; }
-        public string Description { get; set; }
+        public DateTime? Date { get; set; }
+        public string Title { get; set; }
+        public string PhotoUpload { get; set; }
     }
 
-    // ==================== TEACHING AIDS ====================
-
+    // ==================== TEACHING AIDS (Section C - Subsection) ====================
+    
     public class IbtvaTeachingAidsCreateDto
     {
         [Required]
         public int IbtvaProgramContentAndResourcesId { get; set; }
-
-        [Required]
-        public string AidType { get; set; }
-
-        public string? Description { get; set; }
-        public int? Quantity { get; set; }
+        
+        public int? TypeOfAidId { get; set; }
+        public string? OtherTypeOfAid { get; set; }
+        public string? Purpose { get; set; }
+        public int Number { get; set; }
     }
 
     public class IbtvaTeachingAidsUpdateDto : IUpdateDto
     {
         public int Id { get; set; }
-        public string? AidType { get; set; }
-        public string? Description { get; set; }
-        public int? Quantity { get; set; }
+        public int? TypeOfAidId { get; set; }
+        public string? OtherTypeOfAid { get; set; }
+        public string? Purpose { get; set; }
+        public int? Number { get; set; }
     }
 
     public class IbtvaTeachingAidsDto
     {
         public int Id { get; set; }
-        public string AidType { get; set; }
-        public string Description { get; set; }
-        public int Quantity { get; set; }
+        public int? TypeOfAidId { get; set; }
+        public string? OtherTypeOfAid { get; set; }
+        public string? Purpose { get; set; }
+        public int? Number { get; set; }
     }
 
-    // ==================== ADVISORY SERVICES ====================
-
+    // ==================== ADVISORY SERVICES (Section D) ====================
+    
     public class IbtvaAdvisoryServicesCreateDto
     {
         [Required]
         public int IbtvaProgramDetailsId { get; set; }
-
+        
         public int NoOfFacebookSMS { get; set; }
         public int NoOfSMSSentToRegisteredFarmers { get; set; }
         public int NoOfWhatsappGroups { get; set; }
@@ -326,18 +396,26 @@ namespace Application.Models.DataTables.IBTVA
     public class IbtvaAdvisoryServicesDto
     {
         public int Id { get; set; }
-        public int TotalDigitalOutreach { get; set; }
-        public int TotalPhysicalInteractions { get; set; }
+        public int NoOfFacebookSMS { get; set; }
+        public int NoOfSMSSentToRegisteredFarmers { get; set; }
+        public int NoOfWhatsappGroups { get; set; }
+        public int NoOfWhatsappSMS { get; set; }
+        public int NoOfAnsweredWhatsappQueries { get; set; }
+        public int NoOfPhoneCalls { get; set; }
+        public int NoOfFaceToFaceDiscussions { get; set; }
+        public int NoOfGroupDiscussions { get; set; }
+        public int NoOfEmailsSent { get; set; }
+        public int NoOfNewspaperCoverage { get; set; }
         public int NoOfBeneficiaries { get; set; }
     }
 
-    // ==================== REPORTS ====================
-
+    // ==================== REPORTS (Section E) ====================
+    
     public class IbtvaReportCreateDto
     {
         [Required]
         public int IbtvaProgramDetailsId { get; set; }
-
+        
         public string? ProgressReportReportingYear { get; set; }
         public DateTime? Date { get; set; }
         public string? UploadPhoto { get; set; }
@@ -360,20 +438,21 @@ namespace Application.Models.DataTables.IBTVA
     public class IbtvaReportDto
     {
         public int Id { get; set; }
-        public string ReportingYear { get; set; }
+        public string? ProgressReportReportingYear { get; set; }
         public DateTime? Date { get; set; }
-        public string SignificantOutcome { get; set; }
-        public bool HasPhotos { get; set; }
-        public bool HasVideos { get; set; }
+        public string? UploadPhoto { get; set; }
+        public string? PhotosGeotaggedPhotoOrUploadPhoto { get; set; }
+        public string? UploadVideo { get; set; }
+        public string? SignificantOutcome { get; set; }
     }
 
-    // ==================== RECOMMENDATIONS ====================
-
+    // ==================== RECOMMENDATIONS (Section F) ====================
+    
     public class IbtvaRecommendationCreateDto
     {
         [Required]
         public int IbtvaProgramDetailsId { get; set; }
-
+        
         public string? ProblemsIdentified { get; set; }
         public string? Recommendation { get; set; }
         public string? ActionTaken { get; set; }
@@ -400,5 +479,7 @@ namespace Application.Models.DataTables.IBTVA
         public string? Recommendation { get; set; }
         public string? ActionTaken { get; set; }
         public string? SignificantAchievement { get; set; }
+        public string? SuccessStories { get; set; }
+        public string? ImpactOutcome { get; set; }
     }
 }

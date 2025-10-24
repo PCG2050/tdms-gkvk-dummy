@@ -1,92 +1,108 @@
-﻿using Application.Models.DataTables.IBTVA;
+﻿// Application/Interface/Services/DataTables/IIbtvaProgramService.cs
+using Application.Models;
+using Application.Models.DataTables.IBTVA;
 
 namespace Application.Interface.Services.DataTables.IBTVA
 {
-    // Phase 1: Program
     public interface IIbtvaProgramService
     {
-        Task<IbtvaProgramDetailsDto> CreateAsync(IbtvaProgramCreateDto dto, int trainerId, int organizationId);
-        Task<IbtvaProgramDetailsDto?> GetByIdAsync(int id, int trainerId);
-        Task<IEnumerable<IbtvaProgramDetailsDto>> GetAllAsync(int trainerId);
-        Task<IbtvaProgramDetailsDto?> UpdateAsync(int id, IbtvaProgramUpdateDto dto, int trainerId);
-        Task<bool> DeleteAsync(int id, int trainerId);
-        Task<bool> SubmitAsync(int id, int trainerId);
-    }
+        // ============================
+        // SECTION A: PROGRAM DETAILS
+        // ============================
+        Task<ServiceResult<IbtvaProgramDetailsDto>> CreateProgramAsync(IbtvaProgramCreateDto dto);
+        Task<ServiceResult<IbtvaProgramDetailsDto>> GetProgramByIdAsync(int id);
+        Task<ServiceResult<IbtvaProgramDetailsCompleteDto>> GetCompleteProgramAsync(int id);
+        Task<ServiceResult<IbtvaProgramDetailsDto>> UpdateProgramAsync(int id, IbtvaProgramUpdateDto dto);
+        Task<ServiceResult> DeleteProgramAsync(int id);
 
-    // Phase 2: Demographics
-    public interface IIbtvaDemographicsService
-    {
-        Task<DemographicsDto> CreateAsync(int programId, DemographicsCreateDto dto, int trainerId);
-        Task<DemographicsDto?> GetByIdAsync(int id, int programId);
-        Task<IEnumerable<DemographicsDto>> GetAllByProgramAsync(int programId);
-        Task<DemographicsDto?> UpdateAsync(int id, int programId, DemographicsCreateDto dto, int trainerId);
-        Task<bool> DeleteAsync(int id, int programId);
-    }
+        // ============================
+        // SECTION B: PARTICIPANT DEMOGRAPHICS
+        // ============================
+        Task<ServiceResult<IbtvaParticipantDemographicsDto>> AddDemographicsAsync(int programId, IbtvaParticipantDemographicsCreateDto dto);
+        Task<ServiceResult<IbtvaParticipantDemographicsDto>> UpdateDemographicsAsync(int demographicsId, IbtvaParticipantDemographicsUpdateDto dto);
+        Task<ServiceResult> DeleteDemographicsAsync(int demographicsId);
+        Task<ServiceResult<List<IbtvaParticipantDemographicsDto>>> GetDemographicsByProgramIdAsync(int programId);
 
-    // Phase 3: Content
-    public interface IIbtvaContentService
-    {
-        Task<ContentResourcesDto> CreateAsync(int programId, ContentResourcesCreateDto dto, int trainerId);
-        Task<ContentResourcesDto?> GetByIdAsync(int id, int programId);
-        Task<IEnumerable<ContentResourcesDto>> GetAllByProgramAsync(int programId);
-        Task<ContentResourcesDto?> UpdateAsync(int id, int programId, ContentResourcesCreateDto dto, int trainerId);
-        Task<bool> DeleteAsync(int id, int programId);
-    }
+        // ============================
+        // SECTION C: PROGRAM CONTENT & RESOURCES
+        // ============================
+        Task<ServiceResult<IbtvaProgramContentDto>> AddProgramContentAsync(int programId, IbtvaProgramContentCreateDto dto);
+        Task<ServiceResult<IbtvaProgramContentDto>> GetProgramContentByIdAsync(int contentId);
+        Task<ServiceResult> DeleteProgramContentAsync(int contentId);
+        Task<ServiceResult<List<IbtvaProgramContentDto>>> GetProgramContentsByProgramIdAsync(int programId);
 
-    public interface IIbtvaResourcePersonService
-    {
-        Task<ResourcePersonDto> CreateAsync(int programId, ResourcePersonCreateDto dto, int trainerId);
-        Task<ResourcePersonDto?> GetByIdAsync(int id, int programId);
-        Task<IEnumerable<ResourcePersonDto>> GetAllByProgramAsync(int programId);
-        Task<ResourcePersonDto?> UpdateAsync(int id, int programId, ResourcePersonCreateDto dto, int trainerId);
-        Task<bool> DeleteAsync(int id, int programId);
-    }
+        // ============================
+        // SECTION C1: RESOURCE PERSONS
+        // ============================
+        Task<ServiceResult<IbtvaResourcePersonDto>> AddResourcePersonAsync(int contentId, IbtvaResourcePersonCreateDto dto);
+        Task<ServiceResult<IbtvaResourcePersonDto>> UpdateResourcePersonAsync(int personId, IbtvaResourcePersonUpdateDto dto);
+        Task<ServiceResult> DeleteResourcePersonAsync(int personId);
+        Task<ServiceResult<List<IbtvaResourcePersonDto>>> GetResourcePersonsByContentIdAsync(int contentId);
 
-    public interface IIbtvaTopicService
-    {
-        Task<TopicDto> CreateAsync(int programId, TopicCreateDto dto, int trainerId);
-        Task<TopicDto?> GetByIdAsync(int id, int programId);
-        Task<IEnumerable<TopicDto>> GetAllByProgramAsync(int programId);
-        Task<TopicDto?> UpdateAsync(int id, int programId, TopicCreateDto dto, int trainerId);
-        Task<bool> DeleteAsync(int id, int programId);
-    }
+        // ============================
+        // SECTION C2: TOPICS COVERED
+        // ============================
+        Task<ServiceResult<IbtvaTopicsCoveredDto>> AddTopicAsync(int contentId, IbtvaTopicsCoveredCreateDto dto);
+        Task<ServiceResult<IbtvaTopicsCoveredDto>> UpdateTopicAsync(int topicId, IbtvaTopicsCoveredUpdateDto dto);
+        Task<ServiceResult> DeleteTopicAsync(int topicId);
+        Task<ServiceResult<List<IbtvaTopicsCoveredDto>>> GetTopicsByContentIdAsync(int contentId);
 
-    public interface IIbtvaTeachingAidService
-    {
-        Task<TeachingAidDto> CreateAsync(int programId, TeachingAidCreateDto dto, int trainerId);
-        Task<TeachingAidDto?> GetByIdAsync(int id, int programId);
-        Task<IEnumerable<TeachingAidDto>> GetAllByProgramAsync(int programId);
-        Task<TeachingAidDto?> UpdateAsync(int id, int programId, TeachingAidCreateDto dto, int trainerId);
-        Task<bool> DeleteAsync(int id, int programId);
-    }
+        // ============================
+        // SECTION C3: TEACHING AIDS
+        // ============================
+        Task<ServiceResult<IbtvaTeachingAidsDto>> AddTeachingAidAsync(int contentId, IbtvaTeachingAidsCreateDto dto);
+        Task<ServiceResult<IbtvaTeachingAidsDto>> UpdateTeachingAidAsync(int aidId, IbtvaTeachingAidsUpdateDto dto);
+        Task<ServiceResult> DeleteTeachingAidAsync(int aidId);
+        Task<ServiceResult<List<IbtvaTeachingAidsDto>>> GetTeachingAidsByContentIdAsync(int contentId);
 
-    // Phase 4: Advisory
-    public interface IIbtvaAdvisoryService
-    {
-        Task<AdvisoryDto> CreateAsync(int programId, AdvisoryCreateDto dto, int trainerId);
-        Task<AdvisoryDto?> GetByIdAsync(int id, int programId);
-        Task<IEnumerable<AdvisoryDto>> GetAllByProgramAsync(int programId);
-        Task<AdvisoryDto?> UpdateAsync(int id, int programId, AdvisoryCreateDto dto, int trainerId);
-        Task<bool> DeleteAsync(int id, int programId);
-    }
+        // ============================
+        // SECTION D: ADVISORY SERVICES
+        // ============================
+        Task<ServiceResult<IbtvaAdvisoryServicesDto>> AddAdvisoryServicesAsync(int programId, IbtvaAdvisoryServicesCreateDto dto);
+        Task<ServiceResult<IbtvaAdvisoryServicesDto>> UpdateAdvisoryServicesAsync(int advisoryId, IbtvaAdvisoryServicesUpdateDto dto);
+        Task<ServiceResult> DeleteAdvisoryServicesAsync(int advisoryId);
+        Task<ServiceResult<IbtvaAdvisoryServicesDto>> GetAdvisoryServicesByProgramIdAsync(int programId);
 
-    // Phase 5: Reports
-    public interface IIbtvaReportService
-    {
-        Task<ReportDto> CreateAsync(int programId, ReportCreateDto dto, int trainerId);
-        Task<ReportDto?> GetByIdAsync(int id, int programId);
-        Task<IEnumerable<ReportDto>> GetAllByProgramAsync(int programId);
-        Task<ReportDto?> UpdateAsync(int id, int programId, ReportCreateDto dto, int trainerId);
-        Task<bool> DeleteAsync(int id, int programId);
-    }
+        // ============================
+        // SECTION E: REPORTS
+        // ============================
+        Task<ServiceResult<IbtvaReportDto>> AddReportAsync(int programId, IbtvaReportCreateDto dto);
+        Task<ServiceResult<IbtvaReportDto>> UpdateReportAsync(int reportId, IbtvaReportUpdateDto dto);
+        Task<ServiceResult> DeleteReportAsync(int reportId);
+        Task<ServiceResult<IbtvaReportDto>> GetReportByProgramIdAsync(int programId);
 
-    // Phase 6: Recommendations
-    public interface IIbtvaRecommendationService
-    {
-        Task<RecommendationDto> CreateAsync(int programId, RecommendationCreateDto dto, int trainerId);
-        Task<RecommendationDto?> GetByIdAsync(int id, int programId);
-        Task<IEnumerable<RecommendationDto>> GetAllByProgramAsync(int programId);
-        Task<RecommendationDto?> UpdateAsync(int id, int programId, RecommendationCreateDto dto, int trainerId);
-        Task<bool> DeleteAsync(int id, int programId);
+        // ============================
+        // SECTION F: RECOMMENDATIONS
+        // ============================
+        Task<ServiceResult<IbtvaRecommendationDto>> AddRecommendationAsync(int programId, IbtvaRecommendationCreateDto dto);
+        Task<ServiceResult<IbtvaRecommendationDto>> UpdateRecommendationAsync(int recommendationId, IbtvaRecommendationUpdateDto dto);
+        Task<ServiceResult> DeleteRecommendationAsync(int recommendationId);
+        Task<ServiceResult<IbtvaRecommendationDto>> GetRecommendationByProgramIdAsync(int programId);
+
+        // ============================
+        // STATUS MANAGEMENT & SUBMISSION
+        // ============================
+        Task<ServiceResult> SubmitForApprovalAsync(int programId);
+        Task<ServiceResult> ApproveAsync(int programId, string? remarks = null);
+        Task<ServiceResult> RejectAsync(int programId, string remarks);
+
+        // ============================
+        // PAGINATION & FILTERING
+        // ============================
+        Task<PaginatedResult<IbtvaProgramDetailsDto>> GetPaginatedAsync(
+            int pageNumber = 1,
+            int pageSize = 10,
+            DateOnly? startDate = null,
+            DateOnly? endDate = null,
+            int? programTypeId = null,
+            string? searchTerm = null,
+            int? unitLocationId = null);
+
+        Task<PaginatedResult<IbtvaProgramDetailsDto>> GetByStatusAsync(
+            string status,
+            int pageNumber = 1,
+            int pageSize = 10);
+
+        Task<Dictionary<string, int>> GetStatusSummaryAsync();
     }
 }

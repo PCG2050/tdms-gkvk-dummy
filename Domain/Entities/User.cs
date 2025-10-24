@@ -1,7 +1,4 @@
-﻿using Domain.Entities.Enum;
-using Domain.Entities.FTI;
-using Domain.Entities.Junction;
-using System.Text.Json.Serialization;
+﻿
 namespace Domain.Entities
 {
     public class User:AuditableBaseEntity

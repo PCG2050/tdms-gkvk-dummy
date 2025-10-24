@@ -1,36 +1,42 @@
-﻿using Domain.Entities.FIU;
-using Domain.Entities.FTI;
-using Domain.Entities.KVK;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace Domain.Entities.STU
 {
-    public class STUProgramDetails : AuditableBaseEntity
+    public class StuProgramDetails : ReportEntryBaseEntity
     {
-        public int ProgramTypeId { get; set; }
+        public int? ProgramTypeId { get; set; }
+        [JsonIgnore]
+        public ProgramType? ProgramType { get; set; }
         // Foreign keys & “Other” text fields
-        public int CategoryId { get; set; }
+
+        public int? CategoryId { get; set; }
+
+        [JsonIgnore]
+        public ProgramCategory? Category { get; set; }
+
         [MaxLength(200)]
         public string? CategoryOther { get; set; }
 
         [MaxLength(100)]
-        public int? Type { get; set; }
+        public int? TypeId { get; set; }
+        [JsonIgnore]
+        public InfoType? Type { get; set; }
+
+
         [MaxLength(200)]
         public string? TypeOther { get; set; }
 
         [MaxLength(150)]
-        public int? Theme { get; set; }
+        public int? ThemeId { get; set; }
+        [JsonIgnore]
+        public Theme? Theme { get; set; }
+
         [MaxLength(200)]
         public string? ThemeOther { get; set; }
 
         [MaxLength(150)]
-        public int? ThematicArea { get; set; }
+        public int? ThematicAreaId { get; set; }
+        [JsonIgnore]
+        public ThematicArea? ThematicArea { get; set; }
         [MaxLength(200)]
         public string? ThematicAreaOther { get; set; }
 
@@ -40,23 +46,24 @@ namespace Domain.Entities.STU
         [MaxLength(200)]
         public string? SponsoredOrganizationName { get; set; }
 
-        [Required]
+
         [MaxLength(250)]
         public string? Title { get; set; }
 
         [MaxLength(100)]
-        public int? Mode { get; set; }
-
-        // Dates
-        public DateTime? StartDate { get; set; }
-        [Required]
-        public DateTime? EndDate { get; set; }
+        public int? ModeId { get; set; }
+        [JsonIgnore]
+        public Mode? Mode { get; set; }
 
         [MaxLength(100)]
         public string? Duration { get; set; }
 
         [MaxLength(150)]
-        public int? Region { get; set; }
+        public int? RegionId { get; set; }
+
+        [JsonIgnore]
+        public Region? Region { get; set; }
+
         [MaxLength(200)]
         public string? RegionOther { get; set; }
 
@@ -66,14 +73,37 @@ namespace Domain.Entities.STU
         [MaxLength(250)]
         public string? Location { get; set; }
 
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal? TotalOutlayRs { get; set; }
+
+        public int? SourceOfFundId { get; set; }
+
+        [JsonIgnore]
+        public SourceOfFund? SourceOfFund { get; set; }
+
+        public int? Funds { get; set; }
 
         [MaxLength(100)]
-        public int? Status { get; set; }
+        public int? StatusId { get; set; }
+        [JsonIgnore]
+        public Status? Status { get; set; }
+
+        public decimal? TotalOutlayRs { get; set; }
+        //this is for project dropdown it has to be linked to masterdata table
+        public string? Copi { get; set; }
+
+
 
         [MaxLength(100)]
         public int? BatchNo { get; set; }
+
+
+        public string? OrganizerBroucherFile { get; set; }
+
+        public string? OrganizerInstitutionName { get; set; }
+        public string? OrganizerInstitutionAddress { get; set; }
+
+        public int? SourceId { get; set; }
+        [JsonIgnore]
+        public ParticipatedSource? Source { get; set; }
 
         // Proposal details
         public DateTime? ProposalDate { get; set; }
@@ -88,56 +118,13 @@ namespace Domain.Entities.STU
         [MaxLength(500)]
         public string? FundsSanctionLetterUploadFile { get; set; }
 
-        [MaxLength(500)]
-        public string? UploadVideo { get; set; }
+        public ICollection<StuParticipantDemographics>? ParticipantDemographics { get; set; }
 
-        [MaxLength(100)]
-        public int? SD { get; set; }
-
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal? AreaHa { get; set; }
-
-        [MaxLength(500)]
-        public string? OrganizerFileUpload { get; set; }
-
-        [MaxLength(250)]
-        public string? OrganizerInstitutionName { get; set; }
-
-        [MaxLength(500)]
-        public string? OrganizerAddress { get; set; }
-
-        // Participation details
-        [MaxLength(250)]
-        public string? Participation { get; set; }
-
-        [MaxLength(250)]
-        public string? ParticipatedAs { get; set; }
-
-        [MaxLength(500)]
-        public string? ParticipationFileLink { get; set; }
-
-        // Source of Information
-        [MaxLength(250)]
-        public string? SourceOfInformation { get; set; }
-
-        // Thesis / Project / Paper / Others
-        [MaxLength(500)]
-        public string? TitleOfThesisOrProjectOrPaperOrOthers { get; set; }
-
-        // Paper / Poster / Abstract details
-        [MaxLength(100)]
-        public string? PaperPosterAbstract { get; set; }
-
-        public DateTime? PaperPosterAbstractDate { get; set; }
-
-        [MaxLength(500)]
-        public string? PaperPosterAbstractLink { get; set; }
+        public ICollection<StuProgramContentAndResources>? ProgramContent { get; set; }
+        public StuAdvisoryServices? AdvisoryServices { get; set; }
+        public StuRecommendation? Recommendations { get; set; }
+        public StuReport? Reports { get; set; }
 
 
-        public ICollection<STURecommendation> Recommendations { get; set; }
-
-        public ICollection<STUReport> Reports { get; set; }
-
-        public ICollection<STUAdvisoryServices> AdvisoryServices { get; set; }
     }
 }

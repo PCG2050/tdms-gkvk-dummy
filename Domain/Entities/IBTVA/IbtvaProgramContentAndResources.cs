@@ -1,13 +1,5 @@
-﻿using Domain.Entities.DEU;
-using Domain.Entities.EEU;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿
+
 
 namespace Domain.Entities.IBTVA
 {
@@ -19,12 +11,9 @@ namespace Domain.Entities.IBTVA
         [ForeignKey(nameof(IbtvaProgramDetailsId))]
         public IbtvaProgramDetails? ProgramDetails { get; set; }
 
-        // Optionally add fields describing the content/resources record
-        [MaxLength(250)]
-        public string? Title { get; set; }
+        public int? UnitLocationId { get; set; }
 
-        [MaxLength(500)]
-        public string? Description { get; set; }
+        public int? OrganizationId { get; set; }
 
         // Navigation children
         public ICollection<IbtvaResourcePerson>? ResourcePersons { get; set; }

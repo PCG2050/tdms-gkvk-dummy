@@ -1,21 +1,12 @@
-﻿using Domain.Entities.FTI;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Domain.Entities.DEU
+﻿namespace Domain.Entities.DEU
 {
     public class DeuResourcePerson : AuditableBaseEntity
     {
         [Required]
         public int? DeuProgramContentAndResourcesId { get; set; }
-
+        [JsonIgnore]
         [ForeignKey(nameof(DeuProgramContentAndResourcesId))]
-        public DeuProgramContentAndResources ProgramContentAndResources { get; set; }
+        public DeuProgramContentAndResources? ProgramContentAndResources { get; set; }
 
         [MaxLength(200)]
         public string? Name { get; set; }
@@ -31,5 +22,8 @@ namespace Domain.Entities.DEU
 
         [MaxLength(250)]
         public string? InstitutionOrDepartment { get; set; }
+        public int? UnitLocationId { get; set; }
+
+        public int? OrganizationId { get; set; }
     }
 }

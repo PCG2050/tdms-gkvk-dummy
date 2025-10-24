@@ -149,10 +149,10 @@ namespace Domain.Entities.FTI
         public string? PaperPosterAbstractLink { get; set; }
 
 
-        public ICollection<FTIRecommendation> Recommendations { get; set; }
-
-        public ICollection<FTIReport> Reports { get; set; }
-
-        public ICollection<FTIAdvisoryServices> AdvisoryServices { get; set; }
+        public ICollection<FTIRecommendation> Recommendations { get; set; } = new List<FTIRecommendation>();
+        public ICollection<FTIReport> Reports { get; set; } = new List<FTIReport>();
+        public ICollection<FTIAdvisoryServices> AdvisoryServices { get; set; } = new List<FTIAdvisoryServices>();
+        public ICollection<FTIParticipantDemographics> ParticipantDemographics { get; set; } = new List<FTIParticipantDemographics>();
+        public ICollection<FTIProgramContentAndResources> ProgramContentAndResources { get; set; } = new List<FTIProgramContentAndResources>();
     }
 }

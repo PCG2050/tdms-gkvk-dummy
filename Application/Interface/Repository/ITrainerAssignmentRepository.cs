@@ -1,6 +1,6 @@
 ﻿using Application.Models;
 using Domain.Entities;
-using Domain.Entities.Junction;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +12,8 @@ namespace Application.Interface.Repository
     public interface ITrainerAssignmentRepository
     {
         Task<List<int>> GetUnitLocationIdsByTrainerIdAsync(int trainerId);
+
+        Task<bool> IsTrainerAssignedToLocationAsync(int trainerID, int unitLocaitonId);
         Task<TrainerAssignment?> GetByTrainerLocationAsync(int unitLocationId, int trainerId);
         Task<TrainerAssignment> AddAsync(TrainerAssignment unitLocationTrainer);
 

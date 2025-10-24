@@ -12,8 +12,8 @@ namespace Application.Models.DataTables
         public int Id { get; set; }
         public string? Title { get; set; }
         public DateOnly? PublicationDate { get; set; }
-        public DateOnly StartDate { get; set; }
-        public DateOnly EndDate { get; set; }
+        public DateOnly? StartDate { get; set; }
+        public DateOnly? EndDate { get; set; }
         public string? Attachments { get; set; }
 
         // Status tracking (Draft, Pending, Approved, Rejected)
@@ -91,17 +91,11 @@ namespace Application.Models.DataTables
     /// </summary>
     public class PublicationCreateDto
     {
-        [Required(ErrorMessage = "Title is required")]
+       
         [MaxLength(500, ErrorMessage = "Title cannot exceed 500 characters")]
         public string Title { get; set; } = string.Empty;
 
-        public DateOnly? PublicationDate { get; set; }
-
-        [Required(ErrorMessage = "Start date is required")]
-        public DateOnly StartDate { get; set; }
-
-        [Required(ErrorMessage = "End date is required")]
-        public DateOnly EndDate { get; set; }
+        public DateOnly? PublicationDate { get; set; }    
 
         public string? Attachments { get; set; }
 

@@ -1,15 +1,10 @@
-﻿using Application.Interface;
-using Application.Interface.Repository;
-using Application.Models;
-using Domain.Entities.Enum;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿
 
 namespace WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController : ControllerBase
+    public class AuthController : BaseApiController
     {
         private readonly IAuthService _authService;
         private readonly ICurrentUserService _currentUserService;

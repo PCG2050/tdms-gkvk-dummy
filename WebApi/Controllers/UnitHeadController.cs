@@ -1,10 +1,4 @@
 ﻿
-using Application.Interface;
-using Application.Models;
-using Domain.Entities.Enum;
-using Infrastructure.Services;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers
 {

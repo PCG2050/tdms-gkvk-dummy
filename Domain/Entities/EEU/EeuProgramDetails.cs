@@ -1,22 +1,12 @@
-﻿using Domain.Entities.MasterData;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-
+﻿
 namespace Domain.Entities.EEU
 {
     public class EeuProgramDetails : ReportEntryBaseEntity
     {
         public int? ProgramTypeId { get; set; }
-
-      
         [JsonIgnore]
         public ProgramType? ProgramType { get; set; }
-
+        // Foreign keys & “Other” text fields
 
         public int? CategoryId { get; set; }
 
@@ -56,17 +46,14 @@ namespace Domain.Entities.EEU
         [MaxLength(200)]
         public string? SponsoredOrganizationName { get; set; }
 
-        [Required]
+
         [MaxLength(250)]
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         [MaxLength(100)]
-        public int? Mode { get; set; }
-
-        // Dates
-        public DateTime? StartDate { get; set; }
-        [Required]
-        public DateTime? EndDate { get; set; }
+        public int? ModeId { get; set; }
+        [JsonIgnore]
+        public Mode? Mode { get; set; }
 
         [MaxLength(100)]
         public string? Duration { get; set; }
@@ -86,23 +73,24 @@ namespace Domain.Entities.EEU
         [MaxLength(250)]
         public string? Location { get; set; }
 
-        //missing Total overlay(Rs)
-
-        public decimal TotalOutlayRs { get; set; }
 
         public int? SourceOfFundId { get; set; }
 
         [JsonIgnore]
-        public SourceOfFund SourceOfFund { get; set; }
+        public SourceOfFund? SourceOfFund { get; set; }
 
         public int? Funds { get; set; }
 
         [MaxLength(100)]
         public int? StatusId { get; set; }
         [JsonIgnore]
-        public Status Status { get; set; }
+        public Status? Status { get; set; }
+
+        public decimal? TotalOutlayRs { get; set; }
         //this is for project dropdown it has to be linked to masterdata table
         public string? Copi { get; set; }
+
+
 
         [MaxLength(100)]
         public int? BatchNo { get; set; }
@@ -130,10 +118,13 @@ namespace Domain.Entities.EEU
         [MaxLength(500)]
         public string? FundsSanctionLetterUploadFile { get; set; }
 
-        public ICollection<EeuRecommendation> Recommendations { get; set; }
+        public ICollection<EeuParticipantDemographics>? ParticipantDemographics { get; set; }
 
-        public ICollection<EeuReport> Reports { get; set; }
+        public ICollection<EeuProgramContentAndResources>? ProgramContent { get; set; }
+        public EeuAdvisoryServices? AdvisoryServices { get; set; }
+        public EeuRecommendation? Recommendations { get; set; }
+        public EeuReport? Reports { get; set; }
 
-        public ICollection<EeuAdvisoryServices> AdvisoryServices { get; set; }
+
     }
 }

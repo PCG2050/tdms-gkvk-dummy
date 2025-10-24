@@ -1,21 +1,12 @@
-﻿using Domain.Entities.DEU;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Domain.Entities.EEU
+﻿namespace Domain.Entities.EEU
 {
     public class EeuAdvisoryServices : AuditableBaseEntity
     {
         [Required]
         public int? EeuProgramDetailsId { get; set; }
-
+        [JsonIgnore]
         [ForeignKey(nameof(EeuProgramDetailsId))]
-        public EeuProgramDetails ProgramDetails { get; set; }
+        public EeuProgramDetails? ProgramDetails { get; set; }
 
         // Advisory service metrics
         public int NoOfFacebookSMS { get; set; }
@@ -29,5 +20,8 @@ namespace Domain.Entities.EEU
         public int NoOfEmailsSent { get; set; }
         public int NoOfNewspaperCoverage { get; set; }
         public int NoOfBeneficiaries { get; set; }
+        public int? UnitLocationId { get; set; }
+
+        public int? OrganizationId { get; set; }
     }
 }

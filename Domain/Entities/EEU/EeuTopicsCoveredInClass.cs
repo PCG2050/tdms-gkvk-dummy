@@ -13,9 +13,10 @@ namespace Domain.Entities.EEU
     {
         [Required]
         public int? EeuProgramContentAndResourcesId { get; set; }
-
+        [JsonIgnore]
         [ForeignKey(nameof(EeuProgramContentAndResourcesId))]
-        public EeuProgramContentAndResources ProgramContentAndResources { get; set; }
+        public EeuProgramContentAndResources? ProgramContentAndResources { get; set; }
+
 
         public DateTime? Date { get; set; }
 
@@ -24,5 +25,9 @@ namespace Domain.Entities.EEU
 
         [MaxLength(500)]
         public string? PhotoUpload { get; set; }
+
+        public int? UnitLocationId { get; set; }
+
+        public int? OrganizationId { get; set; }
     }
 }

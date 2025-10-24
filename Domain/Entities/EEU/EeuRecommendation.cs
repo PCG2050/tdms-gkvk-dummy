@@ -1,11 +1,4 @@
-﻿using Domain.Entities.DEU;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 
 namespace Domain.Entities.EEU
 {
@@ -15,25 +8,28 @@ namespace Domain.Entities.EEU
         public int? EeuProgramDetailsId { get; set; }
 
         [ForeignKey(nameof(EeuProgramDetailsId))]
-        public EeuProgramDetails ProgramDetails { get; set; }
+        public EeuProgramDetails? ProgramDetails { get; set; }
 
         // Recommendation fields
         [MaxLength(1000)]
-        public string ProblemsIdentified { get; set; }
+        public string? ProblemsIdentified { get; set; }
 
         [MaxLength(1000)]
-        public string Recommendation { get; set; }
+        public string? Recommendation { get; set; }
 
         [MaxLength(1000)]
-        public string ActionTaken { get; set; }
+        public string? ActionTaken { get; set; }
 
         [MaxLength(1000)]
-        public string SignificantAchievement { get; set; }
+        public string? SignificantAchievement { get; set; }
 
         [MaxLength(1000)]
-        public string SuccessStories { get; set; }
+        public string? SuccessStories { get; set; }
 
         [MaxLength(1000)]
-        public string ImpactOutcome { get; set; }
+        public string? ImpactOutcome { get; set; }
+        public int? UnitLocationId { get; set; }
+
+        public int? OrganizationId { get; set; }
     }
 }

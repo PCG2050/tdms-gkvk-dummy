@@ -58,7 +58,7 @@ namespace WebApi.Controllers.DataEntry
 
             if (!await ValidateTrainerAccess(unitLocationId))
                 return Forbid("You don't have access to this unit location");
-
+           
             return null; // null means validation passed
         }
 
@@ -70,10 +70,11 @@ namespace WebApi.Controllers.DataEntry
         /// <summary>
         /// Validates that an entity was created by the current user
         /// </summary>
-        protected bool ValidateOwnership<T>(T entity) where T : Domain.Entities.AuditableBaseEntity
+        protected bool ValidateOwnership<T>(T entity) where T : ReportEntryBaseEntity
         {
             return entity.CreatedById == _currentUser.UserId;
         }
+
 
         /// <summary>
         /// Standard response for ownership validation failure

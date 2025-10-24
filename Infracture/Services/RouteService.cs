@@ -1,9 +1,5 @@
-﻿using Application.Interface.Services;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.Extensions.DependencyInjection;
+﻿
+
 
 namespace Infrastructure.Services
 {

@@ -1,10 +1,4 @@
-﻿// Controllers/DebugResendController.cs - Better debugging
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Resend;
-using System.Text.Json;
-
-namespace WebApi.Controllers
+﻿namespace WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

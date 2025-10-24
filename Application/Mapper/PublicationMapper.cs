@@ -1,10 +1,4 @@
-﻿using Application.Models.DataTables;
-using Domain.Entities;
-using Domain.Entities.GenericTables;
-using Domain.Entities.Junction;
-using Riok.Mapperly.Abstractions;
-
-namespace Application.Mapper
+﻿namespace Application.Mapper
 {
     [Mapper]
     public partial class PublicationMapper

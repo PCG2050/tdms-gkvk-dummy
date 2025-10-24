@@ -1,421 +1,311 @@
-﻿// =================================================================
-// File: Application/Mappers/IbtvaProgramMapper.cs
-// =================================================================
-using Application.Models.DataTables;
-using Application.Models.DataTables.IBTVA;
-using Domain.Entities.IBTVA;
-using Riok.Mapperly.Abstractions;
-
-namespace Application.Mappers.IBTVA
+﻿namespace Application.Mapper.DataTable.IBTVA
 {
-    /// <summary>
-    /// Mapperly mapper for IBTVA Program and all related entities (Phases 1-6)
-    /// </summary>
     [Mapper]
     public partial class IbtvaProgramMapper
     {
-        // ========== PHASE 1: Program Details ==========
+        // ============================
+        // MAIN PROGRAM DETAILS MAPPINGS
+        // ============================
 
-        /// <summary>
-        /// Map CreateDto to Program Entity
-        /// </summary>
+        public partial IbtvaProgramDetailsDto MapToDto(IbtvaProgramDetails entity);
+        public partial IbtvaProgramDetailsCompleteDto MapToCompleteDto(IbtvaProgramDetails entity);
         public partial IbtvaProgramDetails MapToEntity(IbtvaProgramCreateDto dto);
 
-        /// <summary>
-        /// Map Program Entity to Dto
-        /// </summary>
-        [MapProperty(nameof(IbtvaProgramDetails.CreatedAt), nameof(IbtvaProgramDetailsDto.CreatedAt), Use = nameof(MapDateTimeOffset))]
-        [MapProperty(nameof(IbtvaProgramDetails.UpdatedAt), nameof(IbtvaProgramDetailsDto.UpdatedAt), Use = nameof(MapNullableDateTimeOffset))]
-        public partial IbtvaProgramDetailsDto MapToDto(IbtvaProgramDetails entity);
+        // ============================
+        // DEMOGRAPHICS
+        // ============================
+
+        public partial IbtvaParticipantDemographicsDto MapToDto(IbtvaParticipantDemographics entity);
+        public partial IbtvaParticipantDemographics MapToEntity(IbtvaParticipantDemographicsCreateDto dto);
+
+        // ============================
+        // PROGRAM CONTENT
+        // ============================
+
+        public partial IbtvaProgramContentDto MapToDto(IbtvaProgramContentAndResources entity);
+        public partial IbtvaProgramContentAndResources MapToEntity(IbtvaProgramContentCreateDto dto);
+
+        // ============================
+        // RESOURCE PERSON
+        // ============================
+
+        public partial IbtvaResourcePersonDto MapToDto(IbtvaResourcePerson entity);
+        public partial IbtvaResourcePerson MapToEntity(IbtvaResourcePersonCreateDto dto);
+
+        // ============================
+        // TOPICS COVERED
+        // ============================
+
+        public partial IbtvaTopicsCoveredDto MapToDto(IbtvaTopicsCoveredInClass entity);
+        public partial IbtvaTopicsCoveredInClass MapToEntity(IbtvaTopicsCoveredCreateDto dto);
+
+        // ============================
+        // TEACHING AIDS
+        // ============================
+
+        public partial IbtvaTeachingAidsDto MapToDto(IbtvaTeachingAidsDeveloped entity);
+        public partial IbtvaTeachingAidsDeveloped MapToEntity(IbtvaTeachingAidsCreateDto dto);
+
+        // ============================
+        // ADVISORY SERVICES
+        // ============================
+
+        public partial IbtvaAdvisoryServicesDto MapToDto(IbtvaAdvisoryServices entity);
+        public partial IbtvaAdvisoryServices MapToEntity(IbtvaAdvisoryServicesCreateDto dto);
+
+        // ============================
+        // REPORT
+        // ============================
+
+        public partial IbtvaReportDto MapToDto(IbtvaReport entity);
+        public partial IbtvaReport MapToEntity(IbtvaReportCreateDto dto);
+
+        // ============================
+        // RECOMMENDATION
+        // ============================
+
+        public partial IbtvaRecommendationDto MapToDto(IbtvaRecommendation entity);
+        public partial IbtvaRecommendation MapToEntity(IbtvaRecommendationCreateDto dto);
+
+        // ============================
+        // HELPER METHODS FOR NESTED PROPERTIES
+        // ============================
+
+        private string? GetUnitName(OrganizationUnitLocation? location)
+            => location?.Unit?.Name;
+
+        private string? GetDistrictName(OrganizationUnitLocation? location)
+            => location?.District?.Name;
+
+        private string? GetStateName(OrganizationUnitLocation? location)
+            => location?.District?.State?.Name;
+
+        // ============================
+        // MAPPING WITH NAVIGATION DETAILS
+        // ============================
+
+        [MapProperty(nameof(IbtvaProgramDetails.UnitLocation), nameof(IbtvaProgramDetailsDto.UnitName), Use = nameof(GetUnitName))]
+        [MapProperty(nameof(IbtvaProgramDetails.UnitLocation), nameof(IbtvaProgramDetailsDto.DistrictName), Use = nameof(GetDistrictName))]
+        [MapProperty(nameof(IbtvaProgramDetails.UnitLocation), nameof(IbtvaProgramDetailsDto.StateName), Use = nameof(GetStateName))]
+        [MapProperty(nameof(IbtvaProgramDetails.Category.Name), nameof(IbtvaProgramDetailsDto.CategoryName))]
+        [MapProperty(nameof(IbtvaProgramDetails.ProgramType.Name), nameof(IbtvaProgramDetailsDto.ProgramTypeName))]
+        [MapProperty(nameof(IbtvaProgramDetails.Theme.Name), nameof(IbtvaProgramDetailsDto.ThemeName))]
+        [MapProperty(nameof(IbtvaProgramDetails.Region.Name), nameof(IbtvaProgramDetailsDto.RegionName))]
+        [MapProperty(nameof(IbtvaProgramDetails.Mode.Name), nameof(IbtvaProgramDetailsDto.ModeName))]
+        [MapProperty(nameof(IbtvaProgramDetails.SourceOfFund.Name), nameof(IbtvaProgramDetailsDto.SourceOfFundName))]
+        [MapProperty(nameof(IbtvaProgramDetails.CreatedBy.FirstName), nameof(IbtvaProgramDetailsDto.CreatedByName))]
+        [MapProperty(nameof(IbtvaProgramDetails.ApprovedBy.FirstName), nameof(IbtvaProgramDetailsDto.ApprovedByName))]
+        public partial IbtvaProgramDetailsDto MapToDtoWithDetails(IbtvaProgramDetails entity);
+
+        // ============================
+        // MANUAL UPDATE MAPPINGS
+        // ============================
 
         /// <summary>
-        /// Map UpdateDto to existing Program Entity
+        /// Maps IbtvaProgramUpdateDto to IbtvaProgramDetails entity (only non-null values)
         /// </summary>
-        public partial void MapUpdateToEntity(IbtvaProgramUpdateDto dto, IbtvaProgramDetails entity);
-
-        // ========== PHASE 2: Demographics ==========
-
-        /// <summary>
-        /// Map Demographics CreateDto to Entity
-        /// </summary>
-        public partial IbtvaParticipantDemographics MapToEntity(DemographicsCreateDto dto);
-
-        /// <summary>
-        /// Map Demographics Entity to Dto
-        /// </summary>
-        public partial DemographicsDto MapToDto(IbtvaParticipantDemographics entity);
-
-        // ========== PHASE 3: Content & Resources ==========
-
-        /// <summary>
-        /// Map Content CreateDto to Entity
-        /// </summary>
-        public partial IbtvaProgramContentAndResources MapToEntity(ContentResourcesCreateDto dto);
-
-        /// <summary>
-        /// Map Content Entity to Dto
-        /// </summary>
-        public partial ContentResourcesDto MapToDto(IbtvaProgramContentAndResources entity);
-
-        /// <summary>
-        /// Map ResourcePerson CreateDto to Entity
-        /// </summary>
-        public partial IbtvaResourcePerson MapToEntity(ResourcePersonCreateDto dto);
-
-        /// <summary>
-        /// Map ResourcePerson Entity to Dto
-        /// </summary>
-        public partial ResourcePersonDto MapToDto(IbtvaResourcePerson entity);
-
-        /// <summary>
-        /// Map Topic CreateDto to Entity
-        /// </summary>
-        public partial IbtvaTopicsCoveredInClass MapToEntity(TopicCreateDto dto);
-
-        /// <summary>
-        /// Map Topic Entity to Dto
-        /// </summary>
-        public partial TopicDto MapToDto(IbtvaTopicsCoveredInClass entity);
-
-        /// <summary>
-        /// Map TeachingAid CreateDto to Entity
-        /// </summary>
-        public partial IbtvaTeachingAidsDeveloped MapToEntity(TeachingAidCreateDto dto);
-
-        /// <summary>
-        /// Map TeachingAid Entity to Dto
-        /// </summary>
-        public partial TeachingAidDto MapToDto(IbtvaTeachingAidsDeveloped entity);
-
-        // ========== PHASE 4: Advisory Services ==========
-
-        /// <summary>
-        /// Map Advisory CreateDto to Entity
-        /// </summary>
-        public partial IbtvaAdvisoryServices MapToEntity(AdvisoryCreateDto dto);
-
-        /// <summary>
-        /// Map Advisory Entity to Dto
-        /// </summary>
-        public partial AdvisoryDto MapToDto(IbtvaAdvisoryServices entity);
-
-        // ========== PHASE 5: Reports ==========
-
-        /// <summary>
-        /// Map Report CreateDto to Entity
-        /// </summary>
-        public partial IbtvaReport MapToEntity(ReportCreateDto dto);
-
-        /// <summary>
-        /// Map Report Entity to Dto
-        /// </summary>
-        public partial ReportDto MapToDto(IbtvaReport entity);
-
-        // ========== PHASE 6: Recommendations ==========
-
-        /// <summary>
-        /// Map Recommendation CreateDto to Entity
-        /// </summary>
-        public partial IbtvaRecommendation MapToEntity(RecommendationCreateDto dto);
-
-        /// <summary>
-        /// Map Recommendation Entity to Dto
-        /// </summary>
-        public partial RecommendationDto MapToDto(IbtvaRecommendation entity);
-
-        // ========== Helper Methods ==========
-
-        /// <summary>
-        /// Convert DateTimeOffset to DateTime
-        /// </summary>
-        private DateTime MapDateTimeOffset(DateTimeOffset dateTimeOffset)
+        public static void MapUpdateDtoToEntity(IbtvaProgramUpdateDto dto, IbtvaProgramDetails entity)
         {
-            return dateTimeOffset.DateTime;
+            if (dto.StartDate.HasValue) entity.StartDate = dto.StartDate.Value;
+            if (dto.EndDate.HasValue) entity.EndDate = dto.EndDate.Value;
+            if (dto.ProgramTypeId.HasValue) entity.ProgramTypeId = dto.ProgramTypeId;
+            if (dto.CategoryId.HasValue) entity.CategoryId = dto.CategoryId;
+            if (dto.CategoryOther != null) entity.CategoryOther = dto.CategoryOther;
+            if (dto.TypeId.HasValue) entity.TypeId = dto.TypeId;
+            if (dto.TypeOther != null) entity.TypeOther = dto.TypeOther;
+            if (dto.ThemeId.HasValue) entity.ThemeId = dto.ThemeId;
+            if (dto.ThemeOther != null) entity.ThemeOther = dto.ThemeOther;
+            if (dto.ThematicAreaId.HasValue) entity.ThematicAreaId = dto.ThematicAreaId;
+            if (dto.ThematicAreaOther != null) entity.ThematicAreaOther = dto.ThematicAreaOther;
+            if (dto.SponsoredOrganization.HasValue) entity.SponsoredOrganization = dto.SponsoredOrganization;
+            if (dto.SponsoredOrganizationName != null) entity.SponsoredOrganizationName = dto.SponsoredOrganizationName;
+            if (dto.Title != null) entity.Title = dto.Title;
+            if (dto.Mode.HasValue) entity.ModeId = dto.Mode;
+            if (dto.Duration != null) entity.Duration = dto.Duration;
+            if (dto.RegionId.HasValue) entity.RegionId = dto.RegionId;
+            if (dto.RegionOther != null) entity.RegionOther = dto.RegionOther;
+            if (dto.TPNo.HasValue) entity.TPNo = dto.TPNo;
+            if (dto.Location != null) entity.Location = dto.Location;
+            if (dto.SourceOfFundId.HasValue) entity.SourceOfFundId = dto.SourceOfFundId;
+            if (dto.NoOfCourses.HasValue) entity.Funds = dto.NoOfCourses;
+            if (dto.Attachments != null) entity.Attachements = dto.Attachments;
         }
 
         /// <summary>
-        /// Convert nullable DateTimeOffset to nullable DateTime
+        /// Maps IbtvaParticipantDemographicsUpdateDto to IbtvaParticipantDemographics entity
         /// </summary>
-        private DateTime? MapNullableDateTimeOffset(DateTimeOffset? dateTimeOffset)
+        public static void MapUpdateDtoToEntity(IbtvaParticipantDemographicsUpdateDto dto, IbtvaParticipantDemographics entity)
         {
-            return dateTimeOffset?.DateTime;
-        }
-
-        // ========== Phase 1 Helper Methods with Timestamps ==========
-
-        /// <summary>
-        /// Create Program Entity with automatic CreatedAt and initial status
-        /// </summary>
-        public IbtvaProgramDetails CreateProgramEntity(
-            IbtvaProgramCreateDto dto,
-            int trainerId,
-            int organizationId)
-        {
-            var entity = MapToEntity(dto);
-            entity.CreatedAt = DateTimeOffset.UtcNow;
-            entity.CreatedById = trainerId;
-            entity.OrganizationId = organizationId;
-            entity.FormStatus = "Saved";
-            entity.CurrentPhase = 1;
-            return entity;
-        }
-
-        /// <summary>
-        /// Update Program Entity with automatic UpdatedAt
-        /// </summary>
-        public void UpdateProgramEntity(
-            IbtvaProgramUpdateDto dto,
-            IbtvaProgramDetails entity,
-            int trainerId)
-        {
-            MapUpdateToEntity(dto, entity);
-            entity.UpdatedAt = DateTimeOffset.UtcNow;
-            entity.UpdatedById = trainerId;
-        }
-
-        // ========== Phase 2 Helper Methods ==========
-
-        /// <summary>
-        /// Create Demographics Entity with metadata
-        /// </summary>
-        public IbtvaParticipantDemographics CreateDemographicsEntity(
-            DemographicsCreateDto dto,
-            int programId,
-            int trainerId)
-        {
-            var entity = MapToEntity(dto);
-            entity.IbtvaProgramDetailsId = programId;
-            entity.CreatedById = trainerId;
-            entity.CreatedAt = DateTimeOffset.UtcNow;
-            return entity;
+            if (dto.ParticipantId.HasValue) entity.ParticipantId = dto.ParticipantId;
+            if (dto.Male_SC.HasValue) entity.Male_SC = dto.Male_SC;
+            if (dto.Male_ST.HasValue) entity.Male_ST = dto.Male_ST;
+            if (dto.Male_OBC.HasValue) entity.Male_OBC = dto.Male_OBC;
+            if (dto.Male_GEN.HasValue) entity.Male_GEN = dto.Male_GEN;
+            if (dto.SC_Male_StayedInHostel.HasValue) entity.SC_Male_StayedInHostel = dto.SC_Male_StayedInHostel;
+            if (dto.ST_Male_StayedInHostel.HasValue) entity.ST_Male_StayedInHostel = dto.ST_Male_StayedInHostel;
+            if (dto.OBC_Male_StayedInHostel.HasValue) entity.OBC_Male_StayedInHostel = dto.OBC_Male_StayedInHostel;
+            if (dto.GEN_Male_StayedInHostel.HasValue) entity.GEN_Male_StayedInHostel = dto.GEN_Male_StayedInHostel;
+            if (dto.Female_SC.HasValue) entity.Female_SC = dto.Female_SC;
+            if (dto.Female_ST.HasValue) entity.Female_ST = dto.Female_ST;
+            if (dto.Female_OBC.HasValue) entity.Female_OBC = dto.Female_OBC;
+            if (dto.Female_GEN.HasValue) entity.Female_GEN = dto.Female_GEN;
+            if (dto.SC_Female_StayedInHostel.HasValue) entity.SC_Female_StayedInHostel = dto.SC_Female_StayedInHostel;
+            if (dto.ST_Female_StayedInHostel.HasValue) entity.ST_Female_StayedInHostel = dto.ST_Female_StayedInHostel;
+            if (dto.OBC_Female_StayedInHostel.HasValue) entity.OBC_Female_StayedInHostel = dto.OBC_Female_StayedInHostel;
+            if (dto.GEN_Female_StayedInHostel.HasValue) entity.GEN_Female_StayedInHostel = dto.GEN_Female_StayedInHostel;
+            if (dto.Total.HasValue) entity.Total = dto.Total;
         }
 
         /// <summary>
-        /// Update Demographics Entity with metadata
+        /// Maps IbtvaProgramContentUpdateDto to IbtvaProgramContentAndResources entity
         /// </summary>
-        public void UpdateDemographicsEntity(
-            DemographicsCreateDto dto,
-            IbtvaParticipantDemographics entity,
-            int trainerId)
+        public static void MapUpdateDtoToEntity(IbtvaProgramContentUpdateDto dto, IbtvaProgramContentAndResources entity)
         {
-            var updated = MapToEntity(dto);
-            entity.ParticipantId = updated.ParticipantId;
-            entity.Male_SC = updated.Male_SC;
-            entity.Male_ST = updated.Male_ST;
-            entity.Male_OBC = updated.Male_OBC;
-            entity.Male_GEN = updated.Male_GEN;
-            entity.Female_SC = updated.Female_SC;
-            entity.Female_ST = updated.Female_ST;
-            entity.Female_OBC = updated.Female_OBC;
-            entity.Female_GEN = updated.Female_GEN;
-            entity.Total = updated.Total;
-            entity.UpdatedAt = DateTimeOffset.UtcNow;
-            entity.UpdatedById = trainerId;
-        }
-
-        // ========== Phase 3 Helper Methods ==========
-
-        /// <summary>
-        /// Create Content Entity with metadata
-        /// </summary>
-        public IbtvaProgramContentAndResources CreateContentEntity(
-            ContentResourcesCreateDto dto,
-            int programId,
-            int trainerId)
-        {
-            var entity = MapToEntity(dto);
-            entity.IbtvaProgramDetailsId = programId;
-            entity.CreatedById = trainerId;
-            entity.CreatedAt = DateTimeOffset.UtcNow;
-            return entity;
+            // Currently the update DTO has only Id, but keeping for future expansion
+            // Add mappings here if more fields are added to the update DTO
         }
 
         /// <summary>
-        /// Create ResourcePerson Entity with metadata
+        /// Maps IbtvaResourcePersonUpdateDto to IbtvaResourcePerson entity
         /// </summary>
-        public IbtvaResourcePerson CreateResourcePersonEntity(
-            ResourcePersonCreateDto dto,
-            int programId,
-            int trainerId)
+        public static void MapUpdateDtoToEntity(IbtvaResourcePersonUpdateDto dto, IbtvaResourcePerson entity)
         {
-            var entity = MapToEntity(dto);
-            entity.IbtvaProgramContentAndResourcesId = programId;
-            entity.CreatedById = trainerId;
-            entity.CreatedAt = DateTimeOffset.UtcNow;
-            return entity;
+            if (dto.Name != null) entity.Name = dto.Name;
+            if (dto.Designation != null) entity.Designation = dto.Designation;
+            if (dto.ResourceType.HasValue) entity.ResourceType = dto.ResourceType;
+            if (dto.Responsibility.HasValue) entity.Responsibility = dto.Responsibility;
+            if (dto.InstitutionOrDepartment != null) entity.InstitutionOrDepartment = dto.InstitutionOrDepartment;
         }
 
         /// <summary>
-        /// Create Topic Entity with metadata
+        /// Maps IbtvaTopicsCoveredUpdateDto to IbtvaTopicsCoveredInClass entity
         /// </summary>
-        public IbtvaTopicsCoveredInClass CreateTopicEntity(
-            TopicCreateDto dto,
-            int programId,
-            int trainerId)
+        public static void MapUpdateDtoToEntity(IbtvaTopicsCoveredUpdateDto dto, IbtvaTopicsCoveredInClass entity)
         {
-            var entity = MapToEntity(dto);
-            entity.IbtvaProgramContentAndResourcesId = programId;
-            entity.CreatedById = trainerId;
-            entity.CreatedAt = DateTimeOffset.UtcNow;
-            return entity;
+            if (dto.Date.HasValue) entity.Date = dto.Date;
+            if (dto.Title != null) entity.Title = dto.Title;
+            if (dto.PhotoUpload != null) entity.PhotoUpload = dto.PhotoUpload;
         }
 
         /// <summary>
-        /// Create TeachingAid Entity with metadata
+        /// Maps IbtvaTeachingAidsUpdateDto to IbtvaTeachingAidsDeveloped entity
         /// </summary>
-        public IbtvaTeachingAidsDeveloped CreateTeachingAidEntity(
-            TeachingAidCreateDto dto,
-            int programId,
-            int trainerId)
+        public static void MapUpdateDtoToEntity(IbtvaTeachingAidsUpdateDto dto, IbtvaTeachingAidsDeveloped entity)
         {
-            var entity = MapToEntity(dto);
-            entity.IbtvaProgramContentAndResourcesId = programId;
-            entity.CreatedById = trainerId;
-            entity.CreatedAt = DateTimeOffset.UtcNow;
-            return entity;
-        }
-
-        // ========== Phase 4 Helper Methods ==========
-
-        /// <summary>
-        /// Create Advisory Entity with metadata
-        /// </summary>
-        public IbtvaAdvisoryServices CreateAdvisoryEntity(
-            AdvisoryCreateDto dto,
-            int programId,
-            int trainerId)
-        {
-            var entity = MapToEntity(dto);
-            entity.IbtvaProgramDetailsId = programId;
-            entity.CreatedById = trainerId;
-            entity.CreatedAt = DateTimeOffset.UtcNow;
-            return entity;
+            if (dto.TypeOfAidId.HasValue) entity.TypeOfAidId = dto.TypeOfAidId;
+            if (dto.OtherTypeOfAid != null) entity.OtherTypeOfAid = dto.OtherTypeOfAid;
+            if (dto.Purpose != null) entity.Purpose = dto.Purpose;
+            if (dto.Number.HasValue) entity.Number = dto.Number.Value;
         }
 
         /// <summary>
-        /// Update Advisory Entity with metadata
+        /// Maps IbtvaAdvisoryServicesUpdateDto to IbtvaAdvisoryServices entity
         /// </summary>
-        public void UpdateAdvisoryEntity(
-            AdvisoryCreateDto dto,
-            IbtvaAdvisoryServices entity,
-            int trainerId)
+        public static void MapUpdateDtoToEntity(IbtvaAdvisoryServicesUpdateDto dto, IbtvaAdvisoryServices entity)
         {
-            var updated = MapToEntity(dto);
-            entity.NoOfBeneficiaries = updated.NoOfBeneficiaries;
-            entity.NoOfFaceToFaceDiscussions = updated.NoOfFaceToFaceDiscussions;
-            entity.NoOfGroupDiscussions = updated.NoOfGroupDiscussions;
-            entity.NoOfPhoneCalls = updated.NoOfPhoneCalls;
-            entity.NoOfWhatsappSMS = updated.NoOfWhatsappSMS;
-            entity.UpdatedAt = DateTimeOffset.UtcNow;
-            entity.UpdatedById = trainerId;
-        }
-
-        // ========== Phase 5 Helper Methods ==========
-
-        /// <summary>
-        /// Create Report Entity with metadata
-        /// </summary>
-        public IbtvaReport CreateReportEntity(
-            ReportCreateDto dto,
-            int programId,
-            int trainerId)
-        {
-            var entity = MapToEntity(dto);
-            entity.IbtvaProgramDetailsId = programId;
-            entity.CreatedById = trainerId;
-            entity.CreatedAt = DateTimeOffset.UtcNow;
-
-            // Map ReportDto fields to IbtvaReport fields
-            entity.ProgressReportReportingYear = dto.ReportTitle;
-            entity.Date = dto.ReportDate;
-            entity.UploadPhoto = dto.ReportFileUrl;
-            entity.PhotosGeotaggedPhotoOrUploadPhoto = dto.ReportFileUrl;
-            entity.UploadVideo = dto.ReportFileUrl;
-            entity.SignificantOutcome = dto.ReportTitle;
-
-            return entity;
+            if (dto.NoOfFacebookSMS.HasValue) entity.NoOfFacebookSMS = dto.NoOfFacebookSMS.Value;
+            if (dto.NoOfSMSSentToRegisteredFarmers.HasValue) entity.NoOfSMSSentToRegisteredFarmers = dto.NoOfSMSSentToRegisteredFarmers.Value;
+            if (dto.NoOfWhatsappGroups.HasValue) entity.NoOfWhatsappGroups = dto.NoOfWhatsappGroups.Value;
+            if (dto.NoOfWhatsappSMS.HasValue) entity.NoOfWhatsappSMS = dto.NoOfWhatsappSMS.Value;
+            if (dto.NoOfAnsweredWhatsappQueries.HasValue) entity.NoOfAnsweredWhatsappQueries = dto.NoOfAnsweredWhatsappQueries.Value;
+            if (dto.NoOfPhoneCalls.HasValue) entity.NoOfPhoneCalls = dto.NoOfPhoneCalls.Value;
+            if (dto.NoOfFaceToFaceDiscussions.HasValue) entity.NoOfFaceToFaceDiscussions = dto.NoOfFaceToFaceDiscussions.Value;
+            if (dto.NoOfGroupDiscussions.HasValue) entity.NoOfGroupDiscussions = dto.NoOfGroupDiscussions.Value;
+            if (dto.NoOfEmailsSent.HasValue) entity.NoOfEmailsSent = dto.NoOfEmailsSent.Value;
+            if (dto.NoOfNewspaperCoverage.HasValue) entity.NoOfNewspaperCoverage = dto.NoOfNewspaperCoverage.Value;
+            if (dto.NoOfBeneficiaries.HasValue) entity.NoOfBeneficiaries = dto.NoOfBeneficiaries.Value;
         }
 
         /// <summary>
-        /// Update Report Entity with metadata
+        /// Maps IbtvaReportUpdateDto to IbtvaReport entity
         /// </summary>
-        public void UpdateReportEntity(
-            ReportCreateDto dto,
-            IbtvaReport entity,
-            int trainerId)
+        public static void MapUpdateDtoToEntity(IbtvaReportUpdateDto dto, IbtvaReport entity)
         {
-            entity.ProgressReportReportingYear = dto.ReportTitle;
-            entity.Date = dto.ReportDate;
-            entity.UploadPhoto = dto.ReportFileUrl;
-            entity.PhotosGeotaggedPhotoOrUploadPhoto = dto.ReportFileUrl;
-            entity.UploadVideo = dto.ReportFileUrl;
-            entity.SignificantOutcome = dto.ReportTitle;
-            entity.UpdatedAt = DateTimeOffset.UtcNow;
-            entity.UpdatedById = trainerId;
-        }
-
-        // ========== Phase 6 Helper Methods ==========
-
-        /// <summary>
-        /// Create Recommendation Entity with metadata
-        /// </summary>
-        public IbtvaRecommendation CreateRecommendationEntity(
-            RecommendationCreateDto dto,
-            int programId,
-            int trainerId)
-        {
-            var entity = MapToEntity(dto);
-            entity.IbtvaProgramDetailsId = programId;
-            entity.CreatedById = trainerId;
-            entity.CreatedAt = DateTimeOffset.UtcNow;
-            return entity;
+            if (dto.ProgressReportReportingYear != null) entity.ProgressReportReportingYear = dto.ProgressReportReportingYear;
+            if (dto.Date.HasValue) entity.Date = dto.Date;
+            if (dto.UploadPhoto != null) entity.UploadPhoto = dto.UploadPhoto;
+            if (dto.PhotosGeotaggedPhotoOrUploadPhoto != null) entity.PhotosGeotaggedPhotoOrUploadPhoto = dto.PhotosGeotaggedPhotoOrUploadPhoto;
+            if (dto.UploadVideo != null) entity.UploadVideo = dto.UploadVideo;
+            if (dto.SignificantOutcome != null) entity.SignificantOutcome = dto.SignificantOutcome;
         }
 
         /// <summary>
-        /// Update Recommendation Entity with metadata
+        /// Maps IbtvaRecommendationUpdateDto to IbtvaRecommendation entity
         /// </summary>
-        public void UpdateRecommendationEntity(
-            RecommendationCreateDto dto,
-            IbtvaRecommendation entity,
-            int trainerId)
+        public static void MapUpdateDtoToEntity(IbtvaRecommendationUpdateDto dto, IbtvaRecommendation entity)
         {
-            var updated = MapToEntity(dto);
-            entity.Recommendation = updated.Recommendation;
-            entity.UpdatedAt = DateTimeOffset.UtcNow;
-            entity.UpdatedById = trainerId;
+            if (dto.ProblemsIdentified != null) entity.ProblemsIdentified = dto.ProblemsIdentified;
+            if (dto.Recommendation != null) entity.Recommendation = dto.Recommendation;
+            if (dto.ActionTaken != null) entity.ActionTaken = dto.ActionTaken;
+            if (dto.SignificantAchievement != null) entity.SignificantAchievement = dto.SignificantAchievement;
+            if (dto.SuccessStories != null) entity.SuccessStories = dto.SuccessStories;
+            if (dto.ImpactOutcome != null) entity.ImpactOutcome = dto.ImpactOutcome;
         }
+
+
+        //public partial IbtvaProgramDetailsDto MapToDto(IbtvaProgramDetails entity)
+        //{
+        //    if (entity == null) return null;
+
+        //    return new IbtvaProgramDetailsDto
+        //    {
+        //        Id = entity.Id,
+        //        Title = entity.Title,
+        //        StartDate = entity.StartDate,
+        //        EndDate = entity.EndDate,
+        //        ProgramTypeId = entity.ProgramTypeId,
+        //        CategoryId = entity.CategoryId,
+        //        CategoryOther = entity.CategoryOther,
+        //        TypeId = entity.TypeId,
+        //        TypeOther = entity.TypeOther,
+        //        ThemeId = entity.ThemeId,
+        //        ThemeOther = entity.ThemeOther,
+        //        ThematicAreaId = entity.ThematicAreaId,
+        //        ThematicAreaOther = entity.ThematicAreaOther,
+        //        SponsoredOrganization = entity.SponsoredOrganization,
+        //        SponsoredOrganizationName = entity.SponsoredOrganizationName,
+        //        ModeId = entity.ModeId,
+        //        Duration = entity.Duration,
+        //        RegionId = entity.RegionId,
+        //        RegionOther = entity.RegionOther,
+        //        TPNo = entity.TPNo,
+        //        Location = entity.Location,
+        //        SourceOfFundId = entity.SourceOfFundId,
+        //        Funds = entity.Funds,
+        //        StatusId = entity.StatusId,
+        //        TotalOutlayRs = entity.TotalOutlayRs,
+        //        Copi = entity.Copi,
+        //        BatchNo = entity.BatchNo,
+        //        OrganizerBroucherFile = entity.OrganizerBroucherFile,
+        //        OrganizerInstitutionName = entity.OrganizerInstitutionName,
+        //        OrganizerInstitutionAddress = entity.OrganizerInstitutionAddress,
+        //        SourceId = entity.SourceId,
+        //        ProposalDate = entity.ProposalDate,
+        //        ProposalUploadFile = entity.ProposalUploadFile,
+        //        UniversitySanctionLetterDate = entity.UniversitySanctionLetterDate,
+        //        UniversitySanctionLetterUploadFile = entity.UniversitySanctionLetterUploadFile,
+        //        FundsSanctionLetterDate = entity.FundsSanctionLetterDate,
+        //        FundsSanctionLetterUploadFile = entity.FundsSanctionLetterUploadFile,
+        //        UnitLocationId = entity.UnitLocationId,
+        //        UnitLocationName = entity.UnitLocation?.Unit?.Name ?? string.Empty,
+        //        CategoryName = entity.Category?.Name,
+        //        ProgramTypeName = entity.ProgramType?.Name,
+        //        ThemeName = entity.Theme?.Name,
+        //        RegionName = entity.Region?.Name,
+        //        ModeName = entity.Mode?.Name,
+        //        SourceOfFundName = entity.SourceOfFund?.Name,
+        //        UnitName = entity.UnitLocation?.Unit?.Name,
+        //        DistrictName = entity.UnitLocation?.District?.Name,
+        //        StateName = entity.UnitLocation?.District?.State?.Name,
+        //        FormStatus = entity.FormStatus,
+        //        FormStatusRemarks = entity.FormStatusRemarks,
+        //        CreatedAt = entity.CreatedAt,
+        //        UpdatedAt = entity.UpdatedAt,
+        //        CreatedByName = entity.CreatedBy?.FirstName,
+        //        ApprovedAt = entity.ApprovedAt,
+        //        ApprovedById = entity.ApprovedById,
+        //        ApprovedByName = entity.ApprovedBy?.FirstName
+        //    };
+        //}
     }
 }
-
-// =================================================================
-// USAGE EXAMPLES:
-// =================================================================
-/*
-// Phase 1: Program
-var program = _mapper.CreateProgramEntity(createDto, trainerId, organizationId);
-_mapper.UpdateProgramEntity(updateDto, existingProgram, trainerId);
-var programDto = _mapper.MapToDto(programEntity);
-
-// Phase 2: Demographics
-var demographic = _mapper.CreateDemographicsEntity(createDto, programId, trainerId);
-_mapper.UpdateDemographicsEntity(updateDto, existingDemographic, trainerId);
-var demographicDto = _mapper.MapToDto(demographicEntity);
-
-// Phase 3: Content
-var content = _mapper.CreateContentEntity(createDto, programId, trainerId);
-var resourcePerson = _mapper.CreateResourcePersonEntity(createDto, programId, trainerId);
-var topic = _mapper.CreateTopicEntity(createDto, programId, trainerId);
-var teachingAid = _mapper.CreateTeachingAidEntity(createDto, programId, trainerId);
-
-// Phase 4: Advisory
-var advisory = _mapper.CreateAdvisoryEntity(createDto, programId, trainerId);
-_mapper.UpdateAdvisoryEntity(updateDto, existingAdvisory, trainerId);
-
-// Phase 5: Reports
-var report = _mapper.CreateReportEntity(createDto, programId, trainerId);
-_mapper.UpdateReportEntity(updateDto, existingReport, trainerId);
-
-// Phase 6: Recommendations
-var recommendation = _mapper.CreateRecommendationEntity(createDto, programId, trainerId);
-_mapper.UpdateRecommendationEntity(updateDto, existingRecommendation, trainerId);
-*/

@@ -1,8 +1,4 @@
-﻿using Application.Models;
-using Application.Models.DataTables;
-using Domain.Entities.GenericTables.Service;
-using Domain.Entities.Junction;
-using Riok.Mapperly.Abstractions;
+﻿
 
 namespace Application.Mapper
 {

@@ -1,6 +1,4 @@
-﻿using Application.Interface;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿
 
 namespace WebApi.Controllers
 {

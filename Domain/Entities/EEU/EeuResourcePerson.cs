@@ -13,23 +13,26 @@ namespace Domain.Entities.EEU
     {
         [Required]
         public int? EeuProgramContentAndResourcesId { get; set; }
-
+        [JsonIgnore]
         [ForeignKey(nameof(EeuProgramContentAndResourcesId))]
-        public EeuProgramContentAndResources ProgramContentAndResources { get; set; }
+        public EeuProgramContentAndResources? ProgramContentAndResources { get; set; }
 
         [MaxLength(200)]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [MaxLength(150)]
-        public string Designation { get; set; }
+        public string? Designation { get; set; }
 
         [MaxLength(150)]
-        public int ResourceType { get; set; }
+        public int? ResourceType { get; set; }
 
         [MaxLength(250)]
-        public int Responsibility { get; set; }
+        public int? Responsibility { get; set; }
 
         [MaxLength(250)]
-        public string InstitutionOrDepartment { get; set; }
+        public string? InstitutionOrDepartment { get; set; }
+        public int? UnitLocationId { get; set; }
+
+        public int? OrganizationId { get; set; }
     }
 }

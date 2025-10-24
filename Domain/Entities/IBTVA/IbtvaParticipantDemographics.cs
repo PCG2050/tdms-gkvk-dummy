@@ -50,5 +50,9 @@ namespace Domain.Entities.IBTVA
 
         // Total participants (store or compute)
         public int? Total { get; set; }
+
+        public int? UnitLocationId { get; set; }
+
+        public int? OrganizationId { get; set; }
     }
 }

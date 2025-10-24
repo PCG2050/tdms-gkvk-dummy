@@ -1,11 +1,4 @@
-﻿using Application.Interface;
-using Infrastructure.Settings;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Resend;
-using System;
-using System.Net;
-using System.Threading.Tasks;
+﻿
 
 namespace Infrastructure.Services
 {

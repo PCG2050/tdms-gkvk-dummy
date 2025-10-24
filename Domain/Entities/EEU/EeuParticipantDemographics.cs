@@ -1,13 +1,4 @@
-﻿using Domain.Entities.DEU;
-using Domain.Entities.MasterData;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace Domain.Entities.EEU
 {
     public class EeuParticipantDemographics : AuditableBaseEntity
@@ -50,5 +41,8 @@ namespace Domain.Entities.EEU
 
         // Total participants (store or compute)
         public int? Total { get; set; }
+        public int? UnitLocationId { get; set; }
+
+        public int? OrganizationId { get; set; }
     }
 }

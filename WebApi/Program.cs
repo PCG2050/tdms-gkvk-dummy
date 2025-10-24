@@ -1,46 +1,31 @@
 
-using Application.Interface;
-using Application.Interface.Repository;
-using Application.Interface.Repository.DataTables;
-using Application.Interface.Repository.DataTables.IBTVA;
-using Application.Interface.Services;
-using Application.Interface.Services.Common;
-using Application.Interface.Services.DataTables;
-using Application.Interface.Services.DataTables.IBTVA;
-using Application.Mappers;
-using Application.Mappers.IBTVA;
-using Infrastructure.DbContext;
-using Infrastructure.Repository;
-using Infrastructure.Repository.DataTables;
-using Infrastructure.Repository.DataTables.IBTVA;
-using Infrastructure.Services;
-using Infrastructure.Services.DataTables;
-using Infrastructure.Services.DataTables.IBTVA;
-using Infrastructure.Settings;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc;
-using Asp.Versioning;
-using Asp.Versioning.ApiExplorer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using Resend;
-using Scalar.AspNetCore;
-using Serilog;
-using Serilog.Sinks.File;
-using System.Reflection;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using WebApi.Services;
-using Application.Mapper;
-using Application.Interface.Repository.DataTables.ConsultSocialMedia;
-using Infrastructure.Repository.DataTables.ConsultSocialMedia;
-using Infrastructure.Repository.DataTables.Publication_Repo;
-using Application.Interface.Services.DataTables.ConsultSocialMedia;
-using Infrastructure.Services.DataTables.ConsultSocialMedia;
-using Application.Interface.Repository.DataTables.TblService;
+
+
+
+using Application.Interface.Repository.DataTables.ATIC;
+using Application.Interface.Repository.DataTables.DEU;
+using Application.Interface.Repository.DataTables.EEU;
+using Application.Interface.Repository.DataTables.NAEP;
+using Application.Interface.Repository.DataTables.STU;
+using Application.Interface.Services.DataTables.ATIC;
+using Application.Interface.Services.DataTables.DEU;
+using Application.Interface.Services.DataTables.EEU;
+using Application.Interface.Services.DataTables.NAEP;
+using Application.Interface.Services.DataTables.STU;
+using Application.Mapper.DataTable.ATIC;
+using Application.Mapper.DataTable.DEU;
+using Application.Mapper.DataTable.EEU;
+using Application.Mapper.DataTable.NAEP;
+using Application.Mapper.DataTable.STU;
+using Infrastructure.Repository.DataTables.ATIC;
+using Infrastructure.Repository.DataTables.DEU;
+using Infrastructure.Repository.DataTables.EEU;
+using Infrastructure.Repository.DataTables.NAEP;
+using Infrastructure.Repository.DataTables.STU;
+using Infrastructure.Services.DataTables.ATIC;
+using Infrastructure.Services.DataTables.DEU;
+using Infrastructure.Services.DataTables.EEU;
+using Infrastructure.Services.DataTables.NAEP;
 
 namespace WebApi
 {
@@ -66,10 +51,10 @@ namespace WebApi
                      options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                  });
 
-            // API Versioning Configuration
+            //API Versioning Configuration
             //builder.Services.AddApiVersioning(options =>
-            //{
-            //    options.DefaultApiVersion = new ApiVersion(1, 0);
+            //{                
+            //    options.DefaultApiVersion = new Asp.Versioning.ApiVersion(1, 0);
             //    options.AssumeDefaultVersionWhenUnspecified = true;
             //    options.ReportApiVersions = true;
             //    options.ApiVersionReader = new UrlSegmentApiVersionReader();
@@ -166,8 +151,7 @@ namespace WebApi
             builder.Services.AddScoped<IDaesiProgrammeService, DaesiProgrammeService>();
 
             builder.Services.AddScoped<IIbtvaProgrammeRepository, IbtvaProgrammeRepository>();
-            builder.Services.AddScoped<IIbtvaProgrammeService, IbtvaProgrammeService>();
-            builder.Services.AddScoped<IAticAdvisoryServiceRepository, AticAdvisoryServiceRepository>();
+            builder.Services.AddScoped<IIbtvaProgrammeService, IbtvaProgrammeService>();         
             builder.Services.AddScoped<IAticSalesRepository, AticSalesRepository>();
 
          
@@ -181,7 +165,7 @@ namespace WebApi
             builder.Services.AddScoped<IEeuFldRepository, EeuFldRepository>();
             builder.Services.AddScoped<IEeuTrainingProgrammeRepository, EeuTrainingProgrammeRepository>();
 
-            builder.Services.AddScoped<IAticAdvisoryServiceService, AticAdvisoryServiceService>();
+           
             builder.Services.AddScoped<IAticSalesService, AticSalesService>();
             builder.Services.AddScoped<IAsmVisitService, AsmVisitService>();
             builder.Services.AddScoped<IDeuCourseService, DeuCourseService>();
@@ -192,20 +176,97 @@ namespace WebApi
 
             // Mappers
             builder.Services.AddSingleton<IbtvaProgramMapper>();
+            builder.Services.AddSingleton<AticProgramMapper>();
+            builder.Services.AddSingleton<DeuProgramMapper>();
+            builder.Services.AddSingleton<NaepProgramMapper>();
+            builder.Services.AddSingleton<EeuProgramMapper>();
+            builder.Services.AddSingleton<StuProgramMapper>();
+        
             builder.Services.AddSingleton<ConsultingServiceMapper>();
             builder.Services.AddSingleton<PublicationMapper>();
             builder.Services.AddSingleton<TblServiceMapper>();
 
+            #region STU
+            builder.Services.AddScoped<IStuProgramDetailsRepository, StuProgramDetailsRepository>();
+            builder.Services.AddScoped<IStuParticipantDemographicsRepository, StuParticipantDemographicsRepository>();
+            builder.Services.AddScoped<IStuProgramContentRepository, StuProgramContentRepository>();
+            builder.Services.AddScoped<IStuResourcePersonRepository, StuResourcePersonRepository>();
+            builder.Services.AddScoped<IStuTopicsCoveredRepository, StuTopicsCoveredRepository>();
+            builder.Services.AddScoped<IStuTeachingAidsRepository, StuTeachingAidsRepository>();
+            builder.Services.AddScoped<IStuAdvisoryServicesRepository, StuAdvisoryServicesRepository>();
+            builder.Services.AddScoped<IStuReportRepository, StuReportRepository>();
+            builder.Services.AddScoped<IStuRecommendationRepository, StuRecommendationRepository>();
 
-            // Phase 1: Program
-            builder.Services.AddScoped<IIbtvaProgramRepository, IbtvaProgramRepository>();
+            builder.Services.AddScoped<IStuProgramService, StuProgramService>();
+            #endregion
+            #region IBTVA
+            // IBTVA Repositories
+            builder.Services.AddScoped<IIbtvaProgramDetailsRepository, IbtvaProgramDetailsRepository>();
+            builder.Services.AddScoped<IIbtvaParticipantDemographicsRepository, IbtvaParticipantDemographicsRepository>();
+            builder.Services.AddScoped<IIbtvaProgramContentRepository, IbtvaProgramContentRepository>();
+            builder.Services.AddScoped<IIbtvaResourcePersonRepository, IbtvaResourcePersonRepository>();
+            builder.Services.AddScoped<IIbtvaTopicsCoveredRepository, IbtvaTopicsCoveredRepository>();
+            builder.Services.AddScoped<IIbtvaTeachingAidsRepository, IbtvaTeachingAidsRepository>();
+            builder.Services.AddScoped<IIbtvaAdvisoryServicesRepository, IbtvaAdvisoryServicesRepository>();
+            builder.Services.AddScoped<IIbtvaReportRepository, IbtvaReportRepository>();
+            builder.Services.AddScoped<IIbtvaRecommendationRepository, IbtvaRecommendationRepository>();
+
+            // IBTVA Service
             builder.Services.AddScoped<IIbtvaProgramService, IbtvaProgramService>();
+            #endregion
+            #region ATIC
+            builder.Services.AddScoped<IAticProgramDetailsRepository, AticProgramDetailsRepository>();
+            builder.Services.AddScoped<IAticParticipantDemographicsRepository, AticParticipantDemographicsRepository>();
+            builder.Services.AddScoped<IAticProgramContentRepository, AticProgramContentRepository>();
+            builder.Services.AddScoped<IAticResourcePersonRepository, AticResourcePersonRepository>();
+            builder.Services.AddScoped<IAticTopicsCoveredRepository, AticTopicsCoveredRepository>();
+            builder.Services.AddScoped<IAticTeachingAidsRepository, AticTeachingAidsRepository>();
+            builder.Services.AddScoped<IAticAdvisoryServicesRepository, AticAdvisoryServicesRepository>();
+            builder.Services.AddScoped<IAticReportRepository, AticReportRepository>();
+            builder.Services.AddScoped<IAticRecommendationRepository, AticRecommendationRepository>();
 
-            // Phase 2: Demographics
-            //builder.Services.AddScoped<IIbtvaDemographicsRepository, IbtvaDemographicsRepository>();
-            //builder.Services.AddScoped<IIbtvaDemographicsService, IbtvaDemographicsService>();
+            builder.Services.AddScoped<IAticProgramService, AticProgramService>();
+            #endregion
+            #region DEU
+            builder.Services.AddScoped<IDeuProgramDetailsRepository, DeuProgramDetailsRepository>();
+            builder.Services.AddScoped<IDeuParticipantDemographicsRepository, DeuParticipantDemographicsRepository>();
+            builder.Services.AddScoped<IDeuProgramContentRepository, DeuProgramContentRepository>();
+            builder.Services.AddScoped<IDeuResourcePersonRepository, DeuResourcePersonRepository>();
+            builder.Services.AddScoped<IDeuTopicsCoveredRepository, DeuTopicsCoveredRepository>();
+            builder.Services.AddScoped<IDeuTeachingAidsRepository, DeuTeachingAidsRepository>();
+            builder.Services.AddScoped<IDeuAdvisoryServicesRepository, DeuAdvisoryServicesRepository>();
+            builder.Services.AddScoped<IDeuReportRepository, DeuReportRepository>();
+            builder.Services.AddScoped<IDeuRecommendationRepository, DeuRecommendationRepository>();
 
-            // Continue pattern for Phases 3-6...
+            builder.Services.AddScoped<IDeuProgramService, DeuProgramService>();
+            #endregion
+            #region NAEP
+            builder.Services.AddScoped<INaepProgramDetailsRepository, NaepProgramDetailsRepository>();
+            builder.Services.AddScoped<INaepParticipantDemographicsRepository, NaepParticipantDemographicsRepository>();
+            builder.Services.AddScoped<INaepProgramContentRepository, NaepProgramContentRepository>();
+            builder.Services.AddScoped<INaepResourcePersonRepository, NaepResourcePersonRepository>();
+            builder.Services.AddScoped<INaepTopicsCoveredRepository, NaepTopicsCoveredRepository>();
+            builder.Services.AddScoped<INaepTeachingAidsRepository, NaepTeachingAidsRepository>();
+            builder.Services.AddScoped<INaepAdvisoryServicesRepository, NaepAdvisoryServicesRepository>();
+            builder.Services.AddScoped<INaepReportRepository, NaepReportRepository>();
+            builder.Services.AddScoped<INaepRecommendationRepository, NaepRecommendationRepository>();
+
+            builder.Services.AddScoped<INaepProgramService, NaepProgramService>();
+            #endregion
+            #region EEU
+            builder.Services.AddScoped<IEeuProgramDetailsRepository, EeuProgramDetailsRepository>();
+            builder.Services.AddScoped<IEeuParticipantDemographicsRepository, EeuParticipantDemographicsRepository>();
+            builder.Services.AddScoped<IEeuProgramContentRepository, EeuProgramContentRepository>();
+            builder.Services.AddScoped<IEeuResourcePersonRepository, EeuResourcePersonRepository>();
+            builder.Services.AddScoped<IEeuTopicsCoveredRepository, EeuTopicsCoveredRepository>();
+            builder.Services.AddScoped<IEeuTeachingAidsRepository, EeuTeachingAidsRepository>();
+            builder.Services.AddScoped<IEeuAdvisoryServicesRepository, EeuAdvisoryServicesRepository>();
+            builder.Services.AddScoped<IEeuReportRepository, EeuReportRepository>();
+            builder.Services.AddScoped<IEeuRecommendationRepository, EeuRecommendationRepository>();
+
+            builder.Services.AddScoped<IEeuProgramService, EeuProgramService>();
+            #endregion
+
 
 
             //Generic Tables

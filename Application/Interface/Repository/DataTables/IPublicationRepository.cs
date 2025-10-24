@@ -1,5 +1,4 @@
-﻿using Application.Models;
-using Domain.Entities.GenericTables;
+﻿
 
 namespace Application.Interface.Repository.DataTables
 {

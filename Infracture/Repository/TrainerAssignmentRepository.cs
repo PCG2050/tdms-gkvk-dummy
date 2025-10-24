@@ -28,6 +28,13 @@ namespace Infrastructure.Repository
                 .Distinct()
                 .ToListAsync();
         }
+
+        public async Task<bool> IsTrainerAssignedToLocationAsync(int trainerId, int unitLocationId)
+        {
+            return await _context.UnitTrainers
+                .AnyAsync(a => a.TrainerId == trainerId && a.UnitLocationId == unitLocationId);
+        }
+
         public async Task<TrainerAssignment> AddAsync(TrainerAssignment unitLocationTrainer)
         {
             await _context.AddAsync(unitLocationTrainer);

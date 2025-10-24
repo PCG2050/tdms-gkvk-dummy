@@ -1,11 +1,4 @@
-﻿using Application.Interface;
-using Application.Interface.Repository;
-using Domain.Entities.Enum;
-using Domain.Entities.FIU;
-using Infrastructure.DbContext;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿
 
 namespace WebApi.Controllers.DataEntry
 {

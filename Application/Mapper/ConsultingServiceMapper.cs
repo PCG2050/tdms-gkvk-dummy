@@ -1,9 +1,4 @@
-﻿using Application.Models.DataTables;
-using Domain.Entities.GenericTables.ConsultingAndSocialMediaService;
-using Domain.Entities.Junction;
-using Riok.Mapperly.Abstractions;
-using System.Xml.Serialization;
-
+﻿
 namespace Application.Mapper
 {
     [Mapper]

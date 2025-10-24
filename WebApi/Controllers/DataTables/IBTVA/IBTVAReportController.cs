@@ -25,15 +25,15 @@ namespace WebApi.Controllers.DataTables.IBTVA
             // ---------- (A) TRAINING PROGRAMMES ----------
             var trainingPrograms = await _context.IbtvaProgramDetails
                 .Where(p => p.CreatedById == 81 &&
-                            p.StartDate.HasValue && p.StartDate.Value.Year == year &&
-                            p.StartDate.HasValue && p.StartDate.Value.Month == month)
+                            p.StartDate.Year == year &&
+                            p.StartDate.Month == month)
                 .Select(p => new
                 {
                     p.Id,
                     p.Title,
-                    Date = (p.StartDate.HasValue && p.EndDate.HasValue && p.StartDate.Value != DateTime.MinValue && p.EndDate.Value != DateTime.MinValue)
-                        ? $"{p.StartDate.Value:dd-MM-yyyy} to {p.EndDate.Value:dd-MM-yyyy}"
-                        : (p.StartDate.HasValue ? p.StartDate.Value.ToString("dd-MM-yyyy") : ""),
+                    Date = (p.StartDate != DateOnly.MinValue && p.EndDate != DateOnly.MinValue)
+                        ? $"{p.StartDate:dd-MM-yyyy} to {p.EndDate:dd-MM-yyyy}"
+                        : (p.StartDate != DateOnly.MinValue ? p.StartDate.ToString("dd-MM-yyyy") : ""),
                     p.Duration,
                     // 🟢 Fetch participants from related IbtvaParticipantDemographics table
                     NoOfParticipants = _context.IbtvaParticipantDemographics
@@ -119,8 +119,8 @@ namespace WebApi.Controllers.DataTables.IBTVA
             var programs = await _context.IbtvaProgramDetails
                 .Include(p => p.Category)
                 .Where(p => p.CreatedById == 81 &&
-                            p.StartDate.HasValue && p.StartDate.Value.Year == year &&
-                            p.StartDate.HasValue && p.StartDate.Value.Month == month)
+                            p.StartDate.Year == year &&
+                            p.StartDate.Month == month)
                 .ToListAsync();
 
             var grouped = programs
@@ -128,10 +128,10 @@ namespace WebApi.Controllers.DataTables.IBTVA
                 .Select(g => new
                 {
                     Category = g.Key,
-                    CompletedPrograms = g.Count(p => p.EndDate.HasValue && p.EndDate.Value < DateTime.Now),
-                    OngoingPrograms = g.Count(p => p.StartDate.HasValue && p.StartDate.Value <= DateTime.Now &&
-                                                   (!p.EndDate.HasValue || p.EndDate.Value == default || p.EndDate.Value >= DateTime.Now)),
-                    StartedPrograms = g.Count(p => p.StartDate.HasValue && p.StartDate.Value.Month == month),
+                    CompletedPrograms = g.Count(p => p.EndDate != DateOnly.MinValue && p.EndDate.ToDateTime(TimeOnly.MinValue) < DateTime.Now),
+                    OngoingPrograms = g.Count(p => p.StartDate != DateOnly.MinValue && p.StartDate.ToDateTime(TimeOnly.MinValue) <= DateTime.Now &&
+                                                   (p.EndDate == DateOnly.MinValue || p.EndDate.ToDateTime(TimeOnly.MinValue) == default || p.EndDate.ToDateTime(TimeOnly.MinValue) >= DateTime.Now)),
+                    StartedPrograms = g.Count(p => p.StartDate != DateOnly.MinValue && p.StartDate.Month == month),
                     //TotalParticipants = g.Sum(p => p.Reports !=null ? p.Reports.Count : 0),
                     UnitId = unitId
                 })

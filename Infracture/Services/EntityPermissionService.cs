@@ -1,8 +1,5 @@
-﻿//Temporary Fix for the Services
+﻿
 
-using Application.Interface;
-using Application.Interface.Services.Common;
-using Domain.Entities;
 
 namespace Infrastructure.Services
 {
@@ -52,254 +49,155 @@ namespace Infrastructure.Services
 }
 
 
+/* Produciton EntityPermissionService changes */
 
 
-
-
-
-
-
-
-//using Application.Interface;
-//using Application.Interface.Services.Common;
-//using Domain.Entities;
-//using Domain.Entities.Enum;
-
-//namespace Infrastructure.Services
+//public class EntityPermissionService : IEntityPermissionService
 //{
-//    /// <summary>
-//    /// Centralized permission management for form/report entities.
-//    /// Includes role-based logic and workflow-specific checks (approval/rejection).
-//    /// </summary>
-//    public class EntityPermissionService : IEntityPermissionService
+//    private readonly ICurrentUserService _currentUserService;
+//    private readonly ITrainerAssignmentRepository _trainerAssignmentRepo;
+//    private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepo;
+
+//    public EntityPermissionService(
+//        ICurrentUserService currentUserService,
+//        ITrainerAssignmentRepository trainerAssignmentRepo,
+//        IUnitHeadAssignmentRepository unitHeadAssignmentRepo)
 //    {
-//        private readonly ICurrentUserService _currentUserService;
+//        _currentUserService = currentUserService;
+//        _trainerAssignmentRepo = trainerAssignmentRepo;
+//        _unitHeadAssignmentRepo = unitHeadAssignmentRepo;
+//    }
 
-//        public EntityPermissionService(ICurrentUserService currentUserService)
+//    // ===== For ReportEntryBaseEntity (IBTVA, FTI, etc.) =====
+
+//    public async Task<bool> CanModify<T>(T entity) where T : ReportEntryBaseEntity
+//    {
+//        var currentUserId = _currentUserService.UserId;
+//        var currentUserRole = _currentUserService.Role;
+
+//        // Admin can modify everything
+//        if (currentUserRole == Role.ADMIN)
+//            return true;
+
+//        // UnitHead can modify in their units
+//        if (currentUserRole == Role.UNITHEAD)
 //        {
-//            _currentUserService = currentUserService;
+//            var unitHeadLocations = await _unitHeadAssignmentRepo
+//                .GetUnitLocationIdsByUnitHeadIdAsync(currentUserId);
+//            return unitHeadLocations.Contains(entity.UnitLocationId);
 //        }
 
-//        // ================================================================
-//        // REPORT-BASED ENTITIES (ReportEntryBaseEntity)
-//        // ================================================================
-
-//        public async Task<bool> CanModify<T>(T entity) where T : ReportEntryBaseEntity
+//        // Trainer can modify their own entries (if Draft or Rejected)
+//        if (currentUserRole == Role.TRAINER)
 //        {
-//            try
-//            {
-//                var role = _currentUserService.Role;
-//                var orgId = _currentUserService.OrganizationId;
-
-//                if (orgId != entity.OrganizationId)
-//                    return false;
-
-//                if (role == Role.ADMIN)
-//                    return true;
-
-//                if (role == Role.UNITHEAD)
-//                {
-//                    var unitIds = await _currentUserService.MappedUnitLocationIds();
-
-//                    // UnitHead can modify all under their mapped units
-//                    // including changing status from Pending → Approved/Rejected
-//                    return unitIds.Contains(entity.UnitLocationId);
-//                }
-
-//                if (role == Role.TRAINER)
-//                {
-//                    var unitIds = await _currentUserService.MappedUnitLocationIds();
-//                    return unitIds.Contains(entity.UnitLocationId)
-//                        && _currentUserService.UserId == entity.CreatedById
-//                        && entity.FormStatus?.Equals("Draft", StringComparison.OrdinalIgnoreCase) == true;
-//                }
-
-//                return false;
-//            }
-//            catch
-//            {
-//                return false;
-//            }
+//            bool isCreator = entity.CreatedById == currentUserId;
+//            bool canEdit = entity.FormStatus == "Draft" || entity.FormStatus == "Rejected";
+//            return isCreator && canEdit;
 //        }
 
-//        public async Task<bool> CanView<T>(T entity) where T : ReportEntryBaseEntity
+//        return false;
+//    }
+
+//    public async Task<bool> CanView<T>(T entity) where T : ReportEntryBaseEntity
+//    {
+//        var currentUserId = _currentUserService.UserId;
+//        var currentUserRole = _currentUserService.Role;
+
+//        // Admin can view everything
+//        if (currentUserRole == Role.ADMIN)
+//            return true;
+
+//        // UnitHead can view in their units
+//        if (currentUserRole == Role.UNITHEAD)
 //        {
-//            try
-//            {
-//                var role = _currentUserService.Role;
-//                if (_currentUserService.OrganizationId != entity.OrganizationId)
-//                    return false;
-
-//                if (role == Role.ADMIN)
-//                    return true;
-
-//                if (role == Role.UNITHEAD)
-//                {
-//                    var unitIds = await _currentUserService.MappedUnitLocationIds();
-//                    return unitIds.Contains(entity.UnitLocationId);
-//                }
-
-//                if (role == Role.TRAINER)
-//                {
-//                    var unitIds = await _currentUserService.MappedUnitLocationIds();
-//                    return unitIds.Contains(entity.UnitLocationId)
-//                        && _currentUserService.UserId == entity.CreatedById
-//                        && entity.FormStatus?.Equals("Draft", StringComparison.OrdinalIgnoreCase) == true;
-//                }
-
-//                return false;
-//            }
-//            catch
-//            {
-//                return false;
-//            }
+//            var unitHeadLocations = await _unitHeadAssignmentRepo
+//                .GetUnitLocationIdsByUnitHeadIdAsync(currentUserId);
+//            return unitHeadLocations.Contains(entity.UnitLocationId);
 //        }
 
-//        public async Task<bool> CanDelete<T>(T entity) where T : ReportEntryBaseEntity
+//        // Trainer can view their own entries
+//        if (currentUserRole == Role.TRAINER)
 //        {
-//            try
-//            {
-//                var role = _currentUserService.Role;
-//                if (_currentUserService.OrganizationId != entity.OrganizationId)
-//                    return false;
-
-//                if (role == Role.ADMIN)
-//                    return true;
-
-//                if (role == Role.UNITHEAD)
-//                {
-//                    var unitIds = await _currentUserService.MappedUnitLocationIds();
-//                    return unitIds.Contains(entity.UnitLocationId)
-//                        && entity.FormStatus?.Equals("Draft", StringComparison.OrdinalIgnoreCase) == true;
-//                }
-
-//                if (role == Role.TRAINER)
-//                {
-//                    var unitIds = await _currentUserService.MappedUnitLocationIds();
-//                    return unitIds.Contains(entity.UnitLocationId)
-//                        && _currentUserService.UserId == entity.CreatedById
-//                        && entity.FormStatus?.Equals("Draft", StringComparison.OrdinalIgnoreCase) == true;
-//                }
-
-//                return false;
-//            }
-//            catch
-//            {
-//                return false;
-//            }
+//            return entity.CreatedById == currentUserId;
 //        }
 
-//        // ================================================================
-//        // FORM-BASED ENTITIES (AuditableBaseEntity)
-//        // ================================================================
+//        return false;
+//    }
 
-//        public async Task<bool> CanViewForm<T>(T entity) where T : AuditableBaseEntity
+//    public async Task<bool> CanDelete<T>(T entity) where T : ReportEntryBaseEntity
+//    {
+//        var currentUserRole = _currentUserService.Role;
+
+//        // Only Admin can delete
+//        if (currentUserRole == Role.ADMIN)
+//            return true;
+
+//        // Trainers can delete their own Draft entries
+//        if (currentUserRole == Role.TRAINER)
 //        {
-//            try
-//            {
-//                var role = _currentUserService.Role;
-//                if (_currentUserService.OrganizationId != entity.OrganizationId)
-//                    return false;
-
-//                if (role == Role.ADMIN)
-//                    return true;
-
-//                if (role == Role.UNITHEAD)
-//                {
-//                    var unitIds = await _currentUserService.MappedUnitLocationIds();
-//                    return unitIds.Contains(entity.UnitLocationId);
-//                }
-
-//                if (role == Role.TRAINER)
-//                {
-//                    var unitIds = await _currentUserService.MappedUnitLocationIds();
-//                    return unitIds.Contains(entity.UnitLocationId)
-//                        && _currentUserService.UserId == entity.CreatedById
-//                        && entity.FormStatus?.Equals("Draft", StringComparison.OrdinalIgnoreCase) == true;
-//                }
-
-//                return false;
-//            }
-//            catch
-//            {
-//                return false;
-//            }
+//            bool isCreator = entity.CreatedById == _currentUserService.UserId;
+//            bool isDraft = entity.FormStatus == "Draft";
+//            return isCreator && isDraft;
 //        }
 
-//        public async Task<bool> CanModifyForm<T>(T entity) where T : AuditableBaseEntity
+//        return false;
+//    }
+
+//    // ===== For AuditableBaseEntity (Publications, Nominations) =====
+
+//    public Task<bool> CanViewForm<T>(T entity) where T : AuditableBaseEntity
+//    {
+//        // Similar logic but simpler
+//        var currentUserRole = _currentUserService.Role;
+
+//        if (currentUserRole == Role.ADMIN || currentUserRole == Role.UNITHEAD)
+//            return Task.FromResult(true);
+
+//        // Trainer can view their own
+//        return Task.FromResult(entity.CreatedById == _currentUserService.UserId);
+//    }
+
+//    public Task<bool> CanModifyForm<T>(T entity) where T : AuditableBaseEntity
+//    {
+//        var currentUserRole = _currentUserService.Role;
+
+//        if (currentUserRole == Role.ADMIN)
+//            return Task.FromResult(true);
+
+//        // Check if it has FormStatus property
+//        var formStatusProp = typeof(T).GetProperty("FormStatus");
+//        if (formStatusProp != null)
 //        {
-//            try
-//            {
-//                var role = _currentUserService.Role;
-//                if (_currentUserService.OrganizationId != entity.OrganizationId)
-//                    return false;
-
-//                if (role == Role.ADMIN)
-//                    return true;
-
-//                if (role == Role.UNITHEAD)
-//                {
-//                    var unitIds = await _currentUserService.MappedUnitLocationIds();
-
-//                    // ✅ UnitHead can modify any mapped-unit form
-//                    // including updating status Pending → Approved / Rejected
-//                    return unitIds.Contains(entity.UnitLocationId);
-//                }
-
-//                if (role == Role.TRAINER)
-//                {
-//                    var unitIds = await _currentUserService.MappedUnitLocationIds();
-
-//                    // Trainer: can modify only their own Draft
-//                    return unitIds.Contains(entity.UnitLocationId)
-//                        && _currentUserService.UserId == entity.CreatedById
-//                        && entity.FormStatus?.Equals("Draft", StringComparison.OrdinalIgnoreCase) == true;
-//                }
-
-//                return false;
-//            }
-//            catch
-//            {
-//                return false;
-//            }
+//            var status = formStatusProp.GetValue(entity) as string;
+//            bool canEdit = status == "Draft" || status == "Rejected";
+//            bool isCreator = entity.CreatedById == _currentUserService.UserId;
+//            return Task.FromResult(isCreator && canEdit);
 //        }
 
-//        public async Task<bool> CanDeleteForm<T>(T entity) where T : AuditableBaseEntity
+//        // If no FormStatus, creator can modify
+//        return Task.FromResult(entity.CreatedById == _currentUserService.UserId);
+//    }
+
+//    public Task<bool> CanDeleteForm<T>(T entity) where T : AuditableBaseEntity
+//    {
+//        var currentUserRole = _currentUserService.Role;
+
+//        if (currentUserRole == Role.ADMIN)
+//            return Task.FromResult(true);
+
+//        // Trainers can delete their own Draft entries
+//        var formStatusProp = typeof(T).GetProperty("FormStatus");
+//        if (formStatusProp != null)
 //        {
-//            try
-//            {
-//                var role = _currentUserService.Role;
-//                if (_currentUserService.OrganizationId != entity.OrganizationId)
-//                    return false;
-
-//                if (role == Role.ADMIN)
-//                    return true;
-
-//                if (role == Role.UNITHEAD)
-//                {
-//                    var unitIds = await _currentUserService.MappedUnitLocationIds();
-
-//                    // UnitHead can delete only if still Draft
-//                    return unitIds.Contains(entity.UnitLocationId)
-//                        && entity.FormStatus?.Equals("Draft", StringComparison.OrdinalIgnoreCase) == true;
-//                }
-
-//                if (role == Role.TRAINER)
-//                {
-//                    var unitIds = await _currentUserService.MappedUnitLocationIds();
-
-//                    // Trainer can delete only their own Draft
-//                    return unitIds.Contains(entity.UnitLocationId)
-//                        && _currentUserService.UserId == entity.CreatedById
-//                        && entity.FormStatus?.Equals("Draft", StringComparison.OrdinalIgnoreCase) == true;
-//                }
-
-//                return false;
-//            }
-//            catch
-//            {
-//                return false;
-//            }
+//            var status = formStatusProp.GetValue(entity) as string;
+//            bool isDraft = status == "Draft";
+//            bool isCreator = entity.CreatedById == _currentUserService.UserId;
+//            return Task.FromResult(isCreator && isDraft);
 //        }
+
+//        return Task.FromResult(false);
 //    }
 //}
+
+
+

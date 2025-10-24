@@ -1,22 +1,13 @@
-﻿using Domain.Entities.KVK;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Domain.Entities.STU
+﻿namespace Domain.Entities.STU
 {
-    public class STURecommendation : AuditableBaseEntity
+    public class StuRecommendation : AuditableBaseEntity
     {
         // FK to parent KVK program
         [Required]
-        public int STUProgramDetailsID { get; set; }
-
-        [ForeignKey(nameof(STUProgramDetailsID))]
-        public STUProgramDetails ProgramDetails { get; set; }
+        public int? StuProgramDetailsId { get; set; }
+        [JsonIgnore]
+        [ForeignKey(nameof(StuProgramDetailsId))]
+        public StuProgramDetails? ProgramDetails { get; set; }
 
         // Recommendation fields
         [MaxLength(1000)]
@@ -36,5 +27,9 @@ namespace Domain.Entities.STU
 
         [MaxLength(1000)]
         public string? ImpactOutcome { get; set; }
+
+        public int? UnitLocationId { get; set; }
+
+        public int? OrganizationId { get; set; }
     }
 }

@@ -1,20 +1,9 @@
-﻿using Domain.Entities.FIU;
-using Domain.Entities.MasterData;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-
-namespace Domain.Entities.DEU
+﻿namespace Domain.Entities.DEU
 {
     public class DeuProgramDetails : ReportEntryBaseEntity
     {
        
-            public int? ProgramTypeId { get; set; }
+        public int? ProgramTypeId { get; set; }
 
          [JsonIgnore]
         public ProgramType? ProgramType { get; set; }
@@ -62,13 +51,12 @@ namespace Domain.Entities.DEU
             [MaxLength(250)]
             public string Title { get; set; }
 
-            [MaxLength(100)]
-            public int? Mode { get; set; }
+        [MaxLength(100)]
+        public int? ModeId { get; set; }
+        [JsonIgnore]
+        public Mode? Mode { get; set; }
 
-            // Dates
-            public DateTime? StartDate { get; set; }
-            [Required]
-            public DateTime? EndDate { get; set; }
+     
 
             [MaxLength(100)]
             public string? Duration { get; set; }
@@ -92,20 +80,20 @@ namespace Domain.Entities.DEU
             public int? SourceOfFundId { get; set; }
             
             [JsonIgnore]
-            public  SourceOfFund SourceOfFund { get; set; }
+            public  SourceOfFund? SourceOfFund { get; set; }
             
             public int? Funds { get; set; }
 
             [MaxLength(100)]
             public int? StatusId { get; set; }
-        [JsonIgnore]
-            public Status Status { get; set; }
+            [JsonIgnore]
+            public Status? Status { get; set; }
             //this is for project dropdown it has to be linked to masterdata table
             public string? Copi { get; set; }
 
-            public decimal TotalOutlayRs { get; set; }
+            public decimal? TotalOutlayRs { get; set; }
 
-            [MaxLength(100)]
+        [MaxLength(100)]
             public int? BatchNo { get; set; }
 
 
@@ -131,11 +119,12 @@ namespace Domain.Entities.DEU
             [MaxLength(500)]
             public string? FundsSanctionLetterUploadFile { get; set; }
 
-        public ICollection<DeuRecommendation> Recommendations { get; set; }
+        public ICollection<DeuParticipantDemographics>? ParticipantDemographics { get; set; }
 
-        public ICollection<DeuReport> Reports { get; set; }
-
-        public ICollection<DeuAdvisoryServices> AdvisoryServices { get; set; }
+        public ICollection<DeuProgramContentAndResources>? ProgramContent { get; set; }
+        public DeuAdvisoryServices? AdvisoryServices { get; set; }
+        public DeuRecommendation? Recommendations { get; set; }
+        public DeuReport? Reports { get; set; }
 
     }
 }

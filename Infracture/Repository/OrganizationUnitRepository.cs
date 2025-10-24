@@ -24,6 +24,24 @@ namespace Infrastructure.Repository
                 .ToListAsync();
 
         }
+
+        public async Task<List<int>> GetUnitLocationIdsByOrganizationAndUnitAsync(
+         int organizationId,
+         int unitId)
+        {
+            return await _dbContext.OrganizationUnitLocations
+                .Where(l => l.OrganizationId == organizationId && l.UnitId == unitId)
+                .Select(l => l.Id)
+                .ToListAsync();
+        }
+
+        public async Task<bool> IsLocationInOrganizationAsync(int unitLocationId, int organizationId)
+        {
+            return await _dbContext.OrganizationUnitLocations
+                .AnyAsync(oul => oul.Id == unitLocationId && oul.OrganizationId == organizationId);
+        }
+
+
         public async Task DeleteAsync(OrganizationUnitLocation entity)
         {
             _dbContext.OrganizationUnitLocations.Remove(entity);

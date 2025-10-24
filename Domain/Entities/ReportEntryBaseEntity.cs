@@ -1,5 +1,5 @@
 ﻿using Domain.Entities.Junction;
-using System.ComponentModel.DataAnnotations;
+
 using System.Text.Json.Serialization;
 
 namespace Domain.Entities
@@ -8,9 +8,10 @@ namespace Domain.Entities
     {
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }
-        public string? Attachements { get; set; } = null; //comma seperated urls of assets
+        public string? Attachements { get; set; } = null; 
         [Required]
         public int UnitLocationId {  get; set; }
+
         public int OrganizationId { get; set; }
         [JsonIgnore]
         public OrganizationUnitLocation UnitLocation { get; set; } = null!;

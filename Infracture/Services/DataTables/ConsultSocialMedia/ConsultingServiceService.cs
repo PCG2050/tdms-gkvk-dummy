@@ -1,16 +1,4 @@
-﻿using Application.Interface;
-using Application.Interface.Repository;
-using Application.Interface.Repository.DataTables;
-using Application.Interface.Repository.DataTables.ConsultSocialMedia;
-using Application.Interface.Services;
-using Application.Interface.Services.Common;
-using Application.Interface.Services.DataTables;
-using Application.Interface.Services.DataTables.ConsultSocialMedia;
-using Application.Mapper;
-using Application.Models;
-using Application.Models.DataTables;
-using Domain.Entities.Enum;
-using Domain.Entities.GenericTables.ConsultingAndSocialMediaService;
+﻿
 
 namespace Infrastructure.Services.DataTables.ConsultSocialMedia
 {

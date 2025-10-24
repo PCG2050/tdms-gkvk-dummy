@@ -1,21 +1,12 @@
-﻿using Domain.Entities.KVK;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Domain.Entities.STU
+﻿namespace Domain.Entities.STU
 {
-    public  class STUReport : AuditableBaseEntity
+    public  class StuReport : AuditableBaseEntity
     {
         [Required]
-        public int STUProgramDetailsID { get; set; }
-
-        [ForeignKey(nameof(STUProgramDetailsID))]
-        public STUProgramDetails ProgramDetails { get; set; }
+        public int? StuProgramDetailsId { get; set; }
+        [JsonIgnore]
+        [ForeignKey(nameof(StuProgramDetailsId))]
+        public StuProgramDetails? ProgramDetails { get; set; }
 
         // Report details
         [MaxLength(150)]
@@ -35,5 +26,9 @@ namespace Domain.Entities.STU
 
         [MaxLength(1000)]
         public string? SignificantOutcome { get; set; }
+        public int? UnitLocationId { get; set; }
+
+        public int? OrganizationId { get; set; }
+
     }
 }

@@ -10,25 +10,6 @@ using Domain.Entities.GenericTables;
 using Domain.Entities.GenericTables.ConsultingAndSocialMediaService;
 using Domain.Entities.GenericTables.Service;
 using Domain.Entities.IBTVA;
-using Domain.Entities.Junction;
-using Domain.Entities.KVK;
-using Domain.Entities.MasterData;
-using Domain.Entities.STU;
-using Infrastructure.DbContext.Configuration;
-using Infrastructure.Services;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-
-
 namespace Infrastructure.DbContext
 {
     public class TdmsDbContext : Microsoft.EntityFrameworkCore.DbContext
@@ -54,15 +35,15 @@ namespace Infrastructure.DbContext
        
         public DbSet<DaesiProgramme> DaesiProgrammes { get; set; }
         public DbSet<DaesiOtherActivity> DaesiOtherActivities { get; set; }
-        public DbSet<STUProgramDetails> STUProgramDetails { get; set; }
-        public DbSet<STUParticipantDemographics> STUParticipantDemographics { get; set; }
-        public DbSet<STUProgramContentAndResources> STUProgramContentAndResources { get; set; }
-        public DbSet<STUResourcePerson> STUResourcePersons { get; set; }
-        public DbSet<STUTopicsCoveredInClass> STUTopicsCoveredInClass { get; set; }
-        public DbSet<STUTeachingAidsDeveloped> STUTeachingAidsDeveloped { get; set; }
-        public DbSet<STUAdvisoryServices> STUAdvisoryServices { get; set; }
-        public DbSet<STUReport> STUReports { get; set; }
-        public DbSet<STURecommendation> STURecommendations { get; set; }
+        public DbSet<StuProgramDetails> StuProgramDetails { get; set; }
+        public DbSet<StuParticipantDemographics> StuParticipantDemographics { get; set; }
+        public DbSet<StuProgramContentAndResources> StuProgramContentAndResources { get; set; }
+        public DbSet<StuResourcePerson> StuResourcePersons { get; set; }
+        public DbSet<StuTopicsCoveredInClass> StuTopicsCoveredInClass { get; set; }
+        public DbSet<StuTeachingAidsDeveloped> StuTeachingAidsDeveloped { get; set; }
+        public DbSet<StuAdvisoryServices> StuAdvisoryServices { get; set; }
+        public DbSet<StuReport> StuReports { get; set; }
+        public DbSet<StuRecommendation> StuRecommendations { get; set; }
 
         #endregion
         #region FIU
@@ -103,9 +84,15 @@ namespace Infrastructure.DbContext
         public DbSet<IbtvaRecommendation> IbtvaRecommendations { get; set; }
         #endregion
         #region ATIC
-        public DbSet<AticSales> AticSales { get; set; }
-        public DbSet<AticAdvisoryService> AticAdvisoryServices { get; set; }
-        public DbSet<AticOtherActivity> AticOtherActivities { get; set; }
+        public DbSet<AticProgramDetails> AticProgramDetails { get; set; }
+        public DbSet<AticParticipantDemographics> AticParticipantDemographics { get; set; }
+        public DbSet<AticProgramContentAndResources> AticProgramContentAndResources { get; set; }
+        public DbSet<AticResourcePerson> AticResourcePersons { get; set; }
+        public DbSet<AticTopicsCoveredInClass> AticTopicsCoveredInClass { get; set; }
+        public DbSet<AticTeachingAidsDeveloped> AticTeachingAidsDeveloped { get; set; }
+        public DbSet<AticAdvisoryServices> AticAdvisoryServices { get; set; }
+        public DbSet<AticReport> AticReports { get; set; }
+        public DbSet<AticRecommendation> AticRecommendations { get; set; }
         #endregion
         #region DEU
         public DbSet<DeuCourse> DeuCourses { get; set; }
@@ -123,7 +110,19 @@ namespace Infrastructure.DbContext
 
         #endregion
         #region ASM
-       
+        public DbSet<ASMVisitorDetails> ASMVisitorDetails { get; set; }
+
+        #endregion
+        #region NAEP
+        public DbSet<NaepProgramDetails> NaepProgramDetails { get; set; }
+        public DbSet<NaepParticipantDemographics> NaepParticipantDemographics { get; set; }
+        public DbSet<NaepProgramContentAndResources> NaepProgramContentAndResources { get; set; }
+        public DbSet<NaepResourcePerson> NaepResourcePersons { get; set; }
+        public DbSet<NaepTopicsCoveredInClass> NaepTopicsCoveredInClass { get; set; }
+        public DbSet<NaepTeachingAidsDeveloped> NaepTeachingAidsDeveloped { get; set; }
+        public DbSet<NaepAdvisoryServices> NaepAdvisoryServices { get; set; }
+        public DbSet<NaepReport> NaepReports { get; set; }
+        public DbSet<NaepRecommendation> NaepRecommendations { get; set; }
         #endregion
         #region EEU
         public DbSet<EeuOFT> EeuOFTs { get; set; }

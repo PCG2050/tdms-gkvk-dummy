@@ -1,12 +1,4 @@
-﻿using Domain.Entities.MasterData;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-
+﻿
 namespace Domain.Entities.IBTVA
 {
     public class IbtvaProgramDetails : ReportEntryBaseEntity
@@ -54,12 +46,14 @@ namespace Domain.Entities.IBTVA
         [MaxLength(200)]
         public string? SponsoredOrganizationName { get; set; }
 
-        [Required]
+        
         [MaxLength(250)]
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         [MaxLength(100)]
-        public int? Mode { get; set; }
+        public int? ModeId { get; set; }
+        [JsonIgnore]
+        public Mode? Mode { get; set; }
 
         [MaxLength(100)]
         public string? Duration { get; set; }
@@ -83,7 +77,7 @@ namespace Domain.Entities.IBTVA
         public int? SourceOfFundId { get; set; }
 
         [JsonIgnore]
-        public SourceOfFund SourceOfFund { get; set; }
+        public SourceOfFund? SourceOfFund { get; set; }
 
         public int? Funds { get; set; }
 
@@ -123,5 +117,14 @@ namespace Domain.Entities.IBTVA
         public DateTime? FundsSanctionLetterDate { get; set; }
         [MaxLength(500)]
         public string? FundsSanctionLetterUploadFile { get; set; }
+
+        public ICollection<IbtvaParticipantDemographics>? ParticipantDemographics { get; set; }
+
+        public ICollection<IbtvaProgramContentAndResources>? ProgramContent { get; set; }     
+        public IbtvaAdvisoryServices? AdvisoryServices { get; set; }
+        public IbtvaRecommendation? Recommendations { get; set; }
+        public IbtvaReport? Reports { get; set; }
+
+
     }
 }

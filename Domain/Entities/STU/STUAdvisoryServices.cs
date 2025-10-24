@@ -1,23 +1,12 @@
-﻿using Domain.Entities.FIU;
-using Domain.Entities.FTI;
-using Domain.Entities.KVK;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Domain.Entities.STU
+﻿namespace Domain.Entities.STU
 {
-    public class STUAdvisoryServices : AuditableBaseEntity
+    public class StuAdvisoryServices : AuditableBaseEntity
     {
         [Required]
-        public int? STUProgramDetailsID { get; set; }
-
-        [ForeignKey(nameof(STUProgramDetailsID))]
-        public STUProgramDetails ProgramDetails { get; set; }
+        public int? StuProgramDetailsId { get; set; }
+        [JsonIgnore]
+        [ForeignKey(nameof(StuProgramDetailsId))]
+        public StuProgramDetails? ProgramDetails { get; set; }
 
         // Advisory service metrics
         public int? NoOfFacebookSMS { get; set; }
@@ -31,5 +20,8 @@ namespace Domain.Entities.STU
         public int? NoOfEmailsSent { get; set; }
         public int? NoOfNewspaperCoverage { get; set; }
         public int? NoOfBeneficiaries { get; set; }
+        public int? UnitLocationId { get; set; }
+
+        public int? OrganizationId { get; set; }
     }
 }
