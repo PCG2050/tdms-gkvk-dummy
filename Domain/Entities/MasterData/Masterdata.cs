@@ -222,6 +222,16 @@ namespace Domain.Entities.MasterData
         {
             public string Name { get; set; } = default!;
         }
-    
+
+        public class OFTDetails : BaseEntity
+        {
+            public string Name { get; set; } = default!;
+        }
+
+        public class FLDDetails : BaseEntity
+        {
+            public string Name { get; set; } = default!;
+    }
+
 
 }

@@ -10,14 +10,14 @@ namespace Domain.Entities.KVK
 {
     public class KvkResourcePerson : AuditableBaseEntity
     {
-        
 
-        // FK to KvkProgramContentAndResources
+
         [Required]
-        public int ProgramContentAndResourcesId { get; set; }
+        public int? KvkProgramContentAndResourcesId { get; set; }
 
-        [ForeignKey(nameof(ProgramContentAndResourcesId))]
-        public KvkProgramContentAndResources ProgramContentAndResources { get; set; }
+        [JsonIgnore]
+        [ForeignKey(nameof(KvkProgramContentAndResourcesId))]
+        public KvkProgramContentAndResources? ProgramContentAndResources { get; set; }
 
         [MaxLength(200)]
         public string? Name { get; set; }
@@ -33,8 +33,11 @@ namespace Domain.Entities.KVK
 
         [MaxLength(250)]
         public string? InstitutionOrDepartment { get; set; }
+        public int? UnitLocationId { get; set; }
 
-       
+        public int? OrganizationId { get; set; }
+
+
 
     }
 }

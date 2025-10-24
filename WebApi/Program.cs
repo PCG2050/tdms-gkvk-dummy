@@ -1,7 +1,3 @@
-
-
-
-
 using Application.Interface.Repository.DataTables.ATIC;
 using Application.Interface.Repository.DataTables.DEU;
 using Application.Interface.Repository.DataTables.EEU;

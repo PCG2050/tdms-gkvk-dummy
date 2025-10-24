@@ -1,22 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 
 namespace Domain.Entities.KVK
 {
     public class KvkTopicsCoveredInClass : AuditableBaseEntity
     {
-        
+
 
         [Required]
-        public int? ProgramContentAndResourcesId { get; set; }
+        public int? KvkProgramContentAndResourcesId { get; set; }
 
-        [ForeignKey(nameof(ProgramContentAndResourcesId))]
-        public KvkProgramContentAndResources ProgramContentAndResources { get; set; }
+        [JsonIgnore]
+        [ForeignKey(nameof(KvkProgramContentAndResourcesId))]
+        public KvkProgramContentAndResources? ProgramContentAndResources { get; set; }
 
         public DateTime? Date { get; set; }
 
@@ -24,9 +19,12 @@ namespace Domain.Entities.KVK
         public string? Title { get; set; }
 
         [MaxLength(500)]
-        public string? PhotoUpload { get; set; } // path or URL to the uploaded photo
+        public string? PhotoUpload { get; set; }
 
-      
+        public int? UnitLocationId { get; set; }
+
+        public int? OrganizationId { get; set; }
+
 
     }
 }

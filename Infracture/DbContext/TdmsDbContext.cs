@@ -141,13 +141,18 @@ namespace Infrastructure.DbContext
         public DbSet<EeuRecommendation> EeuRecommendations { get; set; }
         #endregion
         #region  KVK 
-        public DbSet<TableKVKProgramDetails> KVKProgramDetails { get; set; }
+        public DbSet<KvkProgramDetails> KvkProgramDetails { get; set; }
         public DbSet<KvkParticipantDemographics> KvkParticipantDemographics { get; set; }
         public DbSet<KvkProgramContentAndResources> KvkProgramContentAndResources { get; set; }
         public DbSet<KvkResourcePerson> KvkResourcePersons { get; set; }
         public DbSet<KvkTopicsCoveredInClass> KvkTopicsCoveredInClass { get; set; }
         public DbSet<KvkTeachingAidsDeveloped> KvkTeachingAidsDeveloped { get; set; }
         public DbSet<KvkAdvisoryServices> KvkAdvisoryServices { get; set; }
+
+        public DbSet<KvkResult> KvkResults { get; set; }
+
+        public DbSet<KvkFldResult> KvkFLDResults { get; set; }
+        public DbSet<KvkOftResult> KvkOFTResults { get; set; }
         public DbSet<KvkReport> KvkReports { get; set; }
         public DbSet<KvkRecommendation> KvkRecommendations { get; set; }
 
@@ -342,8 +347,36 @@ namespace Infrastructure.DbContext
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);      
+            base.OnModelCreating(modelBuilder);
 
+            // 1️⃣ ProgramDetails ↔ Result (1:1)
+            modelBuilder.Entity<KvkProgramDetails>()
+                .HasOne(p => p.Results)
+                .WithOne(r => r.ProgramDetails)
+                .HasForeignKey<KvkResult>(r => r.KvkProgramDetailsId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // 2️⃣ ProgramDetails ↔ Report (1:1)
+            modelBuilder.Entity<KvkProgramDetails>()
+                .HasOne(p => p.Reports)
+                .WithOne(r => r.ProgramDetails)
+                .HasForeignKey<KvkReport>(r => r.KvkProgramDetailsId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
+            // 3️⃣ Result ↔ FLD Results (1:N)
+            modelBuilder.Entity<KvkResult>()
+                .HasMany(r => r.FldResults)
+                .WithOne(f => f.KvkResult) // <-- FIX: Use navigation property to KvkResult, not ProgramDetails
+                .HasForeignKey(f => f.KvkResultId) // <-- FIX: Use foreign key to KvkResult
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // 4️⃣ Result ↔ OFT Results (1:N)
+            modelBuilder.Entity<KvkResult>()
+                .HasMany(r => r.OftResults)
+                .WithOne(o => o.KvkResult) // <-- FIX: Use navigation property to KvkResult, not ProgramDetails
+                .HasForeignKey(o => o.KvkResultId) // <-- FIX: Use foreign key to KvkResult
+                .OnDelete(DeleteBehavior.Cascade);
 
 
 
