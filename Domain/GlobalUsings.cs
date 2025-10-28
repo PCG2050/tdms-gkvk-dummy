@@ -13,5 +13,6 @@ global using Domain.Entities.STU;
 global using Domain.Entities.DEU;
 global using Domain.Entities.EEU;
 global using Domain.Entities.NAEP;
+global using Domain.Entities.KVK;
 
 

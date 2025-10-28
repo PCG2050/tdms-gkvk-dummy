@@ -8,6 +8,7 @@ namespace Domain.Entities.KVK
 
         [ForeignKey(nameof(KvkProgramDetailsId))]
         public KvkProgramDetails? ProgramDetails { get; set; }
+
         public ICollection<KvkFldResult>? FldResults { get; set; }
         public ICollection<KvkOftResult>? OftResults { get; set; }
         public string? UploadExcelUrl { get; set; }

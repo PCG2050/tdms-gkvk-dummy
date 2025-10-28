@@ -43,6 +43,7 @@ global using Domain.Entities.ATIC;
 global using Domain.Entities.DEU;
 global using Domain.Entities.STU;
 global using Domain.Entities.IBTVA;
+global using Domain.Entities.KVK;
 
 global using Application.Interface.Repository.DataTables.IBTVA;
 global using Application.Interface.Repository.DataTables.DEU;
@@ -51,6 +52,7 @@ global using Application.Interface.Repository.DataTables.ATIC;
 global using Application.Interface.Repository.DataTables.EEU;
 global using Application.Interface.Repository.DataTables.NAEP;
 global using Application.Interface.Repository.DataTables.STU;
+global using Application.Interface.Repository.DataTables.KVK;
 
 global using Application.Models.DataTables.IBTVA;
 global using Application.Models.DataTables.DEU;
@@ -59,6 +61,7 @@ global using Application.Models.DataTables.ATIC;
 global using Application.Models.DataTables.EEU;
 global using Application.Models.DataTables.NAEP;
 global using Application.Models.DataTables.STU;
+global using Application.Models.DataTables.KVK;
 
 global using Application.Mapper.DataTable.DEU;
 global using Application.Mapper.DataTable.IBTVA;
@@ -66,6 +69,7 @@ global using Application.Mapper.DataTable.ATIC;
 global using Application.Mapper.DataTable.NAEP;
 global using Application.Mapper.DataTable.EEU;
 global using Application.Mapper.DataTable.STU;
+global using Application.Mapper.DataTable.KVK;
 
 global using Application.Interface.Services.DataTables.DEU;
 global using Application.Interface.Services.DataTables.IBTVA;
@@ -73,6 +77,7 @@ global using Application.Interface.Services.DataTables.ATIC;
 global using Application.Interface.Services.DataTables.NAEP;
 global using Application.Interface.Services.DataTables.EEU;
 global using Application.Interface.Services.DataTables.STU;
+global using Application.Interface.Services.DataTables.KVK;
 
 global using Infrastructure.Settings;
 global using Microsoft.Extensions.Logging;

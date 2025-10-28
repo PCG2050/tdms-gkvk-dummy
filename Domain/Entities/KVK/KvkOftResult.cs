@@ -12,7 +12,7 @@ namespace Domain.Entities.KVK
         public int DetailsOfDemoId { get; set; }
         [JsonIgnore]
         [ForeignKey(nameof(DetailsOfDemoId))]
-        public OFTDetails? DetailsOfDemo { get; set; }
+        public OFTResult? DetailsOfDemo { get; set; }
     
         public string? Parameter1 { get; set; }
         public string? Observation1 { get; set; }

@@ -14,6 +14,7 @@ global using Application.Models.DataTables.STU;
 global using Application.Models.DataTables.EEU;
 global using Application.Models.DataTables.NAEP;
 global using Application.Models.DataTables.ATIC;
+global using Application.Models.DataTables.KVK;
 
 //Entities
 global using Domain.Entities;
@@ -23,6 +24,7 @@ global using Domain.Entities.STU;
 global using Domain.Entities.EEU;
 global using Domain.Entities.NAEP;
 global using Domain.Entities.ATIC;
+global using Domain.Entities.KVK;
 
 //Mapper
 global using Application.Mapper.DataTable.DEU;
@@ -31,6 +33,7 @@ global using Application.Mapper.DataTable.STU;
 global using Application.Mapper.DataTable.EEU;
 global using Application.Mapper.DataTable.NAEP;
 global using Application.Mapper.DataTable.ATIC;
+global using Application.Mapper.DataTable.KVK;
 
 //Repository Interfaces
 global using Application.Interface.Repository.DataTables.IBTVA;
@@ -39,4 +42,5 @@ global using Application.Interface.Repository.DataTables.STU;
 global using Application.Interface.Repository.DataTables.EEU;
 global using Application.Interface.Repository.DataTables.NAEP;
 global using Application.Interface.Repository.DataTables.ATIC;
+global using Application.Interface.Repository.DataTables.KVK;
 

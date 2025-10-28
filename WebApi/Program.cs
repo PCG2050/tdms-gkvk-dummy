@@ -3,25 +3,30 @@ using Application.Interface.Repository.DataTables.DEU;
 using Application.Interface.Repository.DataTables.EEU;
 using Application.Interface.Repository.DataTables.NAEP;
 using Application.Interface.Repository.DataTables.STU;
+using Application.Interface.Repository.DataTables.KVK;
 using Application.Interface.Services.DataTables.ATIC;
 using Application.Interface.Services.DataTables.DEU;
 using Application.Interface.Services.DataTables.EEU;
 using Application.Interface.Services.DataTables.NAEP;
 using Application.Interface.Services.DataTables.STU;
+using Application.Interface.Services.DataTables.KVK;
 using Application.Mapper.DataTable.ATIC;
 using Application.Mapper.DataTable.DEU;
 using Application.Mapper.DataTable.EEU;
 using Application.Mapper.DataTable.NAEP;
 using Application.Mapper.DataTable.STU;
+using Application.Mapper.DataTable.KVK;
 using Infrastructure.Repository.DataTables.ATIC;
 using Infrastructure.Repository.DataTables.DEU;
 using Infrastructure.Repository.DataTables.EEU;
 using Infrastructure.Repository.DataTables.NAEP;
 using Infrastructure.Repository.DataTables.STU;
+using Infrastructure.Repository.DataTables.KVK;
 using Infrastructure.Services.DataTables.ATIC;
 using Infrastructure.Services.DataTables.DEU;
 using Infrastructure.Services.DataTables.EEU;
 using Infrastructure.Services.DataTables.NAEP;
+using Infrastructure.Services.DataTables.KVK;
 
 namespace WebApi
 {
@@ -177,7 +182,8 @@ namespace WebApi
             builder.Services.AddSingleton<NaepProgramMapper>();
             builder.Services.AddSingleton<EeuProgramMapper>();
             builder.Services.AddSingleton<StuProgramMapper>();
-        
+            builder.Services.AddSingleton<KvkProgramMapper>();
+
             builder.Services.AddSingleton<ConsultingServiceMapper>();
             builder.Services.AddSingleton<PublicationMapper>();
             builder.Services.AddSingleton<TblServiceMapper>();
@@ -241,7 +247,7 @@ namespace WebApi
             builder.Services.AddScoped<INaepParticipantDemographicsRepository, NaepParticipantDemographicsRepository>();
             builder.Services.AddScoped<INaepProgramContentRepository, NaepProgramContentRepository>();
             builder.Services.AddScoped<INaepResourcePersonRepository, NaepResourcePersonRepository>();
-            builder.Services.AddScoped<INaepTopicsCoveredRepository, NaepTopicsCoveredRepository>();
+            builder.Services.AddScoped<INaepTopicsCoveredRepository,NaepTopicsCoveredRepository>();
             builder.Services.AddScoped<INaepTeachingAidsRepository, NaepTeachingAidsRepository>();
             builder.Services.AddScoped<INaepAdvisoryServicesRepository, NaepAdvisoryServicesRepository>();
             builder.Services.AddScoped<INaepReportRepository, NaepReportRepository>();
@@ -263,6 +269,24 @@ namespace WebApi
             builder.Services.AddScoped<IEeuProgramService, EeuProgramService>();
             #endregion
 
+            #region KVK
+            // KVK Repositories
+            builder.Services.AddScoped<IKvkProgramDetailsRepository, KvkProgramDetailsRepository>();
+            builder.Services.AddScoped<IKvkParticipantDemographicsRepository, KvkParticipantDemographicsRepository>();
+            builder.Services.AddScoped<IKvkProgramContentRepository, KvkProgramContentRepository>();
+            builder.Services.AddScoped<IKvkResourcePersonRepository, KvkResourcePersonRepository>();
+            builder.Services.AddScoped<IKvkTopicsCoveredRepository, KvkTopicsCoveredRepository>();
+            builder.Services.AddScoped<IKvkTeachingAidsRepository, KvkTeachingAidsRepository>();
+            builder.Services.AddScoped<IKvkAdvisoryServicesRepository, KvkAdvisoryServicesRepository>();
+            builder.Services.AddScoped<IKvkResultRepository, KvkResultRepository>();
+            builder.Services.AddScoped<IKvkFldResultRepository, KvkFldResultRepository>();
+            builder.Services.AddScoped<IKvkOftResultRepository, KvkOftResultRepository>();
+            builder.Services.AddScoped<IKvkReportRepository, KvkReportRepository>();
+            builder.Services.AddScoped<IKvkRecommendationRepository, KvkRecommendationRepository>();
+
+            // KVK Services
+            builder.Services.AddScoped<IKvkProgramService, KvkProgramService>();         
+            #endregion
 
 
             //Generic Tables
