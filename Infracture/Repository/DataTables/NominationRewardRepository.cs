@@ -36,7 +36,7 @@ namespace Infrastructure.Repository.DataTables
                 .Include(n => n.Contribution)
                 .Include(n => n.Mode)
                 .Include(n => n.NominationCategory)
-                .Include(n => n.InstitutionPosition)
+                .Include(n => n.Position)
                 .Include(n => n.ApprovedBy)
                 .Include(n => n.NominationRewardIFSFarmers)
                 .Include(n => n.NominationRewardIFSEntrepreneurs)

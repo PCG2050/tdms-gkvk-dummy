@@ -74,7 +74,7 @@ namespace Application.Mapper
             entity.ContributionId = dto.ContributionId;
             entity.ModeId = dto.ModeId;
             entity.NominationCategoryId = dto.NominationCategoryId;
-            entity.InstitutionPositionId = dto.InstitutionPositionId;
+        
             entity.ApprovedById = dto.ApprovedById;
 
             // Update Date/String/Other Fields

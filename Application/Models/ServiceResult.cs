@@ -61,6 +61,7 @@ namespace Application.Models
         FORBIDDEN,
         INVALIDOPERATION,
         CONFLICT,
-        BADREQUEST
+        BADREQUEST,
+        VALIDATIONERROR
     }
 }

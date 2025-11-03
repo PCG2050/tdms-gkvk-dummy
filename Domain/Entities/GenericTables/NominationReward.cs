@@ -48,10 +48,7 @@ namespace Domain.Entities.GenericTables
             public int? NominationCategoryId { get; set; }
      
         public NominationCategory? NominationCategory { get; set; }
-
-            public int? InstitutionPositionId { get; set; }
-        
-        public Position? InstitutionPosition { get; set; }
+      
 
             // === Other Fields ===
             public string? OtherRegion { get; set; }

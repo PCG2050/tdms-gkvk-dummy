@@ -24,7 +24,7 @@ namespace Application.Models.DataTables
         public int? ContributionId { get; set; }
         public int? ModeId { get; set; }
         public int? NominationCategoryId { get; set; }
-        public int? InstitutionPositionId { get; set; }
+       
 
         // === Other Fields ===
         public string? OtherRegion { get; set; }
