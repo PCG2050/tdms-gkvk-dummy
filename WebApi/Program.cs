@@ -268,7 +268,6 @@ namespace WebApi
 
             builder.Services.AddScoped<IEeuProgramService, EeuProgramService>();
             #endregion
-
             #region KVK
             // KVK Repositories
             builder.Services.AddScoped<IKvkProgramDetailsRepository, KvkProgramDetailsRepository>();
@@ -287,7 +286,6 @@ namespace WebApi
             // KVK Services
             builder.Services.AddScoped<IKvkProgramService, KvkProgramService>();         
             #endregion
-
 
             //Generic Tables
             builder.Services.AddScoped<IPublicationRepository, PublicationRepository>();

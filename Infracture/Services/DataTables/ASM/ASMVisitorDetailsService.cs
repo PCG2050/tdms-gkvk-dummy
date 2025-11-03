@@ -52,8 +52,7 @@ namespace Infrastructure.Services.DataTables.ASM
             existing.StudentsCount = dto.StudentsCount;
             existing.PublicCount = dto.PublicCount;
             existing.SubmittedDate = dto.SubmittedDate;
-            existing.Actions = dto.Actions;
-            existing.StatusId = dto.StatusId;
+           
 
             var updated = await _repository.UpdateAsync(existing);
             return _mapper.MapToDto(updated);

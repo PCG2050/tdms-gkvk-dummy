@@ -18,18 +18,38 @@ namespace Domain.Entities.FIU
         [ForeignKey(nameof(UnitLocationId))]
         public OrganizationUnitLocation? UnitLocation { get; set; }
 
-        [Required]
+       
         public int OrganizationId { get; set; }
 
         [ForeignKey(nameof(OrganizationId))]
         public Organization? Organization { get; set; }
         public int? FIUActivitiesId { get; set; }
 
+        [ForeignKey(nameof(FIUActivitiesId))]
         public FIUActivity? FIUActivities { get; set; } 
 
         public int? Number { get; set; }
 
         public string? UploadMediaUrl { get; set; }
+
+        public DateOnly? StartDate { get; set; }
+        public DateOnly? EndDate { get; set; }
+  
+
+        // ===== STATUS TRACKING FIELDS =====
+        // Status: "Draft", "Pending", "Approved", "Rejected"
+        [MaxLength(50)]
+        public string FormStatus { get; set; } = "Draft";
+
+        [MaxLength(1000)]
+        public string? FormStatusRemarks { get; set; }
+
+        // Approval tracking
+        public DateTimeOffset? ApprovedAt { get; set; }
+        public int? ApprovedById { get; set; }
+
+        [JsonIgnore]
+        public User? ApprovedBy { get; set; }
 
     }
 }

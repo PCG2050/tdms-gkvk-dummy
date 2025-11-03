@@ -81,6 +81,7 @@ namespace WebApi.Controllers
                     UnitLocationId = a.UnitLocationId,
                     UnitId = a.UnitLocation.Unit.Id,
                     UnitName = a.UnitLocation.Unit.Name,
+                    OrganizationId = a.UnitLocation.OrganizationId,
                     StateId = a.UnitLocation.District.State.Id,
                     StateName = a.UnitLocation.District.State.Name,
                     DistrictId = a.UnitLocation.District.Id,

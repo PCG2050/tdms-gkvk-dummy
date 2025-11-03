@@ -26,7 +26,7 @@ namespace Domain.Entities.GenericTables
 
         // Master Data References
         public int? CategoryId { get; set; }
-        [JsonIgnore]
+       
         public PublicationCategory? Category { get; set; }
 
         [MaxLength(200)]
@@ -37,7 +37,7 @@ namespace Domain.Entities.GenericTables
         public string Title { get; set; } = string.Empty;
 
         public int? ModeId { get; set; }
-        [JsonIgnore]
+       
         public Mode? Mode { get; set; }
 
         [MaxLength(200)]

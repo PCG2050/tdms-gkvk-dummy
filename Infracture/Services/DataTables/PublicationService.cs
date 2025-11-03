@@ -119,14 +119,26 @@ namespace Infrastructure.Services.DataTables
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (publication.FormStatus != "Draft")
+            // ✅ Only block Approved publications
+            if (publication.FormStatus == "Approved")
                 return ServiceResult<PublicationDto>.Failure(
-                    "Cannot edit publications that have been submitted",
+                    "Cannot edit approved publications. Approved publications are final and cannot be modified.",
                     ServiceErrorStatus.INVALIDOPERATION);
 
+            // ✅ Map the update data first
             PublicationMapper.MapUpdateDtoToEntity(updateDto, publication);
             publication.UpdatedById = _currentUserService.UserId;
             publication.UpdatedAt = DateTimeOffset.UtcNow;
+
+            // ✅ AUTO-RESET: If editing Pending or Rejected, reset to Draft
+            if (publication.FormStatus == "Pending" || publication.FormStatus == "Rejected")
+            {
+                string originalStatus = publication.FormStatus;
+                publication.FormStatus = "Draft";
+                publication.FormStatusRemarks = $"Edited by trainer after {originalStatus} status. Reset to Draft.";
+                publication.ApprovedById = null; // Clear approval data
+                publication.ApprovedAt = null;
+            }
 
             await _publicationRepository.UpdateAsync(publication);
 
@@ -157,8 +169,8 @@ namespace Infrastructure.Services.DataTables
 
         // PHASE 2: Publisher Details
         public async Task<ServiceResult<PublisherDetailsDto>> AddPublisherDetailsAsync(
-            int publicationId,
-            PublisherDetailsCreateDto dto)
+     int publicationId,
+     PublisherDetailsCreateDto dto)
         {
             var publication = await _publicationRepository.GetByIdAsync(publicationId);
 
@@ -171,6 +183,24 @@ namespace Infrastructure.Services.DataTables
                 return ServiceResult<PublisherDetailsDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
+
+            // ✅ ADD: Block editing Approved publications
+            if (publication.FormStatus == "Approved")
+                return ServiceResult<PublisherDetailsDto>.Failure(
+                    "Cannot modify approved publications",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            // ✅ ADD: Auto-reset to Draft if Pending or Rejected
+            if (publication.FormStatus == "Pending" || publication.FormStatus == "Rejected")
+            {
+                publication.FormStatus = "Draft";
+                publication.FormStatusRemarks = "Edited by trainer (Phase 2). Reset to Draft.";
+                publication.UpdatedById = _currentUserService.UserId;
+                publication.UpdatedAt = DateTimeOffset.UtcNow;
+                publication.ApprovedById = null;
+                publication.ApprovedAt = null;
+                await _publicationRepository.UpdateAsync(publication);
+            }
 
             var publisherDetails = _mapper.MapToEntity(dto);
             publisherDetails.PublicationId = publicationId;
@@ -195,10 +225,29 @@ namespace Infrastructure.Services.DataTables
                     ServiceErrorStatus.NOTFOUND);
 
             var publication = await _publicationRepository.GetByIdAsync(publisherDetails.PublicationId);
+
             if (publication == null || !await _entityPermissionService.CanModifyForm(publication))
                 return ServiceResult<PublisherDetailsDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
+
+            // ✅ ADD: Block editing Approved publications
+            if (publication.FormStatus == "Approved")
+                return ServiceResult<PublisherDetailsDto>.Failure(
+                    "Cannot modify approved publications",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            // ✅ ADD: Auto-reset to Draft if Pending or Rejected
+            if (publication.FormStatus == "Pending" || publication.FormStatus == "Rejected")
+            {
+                publication.FormStatus = "Draft";
+                publication.FormStatusRemarks = "Edited by trainer (Phase 2 update). Reset to Draft.";
+                publication.UpdatedById = _currentUserService.UserId;
+                publication.UpdatedAt = DateTimeOffset.UtcNow;
+                publication.ApprovedById = null;
+                publication.ApprovedAt = null;
+                await _publicationRepository.UpdateAsync(publication);
+            }
 
             publisherDetails.PublisherBrochure = dto.PublisherBrochure;
             publisherDetails.PublisherName = dto.PublisherName;
@@ -230,6 +279,23 @@ namespace Infrastructure.Services.DataTables
                 return ServiceResult<ExtensionLiteratureDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
+            // ✅ ADD: Block editing Approved publications
+            if (publication.FormStatus == "Approved")
+                return ServiceResult<ExtensionLiteratureDto>.Failure(
+                    "Cannot modify approved publications",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            // ✅ ADD: Auto-reset to Draft if Pending or Rejected
+            if (publication.FormStatus == "Pending" || publication.FormStatus == "Rejected")
+            {
+                publication.FormStatus = "Draft";
+                publication.FormStatusRemarks = "Edited by trainer (Phase 3). Reset to Draft.";
+                publication.UpdatedById = _currentUserService.UserId;
+                publication.UpdatedAt = DateTimeOffset.UtcNow;
+                publication.ApprovedById = null;
+                publication.ApprovedAt = null;
+                await _publicationRepository.UpdateAsync(publication);
+            }
 
             var extensionLiterature = _mapper.MapToEntity(dto);
             extensionLiterature.PublicationId = publicationId;
@@ -259,6 +325,25 @@ namespace Infrastructure.Services.DataTables
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
+
+            // ✅ ADD: Block editing Approved publications
+            if (publication.FormStatus == "Approved")
+                return ServiceResult<ExtensionLiteratureDto>.Failure(
+                    "Cannot modify approved publications",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            // ✅ ADD: Auto-reset to Draft if Pending or Rejected
+            if (publication.FormStatus == "Pending" || publication.FormStatus == "Rejected")
+            {
+                publication.FormStatus = "Draft";
+                publication.FormStatusRemarks = "Edited by trainer (Phase 3 update). Reset to Draft.";
+                publication.UpdatedById = _currentUserService.UserId;
+                publication.UpdatedAt = DateTimeOffset.UtcNow;
+                publication.ApprovedById = null;
+                publication.ApprovedAt = null;
+                await _publicationRepository.UpdateAsync(publication);
+            }
+
             extensionLiterature.Date = dto.Date;
             extensionLiterature.AmountPerCopy = dto.AmountPerCopy;
             extensionLiterature.NumberOfCopies = dto.NumberOfCopies;
@@ -277,11 +362,34 @@ namespace Infrastructure.Services.DataTables
             var extensionLiterature = await _extensionLiteratureRepository.GetByIdAsync(extensionLiteratureId);
 
             if (extensionLiterature == null)
-                return ServiceResult.Failure("Extension literature not found", ServiceErrorStatus.NOTFOUND);
+                return ServiceResult.Failure(
+                    "Extension literature not found",
+                    ServiceErrorStatus.NOTFOUND);
 
             var publication = await _publicationRepository.GetByIdAsync(extensionLiterature.PublicationId);
+
             if (publication == null || !await _entityPermissionService.CanModifyForm(publication))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
+                return ServiceResult.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            // ✅ ADD: Block editing Approved publications
+            if (publication.FormStatus == "Approved")
+                return ServiceResult.Failure(
+                    "Cannot modify approved publications",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            // ✅ ADD: Auto-reset to Draft if Pending or Rejected
+            if (publication.FormStatus == "Pending" || publication.FormStatus == "Rejected")
+            {
+                publication.FormStatus = "Draft";
+                publication.FormStatusRemarks = "Edited by trainer (Phase 3 delete). Reset to Draft.";
+                publication.UpdatedById = _currentUserService.UserId;
+                publication.UpdatedAt = DateTimeOffset.UtcNow;
+                publication.ApprovedById = null;
+                publication.ApprovedAt = null;
+                await _publicationRepository.UpdateAsync(publication);
+            }
 
             await _extensionLiteratureRepository.DeleteAsync(extensionLiteratureId);
             return ServiceResult.Success();
@@ -342,7 +450,12 @@ namespace Infrastructure.Services.DataTables
             {
                 unitLocationIds = new List<int> { unitLocationId.Value };
             }
-
+          
+            int? createdByIdFilter = null;
+            if (_currentUserService.Role == Role.TRAINER)
+            {
+                createdByIdFilter = _currentUserService.UserId;
+            }
             var result = await _publicationRepository.GetPaginatedAsync(
                 unitLocationIds,
                 pageNumber,
@@ -350,7 +463,8 @@ namespace Infrastructure.Services.DataTables
                 startDate,
                 endDate,
                 categoryId,
-                searchTerm);
+                searchTerm,
+                createdByIdFilter);
 
             var dtos = result.Items.Select(p => _mapper.MapToDtoWithDetails(p)).ToList();
 
@@ -388,7 +502,17 @@ namespace Infrastructure.Services.DataTables
         public async Task<Dictionary<string, int>> GetStatusSummaryAsync()
         {
             var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
-            return await _publicationRepository.GetStatusSummaryAsync(unitLocationIds);
+
+         
+            int? createdByIdFilter = null;
+            if (_currentUserService.Role == Role.TRAINER)
+            {
+                createdByIdFilter = _currentUserService.UserId;
+            }
+
+            return await _publicationRepository.GetStatusSummaryAsync(
+                unitLocationIds,
+                createdByIdFilter);  
         }
 
         // APPROVAL/REJECTION (Unit Head)

@@ -117,6 +117,15 @@ namespace Application.Mapper
             entity.Location = dto.Location;
             entity.Purpose = dto.Purpose;
             entity.PurposeOfVisit = dto.PurposeOfVisit;
+            entity.Male_SC = dto.Male_SC;
+            entity.Male_ST = dto.Male_ST;
+            entity.Male_OBC = dto.Male_OBC;
+            entity.Male_GEN = dto.Male_GEN;
+            entity.Female_SC = dto.Female_SC;
+            entity.Female_ST = dto.Female_ST;
+            entity.Female_OBC = dto.Female_OBC;
+            entity.Female_GEN = dto.Female_GEN;
+            entity.Total = dto.Total;
         }
     }
 }

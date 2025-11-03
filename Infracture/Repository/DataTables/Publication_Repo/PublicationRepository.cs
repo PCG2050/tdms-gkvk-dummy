@@ -72,7 +72,8 @@ namespace Infrastructure.Repository.DataTables.Publication_Repo
             DateOnly? startDate = null,
             DateOnly? endDate = null,
             int? categoryId = null,
-            string? searchTerm = null)
+            string? searchTerm = null,
+            int? createdById = null)
         {
             var query = _context.Publications
                 .Include(p => p.Category)
@@ -91,6 +92,10 @@ namespace Infrastructure.Repository.DataTables.Publication_Repo
                 .AsQueryable();
 
             // Apply filters
+            if (createdById.HasValue)
+            {
+                query = query.Where(p => p.CreatedById == createdById.Value);
+            }
             if (startDate.HasValue)
                 query = query.Where(p => p.StartDate >= startDate.Value);
 
@@ -122,7 +127,8 @@ namespace Infrastructure.Repository.DataTables.Publication_Repo
             List<int> unitLocationIds,
             string status,
             int pageNumber = 1,
-            int pageSize = 10)
+            int pageSize = 10,
+            int? createdById = null)
         {
             var query = _context.Publications
                 .Include(p => p.Category)
@@ -139,6 +145,11 @@ namespace Infrastructure.Repository.DataTables.Publication_Repo
                 .Where(p => unitLocationIds.Contains(p.UnitLocationId) &&
                            p.FormStatus.ToLower() == status.ToLower());
 
+            if (createdById.HasValue)
+            {
+                query = query.Where(p => p.CreatedById == createdById.Value);
+            }
+
             var totalCount = await query.CountAsync();
             var items = await query
                 .OrderByDescending(p => p.CreatedAt)
@@ -149,10 +160,18 @@ namespace Infrastructure.Repository.DataTables.Publication_Repo
             return new PaginatedResult<Publication>(items, totalCount, pageNumber, pageSize);
         }
 
-        public async Task<Dictionary<string, int>> GetStatusSummaryAsync(List<int> unitLocationIds)
+        public async Task<Dictionary<string, int>> GetStatusSummaryAsync(List<int> unitLocationIds, int? createdById = null)
         {
-            var summary = await _context.Publications
-                .Where(p => unitLocationIds.Contains(p.UnitLocationId))
+            var query = _context.Publications
+        .Where(p => unitLocationIds.Contains(p.UnitLocationId));
+
+            // ✅ ADD CREATEDBY FILTER FOR TRAINERS
+            if (createdById.HasValue)
+            {
+                query = query.Where(p => p.CreatedById == createdById.Value);
+            }
+
+            var summary = await query
                 .GroupBy(p => p.FormStatus)
                 .Select(g => new { FormStatus = g.Key, Count = g.Count() })
                 .ToDictionaryAsync(x => x.FormStatus, x => x.Count);

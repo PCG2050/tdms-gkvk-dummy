@@ -17,7 +17,7 @@ namespace Domain.Entities.GenericTables.Service
         public TblService? TblService { get; set; }
         [ForeignKey(nameof(VisitorId))]
         public int VisitorId {  get; set; }
-        [JsonIgnore]
+      
         public Visitor? Visitor { get; set; }
         public string? Name { get; set; }
         public int? MobileNo { get; set; }
@@ -25,6 +25,24 @@ namespace Domain.Entities.GenericTables.Service
         public string? Location { get; set; }
         public string? Purpose { get; set; }
         public string? PurposeOfVisit { get; set; }
+
+        // Male counts
+        public int Male_SC { get; set; } = 0;
+        public int Male_ST { get; set; } = 0;
+        public int Male_OBC { get; set; } = 0;
+        public int Male_GEN { get; set; } = 0;
+
+        // Female counts
+        public int Female_SC { get; set; } = 0;
+        public int Female_ST { get; set; } = 0;
+        public int Female_OBC { get; set; } = 0;
+        public int Female_GEN { get; set; } = 0;
+
+        public int Male_Total { get; set; } 
+        public int Female_Total { get; set; } 
+        public int Total { get; set; } 
+
+
 
     }
 }

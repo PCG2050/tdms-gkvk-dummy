@@ -30,22 +30,28 @@ namespace Domain.Entities.GenericTables
 
             // === Foreign Keys & Navigation Properties ===
             public int? TypeId { get; set; }
+           
             public NominationType? Type { get; set; }
 
             public int? RegionId { get; set; }
-            public Region? Region { get; set; }
+     
+        public Region? Region { get; set; }
 
             public int? ContributionId { get; set; }
-            public Contribution? Contribution { get; set; }
+     
+        public Contribution? Contribution { get; set; }
 
             public int? ModeId { get; set; }
-            public Mode? Mode { get; set; }
+        
+        public Mode? Mode { get; set; }
 
             public int? NominationCategoryId { get; set; }
-            public NominationCategory? NominationCategory { get; set; }
+     
+        public NominationCategory? NominationCategory { get; set; }
 
             public int? InstitutionPositionId { get; set; }
-            public Position? InstitutionPosition { get; set; }
+        
+        public Position? InstitutionPosition { get; set; }
 
             // === Other Fields ===
             public string? OtherRegion { get; set; }
@@ -72,6 +78,10 @@ namespace Domain.Entities.GenericTables
             public string? InstitutionName { get; set; }
             public string? InstitutionDesignation { get; set; }
             public string? InstitutionAddress { get; set; }
+
+            public int? PositionId { get; set; }
+        
+            public Position? Position { get; set; }
 
             public DateOnly? PositionFrom { get; set; }
             public DateOnly? PositionTo { get; set; }
@@ -131,6 +141,8 @@ namespace Domain.Entities.GenericTables
             public string? NameAddress { get; set; }
             public int? PhoneNumber { get; set; }
             public string? CropsGrown { get; set; }
+
+           
             public int NominationRewardId { get; set; }
             public NominationReward NominationReward { get; set; } = default!;
         }

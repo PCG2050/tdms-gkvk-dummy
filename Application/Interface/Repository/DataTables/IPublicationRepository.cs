@@ -17,14 +17,15 @@ namespace Application.Interface.Repository.DataTables
             DateOnly? startDate = null,
             DateOnly? endDate = null,
             int? categoryId = null,
-            string? searchTerm = null);
+            string? searchTerm = null,
+            int? createdById = null);
 
         Task<PaginatedResult<Publication>> GetByStatusAsync(
             List<int> unitLocationIds,
             string status,
             int pageNumber = 1,
-            int pageSize = 10);
+            int pageSize = 10, int? createdById = null);
 
-        Task<Dictionary<string, int>> GetStatusSummaryAsync(List<int> unitLocationIds);
+        Task<Dictionary<string, int>> GetStatusSummaryAsync(List<int> unitLocationIds, int? createdById = null);
     }
 }

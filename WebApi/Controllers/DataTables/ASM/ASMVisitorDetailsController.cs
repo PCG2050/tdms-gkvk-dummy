@@ -3,6 +3,7 @@ using Application.Models.DataTables.ASM;
 
 namespace WebApi.Controllers.DataTables.ASM
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ASMVisitorDetailsController : ControllerBase

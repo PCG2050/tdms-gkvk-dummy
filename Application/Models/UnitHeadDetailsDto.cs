@@ -55,6 +55,7 @@ namespace Application.Models
         public int UnitLocationId { get; set; }
         public int UnitId { get; set; }
         public string UnitName { get; set; }
+        public int OrganizationId { get; set; }
         public int StateId { get; set; }
         public string StateName { get; set; }
         public int DistrictId { get; set; }

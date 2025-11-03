@@ -28,13 +28,13 @@ namespace Domain.Entities.GenericTables.Service
 
         // Foreign keys
         public int? CategoryId { get; set; }
-        [JsonIgnore]
+     
         public ConsultancyServicesCategory? Category { get; set; }
         [MaxLength(200)]
         public string? OtherCategory { get; set; }
 
         public int? ThemeId { get; set; }
-        [JsonIgnore]
+      
         public ServiceTheme? Theme { get; set; }   
         [MaxLength(200)]
         public string? OtherTheme { get; set; }
@@ -46,7 +46,7 @@ namespace Domain.Entities.GenericTables.Service
         public string? Variety { get; set; }
 
         public int? SourceOfFundId { get; set; }
-        [JsonIgnore]
+       
         public SourceOfFund? SourceOfFund { get; set; }
 
         [MaxLength(200)]
@@ -56,7 +56,7 @@ namespace Domain.Entities.GenericTables.Service
         public string? Component { get; set; }
         
         public int? QuantityUnitId { get; set; }
-        [JsonIgnore]
+      
         public QuantityUnit? QuantityUnit { get; set; }
 
         public int Number { get; set; }

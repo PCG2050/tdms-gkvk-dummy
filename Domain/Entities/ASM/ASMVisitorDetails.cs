@@ -9,30 +9,47 @@ namespace Domain.Entities.ASM
 {
     public class ASMVisitorDetails : AuditableBaseEntity
     {
-        [Required]
+    
         [StringLength(200)]
-        public string InstituteName { get; set; } = string.Empty;
-
-        [Required]
-        public DateTime StartDate { get; set; }
-
-        [Required]
-        public DateTime EndDate { get; set; }
+        public string? InstituteName { get; set; } 
 
         public int FarmersCount { get; set; }
         public int StudentsCount { get; set; }
-        public int PublicCount { get; set; }
-
-        [Required]
+        public int PublicCount { get; set; }       
         public DateTime SubmittedDate { get; set; }
 
-        // Optional: store a status or action type if needed
-        [StringLength(100)]
-        public string? Actions { get; set; }
 
-        [MaxLength(100)]
-        public int? StatusId { get; set; }
+        [Required]
+        public int UnitLocationId { get; set; }
+
+        [ForeignKey(nameof(UnitLocationId))]
+        public OrganizationUnitLocation? UnitLocation { get; set; }
+
+        [Required]
+        public int OrganizationId { get; set; }
         [JsonIgnore]
-        public Status? Status { get; set; }
+        [ForeignKey(nameof(OrganizationId))]
+        public Organization? Organization { get; set; }
+        public int? FIUActivitiesId { get; set; }
+
+        public DateOnly? StartDate { get; set; }
+        public DateOnly? EndDate { get; set; }
+
+
+        // ===== STATUS TRACKING FIELDS =====
+        // Status: "Draft", "Pending", "Approved", "Rejected"
+        [MaxLength(50)]
+        public string FormStatus { get; set; } = "Draft";
+
+        [MaxLength(1000)]
+        public string? FormStatusRemarks { get; set; }
+
+        // Approval tracking
+        public DateTimeOffset? ApprovedAt { get; set; }
+        public int? ApprovedById { get; set; }
+        [JsonIgnore]
+        public User? ApprovedBy { get; set; }
+
+
     }
 }

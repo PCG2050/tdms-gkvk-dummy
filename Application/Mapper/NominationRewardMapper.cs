@@ -1,11 +1,13 @@
-﻿
+﻿using Application.Models.DataTables;
+using Domain.Entities.GenericTables;
+
 namespace Application.Mapper
 {
     [Mapper]
     public partial class NominationRewardMapper
     {
         // ----------------------------
-        // Entity → DTO Mappings
+        // Entity → DTO Mappings (Partial methods remain unchanged, assuming the generator handles all scalar/FK fields)
         // ----------------------------
         public partial NominationRewardDto MapToDto(NominationReward entity);
         public partial NominationRewardIFSFarmerDto MapToDto(NominationRewardIFSFarmer entity);
@@ -16,7 +18,7 @@ namespace Application.Mapper
         public partial NominationRewardOrganicEntrepreneurDto MapToDto(NominationRewardOrganicEntrepreneur entity);
 
         // ----------------------------
-        // DTO → Entity Mappings
+        // DTO → Entity Mappings (Partial methods remain unchanged)
         // ----------------------------
         public partial NominationReward MapToEntity(NominationRewardDto dto);
         public partial NominationRewardIFSFarmer MapToEntity(NominationRewardIFSFarmerDto dto);
@@ -27,7 +29,7 @@ namespace Application.Mapper
         public partial NominationRewardOrganicEntrepreneur MapToEntity(NominationRewardOrganicEntrepreneurDto dto);
 
         // ----------------------------
-        // Manual Complete Mapping
+        // Manual Complete Mapping (Updated to include new fields)
         // ----------------------------
         public CompleteNominationRewardDto MapToCompleteDto(NominationReward entity)
         {
@@ -42,6 +44,8 @@ namespace Application.Mapper
                 EndDate = entity.EndDate,
                 FormStatus = entity.FormStatus,
                 FormStatusRemarks = entity.FormStatusRemarks,
+
+                // Navigation DTOs
                 UnitLocationName = entity.UnitLocation?.Unit?.Name,
                 OrganizationName = entity.Organization?.Name,
                 TypeName = entity.Type?.Name,
@@ -58,18 +62,57 @@ namespace Application.Mapper
         }
 
         // ----------------------------
-        // Update Mapping
+        // Update Mapping (Updated to include all fields for update logic)
         // ----------------------------
         public void MapUpdateDtoToEntity(NominationRewardDto dto, NominationReward entity)
         {
-            if (dto.AwardName != null) entity.AwardName = dto.AwardName;
-            if (dto.SpecificContributionTitle != null) entity.SpecificContributionTitle = dto.SpecificContributionTitle;
-            if (dto.StartDate.HasValue) entity.StartDate = dto.StartDate;
-            if (dto.EndDate.HasValue) entity.EndDate = dto.EndDate;
-            if (dto.FormStatus != null) entity.FormStatus = dto.FormStatus;
-            if (dto.FormStatusRemarks != null) entity.FormStatusRemarks = dto.FormStatusRemarks;
+            // Update Foreign Keys
+            entity.UnitLocationId = dto.UnitLocationId; // [Required]
+            entity.OrganizationId = dto.OrganizationId;
+            entity.TypeId = dto.TypeId;
+            entity.RegionId = dto.RegionId;
+            entity.ContributionId = dto.ContributionId;
+            entity.ModeId = dto.ModeId;
+            entity.NominationCategoryId = dto.NominationCategoryId;
+            entity.InstitutionPositionId = dto.InstitutionPositionId;
+            entity.ApprovedById = dto.ApprovedById;
 
-            // Update children
+            // Update Date/String/Other Fields
+            entity.StartDate = dto.StartDate;
+            entity.EndDate = dto.EndDate;
+            entity.OtherRegion = dto.OtherRegion;
+            entity.AwardName = dto.AwardName;
+            entity.OtherContribution = dto.OtherContribution;
+            entity.AwardingAgency = dto.AwardingAgency;
+            entity.SpecificContributionTitle = dto.SpecificContributionTitle;
+            entity.OrganizerInstitutionName = dto.OrganizerInstitutionName;
+            entity.OrganizerInstituteAddress = dto.OrganizerInstituteAddress;
+            entity.AwardApplicationDate = dto.AwardApplicationDate;
+            entity.AwardFilePath = dto.AwardFilePath;
+            entity.AwardEventTitle = dto.AwardEventTitle;
+            entity.AwardEventDate = dto.AwardEventDate;
+            entity.SanctionLetterDate = dto.SanctionLetterDate;
+            entity.SanctionLetterFilePath = dto.SanctionLetterFilePath;
+            entity.PaperDate = dto.PaperDate;
+            entity.PaperFilePath = dto.PaperFilePath;
+            entity.AwardReceivingPhoto = dto.AwardReceivingPhoto;
+            entity.AwardReceivingCertificate = dto.AwardReceivingCertificate;
+            entity.InstitutionBoardName = dto.InstitutionBoardName;
+            entity.InstitutionName = dto.InstitutionName;
+            entity.InstitutionDesignation = dto.InstitutionDesignation;
+            entity.InstitutionAddress = dto.InstitutionAddress;
+            entity.PositionFrom = dto.PositionFrom;
+            entity.PositionTo = dto.PositionTo;
+            entity.DurationDays = dto.DurationDays;
+            entity.NominationDate = dto.NominationDate;
+            entity.NominationLetterPath = dto.NominationLetterPath;
+
+            // Status/Tracking Fields
+            entity.FormStatus = dto.FormStatus; // Not nullable, ensure it's set
+            entity.FormStatusRemarks = dto.FormStatusRemarks;
+            entity.ApprovedAt = dto.ApprovedAt;
+
+            // Update children (Clear and Re-add logic is correct for full collection replacement)
             entity.NominationRewardIFSFarmers.Clear();
             if (dto.IFSFarmers != null)
                 foreach (var child in dto.IFSFarmers)
