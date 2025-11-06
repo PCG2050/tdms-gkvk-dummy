@@ -1,0 +1,216 @@
+﻿using Application.Interface;
+using Application.Interface.Repository;
+using Application.Interface.Repository.DataTables;
+using Application.Interface.Repository.DataTables.TblService;
+using Application.Interface.Services.Reports;
+using Application.Models;
+using Application.Models.Reports;
+using Domain.Entities.Enum;
+using System;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace Infrastructure.Services.Reports
+{
+    public class AdminReportService : IAdminReportService
+    {
+        private readonly ICurrentUserService _currentUserService;
+        private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
+        private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
+        private readonly IOrganizationUnitRepository _organizationUnitRepository;
+       
+        private readonly IDeuProgramDetailsRepository _deuRepository;
+        private readonly IEeuProgramDetailsRepository _eeuRepository;
+        private readonly IKvkProgramDetailsRepository _kvkRepository;
+        private readonly IIbtvaProgramDetailsRepository _ibtvaRepository;
+        private readonly INaepProgramDetailsRepository _naepRepository;
+        private readonly IStuProgramDetailsRepository _stuRepository;
+        private readonly IAticProgramDetailsRepository _aticRepository;
+        //private readonly IFtiProgramDetailsRepository _ftiRepository;
+
+        private readonly IPublicationRepository _publicationRepository;
+        private readonly INominationRewardRepository _nominationRewardRepository;
+
+        private readonly IConsultingServiceRepository _consultingRepository;
+        private readonly ITableServiceRepository _tblServiceRepository;
+
+        public AdminReportService(
+            ICurrentUserService currentUserService,
+            IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
+            ITrainerAssignmentRepository trainerAssignmentRepository,
+            IOrganizationUnitRepository organizationUnitRepository,
+            INominationRewardRepository nominationRewardRepository,
+            IPublicationRepository publicationRepository,
+            IConsultingServiceRepository consultingRepository,
+            ITableServiceRepository tblServiceRepository,
+            INaepProgramDetailsRepository naepRepository,
+            IIbtvaProgramDetailsRepository ibtvaRepository,
+            IKvkProgramDetailsRepository kvkRepository,
+            IStuProgramDetailsRepository stuRepository,
+            IAticProgramDetailsRepository aticRepository,
+            IEeuProgramDetailsRepository eeuRepository,
+            IDeuProgramDetailsRepository deuRepository
+            )
+        {
+            _currentUserService = currentUserService;
+            _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
+            _trainerAssignmentRepository = trainerAssignmentRepository;
+            _organizationUnitRepository = organizationUnitRepository;
+            _nominationRewardRepository = nominationRewardRepository;
+            _publicationRepository = publicationRepository;
+            _consultingRepository = consultingRepository;
+            _tblServiceRepository = tblServiceRepository;
+            _naepRepository = naepRepository;
+            _ibtvaRepository = ibtvaRepository;
+            _kvkRepository = kvkRepository;
+            _stuRepository = stuRepository;
+            _aticRepository = aticRepository;
+            _eeuRepository = eeuRepository;
+            _deuRepository = deuRepository;
+        }
+
+        public async Task<ServiceResult<ReportFilterOptionsDto>> GetFilterOptionsAsync()
+        {
+            if (_currentUserService.Role != Role.ADMIN)
+                return ServiceResult<ReportFilterOptionsDto>.Failure("Only admins can access reports");
+
+            var orgId = _currentUserService.OrganizationId;
+
+            // Get assigned unit locations
+            var unitHeadAssignments = await _unitHeadAssignmentRepository.GetAllAsync();
+            var trainerAssignments = await _trainerAssignmentRepository.GetAllAsync();
+
+            var assignedLocationIds = unitHeadAssignments.Select(x => x.UnitLocationId)
+                .Union(trainerAssignments.Select(x => x.UnitLocationId))
+                .Distinct().ToList();
+
+            var allLocations = await _organizationUnitRepository.GetOrganizationUnitsAsync(orgId);
+            var activeLocations = allLocations.Where(ul => assignedLocationIds.Contains(ul.Id)).ToList();
+
+            // Group by unit
+            var units = activeLocations
+                .GroupBy(ul => new { ul.Unit.Id, ul.Unit.Name })
+                .Select(g => new UnitWithLocationsDto
+                {
+                    UnitId = g.Key.Id,
+                    UnitName = g.Key.Name,
+                    Locations = g.Select(ul => new UnitLocationDto
+                    {
+                        UnitLocationId = ul.Id,
+                        DistrictName = ul.District?.Name ?? "Unknown",
+                        StateName = ul.District?.State?.Name ?? "Unknown"
+                    }).OrderBy(l => l.DistrictName).ToList()
+                })
+                .OrderBy(u => u.UnitName)
+                .ToList();
+
+            var years = Enumerable.Range(DateTime.Now.Year - 5, 6).Reverse().ToList();
+
+            return ServiceResult<ReportFilterOptionsDto>.Success(new ReportFilterOptionsDto
+            {
+                Units = units,
+                Years = years
+            });
+        }
+
+        public async Task<ServiceResult<AdminReportResponseDto>> GenerateReportAsync(AdminReportFilterDto filter)
+        {
+            if (_currentUserService.Role != Role.ADMIN)
+                return ServiceResult<AdminReportResponseDto>.Failure("Only admins can access reports");
+
+            if (filter.Month < 1 || filter.Month > 12)
+                return ServiceResult<AdminReportResponseDto>.Failure("Month must be 1-12");
+
+            // Date range
+            var startDate = new DateTimeOffset(new DateTime(filter.Year, filter.Month, 1), TimeSpan.Zero);
+            var endDate = startDate.AddMonths(1);
+
+            // Get location info
+            var location = await _organizationUnitRepository.GetByIdAsync(filter.UnitLocationId);
+            if (location == null)
+                return ServiceResult<AdminReportResponseDto>.Failure("Unit location not found");
+
+            var report = new AdminReportResponseDto
+            {
+                UnitName = location.Unit?.Name ?? "Unknown",
+                UnitLocationName = location.District?.Name ?? "Unknown",
+                MonthName = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(filter.Month),
+                Month = filter.Month,
+                Year = filter.Year,
+                GeneratedAt = DateTime.UtcNow
+            };
+
+            // ========== NOMINATION & REWARDS ==========
+            var nominations = await _nominationRewardRepository.GetAllAsync();
+            report.Nominations = nominations
+                .Where(x => x.UnitLocationId == filter.UnitLocationId &&
+                           x.FormStatus == "Pending" &&
+                           x.CreatedAt >= startDate && x.CreatedAt < endDate)
+                .Select(x => new ReportNominationDto
+                {
+                    Type = x.Type?.Name ?? "-",
+                    AwardName = x.AwardName ?? "-",
+                    Category = x.NominationCategory?.Name ?? "-",
+                    Date = x.StartDate?.ToString("dd/MM/yyyy") ?? "-"
+                })
+                .ToList();
+
+            // ========== TODO: ADD OTHER TABLES ==========
+            // Publications
+            // var publications = await _publicationRepository.GetAllAsync();
+            // report.Publications = publications.Where(...).Select(x => new ReportPublicationDto {...}).ToList();
+
+            // Programs (DEU, EEU, FTI, KVK, STU, ATIC, NAEP)
+            // Consultancy
+            var consultancies = await _consultingRepository.GetAllAsync();
+            report.Consultancies = consultancies
+                .Where(x => x.UnitLocationId == filter.UnitLocationId &&
+                           x.FormStatus == "Approved" &&
+                           x.CreatedAt >= startDate && x.CreatedAt < endDate)
+                .Select(x => new ReportConsultancyDto
+                {
+                    Category = x.Category?.Name ?? "-",
+                    Title = x.Title ?? "-",
+                    Date = x.Date != default(DateTime) ? x.Date.ToString("dd/MM/yyyy") : "-"
+                })
+                .ToList();
+            // Services
+            var services = await _tblServiceRepository.GetAllAsync();
+            report.Services = services
+                .Where(x => x.UnitLocationId == filter.UnitLocationId &&
+                           x.FormStatus == "Approved" &&
+                           x.CreatedAt >= startDate && x.CreatedAt < endDate)
+                .Select(x => new ReportServiceDto
+                {
+                    Category = x.Category?.Name ?? "-",
+                    Title = x.TitleOfActivityConducted ?? "-",
+                    Discipline = x.RelatedToDiscipline?.Name ?? "-",
+                    Particular = x.Particular?.Name ?? "-",
+                    Location = x.Location ?? "-",
+                    Date = x.Date != default(DateTime) ? x.Date.ToString("dd/MM/yyyy") : "-"
+                })
+                .ToList();
+
+
+            // Other Activities
+            //var otherActivities = await _otherActivitiesRepository.GetAllAsync();
+            //report.OtherActivities = otherActivities
+            //    .Where(x => x.UnitLocationId == filter.UnitLocationId &&
+            //               x.FormStatus == "Approved" &&
+            //               x.CreatedAt >= startDate && x.CreatedAt < endDate)
+            //    .Select(x => new ReportOtherActivityDto
+            //    {
+            //        Title = x.Title ?? "-",
+            //        Description = x.Description ?? "-"
+            //    })
+            //    .ToList();
+
+            report.TotalEntries = report.Programs.Count + report.Publications.Count +
+                                 report.Nominations.Count + report.Consultancies.Count +
+                                 report.Services.Count + report.OtherActivities.Count;
+
+            return ServiceResult<AdminReportResponseDto>.Success(report);
+        }
+    }
+}
