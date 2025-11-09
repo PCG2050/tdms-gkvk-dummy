@@ -33,9 +33,11 @@ global using Application.Interface.Repository.DataTables.ConsultSocialMedia;
 global using Application.Interface.Services;
 
 global using Application.Interface.Services.DataTables.ConsultSocialMedia;
-
+global using Application.Models;
 global using Application.Models.DataTables;
+global using Application.Models.Reports;
 global using Domain.Entities;
+
 
 global using Domain.Entities.EEU;
 global using Domain.Entities.NAEP;

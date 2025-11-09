@@ -44,6 +44,7 @@ namespace Infrastructure.Repository.DataTables
                 .Include(n => n.NominationRewardEntrepreneurInnovations)
                 .Include(n => n.NominationRewardOrganicFarmers)
                 .Include(n => n.NominationRewardOrganicEntrepreneurs)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(n => n.Id == id);
         }
 
@@ -53,10 +54,34 @@ namespace Infrastructure.Repository.DataTables
             await _context.SaveChangesAsync();
             return await GetWithDetailsAsync(entity.Id) ?? entity;
         }
-
         public async Task<NominationReward> UpdateAsync(NominationReward entity)
         {
-            _context.NominationRewards.Update(entity);
+            // Explicitly mark old children as deleted
+            var existingIFSFarmers = _context.NominationRewardIFSFarmers
+                .Where(x => x.NominationRewardId == entity.Id);
+            _context.NominationRewardIFSFarmers.RemoveRange(existingIFSFarmers);
+
+            var existingIFSEntrepreneurs = _context.NominationRewardIFSEntrepreneurs
+                .Where(x => x.NominationRewardId == entity.Id);
+            _context.NominationRewardIFSEntrepreneurs.RemoveRange(existingIFSEntrepreneurs);
+
+            var existingFarmerInnovations = _context.NominationRewardFarmerInnovations
+                .Where(x => x.NominationRewardId == entity.Id);
+            _context.NominationRewardFarmerInnovations.RemoveRange(existingFarmerInnovations);
+
+            var existingEntrepreneurInnovations = _context.NominationRewardEntrepreneurInnovations
+                .Where(x => x.NominationRewardId == entity.Id);
+            _context.NominationRewardEntrepreneurInnovations.RemoveRange(existingEntrepreneurInnovations);
+
+            var existingOrganicFarmers = _context.NominationRewardOrganicFarmers
+                .Where(x => x.NominationRewardId == entity.Id);
+            _context.NominationRewardOrganicFarmers.RemoveRange(existingOrganicFarmers);
+
+            var existingOrganicEntrepreneurs = _context.NominationRewardOrganicEntrepreneurs
+                .Where(x => x.NominationRewardId == entity.Id);
+            _context.NominationRewardOrganicEntrepreneurs.RemoveRange(existingOrganicEntrepreneurs);
+
+            // Now save - will delete old and insert new
             await _context.SaveChangesAsync();
             return entity;
         }
@@ -74,12 +99,15 @@ namespace Infrastructure.Repository.DataTables
         public async Task<List<NominationReward>> GetAllAsync()
         {
             return await _context.NominationRewards
+                .Include(n => n.Type)
+                .Include(n => n.NominationCategory)
                 .Include(n => n.NominationRewardIFSFarmers)
                 .Include(n => n.NominationRewardIFSEntrepreneurs)
                 .Include(n => n.NominationRewardFarmerInnovations)
                 .Include(n => n.NominationRewardEntrepreneurInnovations)
                 .Include(n => n.NominationRewardOrganicFarmers)
                 .Include(n => n.NominationRewardOrganicEntrepreneurs)
+                .AsSplitQuery()                
                 .ToListAsync();
         }
 
@@ -124,6 +152,8 @@ namespace Infrastructure.Repository.DataTables
                 .Include(n => n.NominationRewardEntrepreneurInnovations)
                 .Include(n => n.NominationRewardOrganicFarmers)
                 .Include(n => n.NominationRewardOrganicEntrepreneurs)
+                .AsSplitQuery()
+                .AsNoTracking()
                 .ToListAsync();
 
             return new PaginatedResult<NominationReward>(items, totalCount, pageNumber, pageSize);
@@ -137,7 +167,8 @@ namespace Infrastructure.Repository.DataTables
         {
             var query = _context.NominationRewards
                 .Where(n => unitLocationIds.Contains(n.UnitLocationId) &&
-                            n.FormStatus.ToLower() == status.ToLower());
+                            n.FormStatus == status)
+                            .AsQueryable();
 
             var totalCount = await query.CountAsync();
 
@@ -151,9 +182,14 @@ namespace Infrastructure.Repository.DataTables
                 .Include(n => n.NominationRewardEntrepreneurInnovations)
                 .Include(n => n.NominationRewardOrganicFarmers)
                 .Include(n => n.NominationRewardOrganicEntrepreneurs)
+                .AsSplitQuery()
                 .ToListAsync();
 
-            return new PaginatedResult<NominationReward>(items, totalCount, pageNumber, pageSize);
+            return new PaginatedResult<NominationReward>(
+                items, 
+                totalCount, 
+                pageNumber, 
+                pageSize);
         }
 
         public async Task<Dictionary<string, int>> GetStatusSummaryAsync(List<int> unitLocationIds)
@@ -162,17 +198,9 @@ namespace Infrastructure.Repository.DataTables
                 .Where(n => unitLocationIds.Contains(n.UnitLocationId))
                 .GroupBy(n => n.FormStatus)
                 .Select(g => new { FormStatus = g.Key, Count = g.Count() })
-                .ToDictionaryAsync(x => x.FormStatus, x => x.Count);
-
-            // Ensure all statuses exist
-            var allStatuses = new[] { "Draft", "Pending", "Approved", "Rejected" };
-            foreach (var status in allStatuses)
-            {
-                if (!summary.ContainsKey(status))
-                    summary[status] = 0;
-            }
-
-            return summary;
+                .ToListAsync();
+            return summary.ToDictionary(x => x.FormStatus, x => x.Count);
+           
         }
     }
 }

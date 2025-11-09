@@ -4,6 +4,7 @@ namespace Application.Interface.Repository.DataTables.ConsultSocialMedia
 {
     public interface IConsultingServiceRepository
     {
+        Task<List<ConsultingAndSocialMediaService>> GetAllAsync();
         Task<ConsultingAndSocialMediaService?> GetByIdAsync(int id);
         Task<ConsultingAndSocialMediaService?> GetWithDetailsAsync(int id);
         Task<ConsultingAndSocialMediaService> CreateAsync(ConsultingAndSocialMediaService entity);

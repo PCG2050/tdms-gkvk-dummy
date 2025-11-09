@@ -7,6 +7,7 @@ namespace Application.Interface.Repository.DataTables.NAEP
 {
     public interface INaepProgramDetailsRepository
     {
+        Task<List<NaepProgramDetails>> GetAllAsync();
         Task<NaepProgramDetails?> GetByIdAsync(int id);
         Task<NaepProgramDetails?> GetWithDetailsAsync(int id);
         Task<NaepProgramDetails> CreateAsync(NaepProgramDetails entity);

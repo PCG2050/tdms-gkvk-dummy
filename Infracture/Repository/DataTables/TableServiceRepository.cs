@@ -19,6 +19,18 @@ namespace Infrastructure.Repository.DataTables
         // ============================
         // CORE CRUD
         // ============================
+
+        public async Task<List<TblService>> GetAllAsync()
+        {
+            
+        
+            return await _context.Services    
+                .Include(n => n.Hostels)
+                .Include(n => n.RevolvingFundStatuses)
+                .Include(n => n.VisitorDetails)            
+                .ToListAsync();
+        
+        }
         public async Task<TblService?> GetByIdAsync(int id)
         {
             return await _context.Services.FindAsync(id);
@@ -43,6 +55,7 @@ namespace Infrastructure.Repository.DataTables
                 .Include(s => s.Hostels)
                 .Include(s => s.RevolvingFundStatuses)
                 .Include(s => s.VisitorDetails)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(s => s.Id == id);
         }
 
@@ -55,7 +68,7 @@ namespace Infrastructure.Repository.DataTables
 
         public async Task<TblService> UpdateAsync(TblService entity)
         {
-            _context.Services.Update(entity);
+            //_context.Services.Update(entity);
             await _context.SaveChangesAsync();
             return entity;
         }

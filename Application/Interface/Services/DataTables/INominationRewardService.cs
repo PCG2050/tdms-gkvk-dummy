@@ -26,7 +26,12 @@ namespace Application.Interface.Services.DataTables
 
         Task<ServiceResult> RejectAsync(int nominationRewardId, string remarks);
 
-      
+        Task<List<UserHistoryDto>> GetTrainerHistoryAsync();
+        
+        Task<List<UserHistoryDto>> GetHistoryByUnitLocationAsync(int unitLocationId);
+
+        Task<List<UserHistoryDto>> GetMyHistoryAsync();
+
         Task<PaginatedResult<NominationRewardDto>> GetPaginatedAsync(
             int pageNumber = 1,
             int pageSize = 10,
@@ -41,6 +46,10 @@ namespace Application.Interface.Services.DataTables
             int pageNumber = 1,
             int pageSize = 10);
 
+       
+
         Task<Dictionary<string, int>> GetStatusSummaryAsync();
+
+
     }
 }

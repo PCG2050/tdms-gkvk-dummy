@@ -209,7 +209,7 @@ namespace Infrastructure.Repository.DataTables.ASM
         public async Task<Dictionary<string, int>> GetStatusSummaryAsync(List<int> unitLocationIds)
         {
             var statusCounts = await _context.ASMVisitorDetails
-                .Where(x => unitLocationIds.Contains(x.UnitLocationId))
+                .Where(x => unitLocationIds.Contains(x.UnitLocationId))               
                 .GroupBy(x => x.FormStatus)
                 .Select(g => new { Status = g.Key, Count = g.Count() })
                 .ToListAsync();

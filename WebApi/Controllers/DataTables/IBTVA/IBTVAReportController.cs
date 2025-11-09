@@ -167,7 +167,7 @@ namespace WebApi.Controllers.DataTables.IBTVA
         // =======================================================
         private async Task<object> GetExtensionActivitiesData(int trainerId, int year, int month)
         {
-            var startDateOnly = new DateOnly(year, month, 1);
+            var startDateOnly = new DateOnly(year, month, 1); 
             var endDateOnly = startDateOnly.AddMonths(1);
 
             // 1. Method/Skill Demonstrations (Type = "Skill Development", Theme = "Method Demonstration")
@@ -271,6 +271,7 @@ namespace WebApi.Controllers.DataTables.IBTVA
 
             // 5. Important Events (same as Important Days but could be tracked separately)
             // Reusing the same data for now
+                
 
             // 6. Melas/Exhibitions
             var melasOrganized = await _context.IbtvaProgramDetails

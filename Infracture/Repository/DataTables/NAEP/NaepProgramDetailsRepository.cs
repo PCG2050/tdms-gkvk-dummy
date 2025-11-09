@@ -16,6 +16,20 @@ namespace Infrastructure.Repository.DataTables.NAEP
             _context = context;
         }
 
+        public async Task<List<NaepProgramDetails>> GetAllAsync()
+        {
+            return await _context.NaepProgramDetails
+               .Include(p => p.ProgramContent!)
+                    .ThenInclude(pc => pc.ResourcePersons)
+                .Include(p => p.ProgramContent!)
+                    .ThenInclude(pc => pc.TopicsCovered)
+                .Include(p => p.ProgramContent!)
+                    .ThenInclude(pc => pc.TeachingAids)
+                .Include(p => p.AdvisoryServices)
+                .Include(p => p.Reports)
+                .Include(p => p.Recommendations)
+                .ToListAsync();
+        }
         public async Task<NaepProgramDetails?> GetByIdAsync(int id)
         {
             return await _context.NaepProgramDetails.FindAsync(id);

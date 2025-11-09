@@ -4,7 +4,7 @@
     {
         public int UnitId { get; set; }
         public string UnitName { get; set; }
-        public List<UnitLocationDto> Locations { get; set; }
+        public List<UnitLocationDto> Locations { get; set; } = new();
     }
 
     public class UnitHeadFlatDto

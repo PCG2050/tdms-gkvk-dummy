@@ -7,6 +7,7 @@ namespace Application.Interface.Repository.DataTables.IBTVA
 {
     public interface IIbtvaProgramDetailsRepository
     {
+        Task<List<IbtvaProgramDetails>> GetAllAsync();
         Task<IbtvaProgramDetails?> GetByIdAsync(int id);
         Task<IbtvaProgramDetails?> GetWithDetailsAsync(int id);
         Task<IbtvaProgramDetails> CreateAsync(IbtvaProgramDetails entity);

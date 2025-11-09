@@ -7,6 +7,7 @@ namespace Application.Interface.Repository.DataTables.DEU
 {
     public interface IDeuProgramDetailsRepository
     {
+        Task<List<DeuProgramDetails>> GetAllAsync();
         Task<DeuProgramDetails?> GetByIdAsync(int id);
         Task<DeuProgramDetails?> GetWithDetailsAsync(int id);
         Task<DeuProgramDetails> CreateAsync(DeuProgramDetails entity);

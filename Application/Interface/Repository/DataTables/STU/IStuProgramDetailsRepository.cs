@@ -5,6 +5,8 @@ namespace Application.Interface.Repository.DataTables.STU
 {
     public interface IStuProgramDetailsRepository
     {
+      
+        Task<List<StuProgramDetails>> GetAllAsync();
         Task<StuProgramDetails?> GetByIdAsync(int id);
         Task<StuProgramDetails?> GetWithDetailsAsync(int id);
         Task<StuProgramDetails> CreateAsync(StuProgramDetails entity);

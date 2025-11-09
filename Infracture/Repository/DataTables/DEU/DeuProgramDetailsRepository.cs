@@ -11,6 +11,21 @@ namespace Infrastructure.Repository.DataTables.DEU
     {
         private readonly TdmsDbContext _context;
 
+
+        public async Task<List<DeuProgramDetails>> GetAllAsync()
+        {
+            return await _context.DeuProgramDetails
+               .Include(p => p.ProgramContent!)
+                    .ThenInclude(pc => pc.ResourcePersons)
+                .Include(p => p.ProgramContent!)
+                    .ThenInclude(pc => pc.TopicsCovered)
+                .Include(p => p.ProgramContent!)
+                    .ThenInclude(pc => pc.TeachingAids)
+                .Include(p => p.AdvisoryServices)
+                .Include(p => p.Reports)
+                .Include(p => p.Recommendations)
+                .ToListAsync();
+        }
         public DeuProgramDetailsRepository(TdmsDbContext context)
         {
             _context = context;

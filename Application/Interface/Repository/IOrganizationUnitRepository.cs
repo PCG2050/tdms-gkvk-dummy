@@ -5,6 +5,7 @@ namespace Application.Interface.Repository
 {
     public interface IOrganizationUnitRepository
     {
+        Task<List<OrganizationUnitLocation>> GetOrganizationUnitsAsync(int organizationId);
         Task<List<int>> GetUnitLocationIdsByOrganizationIdAsync(int organizationId);
 
         Task<List<int>> GetUnitLocationIdsByOrganizationAndUnitAsync(int organizationId, int unitId);

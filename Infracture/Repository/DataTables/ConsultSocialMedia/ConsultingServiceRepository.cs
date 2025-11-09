@@ -20,6 +20,28 @@ namespace Infrastructure.Repository.DataTables.ConsultSocialMedia
             _context = context;
         }
 
+        public async Task<List<ConsultingAndSocialMediaService>> GetAllAsync()
+        {
+            return await _context.TableConsultingAndSocialMediaServices
+                 .Include(n => n.Category)
+                 .Include(n => n.RelatedTo)
+                 .Include(n => n.ExtensionActivity)
+                 .Include(n => n.Particulars)
+                 .Include(n => n.ModeOutreach)
+                 .Include(n => n.UnitLocation)
+                     .ThenInclude(ul => ul.Unit)
+                 .Include(n => n.UnitLocation)
+                     .ThenInclude(ul => ul.District)
+                         .ThenInclude(d => d.State)
+                 .Include(n => n.Organization)
+                 .Include(n => n.CreatedBy)
+                 .Include(n => n.UpdatedBy)
+                 .Include(n => n.ApprovedBy)
+                 .Include(n => n.TableModeAndOutreaches)
+                 .AsSplitQuery()
+                 .ToListAsync();
+        }
+
         public async Task<ConsultingAndSocialMediaService?> GetByIdAsync(int id)
         {
             return await _context.TableConsultingAndSocialMediaServices.FindAsync(id);
@@ -43,6 +65,7 @@ namespace Infrastructure.Repository.DataTables.ConsultSocialMedia
                 .Include(c => c.UpdatedBy)
                 .Include(c => c.ApprovedBy)
                 .Include(c => c.TableModeAndOutreaches)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
 
@@ -54,8 +77,7 @@ namespace Infrastructure.Repository.DataTables.ConsultSocialMedia
         }
 
         public async Task<ConsultingAndSocialMediaService> UpdateAsync(ConsultingAndSocialMediaService entity)
-        {
-            _context.TableConsultingAndSocialMediaServices.Update(entity);
+        {            
             await _context.SaveChangesAsync();
             return entity;
         }
@@ -94,6 +116,7 @@ namespace Infrastructure.Repository.DataTables.ConsultSocialMedia
                 .Include(c => c.CreatedBy)
                 .Include(c => c.ApprovedBy)
                 .Where(c => unitLocationIds.Contains(c.UnitLocationId))
+                .AsSplitQuery()
                 .AsQueryable();
 
             // Apply filters
@@ -142,6 +165,7 @@ namespace Infrastructure.Repository.DataTables.ConsultSocialMedia
                 .Include(c => c.Organization)
                 .Include(c => c.CreatedBy)
                 .Include(c => c.ApprovedBy)
+                .AsSplitQuery()
                 .Where(c => unitLocationIds.Contains(c.UnitLocationId) &&
                            c.FormStatus.ToLower() == status.ToLower());
 

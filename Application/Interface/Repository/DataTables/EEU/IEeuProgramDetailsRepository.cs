@@ -7,6 +7,7 @@ namespace Application.Interface.Repository.DataTables.EEU
 {
     public interface IEeuProgramDetailsRepository
     {
+        Task<List<EeuProgramDetails>> GetAllAsync();
         Task<EeuProgramDetails?> GetByIdAsync(int id);
         Task<EeuProgramDetails?> GetWithDetailsAsync(int id);
         Task<EeuProgramDetails> CreateAsync(EeuProgramDetails entity);

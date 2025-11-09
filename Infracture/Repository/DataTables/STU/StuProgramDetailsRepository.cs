@@ -16,6 +16,21 @@ namespace Infrastructure.Repository.DataTables.STU
             _context = context;
         }
 
+         public async Task<List<StuProgramDetails>> GetAllAsync()
+        {
+            return await _context.StuProgramDetails
+               .Include(p => p.ProgramContent!)
+                    .ThenInclude(pc => pc.ResourcePersons)
+                .Include(p => p.ProgramContent!)
+                    .ThenInclude(pc => pc.TopicsCovered)
+                .Include(p => p.ProgramContent!)
+                    .ThenInclude(pc => pc.TeachingAids)
+                .Include(p => p.AdvisoryServices)
+                .Include(p => p.Reports)
+                .Include(p => p.Recommendations)
+                .ToListAsync();
+        }
+
         public async Task<StuProgramDetails?> GetByIdAsync(int id)
         {
             return await _context.StuProgramDetails.FindAsync(id);

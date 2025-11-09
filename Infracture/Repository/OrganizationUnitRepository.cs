@@ -15,6 +15,16 @@ namespace Infrastructure.Repository
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
+        public async Task<List<OrganizationUnitLocation>> GetOrganizationUnitsAsync(int organizationId)
+        {
+            return await _dbContext.OrganizationUnitLocations
+                .Include(x => x.Unit)
+                .Include(x => x.District)
+                    .ThenInclude(d => d.State)
+                .Where(x => x.OrganizationId == organizationId)
+                .ToListAsync();
+        }
+
         public async Task<List<int>> GetUnitLocationIdsByOrganizationIdAsync(int organizationId)
         {
             return await _dbContext.OrganizationUnitLocations
@@ -34,6 +44,8 @@ namespace Infrastructure.Repository
                 .Select(l => l.Id)
                 .ToListAsync();
         }
+
+       
 
         public async Task<bool> IsLocationInOrganizationAsync(int unitLocationId, int organizationId)
         {

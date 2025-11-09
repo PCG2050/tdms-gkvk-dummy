@@ -1,5 +1,6 @@
 ﻿//Application global usings
 global using Application.Models;
+global using Application.Models.Reports;
 global using Domain.Entities.GenericTables;
 global using Domain.Entities.GenericTables.Service;
 global using Domain.Entities.GenericTables.ConsultingAndSocialMediaService;

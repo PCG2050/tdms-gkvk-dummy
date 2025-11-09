@@ -11,6 +11,7 @@ namespace Application.Interface.Repository
 {
     public interface ITrainerAssignmentRepository
     {
+        Task<List<TrainerAssignment>> GetAllAsync();
         Task<List<int>> GetUnitLocationIdsByTrainerIdAsync(int trainerId);
 
         Task<bool> IsTrainerAssignedToLocationAsync(int trainerID, int unitLocaitonId);

@@ -10,7 +10,7 @@ namespace Application.Interface.Repository
 {
     public interface IUnitHeadAssignmentRepository
     {
-
+        Task<List<UnitHeadAssignment>> GetAllAsync();
         Task<List<int>> GetUnitLocationIdsByUnitHeadIdAsync(int unitHeadId);
         Task<bool> IsUnitHeadAssignedToLocationAsync(int unitHeadId, int unitLocationId);       
         Task<List<int>> GetUnitIdsByUnitHeadIdAsync(int unitHeadId);

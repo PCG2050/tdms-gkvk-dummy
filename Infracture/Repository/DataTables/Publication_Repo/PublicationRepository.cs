@@ -15,6 +15,28 @@ namespace Infrastructure.Repository.DataTables.Publication_Repo
             _context = context;
         }
 
+        public async Task<List<Publication>> GetAllAsync()
+        {
+            return await _context.Publications
+               .Include(p => p.Category)
+               .Include(p => p.Mode)
+               .Include(p => p.Region)
+               .Include(p => p.Source)
+               .Include(p => p.UnitLocation)
+                   .ThenInclude(ul => ul.Unit)
+               .Include(p => p.UnitLocation)
+                   .ThenInclude(ul => ul.District)
+                       .ThenInclude(d => d.State)
+               .Include(p => p.Organization)
+               .Include(p => p.CreatedBy)
+               .Include(p => p.UpdatedBy)
+               .Include(p => p.ApprovedBy)
+                .Include(p => p.PublisherDetails)
+                .Include(p => p.ExtensionLiteratures)
+                .AsSplitQuery()
+               .ToListAsync();
+        }
+
         public async Task<Publication?> GetByIdAsync(int id)
         {
             return await _context.Publications.FindAsync(id);
@@ -38,6 +60,7 @@ namespace Infrastructure.Repository.DataTables.Publication_Repo
                 .Include(p => p.ApprovedBy)
                 .Include(p => p.PublisherDetails)
                 .Include(p => p.ExtensionLiteratures)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
@@ -50,7 +73,7 @@ namespace Infrastructure.Repository.DataTables.Publication_Repo
 
         public async Task<Publication> UpdateAsync(Publication publication)
         {
-            _context.Publications.Update(publication);
+            //_context.Publications.Update(publication);
             await _context.SaveChangesAsync();
             return publication;
         }

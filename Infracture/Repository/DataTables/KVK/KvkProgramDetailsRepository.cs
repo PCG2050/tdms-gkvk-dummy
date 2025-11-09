@@ -15,6 +15,29 @@ namespace Infrastructure.Repository.DataTables.KVK
         {
             _context = context;
         }
+        public async Task<List<KvkProgramDetails>> GetAllAsync()
+        {
+            return await _context.KvkProgramDetails
+                .Include(p => p.ParticipantDemographics!)
+                    .ThenInclude(pd => pd.Participant)
+                .Include(p => p.ProgramContent!)
+                    .ThenInclude(pc => pc.ResourcePersons!)
+                .Include(p => p.ProgramContent!)
+                    .ThenInclude(pc => pc.TopicsCovered!)
+                .Include(p => p.ProgramContent!)
+                    .ThenInclude(pc => pc.TeachingAids!)
+                        .ThenInclude(ta => ta.TypeOfAid)
+                .Include(p => p.AdvisoryServices)
+                .Include(p => p.Results)
+                    .ThenInclude(r => r.FldResults!)
+                        .ThenInclude(f => f.DetailsOfDemo)
+                .Include(p => p.Results)
+                    .ThenInclude(r => r.OftResults!)
+                        .ThenInclude(o => o.DetailsOfDemo)
+                .Include(p => p.Reports)
+                .Include(p => p.Recommendations)
+                .ToListAsync();
+        }
         public async Task<KvkProgramDetails?> GetByIdAsync(int id)
         {
             return await _context.KvkProgramDetails

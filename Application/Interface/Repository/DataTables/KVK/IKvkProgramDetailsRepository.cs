@@ -6,6 +6,7 @@ namespace Application.Interface.Repository.DataTables.KVK
 {
     public interface IKvkProgramDetailsRepository
     {
+        Task<List<KvkProgramDetails>> GetAllAsync();
         Task<KvkProgramDetails?> GetByIdAsync(int id);
         Task<KvkProgramDetails?> GetWithDetailsAsync(int id);
         Task<KvkProgramDetails> CreateAsync(KvkProgramDetails entity);

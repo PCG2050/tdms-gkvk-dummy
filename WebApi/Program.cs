@@ -27,6 +27,9 @@ using Infrastructure.Services.DataTables.DEU;
 using Infrastructure.Services.DataTables.EEU;
 using Infrastructure.Services.DataTables.NAEP;
 using Infrastructure.Services.DataTables.KVK;
+using Application.Interface.Services.DataTables;
+using Application.Interface.Services.Reports;
+using Infrastructure.Services.Reports;
 
 namespace WebApi
 {
@@ -70,7 +73,7 @@ namespace WebApi
             // Mapperly Mapper - Singleton (stateless)
             builder.Services.AddSingleton<PublicationMapper>();
             builder.Services.AddSingleton<ConsultingServiceMapper>();
-            builder.Services.AddSingleton<NominationRewardMapper>();
+            IServiceCollection serviceCollection = builder.Services.AddSingleton<NominationRewardMapper>();
             builder.Services.AddSingleton<TableOtherActivityMapper>();
 
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openappi
@@ -307,6 +310,7 @@ namespace WebApi
             builder.Services.AddScoped<IRevolvingFundRepository, RevolvingFundRepository>();
             builder.Services.AddScoped<IVisitorDetailsRepository, VisitorDetailRepository>();
 
+            builder.Services.AddScoped<IAdminReportService, AdminReportService>();
 
 
 

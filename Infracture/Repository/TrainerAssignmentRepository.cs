@@ -20,6 +20,11 @@ namespace Infrastructure.Repository
             _context = context;
         }
 
+        public async Task<List<TrainerAssignment>> GetAllAsync()
+        {
+            return await _context.UnitTrainers.ToListAsync();
+        }
+
         public async Task<List<int>> GetUnitLocationIdsByTrainerIdAsync(int trainerId)
         {
             return await _context.UnitTrainers

@@ -434,7 +434,6 @@ namespace Infrastructure.Services.DataTables
         }
 
         // PAGINATION
-        // PAGINATION
         public async Task<PaginatedResult<PublicationDto>> GetPaginatedAsync(
             int pageNumber = 1,
             int pageSize = 10,
@@ -599,6 +598,75 @@ namespace Infrastructure.Services.DataTables
                 }
             };
         }
+        // HISTORY: Get History
+        // -------------------------------------------------------
+        // ADD THESE METHODS TO NominationRewardService.cs
+
+        public async Task<List<UserHistoryDto>> GetTrainerHistoryAsync()
+        {
+            var userId = _currentUserService.UserId;
+            var unitLocationIds = await _trainerAssignmentRepository.GetUnitLocationIdsByTrainerIdAsync(userId);
+
+            var entities = await _publicationRepository.GetAllAsync();
+
+            return entities
+                .Where(x => x.CreatedById == userId && unitLocationIds.Contains(x.UnitLocationId))
+                .OrderByDescending(x => x.CreatedAt)
+                .Select(x => new UserHistoryDto
+                {
+                    Id = x.Id,
+                    Title = x.Title ?? "Untitled",
+                    CreatedAt = x.CreatedAt.ToString("dd-MM-yyyy HH:mm"),
+                    FormStatus = x.FormStatus
+                })
+                .ToList();
+        }
+
+        public async Task<List<UserHistoryDto>> GetHistoryByUnitLocationAsync(int unitLocationId)
+        {
+            if (_currentUserService.Role != Role.UNITHEAD && _currentUserService.Role != Role.ADMIN)
+                return new List<UserHistoryDto>();
+
+            var entities = await _publicationRepository.GetAllAsync();
+
+            return entities
+                .Where(x => x.UnitLocationId == unitLocationId)
+                .OrderByDescending(x => x.CreatedAt)
+                .Select(x => new UserHistoryDto
+                {
+                    Id = x.Id,
+                    Title = x.Title ?? "Untitled",
+                    CreatedAt = x.CreatedAt.ToString("dd_MM-yyyy HH:mm"),
+                    FormStatus = x.FormStatus
+                })
+                .ToList();
+        }
+
+        public async Task<List<UserHistoryDto>> GetMyHistoryAsync()
+        {
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+            var userId = _currentUserService.UserId;
+
+            var entities = await _publicationRepository.GetAllAsync();
+            var filtered = entities.Where(x => unitLocationIds.Contains(x.UnitLocationId));
+
+            if (_currentUserService.Role == Role.TRAINER)
+                filtered = filtered.Where(x => x.CreatedById == userId);
+
+            return filtered
+                .OrderByDescending(x => x.CreatedAt)
+                .Select(x => new UserHistoryDto
+                {
+                    Id = x.Id,
+                    Title = x.Title ?? "Untitled",
+                    CreatedAt = x.CreatedAt.ToString("dd-MM-yyyy HH:mm"),
+                    FormStatus = x.FormStatus
+                })
+                .ToList();
+        }
+
+
+
 
 
         // PRIVATE HELPER METHODS

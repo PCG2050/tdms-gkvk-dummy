@@ -7,5 +7,18 @@ namespace WebApi.Controllers.DataTables.DEU
     [ApiController]
     public class DEUReportController : ControllerBase
     {
+        private readonly TdmsDbContext _context;
+        public DEUReportController(TdmsDbContext context)
+        {
+            _context = context;
+        }
+
+        //[HttpGet("MonthlyReport")]
+        //public async Task<IActionResult<IEnumerable<object>>> GetMonthlyReport(int unitId, int year,int month)
+        //{
+
+        //}
+
+
     }
 }

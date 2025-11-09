@@ -162,6 +162,39 @@ namespace WebApi.Controllers.DataTables.IBTVA
                 var result = await _service.GetStatusSummaryAsync();
                 return Ok(result);
             }
+
+            /// <summary>
+            /// Get trainer's own history
+            /// </summary>
+            [HttpGet("my-history")]
+            [Authorize(Roles = RoleString.Trainer)]
+            public async Task<IActionResult> GetMyHistory()
+            {
+                var result = await _service.GetTrainerHistoryAsync();
+                return Ok(result);
+            }
+
+            /// <summary>
+            /// Get history for specific unit location (UnitHead/Admin)
+            /// </summary>
+            [HttpGet("unit-location/{unitLocationId}/history")]
+            [Authorize(Roles = RoleString.UnitHead + "," + RoleString.Admin)]
+            public async Task<IActionResult> GetUnitHistory(int unitLocationId)
+            {
+                var result = await _service.GetHistoryByUnitLocationAsync(unitLocationId);
+                return Ok(result);
+            }
+
+            ///// <summary>
+            ///// Get all accessible history (respects role permissions)
+            ///// </summary>
+            //[HttpGet("history")]
+            //[Authorize]
+            //public async Task<IActionResult> GetHistory()
+            //{
+            //    var result = await _service.GetMyHistoryAsync();
+            //    return Ok(result);
+            //}
         }
     }
 

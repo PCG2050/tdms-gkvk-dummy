@@ -51,7 +51,7 @@
             //});
 
             //return Ok(result);
-            return Ok(new { Message = "This endpoint is under construction." });
+             return Ok(new { Message = "This endpoint is under construction." });
         }
 
         [HttpGet("Last3MonthsThemeReportByLocation")]
@@ -111,8 +111,7 @@
 
             //    return Ok(groupedByLocation);
             //}
-            return Ok(new { Message = "This endpoint is under construction." });
-
+            return Ok(new { Message = "This endpoint is under construction."});
 
         }
     }
@@ -120,8 +119,8 @@
 
 public class MonthWiseLocationReportDto
 {
-    public string Month { get; set; }
-    public string Location { get; set; }
+    public string? Month { get; set; }
+    public string? Location { get; set; }
     public int CompletedBatches { get; set; }
     public int OngoingBatches { get; set; }
     public int StartedBatches { get; set; }

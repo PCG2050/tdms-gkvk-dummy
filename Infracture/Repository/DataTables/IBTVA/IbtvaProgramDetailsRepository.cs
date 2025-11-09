@@ -16,6 +16,21 @@ namespace Infrastructure.Repository.DataTables.IBTVA
             _context = context;
         }
 
+
+        public async Task<List<IbtvaProgramDetails>> GetAllAsync()
+        {
+            return await _context.IbtvaProgramDetails
+               .Include(p => p.ProgramContent!)
+                    .ThenInclude(pc => pc.ResourcePersons)
+                .Include(p => p.ProgramContent!)
+                    .ThenInclude(pc => pc.TopicsCovered)
+                .Include(p => p.ProgramContent!)
+                    .ThenInclude(pc => pc.TeachingAids)
+                .Include(p => p.AdvisoryServices)
+                .Include(p => p.Reports)
+                .Include(p => p.Recommendations)
+                .ToListAsync();
+        }
         public async Task<IbtvaProgramDetails?> GetByIdAsync(int id)
         {
             return await _context.IbtvaProgramDetails.FindAsync(id);

@@ -169,4 +169,6 @@ namespace Application.Models.DataTables
         public List<NominationRewardOrganicFarmerDto> OrganicFarmers { get; set; } = new();
         public List<NominationRewardOrganicEntrepreneurDto> OrganicEntrepreneurs { get; set; } = new();
     }
+
+   
 }

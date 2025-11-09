@@ -347,37 +347,6 @@ namespace Infrastructure.DbContext
         {
             base.OnModelCreating(modelBuilder);
 
-            // 1️⃣ ProgramDetails ↔ Result (1:1)
-            modelBuilder.Entity<KvkProgramDetails>()
-                .HasOne(p => p.Results)
-                .WithOne(r => r.ProgramDetails)
-                .HasForeignKey<KvkResult>(r => r.KvkProgramDetailsId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            // 2️⃣ ProgramDetails ↔ Report (1:1)
-            modelBuilder.Entity<KvkProgramDetails>()
-                .HasOne(p => p.Reports)
-                .WithOne(r => r.ProgramDetails)
-                .HasForeignKey<KvkReport>(r => r.KvkProgramDetailsId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-
-            // 3️⃣ Result ↔ FLD Results (1:N)
-            modelBuilder.Entity<KvkResult>()
-                .HasMany(r => r.FldResults)
-                .WithOne(f => f.KvkResult) // <-- FIX: Use navigation property to KvkResult, not ProgramDetails
-                .HasForeignKey(f => f.KvkResultId) // <-- FIX: Use foreign key to KvkResult
-                .OnDelete(DeleteBehavior.Cascade);
-
-            // 4️⃣ Result ↔ OFT Results (1:N)
-            modelBuilder.Entity<KvkResult>()
-                .HasMany(r => r.OftResults)
-                .WithOne(o => o.KvkResult) // <-- FIX: Use navigation property to KvkResult, not ProgramDetails
-                .HasForeignKey(o => o.KvkResultId) // <-- FIX: Use foreign key to KvkResult
-                .OnDelete(DeleteBehavior.Cascade);
-
-
-
             modelBuilder.Entity<TrainerAssignment>()
                 .HasOne(t => t.CreatedBy)
                 .WithMany()

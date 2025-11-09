@@ -146,5 +146,11 @@ namespace Application.Interface.Services.DataTables
         /// </summary>
         //Task<object> GetGroupedByUnitAsync(int pageNumber = 1, int pageSize = 10);
         Task<object> GetGroupedByUnitAsync(PaginationRequest pagination);
+
+        Task<List<UserHistoryDto>> GetTrainerHistoryAsync();
+
+        Task<List<UserHistoryDto>> GetHistoryByUnitLocationAsync(int unitLocationId);
+
+        Task<List<UserHistoryDto>> GetMyHistoryAsync();
     }
 }

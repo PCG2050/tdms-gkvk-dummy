@@ -16,6 +16,20 @@ namespace Infrastructure.Repository.DataTables.ATIC
             _context = context;
         }
 
+        public async Task<List<AticProgramDetails>> GetAllAsync()
+        {
+            return await _context.AticProgramDetails
+               .Include(p => p.ProgramContent!)
+                    .ThenInclude(pc => pc.ResourcePersons)
+                .Include(p => p.ProgramContent!)
+                    .ThenInclude(pc => pc.TopicsCovered)
+                .Include(p => p.ProgramContent!)
+                    .ThenInclude(pc => pc.TeachingAids)
+                .Include(p => p.AdvisoryServices)
+                .Include(p => p.Reports)
+                .Include(p => p.Recommendations)
+                .ToListAsync();
+        }
         public async Task<AticProgramDetails?> GetByIdAsync(int id)
         {
             return await _context.AticProgramDetails.FindAsync(id);
