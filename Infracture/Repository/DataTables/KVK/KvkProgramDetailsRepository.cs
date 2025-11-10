@@ -36,6 +36,7 @@ namespace Infrastructure.Repository.DataTables.KVK
                         .ThenInclude(o => o.DetailsOfDemo)
                 .Include(p => p.Reports)
                 .Include(p => p.Recommendations)
+                .AsSplitQuery()
                 .ToListAsync();
         }
         public async Task<KvkProgramDetails?> GetByIdAsync(int id)

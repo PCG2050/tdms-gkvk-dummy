@@ -29,6 +29,7 @@ namespace Infrastructure.Repository.DataTables.EEU
                 .Include(p => p.AdvisoryServices)
                 .Include(p => p.Reports)
                 .Include(p => p.Recommendations)
+                .AsSplitQuery()
                 .ToListAsync();
         }
 

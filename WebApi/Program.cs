@@ -141,42 +141,43 @@ namespace WebApi
             builder.Services.AddScoped<IEntityPermissionService, EntityPermissionService>();
 
             //Tables
-            builder.Services.AddScoped<IFtiTrainingProgrammeRepository, FtiTrainingProgrammeRepository>();
-            builder.Services.AddScoped<IFtiTrainingProgrammeService, FtiTrainingProgrammeService>();
+            //builder.Services.AddScoped<I
+            //TrainingProgrammeRepository, FtiTrainingProgrammeRepository>();
+            //builder.Services.AddScoped<IFtiTrainingProgrammeService, FtiTrainingProgrammeService>();
             builder.Services.AddScoped<IFtiOtherActivitiesRepository, FtiOtherActivitiesRepository>();
-            builder.Services.AddScoped<IFtiOtherActivityService, FtiOtherActivityService>();
+            //builder.Services.AddScoped<IFtiOtherActivityService, FtiOtherActivityService>();
 
-            builder.Services.AddScoped<IStuTrainingProgrammeRepository, StuTrainingProgrammeRepository>();
-            builder.Services.AddScoped<IStuTrainingProgrammeService, StuTrainingProgrammeService>();
-            builder.Services.AddScoped<IStuSposoredTrainingProgrammeRepository, StuSponsoredTrainingProgrammeRepository>();
-            builder.Services.AddScoped<IStuSponsoredTrainingProgrammeService, StuSponsoredTrainingProgrammeService>();
+            //builder.Services.AddScoped<IStuTrainingProgrammeRepository, StuTrainingProgrammeRepository>();
+            //builder.Services.AddScoped<IStuTrainingProgrammeService, StuTrainingProgrammeService>();
+            //builder.Services.AddScoped<IStuSposoredTrainingProgrammeRepository, StuSponsoredTrainingProgrammeRepository>();
+            //builder.Services.AddScoped<IStuSponsoredTrainingProgrammeService, StuSponsoredTrainingProgrammeService>();
 
-            builder.Services.AddScoped<IDaesiProgrammeRepository, DaesiProgramRepository>();
-            builder.Services.AddScoped<IDaesiProgrammeService, DaesiProgrammeService>();
+            //builder.Services.AddScoped<IDaesiProgrammeRepository, DaesiProgramRepository>();
+            //builder.Services.AddScoped<IDaesiProgrammeService, DaesiProgrammeService>();
 
-            builder.Services.AddScoped<IIbtvaProgrammeRepository, IbtvaProgrammeRepository>();
-            builder.Services.AddScoped<IIbtvaProgrammeService, IbtvaProgrammeService>();         
+            //builder.Services.AddScoped<IIbtvaProgrammeRepository, IbtvaProgrammeRepository>();
+            //builder.Services.AddScoped<IIbtvaProgrammeService, IbtvaProgrammeService>();         
             builder.Services.AddScoped<IAticSalesRepository, AticSalesRepository>();
 
-         
 
-            builder.Services.AddScoped<IDeuCourseRepository, DeuCourseRepository>();
+
+            //builder.Services.AddScoped<IDeuCourseRepository, DeuCourseRepository>();
             builder.Services.AddScoped<IAsmVisitRepository, AsmVisitRepository>();
 
-            builder.Services.AddScoped<INaepDetailsRepository, NaepDetailsRepository>();
+            //builder.Services.AddScoped<INaepDetailsRepository, NaepDetailsRepository>();
 
-            builder.Services.AddScoped<IEeuOftRepository, EeuOftRepository>();
-            builder.Services.AddScoped<IEeuFldRepository, EeuFldRepository>();
-            builder.Services.AddScoped<IEeuTrainingProgrammeRepository, EeuTrainingProgrammeRepository>();
+            //builder.Services.AddScoped<IEeuOftRepository, EeuOftRepository>();
+            //builder.Services.AddScoped<IEeuFldRepository, EeuFldRepository>();
+            //builder.Services.AddScoped<IEeuTrainingProgrammeRepository, EeuTrainingProgrammeRepository>();
 
            
             builder.Services.AddScoped<IAticSalesService, AticSalesService>();
             builder.Services.AddScoped<IAsmVisitService, AsmVisitService>();
-            builder.Services.AddScoped<IDeuCourseService, DeuCourseService>();
-            builder.Services.AddScoped<INaepDetailsService, NaepDetailsService>();
-            builder.Services.AddScoped<IEeuOftService, EeuOftService>();
-            builder.Services.AddScoped<IEeuFldService, EeuFldService>();
-            builder.Services.AddScoped<IEeuTrainingProgrammeService, EeuTrainingProgrammeService>();
+            //builder.Services.AddScoped<IDeuCourseService, DeuCourseService>();
+            //builder.Services.AddScoped<INaepDetailsService, NaepDetailsService>();
+            //builder.Services.AddScoped<IEeuOftService, EeuOftService>();
+            //builder.Services.AddScoped<IEeuFldService, EeuFldService>();
+            //builder.Services.AddScoped<IEeuTrainingProgrammeService, EeuTrainingProgrammeService>();
 
             // Mappers
             builder.Services.AddSingleton<IbtvaProgramMapper>();
@@ -187,6 +188,7 @@ namespace WebApi
             builder.Services.AddSingleton<StuProgramMapper>();
             builder.Services.AddSingleton<KvkProgramMapper>();
 
+            
             builder.Services.AddSingleton<ConsultingServiceMapper>();
             builder.Services.AddSingleton<PublicationMapper>();
             builder.Services.AddSingleton<TblServiceMapper>();

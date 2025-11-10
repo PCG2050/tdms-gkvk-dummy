@@ -31,8 +31,8 @@ namespace Infrastructure.DbContext
         public DbSet<FtiOtherActivity> FtiOtherActivities { get; set; }
         #region STU
        
-        public DbSet<DaesiProgramme> DaesiProgrammes { get; set; }
-        public DbSet<DaesiOtherActivity> DaesiOtherActivities { get; set; }
+        //public DbSet<DaesiProgramme> DaesiProgrammes { get; set; }
+        //public DbSet<DaesiOtherActivity> DaesiOtherActivities { get; set; }
         public DbSet<StuProgramDetails> StuProgramDetails { get; set; }
         public DbSet<StuParticipantDemographics> StuParticipantDemographics { get; set; }
         public DbSet<StuProgramContentAndResources> StuProgramContentAndResources { get; set; }
@@ -41,7 +41,7 @@ namespace Infrastructure.DbContext
         public DbSet<StuTeachingAidsDeveloped> StuTeachingAidsDeveloped { get; set; }
         public DbSet<StuAdvisoryServices> StuAdvisoryServices { get; set; }
         public DbSet<StuReport> StuReports { get; set; }
-        public DbSet<StuRecommendation> StuRecommendations { get; set; }
+        public DbSet<StuRecommendation     > StuRecommendations { get; set; }
 
         #endregion
         #region FIU
@@ -93,8 +93,8 @@ namespace Infrastructure.DbContext
         public DbSet<AticRecommendation> AticRecommendations { get; set; }
         #endregion
         #region DEU
-        public DbSet<DeuCourse> DeuCourses { get; set; }
-        public DbSet<DeuOtherActivity> DeuOtherActivities { get; set; }
+        //public DbSet<DeuCourse> DeuCourses { get; set; }
+        //public DbSet<DeuOtherActivity> DeuOtherActivities { get; set; }
 
         public DbSet<DeuProgramDetails> DeuProgramDetails { get; set; }
         public DbSet<DeuParticipantDemographics> DeuParticipantDemographics { get; set; }
@@ -345,7 +345,7 @@ namespace Infrastructure.DbContext
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(modelBuilder);    
 
             modelBuilder.Entity<TrainerAssignment>()
                 .HasOne(t => t.CreatedBy)
@@ -381,7 +381,7 @@ namespace Infrastructure.DbContext
             new OrganizationTypeConfiguration().Configure(modelBuilder.Entity<Organization>());
             new UserTypeConfiguration().Configure(modelBuilder.Entity<User>());
             new AticSalesTypeConfiguration().Configure(modelBuilder.Entity<AticSales>());
-            new DeuCourseTypeConfiguration().Configure(modelBuilder.Entity<DeuCourse>());
+            //new DeuCourseTypeConfiguration().Configure(modelBuilder.Entity<DeuCourse>());
             
 
             //Configuring Defaults for createdAt only (UpdatedAt will be handled by savechanges override) 

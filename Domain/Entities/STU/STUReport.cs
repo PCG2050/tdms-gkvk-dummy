@@ -1,6 +1,6 @@
 ﻿namespace Domain.Entities.STU
 {
-    public  class StuReport : AuditableBaseEntity
+    public class StuReport : AuditableBaseEntity
     {
         [Required]
         public int? StuProgramDetailsId { get; set; }

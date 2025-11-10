@@ -20,6 +20,12 @@ namespace Infrastructure.Repository.DataTables
         // CORE CRUD
         // ============================
 
+        public IQueryable<TblService> GetQueryable()
+        {
+            return _context.Services.AsQueryable();
+        }
+
+
         public async Task<List<TblService>> GetAllAsync()
         {
             
@@ -27,7 +33,8 @@ namespace Infrastructure.Repository.DataTables
             return await _context.Services    
                 .Include(n => n.Hostels)
                 .Include(n => n.RevolvingFundStatuses)
-                .Include(n => n.VisitorDetails)            
+                .Include(n => n.VisitorDetails)   
+                .AsSplitQuery()
                 .ToListAsync();
         
         }
@@ -162,7 +169,7 @@ namespace Infrastructure.Repository.DataTables
                     .ThenInclude(ul => ul.District)
                 .Include(s => s.Organization)
                 .Include(s => s.CreatedBy)
-                .Include(s => s.ApprovedBy)
+                .Include(s => s.ApprovedBy)              
                 .Where(s => unitLocationIds.Contains(s.UnitLocationId) &&
                            s.FormStatus.ToLower() == status.ToLower());
 

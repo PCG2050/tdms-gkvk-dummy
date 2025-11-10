@@ -24,6 +24,7 @@ namespace Infrastructure.Repository.DataTables.DEU
                 .Include(p => p.AdvisoryServices)
                 .Include(p => p.Reports)
                 .Include(p => p.Recommendations)
+                .AsSplitQuery()
                 .ToListAsync();
         }
         public DeuProgramDetailsRepository(TdmsDbContext context)

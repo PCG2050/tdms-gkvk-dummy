@@ -4,6 +4,10 @@ namespace Application.Interface.Repository.DataTables.ConsultSocialMedia
 {
     public interface IConsultingServiceRepository
     {
+        /// <summary>
+        /// Get queryable for complex filtering (used by history service)
+        /// </summary>
+        IQueryable<ConsultingAndSocialMediaService> GetQueryable();
         Task<List<ConsultingAndSocialMediaService>> GetAllAsync();
         Task<ConsultingAndSocialMediaService?> GetByIdAsync(int id);
         Task<ConsultingAndSocialMediaService?> GetWithDetailsAsync(int id);

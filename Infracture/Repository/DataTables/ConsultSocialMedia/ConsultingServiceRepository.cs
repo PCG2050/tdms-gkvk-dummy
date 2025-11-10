@@ -20,6 +20,14 @@ namespace Infrastructure.Repository.DataTables.ConsultSocialMedia
             _context = context;
         }
 
+        /// <summary>
+        /// Get queryable for complex filtering
+        /// Returns IQueryable to allow further filtering and includes
+        /// </summary>
+        public IQueryable<ConsultingAndSocialMediaService> GetQueryable()
+        {
+            return _context.TableConsultingAndSocialMediaServices.AsQueryable();
+        }
         public async Task<List<ConsultingAndSocialMediaService>> GetAllAsync()
         {
             return await _context.TableConsultingAndSocialMediaServices

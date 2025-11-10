@@ -54,6 +54,7 @@ namespace Infrastructure.Repository.DataTables.FIU
                 .Include(x => x.CreatedBy)
                 .Include(x => x.UpdatedBy)
                 .Include(x => x.ApprovedBy)
+                .AsSplitQuery()
                 .ToListAsync();
         }
 

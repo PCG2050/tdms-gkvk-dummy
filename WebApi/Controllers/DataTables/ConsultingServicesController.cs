@@ -251,7 +251,35 @@ namespace WebApi.Controllers.DataTables
             var result = await _consultingServiceService.GetByStatusAsync("pending", pageNumber, pageSize);
             return Ok(new { data = result.Items, pagination = result });
         }
-       
+
+        [HttpGet("my-history")]
+        [Authorize(Roles = RoleString.Trainer)]
+        public async Task<IActionResult> GetMyHistory(
+         [FromQuery] int pageNumber = 1,
+         [FromQuery] int pageSize = 10)
+        {
+            var result = await _consultingServiceService.GetTrainerHistoryAsync(pageNumber, pageSize);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Get pending approvals for Unit Head
+        /// Shows all entries in Pending status for unit locations
+        /// assigned to the logged-in Unit Head
+        /// </summary>
+        /// <param name="pageNumber">Page number (default: 1)</param>
+        /// <param name="pageSize">Items per page (default: 20)</param>
+        /// <response code="200">Paginated list of pending approvals</response>
+        [HttpGet("pending-approvals")]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
+        public async Task<IActionResult> GetPendingApprovals(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10)
+        {
+            var result = await _consultingServiceService.GetPendingApprovalsAsync(pageNumber, pageSize);
+            return Ok(result);
+        }
+
     }
  
 }

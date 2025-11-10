@@ -1,5 +1,6 @@
 ﻿
 using Application.Interface.Repository.DataTables.TblService;
+using Application.Services.Common;
 
 
 namespace Infrastructure.Services.DataTables
@@ -16,6 +17,8 @@ namespace Infrastructure.Services.DataTables
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
+        // Generic history service
+        private readonly GenericTrainerHistoryService<TblService> _historyService;
 
         public TblServiceService(
             ITableServiceRepository tableServiceRepository,
@@ -39,6 +42,8 @@ namespace Infrastructure.Services.DataTables
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
+            //  generic history service
+            _historyService = new GenericTrainerHistoryService<TblService>(currentUserService, trainerAssignmentRepository, organizationUnitRepository);
         }
 
         // ============================
@@ -472,6 +477,52 @@ namespace Infrastructure.Services.DataTables
         {
             var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
             return await _tableServiceRepository.GetStatusSummaryAsync(unitLocationIds);
+        }
+
+
+        // -------------------------------------------------------
+        // HISTORY: Using Generic Service
+        // -------------------------------------------------------
+
+        /// <summary>
+        /// Get trainer's submission history with pagination
+        /// </summary>
+        public async Task<PaginatedResult<TrainerHistoryItemDto>> GetTrainerHistoryAsync(
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            // Get base query with necessary includes
+            var query = _tableServiceRepository.GetQueryable()
+                .Include(x => x.Category);
+
+            return await _historyService.GetTrainerHistoryAsync(
+                query,
+                getUnitLocationId: x => x.UnitLocationId,
+                getTitleOrName: x => x.Category?.Name,
+                getFormStatus: x => x.FormStatus,
+                pageNumber,
+                pageSize);
+        }
+
+        /// <summary>
+        /// Get pending approvals for Unit Head with pagination
+        /// </summary>
+        public async Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            var query = _tableServiceRepository.GetQueryable()
+                .Include(x => x.Category);
+
+            return await _historyService.GetPendingApprovalsAsync(
+                query,
+                getUnitLocationId: x => x.UnitLocationId,
+                getTitleOrName: x => x.Category?.Name,
+                getFormStatus: x => x.FormStatus,
+                getCreatedById: x => x.CreatedById ?? 0,
+                _unitHeadAssignmentRepository,
+                pageNumber,
+                pageSize);
         }
 
         // ============================

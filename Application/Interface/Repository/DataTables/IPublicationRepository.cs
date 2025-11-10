@@ -4,6 +4,7 @@ namespace Application.Interface.Repository.DataTables
 {
     public interface IPublicationRepository
     {
+        IQueryable<Publication> GetQueryable();
         Task<List<Publication>> GetAllAsync();
         Task<Publication?> GetByIdAsync(int id);
         Task<Publication?> GetWithDetailsAsync(int id);

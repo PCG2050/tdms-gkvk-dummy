@@ -28,6 +28,7 @@ namespace Infrastructure.Repository.DataTables.NAEP
                 .Include(p => p.AdvisoryServices)
                 .Include(p => p.Reports)
                 .Include(p => p.Recommendations)
+                .AsSplitQuery()
                 .ToListAsync();
         }
         public async Task<NaepProgramDetails?> GetByIdAsync(int id)

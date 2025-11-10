@@ -1,4 +1,6 @@
-﻿namespace Application.Interface.Repository.DataTables.TblService
+﻿using System.Linq;
+
+namespace Application.Interface.Repository.DataTables.TblService
 {
     public interface ITableServiceRepository
     {
@@ -6,6 +8,7 @@
         // CORE CRUD OPERATIONS
         // ============================
 
+        IQueryable<Domain.Entities.GenericTables.Service.TblService> GetQueryable();
         Task<List<Domain.Entities.GenericTables.Service.TblService>> GetAllAsync();
         Task<Domain.Entities.GenericTables.Service.TblService?> GetByIdAsync(int id);
         Task<Domain.Entities.GenericTables.Service.TblService?> GetWithDetailsAsync(int id);

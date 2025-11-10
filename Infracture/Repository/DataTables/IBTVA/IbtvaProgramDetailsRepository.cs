@@ -29,6 +29,7 @@ namespace Infrastructure.Repository.DataTables.IBTVA
                 .Include(p => p.AdvisoryServices)
                 .Include(p => p.Reports)
                 .Include(p => p.Recommendations)
+                .AsSplitQuery()
                 .ToListAsync();
         }
         public async Task<IbtvaProgramDetails?> GetByIdAsync(int id)

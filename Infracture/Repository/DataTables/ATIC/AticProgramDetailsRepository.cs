@@ -28,6 +28,7 @@ namespace Infrastructure.Repository.DataTables.ATIC
                 .Include(p => p.AdvisoryServices)
                 .Include(p => p.Reports)
                 .Include(p => p.Recommendations)
+                .AsSplitQuery()
                 .ToListAsync();
         }
         public async Task<AticProgramDetails?> GetByIdAsync(int id)

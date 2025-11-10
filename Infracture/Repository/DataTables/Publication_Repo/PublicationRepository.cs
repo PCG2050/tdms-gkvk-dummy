@@ -15,6 +15,11 @@ namespace Infrastructure.Repository.DataTables.Publication_Repo
             _context = context;
         }
 
+        public IQueryable<Publication> GetQueryable()
+        {
+            return _context.Publications.AsQueryable();
+        }
+
         public async Task<List<Publication>> GetAllAsync()
         {
             return await _context.Publications

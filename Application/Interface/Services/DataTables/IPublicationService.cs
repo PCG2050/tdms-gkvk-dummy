@@ -1,5 +1,6 @@
 ﻿using Application.Models;
 using Application.Models.DataTables;
+using Application.Services.Common;
 
 namespace Application.Interface.Services.DataTables
 {
@@ -147,10 +148,19 @@ namespace Application.Interface.Services.DataTables
         //Task<object> GetGroupedByUnitAsync(int pageNumber = 1, int pageSize = 10);
         Task<object> GetGroupedByUnitAsync(PaginationRequest pagination);
 
-        Task<List<UserHistoryDto>> GetTrainerHistoryAsync();
+        /// <summary>
+        /// Get trainer's submission history with pagination
+        /// </summary>
+        Task<PaginatedResult<TrainerHistoryItemDto>> GetTrainerHistoryAsync(
+            int pageNumber = 1,
+            int pageSize = 10);
 
-        Task<List<UserHistoryDto>> GetHistoryByUnitLocationAsync(int unitLocationId);
+        /// <summary>
+        /// Get pending approvals for Unit Head and Admin with pagination
+        /// </summary>
+        Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
+            int pageNumber = 1,
+            int pageSize = 10);
 
-        Task<List<UserHistoryDto>> GetMyHistoryAsync();
     }
 }

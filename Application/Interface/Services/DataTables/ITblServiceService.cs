@@ -1,4 +1,5 @@
 ﻿using Application.Models;
+using Application.Services.Common;
 using Domain.Entities.GenericTables.Service;
 
 namespace Application.Interface.Services.DataTables
@@ -8,6 +9,7 @@ namespace Application.Interface.Services.DataTables
         // ============================
         // MAIN TblService CRUD
         // ============================
+
 
         Task<ServiceResult<TblServicesDto>> CreateAsync(TblServiceCreateDto createDto);
         Task<ServiceResult<TblServicesDto>> GetByIdAsync(int id);
@@ -69,5 +71,19 @@ namespace Application.Interface.Services.DataTables
             int pageSize = 10);
 
         Task<Dictionary<string, int>> GetStatusSummaryAsync();
+
+        /// <summary>
+        /// Get trainer's submission history with pagination
+        /// </summary>
+        Task<PaginatedResult<TrainerHistoryItemDto>> GetTrainerHistoryAsync(
+            int pageNumber = 1,
+            int pageSize = 10);
+
+        /// <summary>
+        /// Get pending approvals for Unit Head and Admin with pagination
+        /// </summary>
+        Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
+            int pageNumber = 1,
+            int pageSize = 10);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Application.Models;
 using Application.Models.DataTables;
+using Application.Services.Common;
 
 namespace Application.Interface.Services.DataTables.ConsultSocialMedia
 {
@@ -22,6 +23,23 @@ namespace Application.Interface.Services.DataTables.ConsultSocialMedia
         Task<ServiceResult> SubmitForApprovalAsync(int consultingServiceId);
         Task<ServiceResult> ApproveConsultingServiceAsync(int consultingServiceId, string? remarks = null);
         Task<ServiceResult> RejectConsultingServiceAsync(int consultingServiceId, string remarks);
+
+        /// <summary>
+        /// Get trainer's submission history with pagination
+        /// </summary>
+        Task<PaginatedResult<TrainerHistoryItemDto>> GetTrainerHistoryAsync(
+            int pageNumber = 1,
+            int pageSize = 10);
+
+        /// <summary>
+        /// Get pending approvals for Unit Head with pagination
+        /// </summary>
+        Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
+            int pageNumber = 1,
+            int pageSize = 10);   
+
+
+
 
         // Pagination & Filtering
         Task<PaginatedResult<ConsultingServiceDto>> GetPaginatedAsync(

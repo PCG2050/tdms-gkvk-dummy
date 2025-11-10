@@ -61,6 +61,7 @@ namespace Infrastructure.Repository.DataTables.ASM
                 .Include(x => x.Organization)
                 .Include(x => x.CreatedBy)
                 .Include(x => x.ApprovedBy)
+                .AsSplitQuery()
                 .ToListAsync();
         }
 

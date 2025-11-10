@@ -28,6 +28,7 @@ namespace Infrastructure.Repository.DataTables.STU
                 .Include(p => p.AdvisoryServices)
                 .Include(p => p.Reports)
                 .Include(p => p.Recommendations)
+                .AsSplitQuery()
                 .ToListAsync();
         }
 
