@@ -3,6 +3,8 @@ using Application.Interface.Repository.DataTables.KVK;
 using Application.Interface.Services.DataTables.KVK;
 using Application.Mapper.DataTable.KVK;
 using Application.Models.DataTables.KVK;
+using Application.Services.Common;
+using Infrastructure.Repository;
 
 namespace Infrastructure.Services.DataTables.KVK
 {
@@ -23,6 +25,10 @@ namespace Infrastructure.Services.DataTables.KVK
         private readonly ICurrentUserService _currentUserService;
         private readonly IEntityPermissionService _entityPermissionService;
         private readonly KvkProgramMapper _mapper;
+        private readonly IOrganizationUnitRepository _organizationUnitRepository;
+        private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
+        private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
+        private readonly GenericTrainerHistoryService<KvkProgramDetails> _historyService;
 
         private const int FLD_CATEGORY_ID = 18;
         private const int OFT_CATEGORY_ID = 24;
@@ -43,6 +49,9 @@ namespace Infrastructure.Services.DataTables.KVK
             IKvkRecommendationRepository recommendationRepository,
             ICurrentUserService currentUserService,
             IEntityPermissionService entityPermissionService,
+            ITrainerAssignmentRepository trainerAssignmentRepository,
+            IOrganizationUnitRepository organizationUnitRepository,
+            IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
             KvkProgramMapper mapper)
         {
             _programRepository = programRepository;
@@ -59,7 +68,13 @@ namespace Infrastructure.Services.DataTables.KVK
             _recommendationRepository = recommendationRepository;
             _currentUserService = currentUserService;
             _entityPermissionService = entityPermissionService;
+            _trainerAssignmentRepository = trainerAssignmentRepository;
+            _organizationUnitRepository = organizationUnitRepository;
+            _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _mapper = mapper;
+
+            //  generic history service
+            _historyService = new GenericTrainerHistoryService<KvkProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository);
         }
 
         // ============================
@@ -1231,6 +1246,52 @@ namespace Infrastructure.Services.DataTables.KVK
 
             var dto = _mapper.MapToDto(recommendation);
             return ServiceResult<KvkRecommendationDto>.Success(dto);
+        }
+
+
+        // -------------------------------------------------------
+        // HISTORY: Using Generic Service
+        // -------------------------------------------------------
+
+        /// <summary>
+        /// Get trainer's submission history with pagination
+        /// </summary>
+        public async Task<PaginatedResult<TrainerHistoryItemDto>> GetTrainerHistoryAsync(
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            // Get base query with necessary includes
+            var query = _programRepository.GetQueryable()
+                .Include(x => x.Type);
+
+            return await _historyService.GetTrainerHistoryAsync(
+                query,
+                getUnitLocationId: x => x.UnitLocationId,
+                getTitleOrName: x => x.Title ?? x.ProgramType?.Name,
+                getFormStatus: x => x.FormStatus,
+                pageNumber,
+                pageSize);
+        }
+
+        /// <summary>
+        /// Get pending approvals for Unit Head with pagination
+        /// </summary>
+        public async Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            var query = _programRepository.GetQueryable()
+                .Include(x => x.Type);
+
+            return await _historyService.GetPendingApprovalsAsync(
+                query,
+                getUnitLocationId: x => x.UnitLocationId,
+                getTitleOrName: x => x.Title ?? x.ProgramType?.Name,
+                getFormStatus: x => x.FormStatus,
+                getCreatedById: x => x.CreatedById ?? 0,
+                _unitHeadAssignmentRepository,
+                pageNumber,
+                pageSize);
         }
 
 

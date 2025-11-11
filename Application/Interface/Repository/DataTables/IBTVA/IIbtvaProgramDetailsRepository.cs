@@ -1,12 +1,14 @@
 ﻿// IIbtvaProgramDetailsRepository.cs
 using Application.Models;
 using Application.Models.DataTables.IBTVA;
+using Domain.Entities.ASM;
 using Domain.Entities.IBTVA;
 
 namespace Application.Interface.Repository.DataTables.IBTVA
 {
     public interface IIbtvaProgramDetailsRepository
     {
+        IQueryable<IbtvaProgramDetails> GetQueryable();
         Task<List<IbtvaProgramDetails>> GetAllAsync();
         Task<IbtvaProgramDetails?> GetByIdAsync(int id);
         Task<IbtvaProgramDetails?> GetWithDetailsAsync(int id);

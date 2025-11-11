@@ -15,6 +15,12 @@ namespace Infrastructure.Repository.DataTables.KVK
         {
             _context = context;
         }
+
+        public IQueryable<KvkProgramDetails> GetQueryable()
+        {
+            return _context.KvkProgramDetails.AsQueryable();
+        }
+
         public async Task<List<KvkProgramDetails>> GetAllAsync()
         {
             return await _context.KvkProgramDetails

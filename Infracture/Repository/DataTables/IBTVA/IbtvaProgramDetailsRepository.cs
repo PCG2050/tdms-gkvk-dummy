@@ -16,6 +16,10 @@ namespace Infrastructure.Repository.DataTables.IBTVA
             _context = context;
         }
 
+        public IQueryable<IbtvaProgramDetails> GetQueryable()
+        {
+            return _context.IbtvaProgramDetails.AsQueryable();
+        }
 
         public async Task<List<IbtvaProgramDetails>> GetAllAsync()
         {

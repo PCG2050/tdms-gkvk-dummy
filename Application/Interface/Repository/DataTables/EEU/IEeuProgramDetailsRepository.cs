@@ -7,6 +7,7 @@ namespace Application.Interface.Repository.DataTables.EEU
 {
     public interface IEeuProgramDetailsRepository
     {
+        IQueryable<EeuProgramDetails> GetQueryable();
         Task<List<EeuProgramDetails>> GetAllAsync();
         Task<EeuProgramDetails?> GetByIdAsync(int id);
         Task<EeuProgramDetails?> GetWithDetailsAsync(int id);

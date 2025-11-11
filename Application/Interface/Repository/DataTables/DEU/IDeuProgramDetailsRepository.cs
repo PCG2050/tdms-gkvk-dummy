@@ -1,12 +1,14 @@
 ﻿// IDeuProgramDetailsRepository.cs
 using Application.Models;
 using Application.Models.DataTables.DEU;
+using Domain.Entities.ASM;
 using Domain.Entities.DEU;
 
 namespace Application.Interface.Repository.DataTables.DEU
 {
     public interface IDeuProgramDetailsRepository
     {
+        IQueryable<DeuProgramDetails> GetQueryable();
         Task<List<DeuProgramDetails>> GetAllAsync();
         Task<DeuProgramDetails?> GetByIdAsync(int id);
         Task<DeuProgramDetails?> GetWithDetailsAsync(int id);

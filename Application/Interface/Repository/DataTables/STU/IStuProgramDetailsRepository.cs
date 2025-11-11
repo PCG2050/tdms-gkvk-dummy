@@ -1,11 +1,13 @@
 ﻿// IStuProgramDetailsRepository.cs
 
 
+using Domain.Entities.ASM;
+
 namespace Application.Interface.Repository.DataTables.STU
 {
     public interface IStuProgramDetailsRepository
     {
-      
+        IQueryable<StuProgramDetails> GetQueryable();
         Task<List<StuProgramDetails>> GetAllAsync();
         Task<StuProgramDetails?> GetByIdAsync(int id);
         Task<StuProgramDetails?> GetWithDetailsAsync(int id);

@@ -5,6 +5,7 @@ namespace Application.Interface.Repository.DataTables.ATIC
 {
     public interface IAticProgramDetailsRepository
     {
+        IQueryable<AticProgramDetails> GetQueryable();
         Task<List<AticProgramDetails>> GetAllAsync();
         Task<AticProgramDetails?> GetByIdAsync(int id);
         Task<AticProgramDetails?> GetWithDetailsAsync(int id);

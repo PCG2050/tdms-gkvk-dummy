@@ -1,12 +1,14 @@
 ﻿// INaepProgramDetailsRepository.cs
 using Application.Models;
 using Application.Models.DataTables.DEU;
+using Domain.Entities.ASM;
 using Domain.Entities.NAEP;
 
 namespace Application.Interface.Repository.DataTables.NAEP
 {
     public interface INaepProgramDetailsRepository
     {
+        IQueryable<NaepProgramDetails> GetQueryable();
         Task<List<NaepProgramDetails>> GetAllAsync();
         Task<NaepProgramDetails?> GetByIdAsync(int id);
         Task<NaepProgramDetails?> GetWithDetailsAsync(int id);

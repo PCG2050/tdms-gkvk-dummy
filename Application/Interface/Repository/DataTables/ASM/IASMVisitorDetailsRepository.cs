@@ -13,6 +13,8 @@ namespace Application.Interface.Repository.DataTables.ASM
         // CORE CRUD OPERATIONS
         // ==========================================
 
+        IQueryable<ASMVisitorDetails> GetQueryable();
+
         Task<ASMVisitorDetails> AddAsync(ASMVisitorDetails entity);
 
         Task<ASMVisitorDetails?> GetByIdAsync(int id);

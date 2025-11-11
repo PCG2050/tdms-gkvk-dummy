@@ -15,6 +15,10 @@ namespace Infrastructure.Repository.DataTables.NAEP
         {
             _context = context;
         }
+        public IQueryable<NaepProgramDetails> GetQueryable()
+        {
+            return _context.NaepProgramDetails.AsQueryable();
+        }
 
         public async Task<List<NaepProgramDetails>> GetAllAsync()
         {

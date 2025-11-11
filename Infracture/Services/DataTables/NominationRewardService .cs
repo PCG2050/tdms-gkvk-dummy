@@ -6,8 +6,10 @@ using Application.Interface.Services.DataTables;
 using Application.Mapper;
 using Application.Models;
 using Application.Models.DataTables;
+using Application.Services.Common;
 using Domain.Entities.Enum;
 using Domain.Entities.GenericTables;
+using Infrastructure.Repository.DataTables.Publication_Repo;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +26,8 @@ namespace Infrastructure.Services.DataTables
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
+        // Generic history service
+        private readonly GenericTrainerHistoryService<NominationReward> _historyService;
 
         public NominationRewardService(
             INominationRewardRepository repository,
@@ -41,6 +45,9 @@ namespace Infrastructure.Services.DataTables
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
+            //  generic history service
+            _historyService = new GenericTrainerHistoryService<NominationReward>(currentUserService, trainerAssignmentRepository, organizationUnitRepository);
+
         }
 
         // -------------------------------------------------------
@@ -318,72 +325,51 @@ namespace Infrastructure.Services.DataTables
                 result.PageSize);
         }
 
-        // -------------------------------------------------------
-        // HISTORY: Get History
-        // -------------------------------------------------------
-        // ADD THESE METHODS TO NominationRewardService.cs
+     
 
-        public async Task<List<UserHistoryDto>> GetTrainerHistoryAsync()
+        // -------------------------------------------------------
+        // HISTORY: Using Generic Service
+        // -------------------------------------------------------
+
+        /// <summary>
+        /// Get trainer's submission history with pagination
+        /// </summary>
+        public async Task<PaginatedResult<TrainerHistoryItemDto>> GetTrainerHistoryAsync(
+            int pageNumber = 1,
+            int pageSize = 10)
         {
-            var userId = _currentUserService.UserId;
-            var unitLocationIds = await _trainerAssignmentRepository.GetUnitLocationIdsByTrainerIdAsync(userId);
+            // Get base query with necessary includes
+            var query = _repository.GetQueryable()
+                .Include(x => x.Type);
 
-            var entities = await _repository.GetAllAsync();
-
-            return entities
-                .Where(x => x.CreatedById == userId && unitLocationIds.Contains(x.UnitLocationId))
-                .OrderByDescending(x => x.CreatedAt)
-                .Select(x => new UserHistoryDto
-                {
-                    Id = x.Id,
-                    Title = x.Type?.Name ?? "Untitled",
-                    CreatedAt = x.CreatedAt.ToString("dd-MM-yyyy HH:mm"),
-                    FormStatus = x.FormStatus
-                })
-                .ToList();
+            return await _historyService.GetTrainerHistoryAsync(
+                query,
+                getUnitLocationId: x => x.UnitLocationId,
+                getTitleOrName: x => x.Type?.Name,
+                getFormStatus: x => x.FormStatus,
+                pageNumber,
+                pageSize);
         }
 
-        public async Task<List<UserHistoryDto>> GetHistoryByUnitLocationAsync(int unitLocationId)
+        /// <summary>
+        /// Get pending approvals for Unit Head with pagination
+        /// </summary>
+        public async Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
+            int pageNumber = 1,
+            int pageSize = 10)
         {
-            if (_currentUserService.Role != Role.UNITHEAD && _currentUserService.Role != Role.ADMIN)
-                return new List<UserHistoryDto>();
+            var query = _repository.GetQueryable()
+                .Include(x => x.Type);
 
-            var entities = await _repository.GetAllAsync();
-
-            return entities
-                .Where(x => x.UnitLocationId == unitLocationId)
-                .OrderByDescending(x => x.CreatedAt)
-                .Select(x => new UserHistoryDto
-                {
-                    Id = x.Id,
-                    Title = x.Type?.Name?? "Untitled",
-                    CreatedAt = x.CreatedAt.ToString("dd_MM-yyyy HH:mm"),
-                    FormStatus = x.FormStatus
-                })
-                .ToList();
-        }
-
-        public async Task<List<UserHistoryDto>> GetMyHistoryAsync()
-        {
-            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
-            var userId = _currentUserService.UserId;
-
-            var entities = await _repository.GetAllAsync();
-            var filtered = entities.Where(x => unitLocationIds.Contains(x.UnitLocationId));
-
-            if (_currentUserService.Role == Role.TRAINER)
-                filtered = filtered.Where(x => x.CreatedById == userId);
-
-            return filtered
-                .OrderByDescending(x => x.CreatedAt)
-                .Select(x => new UserHistoryDto
-                {
-                    Id = x.Id,
-                    Title = x.Type?.Name ?? "Untitled",
-                    CreatedAt = x.CreatedAt.ToString("dd-MM-yyyy HH:mm"),
-                    FormStatus = x.FormStatus
-                })
-                .ToList();
+            return await _historyService.GetPendingApprovalsAsync(
+                query,
+                getUnitLocationId: x => x.UnitLocationId,
+                getTitleOrName: x => x.Type?.Name,
+                getFormStatus: x => x.FormStatus,
+                getCreatedById: x => x.CreatedById ?? 0,
+                _unitHeadAssignmentRepository,
+                pageNumber,
+                pageSize);
         }
 
 

@@ -1,5 +1,6 @@
 ﻿using Application.Models;
 using Application.Models.DataTables;
+using Application.Services.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,12 +26,7 @@ namespace Application.Interface.Services.DataTables
         Task<ServiceResult> ApproveAsync(int nominationRewardId, string? remarks = null);
 
         Task<ServiceResult> RejectAsync(int nominationRewardId, string remarks);
-
-        Task<List<UserHistoryDto>> GetTrainerHistoryAsync();
-        
-        Task<List<UserHistoryDto>> GetHistoryByUnitLocationAsync(int unitLocationId);
-
-        Task<List<UserHistoryDto>> GetMyHistoryAsync();
+    
 
         Task<PaginatedResult<NominationRewardDto>> GetPaginatedAsync(
             int pageNumber = 1,
@@ -50,6 +46,18 @@ namespace Application.Interface.Services.DataTables
 
         Task<Dictionary<string, int>> GetStatusSummaryAsync();
 
+        /// <summary>
+        /// Get trainer's submission history with pagination
+        /// </summary>
+        Task<PaginatedResult<TrainerHistoryItemDto>> GetTrainerHistoryAsync(
+            int pageNumber = 1,
+            int pageSize = 10);
 
+        /// <summary>
+        /// Get pending approvals for Unit Head and Admin with pagination
+        /// </summary>
+        Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
+            int pageNumber = 1,
+            int pageSize = 10);
     }
 }

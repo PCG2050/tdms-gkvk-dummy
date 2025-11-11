@@ -1,6 +1,7 @@
 ﻿
 using Application.Models;
 using Application.Models.DataTables.KVK;
+using Application.Services.Common;
 
 namespace Application.Interface.Services.DataTables.KVK
 {
@@ -85,5 +86,19 @@ namespace Application.Interface.Services.DataTables.KVK
         // ============================
         Task<ServiceResult<KvkRecommendationDto>> AddOrUpdateRecommendationAsync(int programId, KvkRecommendationCreateDto dto);
         Task<ServiceResult<KvkRecommendationDto>> GetRecommendationByProgramIdAsync(int programId);
+
+        /// <summary>
+        /// Get trainer's submission history with pagination
+        /// </summary>
+        Task<PaginatedResult<TrainerHistoryItemDto>> GetTrainerHistoryAsync(
+            int pageNumber = 1,
+            int pageSize = 10);
+
+        /// <summary>
+        /// Get pending approvals for Unit Head and Admin with pagination
+        /// </summary>
+        Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
+            int pageNumber = 1,
+            int pageSize = 10);
     }
 }

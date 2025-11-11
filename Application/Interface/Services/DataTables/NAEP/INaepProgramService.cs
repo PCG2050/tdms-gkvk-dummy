@@ -1,6 +1,7 @@
 ﻿// Application/Interface/Services/DataTables/INaepProgramService.cs
 
 using Application.Models.DataTables.NAEP;
+using Application.Services.Common;
 
 namespace Application.Interface.Services.DataTables.NAEP
 {
@@ -104,5 +105,19 @@ namespace Application.Interface.Services.DataTables.NAEP
             int pageSize = 10);
 
         Task<Dictionary<string, int>> GetStatusSummaryAsync();
+
+        /// <summary>
+        /// Get trainer's submission history with pagination
+        /// </summary>
+        Task<PaginatedResult<TrainerHistoryItemDto>> GetTrainerHistoryAsync(
+            int pageNumber = 1,
+            int pageSize = 10);
+
+        /// <summary>
+        /// Get pending approvals for Unit Head and Admin with pagination
+        /// </summary>
+        Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
+            int pageNumber = 1,
+            int pageSize = 10);
     }
 }

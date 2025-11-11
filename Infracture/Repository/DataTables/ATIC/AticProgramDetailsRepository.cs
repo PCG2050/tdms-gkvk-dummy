@@ -16,6 +16,12 @@ namespace Infrastructure.Repository.DataTables.ATIC
             _context = context;
         }
 
+        public IQueryable<AticProgramDetails> GetQueryable()
+        {
+            return _context.AticProgramDetails.AsQueryable();
+        }
+
+
         public async Task<List<AticProgramDetails>> GetAllAsync()
         {
             return await _context.AticProgramDetails

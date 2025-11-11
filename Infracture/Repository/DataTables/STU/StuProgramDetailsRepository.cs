@@ -16,7 +16,12 @@ namespace Infrastructure.Repository.DataTables.STU
             _context = context;
         }
 
-         public async Task<List<StuProgramDetails>> GetAllAsync()
+        public IQueryable<StuProgramDetails> GetQueryable()
+        {
+            return _context.StuProgramDetails.AsQueryable();
+        }
+
+        public async Task<List<StuProgramDetails>> GetAllAsync()
         {
             return await _context.StuProgramDetails
                .Include(p => p.ProgramContent!)

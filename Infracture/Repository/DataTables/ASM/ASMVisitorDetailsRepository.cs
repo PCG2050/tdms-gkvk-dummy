@@ -20,6 +20,12 @@ namespace Infrastructure.Repository.DataTables.ASM
         // CORE CRUD OPERATIONS
         // ============================
 
+        public IQueryable<ASMVisitorDetails> GetQueryable()
+        {
+            return _context.ASMVisitorDetails.AsQueryable();
+        }
+
+
         public async Task<ASMVisitorDetails> AddAsync(ASMVisitorDetails entity)
         {
             _context.ASMVisitorDetails.Add(entity);

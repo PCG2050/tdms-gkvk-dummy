@@ -1,5 +1,7 @@
 ﻿
 
+using Application.Services.Common;
+
 namespace Infrastructure.Services.DataTables.EEU
 {
     public class EeuProgramService : IEeuProgramService
@@ -19,6 +21,7 @@ namespace Infrastructure.Services.DataTables.EEU
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
+        private readonly GenericTrainerHistoryService<EeuProgramDetails> _historyService;
 
         public EeuProgramService(
             IEeuProgramDetailsRepository programRepository,
@@ -52,6 +55,7 @@ namespace Infrastructure.Services.DataTables.EEU
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
+            _historyService = new GenericTrainerHistoryService<EeuProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository);
         }
 
         // ============================
@@ -1225,6 +1229,52 @@ namespace Infrastructure.Services.DataTables.EEU
         {
             var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
             return await _programRepository.GetStatusSummaryAsync(unitLocationIds);
+        }
+
+
+        // -------------------------------------------------------
+        // HISTORY: Using Generic Service
+        // -------------------------------------------------------
+
+        /// <summary>
+        /// Get trainer's submission history with pagination
+        /// </summary>
+        public async Task<PaginatedResult<TrainerHistoryItemDto>> GetTrainerHistoryAsync(
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            // Get base query with necessary includes
+            var query = _programRepository  .GetQueryable()
+                .Include(x => x.Type);
+
+            return await _historyService.GetTrainerHistoryAsync(
+                query,
+                getUnitLocationId: x => x.UnitLocationId,
+                getTitleOrName: x => x.Title ?? x.ProgramType?.Name,
+                getFormStatus: x => x.FormStatus,
+                pageNumber,
+                pageSize);
+        }
+
+        /// <summary>
+        /// Get pending approvals for Unit Head with pagination
+        /// </summary>
+        public async Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            var query = _programRepository.GetQueryable()
+                .Include(x => x.Type);
+
+            return await _historyService.GetPendingApprovalsAsync(
+                query,
+                getUnitLocationId: x => x.UnitLocationId,
+                getTitleOrName: x => x.Title ?? x.ProgramType?.Name,
+                getFormStatus: x => x.FormStatus,
+                getCreatedById: x => x.CreatedById ?? 0,
+                _unitHeadAssignmentRepository,
+                pageNumber,
+                pageSize);
         }
 
         // ============================

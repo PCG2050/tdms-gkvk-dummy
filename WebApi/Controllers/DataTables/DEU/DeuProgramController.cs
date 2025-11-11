@@ -324,6 +324,7 @@ namespace WebApi.Controllers.DataTables.DEU
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
+
         // ============================
         // LISTING & FILTERING
         // ============================
@@ -359,6 +360,25 @@ namespace WebApi.Controllers.DataTables.DEU
             var result = await _service.GetStatusSummaryAsync();
             return Ok(result);
         }
+        [HttpGet("my-history")]
+        [Authorize(Roles = RoleString.Trainer)]
+        public async Task<IActionResult> GetMyHistory(
+      [FromQuery] int pageNumber = 1,
+      [FromQuery] int pageSize = 20)
+        {
+            var result = await _service.GetTrainerHistoryAsync(pageNumber, pageSize);
+            return Ok(result);
+        }
+
+        [HttpGet("pending-approvals")]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
+        public async Task<IActionResult> GetPendingApprovals(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 20)
+        {
+            var result = await _service.GetPendingApprovalsAsync(pageNumber, pageSize);
+            return Ok(result);
+        }
 
         // ============================
         // HELPER METHOD
@@ -377,6 +397,8 @@ namespace WebApi.Controllers.DataTables.DEU
             };
         }
     }
+
+
 
     // DTOs for approval/rejection
     public class ApprovalDto

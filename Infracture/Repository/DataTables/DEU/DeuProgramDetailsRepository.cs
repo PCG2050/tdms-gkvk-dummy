@@ -11,6 +11,11 @@ namespace Infrastructure.Repository.DataTables.DEU
     {
         private readonly TdmsDbContext _context;
 
+        public IQueryable<DeuProgramDetails> GetQueryable()
+        {
+            return _context.DeuProgramDetails.AsQueryable();
+        }
+
 
         public async Task<List<DeuProgramDetails>> GetAllAsync()
         {

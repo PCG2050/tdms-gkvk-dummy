@@ -17,8 +17,6 @@ namespace Application.Services.Common
         private readonly ICurrentUserService _currentUserService;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
-        private ICurrentUserService currentUserService;
-        private ITrainerAssignmentRepository trainerAssignmentRepository;
 
         public GenericTrainerHistoryService(
             ICurrentUserService currentUserService,
@@ -30,19 +28,10 @@ namespace Application.Services.Common
             _organizationUnitRepository = organizationUnitRepository;
         }
 
-       
-
         /// <summary>
         /// Get trainer's submission history with pagination
         /// Filters by CreatedById and accessible unit locations
         /// </summary>
-        /// <param name="query">IQueryable of entities (already includes necessary data)</param>
-        /// <param name="getUnitLocationId">Function to extract UnitLocationId from entity</param>
-        /// <param name="getTitleOrName">Function to extract title/name from entity for display</param>
-        /// <param name="getFormStatus">Function to extract FormStatus from entity</param>
-        /// <param name="pageNumber">Page number (default: 1)</param>
-        /// <param name="pageSize">Items per page (default: 20)</param>
-        /// <returns>Paginated list of trainer's submissions with basic info</returns>
         public async Task<PaginatedResult<TrainerHistoryItemDto>> GetTrainerHistoryAsync(
             IQueryable<TEntity> query,
             Func<TEntity, int> getUnitLocationId,
@@ -56,16 +45,21 @@ namespace Application.Services.Common
             var unitLocationIds = await _trainerAssignmentRepository
                 .GetUnitLocationIdsByTrainerIdAsync(userId);
 
-            // Filter by trainer and accessible locations
-            var filteredQuery = query
-                .Where(x => x.CreatedById == userId &&
-                           unitLocationIds.Contains(getUnitLocationId(x)));
+            // Materialize data first to avoid EF Core translation issues
+            var allData = await query
+                .Where(x => x.CreatedById == userId)
+                .ToListAsync();
+
+            // Filter by accessible locations in memory
+            var filteredData = allData
+                .Where(x => unitLocationIds.Contains(getUnitLocationId(x)))
+                .ToList();
 
             // Get total count
-            var totalCount = await filteredQuery.CountAsync();
+            var totalCount = filteredData.Count;
 
             // Get paginated items
-            var items = await filteredQuery
+            var items = filteredData
                 .OrderByDescending(x => x.CreatedAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
@@ -77,7 +71,7 @@ namespace Application.Services.Common
                     UpdatedAt = x.UpdatedAt,
                     FormStatus = getFormStatus(x)
                 })
-                .ToListAsync();
+                .ToList();
 
             return new PaginatedResult<TrainerHistoryItemDto>
             {
@@ -92,14 +86,6 @@ namespace Application.Services.Common
         /// Get pending approvals for Unit Head with pagination
         /// Shows all entries in Pending status for unit locations assigned to Unit Head
         /// </summary>
-        /// <param name="query">IQueryable of entities</param>
-        /// <param name="getUnitLocationId">Function to extract UnitLocationId from entity</param>
-        /// <param name="getTitleOrName">Function to extract title/name from entity</param>
-        /// <param name="getFormStatus">Function to extract FormStatus from entity</param>
-        /// <param name="getCreatedById">Function to extract CreatedById from entity</param>
-        /// <param name="pageNumber">Page number (default: 1)</param>
-        /// <param name="pageSize">Items per page (default: 20)</param>
-        /// <returns>Paginated list of pending approvals</returns>
         public async Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
             IQueryable<TEntity> query,
             Func<TEntity, int> getUnitLocationId,
@@ -127,25 +113,27 @@ namespace Application.Services.Common
             List<int> unitLocationIds;
             if (_currentUserService.Role == Role.ADMIN)
             {
-                // Admin sees all locations in their organization
                 var orgUnits = await _organizationUnitRepository.GetUnitLocationIdsByOrganizationIdAsync(_currentUserService.OrganizationId);
                 unitLocationIds = orgUnits;
             }
             else
             {
-                // Unit Head sees only their assigned locations
                 unitLocationIds = await unitHeadAssignmentRepository
                     .GetUnitLocationIdsByUnitHeadIdAsync(_currentUserService.UserId);
             }
 
-            // Filter by Pending status and accessible locations
-            var filteredQuery = query
-                .Where(x => getFormStatus(x) == "Pending"  &&
-                           unitLocationIds.Contains(getUnitLocationId(x)));
+            // Materialize data first
+            var allPendingData = await query.ToListAsync();
 
-            var totalCount = await filteredQuery.CountAsync();
+            // Filter in memory
+            var filteredData = allPendingData
+                .Where(x => getFormStatus(x) == "Pending" &&
+                           unitLocationIds.Contains(getUnitLocationId(x)))
+                .ToList();
 
-            var items = await filteredQuery
+            var totalCount = filteredData.Count;
+
+            var items = filteredData
                 .OrderByDescending(x => x.CreatedAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
@@ -158,7 +146,7 @@ namespace Application.Services.Common
                     FormStatus = getFormStatus(x),
                     CreatedById = getCreatedById(x)
                 })
-                .ToListAsync();
+                .ToList();
 
             return new PaginatedResult<PendingApprovalItemDto>
             {
@@ -170,9 +158,6 @@ namespace Application.Services.Common
         }
     }
 
-    /// <summary>
-    /// DTO for trainer history items
-    /// </summary>
     public class TrainerHistoryItemDto
     {
         public int Id { get; set; }
@@ -182,9 +167,6 @@ namespace Application.Services.Common
         public string FormStatus { get; set; } = string.Empty;
     }
 
-    /// <summary>
-    /// DTO for pending approval items (includes creator info)
-    /// </summary>
     public class PendingApprovalItemDto
     {
         public int Id { get; set; }

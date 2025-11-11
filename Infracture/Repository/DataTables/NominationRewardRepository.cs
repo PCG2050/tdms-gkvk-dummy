@@ -20,6 +20,11 @@ namespace Infrastructure.Repository.DataTables
             _context = context;
         }
 
+        public IQueryable<NominationReward> GetQueryable()
+        {
+            return _context.NominationRewards.AsQueryable();
+        }
+
         public async Task<NominationReward?> GetByIdAsync(int id)
         {
             return await _context.NominationRewards.FindAsync(id);

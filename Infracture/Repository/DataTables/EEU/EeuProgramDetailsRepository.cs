@@ -16,6 +16,11 @@ namespace Infrastructure.Repository.DataTables.EEU
             _context = context;
         }
 
+        public IQueryable<EeuProgramDetails> GetQueryable()
+        {
+            return _context.EeuProgramDetails.AsQueryable();
+        }
+
 
         public async Task<List<EeuProgramDetails>> GetAllAsync()
         {

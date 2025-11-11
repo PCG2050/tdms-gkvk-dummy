@@ -4,6 +4,7 @@ namespace Application.Interface.Repository.DataTables
 {
     public interface INominationRewardRepository
     {
+        IQueryable<NominationReward> GetQueryable();
         Task<NominationReward?> GetByIdAsync(int id);
         Task<NominationReward?> GetWithDetailsAsync(int id); // includes child collections
         Task<NominationReward> AddAsync(NominationReward entity);
