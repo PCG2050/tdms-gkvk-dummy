@@ -1,7 +1,4 @@
-# These are some examples of commonly ignored file patterns.
-# You should customize this list as applicable to your project.
-# Learn more about .gitignore:
-#     https://www.atlassian.com/git/tutorials/saving-changes/gitignore
+# --- Existing MAUI/Common Ignores ---
 .vs/
 obj/
 bin/
@@ -51,3 +48,15 @@ Thumbs.db
 *.wmv
 
 /WebApi/Properties/PublishProfiles
+
+# --- .NET Web API Additions ---
+# Visual Studio files
+*.user
+*.suo
+*.vshost.exe
+*.vspscc
+*.vssscc
+# NuGet Packages
+packages/
+# Local configuration (Optional, based on team preference)
+appsettings.Development.json
