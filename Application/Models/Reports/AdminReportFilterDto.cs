@@ -47,6 +47,7 @@ namespace Application.Models.Reports
 
 
 
+
     public class LocationOptionDto
     {
         public int Id { get; set; }

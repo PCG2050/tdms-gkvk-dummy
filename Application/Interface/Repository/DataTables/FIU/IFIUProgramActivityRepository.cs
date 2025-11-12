@@ -1,71 +1,39 @@
 ﻿using Application.Models;
+using Application.Models.DataTables.FIU;
 using Domain.Entities.FIU;
 
 namespace Application.Interface.Repository.DataTables.FIU
 {
-    /// <summary>
-    /// Repository interface for FIU Program Activities
-    /// Handles data access operations with filtering and pagination
-    /// </summary>
     public interface IFIUProgramActivityRepository
     {
-        // ==========================================
-        // CORE CRUD OPERATIONS
-        // ==========================================
-
-        Task<FIUProgramActivity> AddAsync(FIUProgramActivity entity);
-
+        IQueryable<FIUProgramActivity> GetQueryable();
+        // CRUD
         Task<FIUProgramActivity?> GetByIdAsync(int id);
-
-        Task<FIUProgramActivity?> GetWithDetailsAsync(int id);
-
-        Task<IEnumerable<FIUProgramActivity>> GetAllAsync();
-
-        Task<FIUProgramActivity> UpdateAsync(FIUProgramActivity entity);
-
+        Task<FIUProgramActivity> CreateAsync(FIUProgramActivity activity);
+        Task<FIUProgramActivity> UpdateAsync(FIUProgramActivity activity);
         Task<bool> DeleteAsync(int id);
+        Task<bool> ExistsAsync(int id);
 
-        // ==========================================
-        // PAGINATION & FILTERS
-        // ==========================================
-
-        /// <summary>
-        /// Get paginated activities for specific trainers (by IDs)
-        /// Supports filtering by date range, unit location, and search term
-        /// </summary>
+        // Queries
         Task<PaginatedResult<FIUProgramActivity>> GetPaginatedAsync(
-            List<int> trainerIds,
+            List<int> unitLocationIds,
             int pageNumber = 1,
             int pageSize = 10,
-            DateOnly? startDate = null,
-            DateOnly? endDate = null,
-            int? unitLocationId = null,
-            string? searchTerm = null);
+            int? activityId = null,
+            string? status = null);
 
-        /// <summary>
-        /// Get activities by status for specific trainers
-        /// Status: "Draft", "Saved", "Pending", "Approved", "Rejected"
-        /// </summary>
-        Task<PaginatedResult<FIUProgramActivity>> GetByStatusAsync(
-            List<int> trainerIds,
-            string status,
-            int pageNumber = 1,
-            int pageSize = 10);
+        Task<List<FIUProgramActivity>> GetByUnitLocationIdAsync(int unitLocationId);
+        Task<List<FIUProgramActivity>> GetByCreatedByIdAsync(int userId);
+        Task<List<FIUProgramActivity>> GetByStatusAsync(List<int> unitLocationIds, string status);
 
-        /// <summary>
-        /// Get count of activities by status for dashboard summary
-        /// Returns aggregated counts for each status
-        /// </summary>
-        Task<Dictionary<string, int>> GetStatusSummaryAsync(List<int> trainerIds);
+        // Statistics
+        Task<Dictionary<string, int>> GetStatsByActivityTypeAsync(List<int> unitLocationIds);
+        Task<Dictionary<string, int>> GetStatsByStatusAsync(List<int> unitLocationIds);
 
-        /// <summary>
-        /// Get activities by unit location
-        /// </summary>
-        Task<List<FIUProgramActivity>> GetByUnitLocationAsync(int unitLocationId);
-
-        /// <summary>
-        /// Get activities created by specific trainer
-        /// </summary>
-        Task<List<FIUProgramActivity>> GetByCreatedByAsync(int trainerId);
+        // Monthly Report
+        Task<List<FIUActivitySummaryDto>> GetMonthlyActivitySummaryAsync(
+            List<int> unitLocationIds,
+            int year,
+            int month);
     }
 }

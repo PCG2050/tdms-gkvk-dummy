@@ -1,282 +1,316 @@
 ﻿using Application.Interface.Services.DataTables.FIU;
 using Application.Models.DataTables.FIU;
-using Domain.Entities.Enum;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace WebApi.Controllers.DataTables.FIU
 {
-    /// <summary>
-    /// Controller for FIU (Farm Information Unit) Program Activities
-    /// 
-    /// STATUS WORKFLOW:
-    /// - Draft: Initial state, can edit
-    /// - Saved: Auto-saved state (when trainer clicks "Save Next")
-    /// - Pending: Submitted for Unit Head approval
-    /// - Approved: Unit Head approved, cannot edit
-    /// - Rejected: Unit Head rejected, can edit and resubmit
-    /// 
-    /// PERMISSIONS:
-    /// - Trainers: Create, Edit (Draft/Rejected), Submit, View own
-    /// - UnitHeads: Approve/Reject, View all under them
-    /// - Admins: View all in organization
-    /// </summary>
-    [Route("api/[controller]")]
+    [Route("api/fiu-activities")]
     [ApiController]
-    [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead},{RoleString.Admin}")]
-    public class FIUProgramActivityController : ControllerBase
+    [Authorize]
+    public class FIUProgramActivitiesController : ControllerBase
     {
         private readonly IFIUProgramActivityService _service;
 
-        public FIUProgramActivityController(IFIUProgramActivityService service)
+        public FIUProgramActivitiesController(IFIUProgramActivityService service)
         {
             _service = service;
         }
 
-        // ==========================================
-        // CRUD OPERATIONS
-        // ==========================================
+        /// <summary>
+        /// Get available activity types (master data dropdown)
+        /// </summary>
+        [HttpGet("activity-types")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetActivityTypes()
+        {
+            var result = await _service.GetAvailableActivitiesAsync();
+
+            if (!result.IsSuccess)
+                return BadRequest(new { message = result.ErrorMessage });
+
+            return Ok(new { data = result.Data });
+        }
 
         /// <summary>
-        /// Create new FIU Program Activity (Trainer only)
-        /// Initial status: Draft
+        /// Create new FIU activity (Trainer only)
         /// </summary>
-        [HttpPost("Create")]
-        [Authorize(Roles = RoleString.Trainer)]
-        public async Task<IActionResult> Create([FromBody] FIUProgramActivityDto dto)
+        [HttpPost]
+        [Authorize(Roles = nameof(Role.TRAINER))]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> CreateActivity([FromBody] FIUProgramActivityCreateDto createDto)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+                return BadRequest(new { message = "Invalid data", errors = ModelState });
 
-            var result = await _service.AddAsync(dto);
+            var result = await _service.CreateAsync(createDto);
 
             if (!result.IsSuccess)
                 return BadRequest(new { message = result.ErrorMessage });
 
             return Ok(new
             {
-                message = "FIU Program Activity created successfully",
-                data = result.Data,
-                status = result.Data.FormStatus
-            });
-        }
-
-        /// <summary>
-        /// Get FIU Program Activity by ID
-        /// Returns activity if user has permission to view
-        /// </summary>
-        [HttpGet("GetById/{id}")]
-        public async Task<IActionResult> GetById(int id)
-        {
-            var result = await _service.GetByIdAsync(id);
-
-            if (!result.IsSuccess)
-            {
-                if (result.ErrorStatus == ServiceErrorStatus.NOTFOUND)
-                    return NotFound(new { message = result.ErrorMessage });
-
-                return StatusCode(403, new { message = result.ErrorMessage });
-            }
-
-            return Ok(result.Data);
-        }
-
-        /// <summary>
-        /// Get all FIU Program Activities accessible to current user
-        /// Filters based on role and permissions
-        /// </summary>
-        [HttpGet("GetAll")]
-        public async Task<IActionResult> GetAll()
-        {
-            var result = await _service.GetAllAsync();
-            return Ok(result);
-        }
-
-        /// <summary>
-        /// Update FIU Program Activity (Trainer only)
-        /// Can only update Draft or Rejected entries
-        /// Auto-resets Rejected entries to Draft
-        /// </summary>
-        [HttpPut("Update/{id}")]
-        [Authorize(Roles = RoleString.Trainer)]
-        public async Task<IActionResult> Update(int id, [FromBody] FIUProgramActivityDto dto)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var result = await _service.UpdateAsync(id, dto);
-
-            if (!result.IsSuccess)
-                return BadRequest(new { message = result.ErrorMessage });
-
-            return Ok(new
-            {
-                message = "FIU Program Activity updated successfully",
+                message = result.SuccessMessage,
+                activityId = result.Data!.Id,
                 data = result.Data
             });
         }
 
         /// <summary>
-        /// Delete FIU Program Activity (Trainer only)
-        /// Can only delete Draft entries
+        /// Update FIU activity (Trainer only, Draft status)
         /// </summary>
-        [HttpDelete("Delete/{id}")]
-        [Authorize(Roles = RoleString.Trainer)]
-        public async Task<IActionResult> Delete(int id)
+        [HttpPut("{id}")]
+        [Authorize(Roles = nameof(Role.TRAINER))]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> UpdateActivity(int id, [FromBody] FIUProgramActivityUpdateDto updateDto)
+        {
+            if (id != updateDto.Id)
+                return BadRequest(new { message = "ID mismatch" });
+
+            if (!ModelState.IsValid)
+                return BadRequest(new { message = "Invalid data", errors = ModelState });
+
+            var result = await _service.UpdateAsync(updateDto);
+
+            if (!result.IsSuccess)
+                return BadRequest(new { message = result.ErrorMessage });
+
+            return Ok(new { message = result.SuccessMessage, data = result.Data });
+        }
+
+        /// <summary>
+        /// Get activity by ID
+        /// </summary>
+        [HttpGet("{id}")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetActivityById(int id)
+        {
+            var result = await _service.GetByIdAsync(id);
+
+            if (!result.IsSuccess)
+                return NotFound(new { message = result.ErrorMessage });
+
+            return Ok(new { data = result.Data });
+        }
+
+        /// <summary>
+        /// Delete activity (Trainer only, Draft status)
+        /// </summary>
+        [HttpDelete("{id}")]
+        [Authorize(Roles = nameof(Role.TRAINER))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> DeleteActivity(int id)
         {
             var result = await _service.DeleteAsync(id);
 
             if (!result.IsSuccess)
                 return BadRequest(new { message = result.ErrorMessage });
 
-            return Ok(new { message = "FIU Program Activity deleted successfully" });
+            return Ok(new { message = result.SuccessMessage });
         }
-
-        // ==========================================
-        // FORM STATUS WORKFLOW
-        // ==========================================
 
         /// <summary>
         /// Submit activity for approval (Trainer only)
-        /// Changes status: Draft → Pending
-        /// Only trainers can submit their own entries
         /// </summary>
         [HttpPost("{id}/submit")]
-        [Authorize(Roles = RoleString.Trainer)]
-        public async Task<IActionResult> SubmitForApproval(int id)
+        [Authorize(Roles = nameof(Role.TRAINER))]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> SubmitActivity(int id)
         {
             var result = await _service.SubmitForApprovalAsync(id);
 
             if (!result.IsSuccess)
                 return BadRequest(new { message = result.ErrorMessage });
 
-            return Ok(new { message = "FIU Program Activity submitted for approval successfully" });
+            return Ok(new { message = result.SuccessMessage, data = result.Data });
         }
 
         /// <summary>
-        /// Approve activity (Unit Head/Admin only)
-        /// Changes status: Pending → Approved
-        /// Optional remarks can be provided
+        /// Approve activity (Unit Head only)
         /// </summary>
         [HttpPost("{id}/approve")]
-        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
-        public async Task<IActionResult> Approve(int id, [FromBody] ApprovalDto? approvalDto = null)
+        [Authorize(Roles = nameof(Role.UNITHEAD))]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> ApproveActivity(int id, [FromBody] ApprovalDto approvalDto)
         {
-            var result = await _service.ApproveAsync(id, approvalDto?.Remarks);
+            var result = await _service.ApproveAsync(id, approvalDto.Remarks);
 
             if (!result.IsSuccess)
                 return BadRequest(new { message = result.ErrorMessage });
 
-            return Ok(new { message = "FIU Program Activity approved successfully" });
+            return Ok(new { message = result.SuccessMessage, data = result.Data });
         }
 
         /// <summary>
-        /// Reject activity with remarks (Unit Head/Admin only)
-        /// Changes status: Pending → Rejected
-        /// Remarks are REQUIRED for rejection
+        /// Reject activity (Unit Head only)
         /// </summary>
         [HttpPost("{id}/reject")]
-        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
-        public async Task<IActionResult> Reject(int id, [FromBody] ApprovalDto approvalDto)
+        [Authorize(Roles = nameof(Role.UNITHEAD))]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> RejectActivity(int id, [FromBody] RejectionDto rejectionDto)
         {
-            if (string.IsNullOrWhiteSpace(approvalDto?.Remarks))
-                return BadRequest(new { message = "Remarks are required for rejection" });
+            if (string.IsNullOrWhiteSpace(rejectionDto.Remarks))
+                return BadRequest(new { message = "Rejection reason is required" });
 
-            var result = await _service.RejectAsync(id, approvalDto.Remarks);
+            var result = await _service.RejectAsync(id, rejectionDto.Remarks);
 
             if (!result.IsSuccess)
                 return BadRequest(new { message = result.ErrorMessage });
 
-            return Ok(new { message = "FIU Program Activity rejected" });
+            return Ok(new { message = result.SuccessMessage, data = result.Data });
         }
 
-        // ==========================================
-        // HISTORY & DASHBOARD
-        // ==========================================
-
         /// <summary>
-        /// Get paginated history of FIU Program Activities
-        /// Filters based on user role and permissions
-        /// Supports filtering by date range, unit location, and search term
+        /// Get paginated activities
         /// </summary>
-        [HttpGet("history")]
-        public async Task<IActionResult> GetHistory(
+        [HttpGet]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetActivities(
             [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 20,
-            [FromQuery] DateOnly? startDate = null,
-            [FromQuery] DateOnly? endDate = null,
-            [FromQuery] int? unitLocationId = null,
-            [FromQuery] string? searchTerm = null)
+            [FromQuery] int pageSize = 10,
+            [FromQuery] int? activityId = null,
+            [FromQuery] string? status = null)
         {
-            var result = await _service.GetPaginatedAsync(
-                pageNumber,
-                pageSize,
-                startDate,
-                endDate,
-                unitLocationId,
-                searchTerm);
+            var result = await _service.GetPaginatedAsync(pageNumber, pageSize, activityId, status);
+
+            if (!result.IsSuccess)
+                return BadRequest(new { message = result.ErrorMessage });
 
             return Ok(new
             {
-                items = result.Items,
-                totalItems = result.TotalItems,
-                pageNumber = result.PageNumber,
-                pageSize = result.PageSize,
-                totalPages = (int)Math.Ceiling((double)result.TotalItems / result.PageSize)
+                data = result.Data!.Items,
+                pagination = new
+                {
+                    result.Data.Items,
+                    result.Data.TotalItems,
+                    result.Data.PageNumber,
+                    result.Data.PageSize
+                }
             });
         }
 
+
+      
         /// <summary>
-        /// Get activities by specific status
-        /// Status options: "Draft", "Saved", "Pending", "Approved", "Rejected"
-        /// Used for filtering history page
+        /// Get trainer's own activities
         /// </summary>
-        [HttpGet("history/status/{status}")]
-        public async Task<IActionResult> GetByStatus(
-            string status,
+        [HttpGet("my-activities")]
+        [Authorize(Roles = nameof(Role.TRAINER))]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetMyActivities()
+        {
+            var result = await _service.GetMyActivitiesAsync();
+
+            if (!result.IsSuccess)
+                return BadRequest(new { message = result.ErrorMessage });
+
+            return Ok(new { data = result.Data });
+        }
+
+        /// <summary>
+        /// Get activities pending approval (Unit Head only)
+        /// </summary>
+        [HttpGet("pending-approvals")]
+        [Authorize(Roles = nameof(Role.UNITHEAD))]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetPendingApprovals()
+        {
+            var result = await _service.GetPendingApprovalsAsync();
+
+            if (!result.IsSuccess)
+                return BadRequest(new { message = result.ErrorMessage });
+
+            return Ok(new { data = result.Data });
+        }
+
+        /// <summary>
+        /// Get statistics by activity type
+        /// </summary>
+        [HttpGet("stats/by-activity-type")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetStatsByActivityType()
+        {
+            var result = await _service.GetStatsByActivityTypeAsync();
+
+            if (!result.IsSuccess)
+                return BadRequest(new { message = result.ErrorMessage });
+
+            return Ok(new { data = result.Data });
+        }
+
+        /// <summary>
+        /// Get statistics by status
+        /// </summary>
+        [HttpGet("stats/by-status")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetStatsByStatus()
+        {
+            var result = await _service.GetStatsByStatusAsync();
+
+            if (!result.IsSuccess)
+                return BadRequest(new { message = result.ErrorMessage });
+
+            return Ok(new { data = result.Data });
+        }
+
+        /// <summary>
+        /// Get monthly report (Admin/UnitHead)
+        /// </summary>
+        [HttpPost("reports/monthly")]
+        [Authorize(Roles = $"{nameof(Role.UNITHEAD)},{nameof(Role.ADMIN)}")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetMonthlyReport([FromBody] FIUReportRequestDto requestDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new { message = "Invalid data", errors = ModelState });
+
+            var result = await _service.GetMonthlyReportAsync(requestDto);
+
+            if (!result.IsSuccess)
+                return BadRequest(new { message = result.ErrorMessage });
+
+            return Ok(new { data = result.Data });
+        }
+
+        [HttpGet("my-history")]
+        [Authorize(Roles = RoleString.Trainer)]
+        public async Task<IActionResult> GetMyHistory(
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 20)
+        {
+            var result = await _service.GetTrainerHistoryAsync(pageNumber, pageSize);
+            return Ok(result);
+        }
+
+        [HttpGet("pending-approvals-paginated")]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
+        public async Task<IActionResult> GetPendingApprovals(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 20)
         {
-            var result = await _service.GetByStatusAsync(status, pageNumber, pageSize);
-
-            return Ok(new
-            {
-                status,
-                items = result.Items,
-                totalItems = result.TotalItems,
-                pageNumber = result.PageNumber,
-                pageSize = result.PageSize,
-                totalPages = (int)Math.Ceiling((double)result.TotalItems / result.PageSize)
-            });
+            var result = await _service.GetPendingApprovalsAsync(pageNumber, pageSize);
+            return Ok(result);
         }
 
-        /// <summary>
-        /// Get status summary for dashboard
-        /// Returns count of activities by status
-        /// Example: { "Draft": 5, "Pending": 8, "Approved": 12, "Rejected": 2 }
-        /// </summary>
-        [HttpGet("dashboard/summary")]
-        public async Task<IActionResult> GetStatusSummary()
-        {
-            var summary = await _service.GetStatusSummaryAsync();
 
-            return Ok(new
-            {
-                summary,
-                total = summary.Values.Sum()
-            });
-        }
+
     }
 
-    /// <summary>
-    /// DTO for approval/rejection operations
-    /// </summary>
     public class ApprovalDto
     {
-        /// <summary>
-        /// Optional remarks for approval
-        /// Required remarks for rejection
-        /// </summary>
         public string? Remarks { get; set; }
+    }
+
+    public class RejectionDto
+    {
+        [Required]
+        public string Remarks { get; set; } = string.Empty;
     }
 }

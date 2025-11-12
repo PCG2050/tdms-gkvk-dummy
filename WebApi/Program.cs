@@ -30,6 +30,11 @@ using Infrastructure.Services.DataTables.KVK;
 using Application.Interface.Services.DataTables;
 using Application.Interface.Services.Reports;
 using Infrastructure.Services.Reports;
+using Application.Mapper.Datatable.FIU;
+using Application.Interface.Services.DataTables.FIU;
+using Infrastructure.Services.DataTables.FIU;
+using Application.Interface.Repository.DataTables.FIU;
+using Infrastructure.Repository.DataTables.FIU;
 
 namespace WebApi
 {
@@ -146,6 +151,7 @@ namespace WebApi
             //builder.Services.AddScoped<IFtiTrainingProgrammeService, FtiTrainingProgrammeService>();
             builder.Services.AddScoped<IFtiOtherActivitiesRepository, FtiOtherActivitiesRepository>();
             //builder.Services.AddScoped<IFtiOtherActivityService, FtiOtherActivityService>();
+            
 
             //builder.Services.AddScoped<IStuTrainingProgrammeRepository, StuTrainingProgrammeRepository>();
             //builder.Services.AddScoped<IStuTrainingProgrammeService, StuTrainingProgrammeService>();
@@ -158,7 +164,6 @@ namespace WebApi
             //builder.Services.AddScoped<IIbtvaProgrammeRepository, IbtvaProgrammeRepository>();
             //builder.Services.AddScoped<IIbtvaProgrammeService, IbtvaProgrammeService>();         
             builder.Services.AddScoped<IAticSalesRepository, AticSalesRepository>();
-
 
 
             //builder.Services.AddScoped<IDeuCourseRepository, DeuCourseRepository>();
@@ -187,11 +192,20 @@ namespace WebApi
             builder.Services.AddSingleton<EeuProgramMapper>();
             builder.Services.AddSingleton<StuProgramMapper>();
             builder.Services.AddSingleton<KvkProgramMapper>();
+            builder.Services.AddSingleton<FIUProgramActivityMapper>();
 
             
             builder.Services.AddSingleton<ConsultingServiceMapper>();
             builder.Services.AddSingleton<PublicationMapper>();
             builder.Services.AddSingleton<TblServiceMapper>();
+
+
+            #region FIU
+           
+            builder.Services.AddScoped<IFIUActivityRepository, FIUActivityRepository>();
+            builder.Services.AddScoped<IFIUProgramActivityRepository, FIUProgramActivityRepository>();
+            builder.Services.AddScoped<IFIUProgramActivityService, FIUProgramActivityService>();
+            #endregion 
 
             #region STU
             builder.Services.AddScoped<IStuProgramDetailsRepository, StuProgramDetailsRepository>();

@@ -1,372 +1,382 @@
-﻿using Application.Interface;
+﻿
 using Application.Interface.Repository.DataTables.FIU;
-using Application.Interface.Services.Common;
 using Application.Interface.Services.DataTables.FIU;
-using Application.Mapper.DataTable.FIU;
-using Application.Models;
+using Application.Mapper.Datatable.FIU;
 using Application.Models.DataTables.FIU;
-using Domain.Entities.Enum;
+using Application.Models.DataTables.FIU.Application.Models.FIU;
+using Application.Services.Common;
 using Domain.Entities.FIU;
+using System.Globalization;
 
 namespace Infrastructure.Services.DataTables.FIU
 {
     public class FIUProgramActivityService : IFIUProgramActivityService
     {
-        private readonly IFIUProgramActivityRepository _repository;
-        private readonly FIUProgramActivityMapper _mapper;
+        private readonly IFIUProgramActivityRepository _activityRepository;
+        private readonly IFIUActivityRepository _fiuActivityRepository;
+        private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
+        private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
+        private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly ICurrentUserService _currentUserService;
-        private readonly IEntityPermissionService _entityPermissionService;
+        private readonly FIUProgramActivityMapper _mapper;
+        private readonly GenericTrainerHistoryService<FIUProgramActivity> _historyService;
 
         public FIUProgramActivityService(
-            IFIUProgramActivityRepository repository,
-            FIUProgramActivityMapper mapper,
+            IFIUProgramActivityRepository activityRepository,
+            IFIUActivityRepository fiuActivityRepository,
+            ITrainerAssignmentRepository trainerAssignmentRepository,
+            IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
+            IOrganizationUnitRepository organizationUnitRepository,
             ICurrentUserService currentUserService,
-            IEntityPermissionService entityPermissionService)
+            FIUProgramActivityMapper mapper)
         {
-            _repository = repository;
-            _mapper = mapper;
+            _activityRepository = activityRepository;
+            _fiuActivityRepository = fiuActivityRepository;
+            _trainerAssignmentRepository = trainerAssignmentRepository;
+            _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
+            _organizationUnitRepository = organizationUnitRepository;
             _currentUserService = currentUserService;
-            _entityPermissionService = entityPermissionService;
+            _mapper = mapper;
+            //  generic history service
+            _historyService = new GenericTrainerHistoryService<FIUProgramActivity>(currentUserService, trainerAssignmentRepository, organizationUnitRepository);
         }
 
-        // ==========================================
-        // CRUD OPERATIONS
-        // ==========================================
-
-        public async Task<ServiceResult<FIUProgramActivityDto>> AddAsync(FIUProgramActivityDto dto)
+        public async Task<ServiceResult<FIUProgramActivityResponseDto>> CreateAsync(FIUProgramActivityCreateDto createDto)
         {
-            var entity = _mapper.MapToEntity(dto);
+            if (_currentUserService.Role != Role.TRAINER)
+                return ServiceResult<FIUProgramActivityResponseDto>.Failure("Only trainers can create activities");
 
-            // Set audit fields
-            entity.CreatedById = _currentUserService.UserId;
-            entity.CreatedAt = DateTimeOffset.UtcNow;
-            entity.OrganizationId = _currentUserService.OrganizationId;
-            entity.FormStatus = "Draft"; // Initial status
+            var hasAccess = await _trainerAssignmentRepository
+                .IsTrainerAssignedToLocationAsync(_currentUserService.UserId, createDto.UnitLocationId);
 
-            var result = await _repository.AddAsync(entity);
-            var resultDto = _mapper.MapToDto(result);
+            if (!hasAccess)
+                return ServiceResult<FIUProgramActivityResponseDto>.Failure("You don't have access to this unit location");
 
-            return ServiceResult<FIUProgramActivityDto>.Success(resultDto);
+            var fiuActivity = await _fiuActivityRepository.GetByIdAsync(createDto.FIUActivitiesId);
+            if (fiuActivity == null || !fiuActivity.IsActive)
+                return ServiceResult<FIUProgramActivityResponseDto>.Failure("Invalid activity type");
+
+            var activity = _mapper.MapCreateDtoToEntity(createDto);
+            activity.OrganizationId = _currentUserService.OrganizationId;
+            activity.CreatedById = _currentUserService.UserId;
+            activity.FormStatus = "Draft";
+
+            var created = await _activityRepository.CreateAsync(activity);
+            var response = _mapper.MapEntityToResponseDto(created);
+
+            return ServiceResult<FIUProgramActivityResponseDto>.Success(response, "Activity created successfully");
         }
 
-        public async Task<ServiceResult<FIUProgramActivityDto>> GetByIdAsync(int id)
+        public async Task<ServiceResult<FIUProgramActivityResponseDto>> UpdateAsync(FIUProgramActivityUpdateDto updateDto)
         {
-            var entity = await _repository.GetByIdAsync(id);
-
-            if (entity == null)
-                return ServiceResult<FIUProgramActivityDto>.Failure(
-                    "FIU Program Activity not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            // Check if user has permission to view
-            if (!await _entityPermissionService.CanViewForm(entity))
-                return ServiceResult<FIUProgramActivityDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            var dto = _mapper.MapToDto(entity);
-            return ServiceResult<FIUProgramActivityDto>.Success(dto);
-        }
-
-        public async Task<IEnumerable<FIUProgramActivityDto>> GetAllAsync()
-        {
-            var entities = await _repository.GetAllAsync();
-
-            // Filter based on user permissions
-            var accessibleEntities = new List<FIUProgramActivity>();
-            foreach (var entity in entities)
-            {
-                if (await _entityPermissionService.CanViewForm(entity))
-                    accessibleEntities.Add(entity);
-            }
-
-            return accessibleEntities.Select(_mapper.MapToDto);
-        }
-
-        public async Task<ServiceResult<FIUProgramActivityDto>> UpdateAsync(int id, FIUProgramActivityDto dto)
-        {
-            var existing = await _repository.GetByIdAsync(id);
-
+            var existing = await _activityRepository.GetByIdAsync(updateDto.Id);
             if (existing == null)
-                return ServiceResult<FIUProgramActivityDto>.Failure(
-                    "FIU Program Activity not found",
-                    ServiceErrorStatus.NOTFOUND);
+                return ServiceResult<FIUProgramActivityResponseDto>.Failure("Activity not found");
 
-            // Check if user can modify
-            if (!await _entityPermissionService.CanModifyForm(existing))
-                return ServiceResult<FIUProgramActivityDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
+            if (existing.CreatedById != _currentUserService.UserId)
+                return ServiceResult<FIUProgramActivityResponseDto>.Failure("You can only update your own activities");
 
-            // Cannot edit Approved entries
-            if (existing.FormStatus == "Approved")
-                return ServiceResult<FIUProgramActivityDto>.Failure(
-                    "Cannot modify approved activities",
-                    ServiceErrorStatus.INVALIDOPERATION);
+            if (existing.FormStatus != "Draft")
+                return ServiceResult<FIUProgramActivityResponseDto>.Failure("Only draft activities can be updated");
 
-            // Update fields from DTO
-            existing.FIUActivitiesId = dto.FIUActivitiesId;
-            existing.Number = dto.Number;
-            existing.UploadMediaUrl = dto.UploadMediaUrl;
-            existing.StartDate = dto.StartDate ?? existing.StartDate;
-            existing.EndDate = dto.EndDate ?? existing.EndDate;
-            existing.UpdatedById = _currentUserService.UserId;
-            existing.UpdatedAt = DateTimeOffset.UtcNow;
+            var fiuActivity = await _fiuActivityRepository.GetByIdAsync(updateDto.FIUActivitiesId);
+            if (fiuActivity == null || !fiuActivity.IsActive)
+                return ServiceResult<FIUProgramActivityResponseDto>.Failure("Invalid activity type");
 
-            // Auto-reset to Draft if Pending or Rejected
-            if (existing.FormStatus == "Pending" || existing.FormStatus == "Rejected")
-            {
-                string originalStatus = existing.FormStatus;
-                existing.FormStatus = "Draft";
-                existing.FormStatusRemarks = $"Edited by trainer after {originalStatus} status. Reset to Draft.";
-                existing.ApprovedById = null;
-                existing.ApprovedAt = null;
-            }
+            _mapper.MapUpdateDtoToEntity(updateDto, existing);
+            var updated = await _activityRepository.UpdateAsync(existing);
+            var response = _mapper.MapEntityToResponseDto(updated);
 
-            var updated = await _repository.UpdateAsync(existing);
-            var resultDto = _mapper.MapToDto(updated);
-
-            return ServiceResult<FIUProgramActivityDto>.Success(resultDto);
+            return ServiceResult<FIUProgramActivityResponseDto>.Success(response, "Activity updated successfully");
         }
 
-        public async Task<ServiceResult> DeleteAsync(int id)
+        public async Task<ServiceResult<FIUProgramActivityResponseDto>> GetByIdAsync(int id)
         {
-            var entity = await _repository.GetByIdAsync(id);
+            var activity = await _activityRepository.GetByIdAsync(id);
+            if (activity == null)
+                return ServiceResult<FIUProgramActivityResponseDto>.Failure("Activity not found");
 
-            if (entity == null)
-                return ServiceResult.Failure(
-                    "FIU Program Activity not found",
-                    ServiceErrorStatus.NOTFOUND);
+            var hasAccess = await HasAccessToActivityAsync(activity);
+            if (!hasAccess)
+                return ServiceResult<FIUProgramActivityResponseDto>.Failure("You don't have access to this activity");
 
-            if (!await _entityPermissionService.CanModifyForm(entity))
-                return ServiceResult.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            // Can only delete Draft entries
-            if (entity.FormStatus != "Draft")
-                return ServiceResult.Failure(
-                    "Only draft activities can be deleted",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            await _repository.DeleteAsync(id);
-            return ServiceResult.Success();
+            var response = _mapper.MapEntityToResponseDto(activity);
+            return ServiceResult<FIUProgramActivityResponseDto>.Success(response);
         }
 
-        // ==========================================
-        // FORM STATUS WORKFLOW
-        // ==========================================
-
-        public async Task<ServiceResult> SubmitForApprovalAsync(int id)
+        public async Task<ServiceResult<bool>> DeleteAsync(int id)
         {
-            var entity = await _repository.GetByIdAsync(id);
+            var activity = await _activityRepository.GetByIdAsync(id);
+            if (activity == null)
+                return ServiceResult<bool>.Failure("Activity not found");
 
-            if (entity == null)
-                return ServiceResult.Failure(
-                    "FIU Program Activity not found",
-                    ServiceErrorStatus.NOTFOUND);
+            if (activity.CreatedById != _currentUserService.UserId)
+                return ServiceResult<bool>.Failure("You can only delete your own activities");
 
-            if (!await _entityPermissionService.CanModifyForm(entity))
-                return ServiceResult.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
+            if (activity.FormStatus != "Draft")
+                return ServiceResult<bool>.Failure("Only draft activities can be deleted");
 
-            if (entity.FormStatus != "Draft" && entity.FormStatus != "Saved")
-                return ServiceResult.Failure(
-                    "Only draft activities can be submitted",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            entity.FormStatus = "Pending";
-            entity.UpdatedById = _currentUserService.UserId;
-            entity.UpdatedAt = DateTimeOffset.UtcNow;
-
-            await _repository.UpdateAsync(entity);
-            return ServiceResult.Success();
+            var deleted = await _activityRepository.DeleteAsync(id);
+            return ServiceResult<bool>.Success(deleted, "Activity deleted successfully");
         }
 
-        public async Task<ServiceResult> ApproveAsync(int id, string? remarks = null)
+        public async Task<ServiceResult<FIUProgramActivityResponseDto>> SubmitForApprovalAsync(int id)
         {
-            var entity = await _repository.GetByIdAsync(id);
+            var activity = await _activityRepository.GetByIdAsync(id);
+            if (activity == null)
+                return ServiceResult<FIUProgramActivityResponseDto>.Failure("Activity not found");
 
-            if (entity == null)
-                return ServiceResult.Failure(
-                    "FIU Program Activity not found",
-                    ServiceErrorStatus.NOTFOUND);
+            if (activity.CreatedById != _currentUserService.UserId)
+                return ServiceResult<FIUProgramActivityResponseDto>.Failure("You can only submit your own activities");
 
-            // Only UnitHead or Admin can approve
-            if (_currentUserService.Role != Role.UNITHEAD && _currentUserService.Role != Role.ADMIN)
-                return ServiceResult.Failure(
-                    "Only Unit Heads and Admins can approve activities",
-                    ServiceErrorStatus.FORBIDDEN);
+            if (activity.FormStatus != "Draft")
+                return ServiceResult<FIUProgramActivityResponseDto>.Failure("Only draft activities can be submitted");
 
-            if (!await _entityPermissionService.CanModifyForm(entity))
-                return ServiceResult.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
+            activity.FormStatus = "Pending";
+            activity.SubmittedAt = DateTimeOffset.UtcNow;
 
-            if (entity.FormStatus != "Pending")
-                return ServiceResult.Failure(
-                    "Only pending activities can be approved",
-                    ServiceErrorStatus.INVALIDOPERATION);
+            var updated = await _activityRepository.UpdateAsync(activity);
+            var response = _mapper.MapEntityToResponseDto(updated);
 
-            entity.FormStatus = "Approved";
-            entity.FormStatusRemarks = remarks;
-            entity.ApprovedById = _currentUserService.UserId;
-            entity.ApprovedAt = DateTimeOffset.UtcNow;
-            entity.UpdatedById = _currentUserService.UserId;
-            entity.UpdatedAt = DateTimeOffset.UtcNow;
-
-            await _repository.UpdateAsync(entity);
-            return ServiceResult.Success();
+            return ServiceResult<FIUProgramActivityResponseDto>.Success(response, "Activity submitted for approval");
         }
 
-        public async Task<ServiceResult> RejectAsync(int id, string remarks)
+        public async Task<ServiceResult<FIUProgramActivityResponseDto>> ApproveAsync(int id, string? remarks)
         {
-            var entity = await _repository.GetByIdAsync(id);
+            if (_currentUserService.Role != Role.UNITHEAD)
+                return ServiceResult<FIUProgramActivityResponseDto>.Failure("Only unit heads can approve activities");
 
-            if (entity == null)
-                return ServiceResult.Failure(
-                    "FIU Program Activity not found",
-                    ServiceErrorStatus.NOTFOUND);
+            var activity = await _activityRepository.GetByIdAsync(id);
+            if (activity == null)
+                return ServiceResult<FIUProgramActivityResponseDto>.Failure("Activity not found");
 
-            // Only UnitHead or Admin can reject
-            if (_currentUserService.Role != Role.UNITHEAD && _currentUserService.Role != Role.ADMIN)
-                return ServiceResult.Failure(
-                    "Only Unit Heads and Admins can reject activities",
-                    ServiceErrorStatus.FORBIDDEN);
+            if (activity.FormStatus != "Pending")
+                return ServiceResult<FIUProgramActivityResponseDto>.Failure("Only pending activities can be approved");
 
-            if (!await _entityPermissionService.CanModifyForm(entity))
-                return ServiceResult.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
+            var hasAccess = await _unitHeadAssignmentRepository
+                .IsUnitHeadAssignedToLocationAsync(_currentUserService.UserId, activity.UnitLocationId);
 
-            if (entity.FormStatus != "Pending")
-                return ServiceResult.Failure(
-                    "Only pending activities can be rejected",
-                    ServiceErrorStatus.INVALIDOPERATION);
+            if (!hasAccess)
+                return ServiceResult<FIUProgramActivityResponseDto>.Failure("You don't have access to approve this activity");
 
-            if (string.IsNullOrWhiteSpace(remarks))
-                return ServiceResult.Failure(
-                    "Remarks are required for rejection",
-                    ServiceErrorStatus.INVALIDOPERATION);
+            activity.FormStatus = "Approved";
+            activity.ApprovedAt = DateTimeOffset.UtcNow;
+            activity.ApprovedById = _currentUserService.UserId;
+            activity.FormStatusRemarks = remarks;
 
-            entity.FormStatus = "Rejected";
-            entity.FormStatusRemarks = remarks;
-            entity.ApprovedById = _currentUserService.UserId;
-            entity.ApprovedAt = DateTimeOffset.UtcNow;
-            entity.UpdatedById = _currentUserService.UserId;
-            entity.UpdatedAt = DateTimeOffset.UtcNow;
+            var updated = await _activityRepository.UpdateAsync(activity);
+            var response = _mapper.MapEntityToResponseDto(updated);
 
-            await _repository.UpdateAsync(entity);
-            return ServiceResult.Success();
+            return ServiceResult<FIUProgramActivityResponseDto>.Success(response, "Activity approved successfully");
         }
 
-        // ==========================================
-        // PAGINATION & FILTERING
-        // ==========================================
+        public async Task<ServiceResult<FIUProgramActivityResponseDto>> RejectAsync(int id, string remarks)
+        {
+            if (_currentUserService.Role != Role.UNITHEAD)
+                return ServiceResult<FIUProgramActivityResponseDto>.Failure("Only unit heads can reject activities");
 
-        public async Task<PaginatedResult<FIUProgramActivityDto>> GetPaginatedAsync(
+            var activity = await _activityRepository.GetByIdAsync(id);
+            if (activity == null)
+                return ServiceResult<FIUProgramActivityResponseDto>.Failure("Activity not found");
+
+            if (activity.FormStatus != "Pending")
+                return ServiceResult<FIUProgramActivityResponseDto>.Failure("Only pending activities can be rejected");
+
+            var hasAccess = await _unitHeadAssignmentRepository
+                .IsUnitHeadAssignedToLocationAsync(_currentUserService.UserId, activity.UnitLocationId);
+
+            if (!hasAccess)
+                return ServiceResult<FIUProgramActivityResponseDto>.Failure("You don't have access to reject this activity");
+
+            activity.FormStatus = "Rejected";
+            activity.ApprovedAt = DateTimeOffset.UtcNow;
+            activity.ApprovedById = _currentUserService.UserId;
+            activity.FormStatusRemarks = remarks;
+
+            var updated = await _activityRepository.UpdateAsync(activity);
+            var response = _mapper.MapEntityToResponseDto(updated);
+
+            return ServiceResult<FIUProgramActivityResponseDto>.Success(response, "Activity rejected");
+        }
+
+        public async Task<ServiceResult<PaginatedResult<FIUProgramActivityResponseDto>>> GetPaginatedAsync(
             int pageNumber = 1,
             int pageSize = 10,
-            DateOnly? startDate = null,
-            DateOnly? endDate = null,
-            int? unitLocationId = null,
-            string? searchTerm = null)
+            int? activityId = null,
+            string? status = null)
         {
-            // Get trainer IDs based on current user's role
-            var trainerIds = await GetAccessibleTrainerIds();
+            var accessibleUnitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+            if (!accessibleUnitLocationIds.Any())
+                return ServiceResult<PaginatedResult<FIUProgramActivityResponseDto>>.Failure("No accessible unit locations");
 
-            var result = await _repository.GetPaginatedAsync(
-                trainerIds,
+            var result = await _activityRepository.GetPaginatedAsync(
+                accessibleUnitLocationIds,
                 pageNumber,
                 pageSize,
-                startDate,
-                endDate,
-                unitLocationId,
-                searchTerm);
+                activityId,
+                status);
 
-            var dtoItems = result.Items.Select(_mapper.MapToDto).ToList();
+            var dtos = result.Items.Select(_mapper.MapEntityToResponseDto).ToList();
+            var paginatedResult = new PaginatedResult<FIUProgramActivityResponseDto>(
+                dtos,
+                result.TotalItems,
+                result.PageNumber,
+                result.PageSize);
 
-            return new PaginatedResult<FIUProgramActivityDto>
-            {
-                Items = dtoItems,
-                TotalItems = result.TotalItems,
-                PageNumber = result.PageNumber,
-                PageSize = result.PageSize
-            };
+            return ServiceResult<PaginatedResult<FIUProgramActivityResponseDto>>.Success(paginatedResult);
         }
 
-        public async Task<PaginatedResult<FIUProgramActivityDto>> GetByStatusAsync(
-            string status,
+        public async Task<ServiceResult<List<FIUProgramActivityResponseDto>>> GetMyActivitiesAsync()
+        {
+            if (_currentUserService.Role != Role.TRAINER)
+                return ServiceResult<List<FIUProgramActivityResponseDto>>.Failure("Only trainers can view their activities");
+
+            var activities = await _activityRepository.GetByCreatedByIdAsync(_currentUserService.UserId);
+            var dtos = activities.Select(_mapper.MapEntityToResponseDto).ToList();
+
+            return ServiceResult<List<FIUProgramActivityResponseDto>>.Success(dtos);
+        }
+
+        public async Task<ServiceResult<List<FIUProgramActivityResponseDto>>> GetPendingApprovalsAsync()
+        {
+            if (_currentUserService.Role != Role.UNITHEAD)
+                return ServiceResult<List<FIUProgramActivityResponseDto>>.Failure("Only unit heads can view pending approvals");
+
+            var accessibleUnitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+            var activities = await _activityRepository.GetByStatusAsync(accessibleUnitLocationIds, "Pending");
+            var dtos = activities.Select(_mapper.MapEntityToResponseDto).ToList();
+
+            return ServiceResult<List<FIUProgramActivityResponseDto>>.Success(dtos);
+        }
+
+        public async Task<ServiceResult<List<FIUActivityDto>>> GetAvailableActivitiesAsync()
+        {
+            var activities = await _fiuActivityRepository.GetAllActiveAsync();
+            var dtos = activities.Select(_mapper.MapActivityEntityToDto).ToList();
+            return ServiceResult<List<FIUActivityDto>>.Success(dtos);
+        }
+
+        public async Task<ServiceResult<Dictionary<string, int>>> GetStatsByActivityTypeAsync()
+        {
+            var accessibleUnitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+            var stats = await _activityRepository.GetStatsByActivityTypeAsync(accessibleUnitLocationIds);
+            return ServiceResult<Dictionary<string, int>>.Success(stats);
+        }
+
+        public async Task<ServiceResult<Dictionary<string, int>>> GetStatsByStatusAsync()
+        {
+            var accessibleUnitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+            var stats = await _activityRepository.GetStatsByStatusAsync(accessibleUnitLocationIds);
+            return ServiceResult<Dictionary<string, int>>.Success(stats);
+        }
+
+        public async Task<ServiceResult<FIUMonthlyReportDto>> GetMonthlyReportAsync(FIUReportRequestDto requestDto)
+        {
+            if (requestDto.Year < 2020 || requestDto.Year > 2100)
+                return ServiceResult<FIUMonthlyReportDto>.Failure("Invalid year");
+
+            if (requestDto.Month < 1 || requestDto.Month > 12)
+                return ServiceResult<FIUMonthlyReportDto>.Failure("Invalid month");
+
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+
+            if (requestDto.UnitLocationId.HasValue)
+            {
+                if (!unitLocationIds.Contains(requestDto.UnitLocationId.Value))
+                    return ServiceResult<FIUMonthlyReportDto>.Failure("You don't have access to this unit location");
+
+                unitLocationIds = new List<int> { requestDto.UnitLocationId.Value };
+            }
+
+            var activitySummary = await _activityRepository.GetMonthlyActivitySummaryAsync(
+                unitLocationIds,
+                requestDto.Year,
+                requestDto.Month);
+
+            var monthName = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(requestDto.Month);
+
+            var report = new FIUMonthlyReportDto
+            {
+                Year = requestDto.Year,
+                Month = requestDto.Month,
+                MonthName = monthName,
+                Activities = activitySummary,
+                TotalActivities = activitySummary.Count,
+                TotalCount = activitySummary.Sum(a => a.Count)
+            };
+
+            return ServiceResult<FIUMonthlyReportDto>.Success(report);
+        }
+
+        // -------------------------------------------------------
+        // HISTORY: Using Generic Service
+        // -------------------------------------------------------
+
+        /// <summary>
+        /// Get trainer's submission history with pagination
+        /// </summary>
+        public async Task<PaginatedResult<TrainerHistoryItemDto>> GetTrainerHistoryAsync(
             int pageNumber = 1,
             int pageSize = 10)
         {
-            var trainerIds = await GetAccessibleTrainerIds();
+            // Get base query with necessary includes
+            var query = _activityRepository.GetQueryable()
+                .Include(x => x.FIUActivity);
 
-            var result = await _repository.GetByStatusAsync(
-                trainerIds,
-                status,
+            return await _historyService.GetTrainerHistoryAsync(
+                query,
+                getUnitLocationId: x => x.UnitLocationId,
+                getTitleOrName: x => x.FIUActivity.ActivityName,
+                getFormStatus: x => x.FormStatus,
                 pageNumber,
                 pageSize);
-
-            var dtoItems = result.Items.Select(_mapper.MapToDto).ToList();
-
-            return new PaginatedResult<FIUProgramActivityDto>
-            {
-                Items = dtoItems,
-                TotalItems = result.TotalItems,
-                PageNumber = result.PageNumber,
-                PageSize = result.PageSize
-            };
         }
 
-        public async Task<Dictionary<string, int>> GetStatusSummaryAsync()
+        /// <summary>
+        /// Get pending approvals for Unit Head with pagination
+        /// </summary>
+        public async Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
+            int pageNumber = 1,
+            int pageSize = 10)
         {
-            var trainerIds = await GetAccessibleTrainerIds();
-            return await _repository.GetStatusSummaryAsync(trainerIds);
+            var query = _activityRepository.GetQueryable()
+                .Include(x => x.FIUActivity);
+
+            return await _historyService.GetPendingApprovalsAsync(
+                query,
+                getUnitLocationId: x => x.UnitLocationId,
+                getTitleOrName: x => x.FIUActivity.ActivityName,
+                getFormStatus: x => x.FormStatus,
+                getCreatedById: x => x.CreatedById ?? 0,
+                _unitHeadAssignmentRepository,
+                pageNumber,
+                pageSize);
         }
 
-        // ==========================================
-        // HELPER METHODS
-        // ==========================================
-
-        private async Task<List<int>> GetAccessibleTrainerIds()
+        private async Task<List<int>> GetAccessibleUnitLocationIdsAsync()
         {
-            // This logic should be similar to what's in EEUReportController
-            // Returns list of trainer IDs accessible to current user based on their role
-
-            var userId = _currentUserService.UserId;
-            var role = _currentUserService.Role;
-
-            return role switch
+            return _currentUserService.Role switch
             {
-                Role.TRAINER => new List<int> { userId },
-                Role.UNITHEAD => await GetTrainersCreatedByUnitHead(userId),
-                Role.ADMIN => await GetTrainersUnderAdmin(userId),
-                Role.SUPERADMIN => await GetAllTrainers(),
+                Role.TRAINER => await _trainerAssignmentRepository
+                    .GetUnitLocationIdsByTrainerIdAsync(_currentUserService.UserId),
+                Role.UNITHEAD => await _unitHeadAssignmentRepository
+                    .GetUnitLocationIdsByUnitHeadIdAsync(_currentUserService.UserId),
+                Role.ADMIN => await _organizationUnitRepository
+                    .GetUnitLocationIdsByOrganizationIdAsync(_currentUserService.OrganizationId),
                 _ => new List<int>()
             };
         }
 
-        private async Task<List<int>> GetTrainersCreatedByUnitHead(int unitHeadId)
+        private async Task<bool> HasAccessToActivityAsync(FIUProgramActivity activity)
         {
-            // Implementation would query Users table for trainers created by this UnitHead
-            // This is a placeholder - actual implementation would use UserRepository
-            return new List<int>();
-        }
-
-        private async Task<List<int>> GetTrainersUnderAdmin(int adminId)
-        {
-            // Implementation would query hierarchy: Admin → UnitHeads → Trainers
-            // This is a placeholder - actual implementation would use UserRepository
-            return new List<int>();
-        }
-
-        private async Task<List<int>> GetAllTrainers()
-        {
-            // Implementation would get all trainers
-            // This is a placeholder - actual implementation would use UserRepository
-            return new List<int>();
+            return _currentUserService.Role switch
+            {
+                Role.TRAINER => activity.CreatedById == _currentUserService.UserId,
+                Role.UNITHEAD => await _unitHeadAssignmentRepository
+                    .IsUnitHeadAssignedToLocationAsync(_currentUserService.UserId, activity.UnitLocationId),
+                Role.ADMIN => activity.OrganizationId == _currentUserService.OrganizationId,
+                _ => false
+            };
         }
     }
 }

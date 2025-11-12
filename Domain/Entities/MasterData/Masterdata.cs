@@ -218,8 +218,5 @@ namespace Domain.Entities.MasterData
             public string Name { get; set; } = default!;
         }
 
-        public class FIUActivity : BaseEntity
-        {
-            public string Name { get; set; } = default!;
-        }
+      
 }

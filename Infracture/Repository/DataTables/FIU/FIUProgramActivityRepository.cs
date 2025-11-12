@@ -1,5 +1,6 @@
 ﻿using Application.Interface.Repository.DataTables.FIU;
 using Application.Models;
+using Application.Models.DataTables.FIU;
 using Domain.Entities.FIU;
 using Infrastructure.DbContext;
 using Microsoft.EntityFrameworkCore;
@@ -15,195 +16,166 @@ namespace Infrastructure.Repository.DataTables.FIU
             _context = context;
         }
 
-        // ==========================================
-        // CORE CRUD OPERATIONS
-        // ==========================================
-
-        public async Task<FIUProgramActivity> AddAsync(FIUProgramActivity entity)
+        public IQueryable<FIUProgramActivity> GetQueryable()
         {
-            _context.FIUProgramActivities.Add(entity);
-            await _context.SaveChangesAsync();
-            return entity;
+            return _context.FIUProgramActivities.AsQueryable();
         }
 
         public async Task<FIUProgramActivity?> GetByIdAsync(int id)
         {
             return await _context.FIUProgramActivities
-                .Include(x => x.UnitLocation)
-                    .ThenInclude(ul => ul.Unit)
-                .Include(x => x.Organization)
-                .Include(x => x.FIUActivities)
-                .Include(x => x.CreatedBy)
-                .Include(x => x.UpdatedBy)
-                .Include(x => x.ApprovedBy)
-                .FirstOrDefaultAsync(x => x.Id == id);
+                .Include(a => a.UnitLocation)
+                    .ThenInclude(ul => ul.District)
+                        .ThenInclude(d => d.State)
+                .Include(a => a.Organization)
+                .Include(a => a.FIUActivity)
+                .Include(a => a.CreatedBy)
+                .Include(a => a.ApprovedBy)
+                .Include(a => a.UpdatedBy)
+                .FirstOrDefaultAsync(a => a.Id == id);
         }
 
-        public async Task<FIUProgramActivity?> GetWithDetailsAsync(int id)
+        public async Task<FIUProgramActivity> CreateAsync(FIUProgramActivity activity)
         {
-            return await GetByIdAsync(id);
-        }
-
-        public async Task<IEnumerable<FIUProgramActivity>> GetAllAsync()
-        {
-            return await _context.FIUProgramActivities
-                .Include(x => x.UnitLocation)
-                    .ThenInclude(ul => ul.Unit)
-                .Include(x => x.Organization)
-                .Include(x => x.FIUActivities)
-                .Include(x => x.CreatedBy)
-                .Include(x => x.UpdatedBy)
-                .Include(x => x.ApprovedBy)
-                .AsSplitQuery()
-                .ToListAsync();
-        }
-
-        public async Task<FIUProgramActivity> UpdateAsync(FIUProgramActivity entity)
-        {
-            _context.FIUProgramActivities.Update(entity);
+            await _context.FIUProgramActivities.AddAsync(activity);
             await _context.SaveChangesAsync();
-            return entity;
+            return await GetByIdAsync(activity.Id) ?? activity;
+        }
+
+        public async Task<FIUProgramActivity> UpdateAsync(FIUProgramActivity activity)
+        {
+            _context.FIUProgramActivities.Update(activity);
+            await _context.SaveChangesAsync();
+            return await GetByIdAsync(activity.Id) ?? activity;
         }
 
         public async Task<bool> DeleteAsync(int id)
         {
-            var entity = await _context.FIUProgramActivities.FindAsync(id);
-            if (entity == null) return false;
+            var activity = await _context.FIUProgramActivities.FindAsync(id);
+            if (activity == null) return false;
 
-            _context.FIUProgramActivities.Remove(entity);
+            _context.FIUProgramActivities.Remove(activity);
             await _context.SaveChangesAsync();
             return true;
         }
 
-        // ==========================================
-        // PAGINATION & FILTERS
-        // ==========================================
+        public async Task<bool> ExistsAsync(int id)
+        {
+            return await _context.FIUProgramActivities.AnyAsync(a => a.Id == id);
+        }
 
         public async Task<PaginatedResult<FIUProgramActivity>> GetPaginatedAsync(
-            List<int> trainerIds,
+            List<int> unitLocationIds,
             int pageNumber = 1,
             int pageSize = 10,
-            DateOnly? startDate = null,
-            DateOnly? endDate = null,
-            int? unitLocationId = null,
-            string? searchTerm = null)
+            int? activityId = null,
+            string? status = null)
         {
             var query = _context.FIUProgramActivities
-                .Include(x => x.UnitLocation)
-                    .ThenInclude(ul => ul.Unit)
-                .Include(x => x.Organization)
-                .Include(x => x.FIUActivities)
-                .Include(x => x.CreatedBy)
-                .Include(x => x.UpdatedBy)
-                .Include(x => x.ApprovedBy)
-                .Where(x => trainerIds.Contains(x.CreatedById ?? 0))
+                .Include(a => a.UnitLocation)
+                    .ThenInclude(ul => ul.District)
+                .Include(a => a.FIUActivity)
+                .Include(a => a.CreatedBy)
+                .Where(a => unitLocationIds.Contains(a.UnitLocationId))
                 .AsQueryable();
 
-            // Apply filters
-            if (startDate.HasValue)
-                query = query.Where(x => x.StartDate >= startDate.Value);
+            if (activityId.HasValue)
+                query = query.Where(a => a.FIUActivitiesId == activityId.Value);
 
-            if (endDate.HasValue)
-                query = query.Where(x => x.EndDate <= endDate.Value);
+            if (!string.IsNullOrWhiteSpace(status))
+                query = query.Where(a => a.FormStatus.ToLower() == status.ToLower());
 
-            if (unitLocationId.HasValue)
-                query = query.Where(x => x.UnitLocationId == unitLocationId.Value);
-
-            if (!string.IsNullOrWhiteSpace(searchTerm))
-            {
-                query = query.Where(x =>
-                    (x.FIUActivities != null && x.FIUActivities.Name.Contains(searchTerm)) ||
-                    (x.UnitLocation != null && x.UnitLocation.District.Name.Contains(searchTerm)));
-            }
-
-            var totalItems = await query.CountAsync();
-
+            var totalCount = await query.CountAsync();
             var items = await query
-                .OrderByDescending(x => x.CreatedAt)
+                .OrderByDescending(a => a.CreatedAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
-            return new PaginatedResult<FIUProgramActivity>
-            {
-                Items = items,
-                TotalItems = totalItems,
-                PageNumber = pageNumber,
-                PageSize = pageSize
-            };
+            return new PaginatedResult<FIUProgramActivity>(items, totalCount, pageNumber, pageSize);
         }
 
-        public async Task<PaginatedResult<FIUProgramActivity>> GetByStatusAsync(
-            List<int> trainerIds,
-            string status,
-            int pageNumber = 1,
-            int pageSize = 10)
+        public async Task<List<FIUProgramActivity>> GetByUnitLocationIdAsync(int unitLocationId)
         {
-            var query = _context.FIUProgramActivities
-                .Include(x => x.UnitLocation)
-                    .ThenInclude(ul => ul.Unit)
-                .Include(x => x.Organization)
-                .Include(x => x.FIUActivities)
-                .Include(x => x.CreatedBy)
-                .Include(x => x.UpdatedBy)
-                .Include(x => x.ApprovedBy)
-                .Where(x => trainerIds.Contains(x.CreatedById ?? 0) &&
-                           x.FormStatus == status);
-
-            var totalItems = await query.CountAsync();
-
-            var items = await query
-                .OrderByDescending(x => x.CreatedAt)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
+            return await _context.FIUProgramActivities
+                .Include(a => a.FIUActivity)
+                .Include(a => a.CreatedBy)
+                .Where(a => a.UnitLocationId == unitLocationId)
+                .OrderByDescending(a => a.CreatedAt)
                 .ToListAsync();
-
-            return new PaginatedResult<FIUProgramActivity>
-            {
-                Items = items,
-                TotalItems = totalItems,
-                PageNumber = pageNumber,
-                PageSize = pageSize
-            };
         }
 
-        public async Task<Dictionary<string, int>> GetStatusSummaryAsync(List<int> trainerIds)
+        public async Task<List<FIUProgramActivity>> GetByCreatedByIdAsync(int userId)
         {
-            var summary = await _context.FIUProgramActivities
-                .Where(x => trainerIds.Contains(x.CreatedById ?? 0))
-                .GroupBy(x => x.FormStatus)
+            return await _context.FIUProgramActivities
+                .Include(a => a.FIUActivity)
+                .Include(a => a.UnitLocation)
+                .Where(a => a.CreatedById == userId)
+                .OrderByDescending(a => a.CreatedAt)
+                .ToListAsync();
+        }
+
+        public async Task<List<FIUProgramActivity>> GetByStatusAsync(List<int> unitLocationIds, string status)
+        {
+            return await _context.FIUProgramActivities
+                .Include(a => a.FIUActivity)
+                .Include(a => a.UnitLocation)
+                .Include(a => a.CreatedBy)
+                .Where(a => unitLocationIds.Contains(a.UnitLocationId) &&
+                           a.FormStatus.ToLower() == status.ToLower())
+                .OrderByDescending(a => a.CreatedAt)
+                .ToListAsync();
+        }
+
+        public async Task<Dictionary<string, int>> GetStatsByActivityTypeAsync(List<int> unitLocationIds)
+        {
+            return await _context.FIUProgramActivities
+                .Include(a => a.FIUActivity)
+                .Where(a => unitLocationIds.Contains(a.UnitLocationId))
+                .GroupBy(a => a.FIUActivity.ActivityName)
+                .Select(g => new { ActivityName = g.Key, Count = g.Sum(a => a.Number) })
+                .ToDictionaryAsync(x => x.ActivityName, x => x.Count);
+        }
+
+        public async Task<Dictionary<string, int>> GetStatsByStatusAsync(List<int> unitLocationIds)
+        {
+            return await _context.FIUProgramActivities
+                .Where(a => unitLocationIds.Contains(a.UnitLocationId))
+                .GroupBy(a => a.FormStatus)
                 .Select(g => new { Status = g.Key, Count = g.Count() })
-                .ToListAsync();
-
-            return summary.ToDictionary(x => x.Status, x => x.Count);
+                .ToDictionaryAsync(x => x.Status, x => x.Count);
         }
 
-        public async Task<List<FIUProgramActivity>> GetByUnitLocationAsync(int unitLocationId)
+        public async Task<List<FIUActivitySummaryDto>> GetMonthlyActivitySummaryAsync(
+            List<int> unitLocationIds,
+            int year,
+            int month)
         {
-            return await _context.FIUProgramActivities
-                .Include(x => x.UnitLocation)
-                    .ThenInclude(ul => ul.Unit)
-                .Include(x => x.Organization)
-                .Include(x => x.FIUActivities)
-                .Include(x => x.CreatedBy)
-                .Include(x => x.UpdatedBy)
-                .Include(x => x.ApprovedBy)
-                .Where(x => x.UnitLocationId == unitLocationId)
-                .ToListAsync();
-        }
+            var startDate = new DateTimeOffset(year, month, 1, 0, 0, 0, TimeSpan.Zero);
+            var endDate = startDate.AddMonths(1).AddSeconds(-1);
 
-        public async Task<List<FIUProgramActivity>> GetByCreatedByAsync(int trainerId)
-        {
-            return await _context.FIUProgramActivities
-                .Include(x => x.UnitLocation)
-                    .ThenInclude(ul => ul.Unit)
-                .Include(x => x.Organization)
-                .Include(x => x.FIUActivities)
-                .Include(x => x.CreatedBy)
-                .Include(x => x.UpdatedBy)
-                .Include(x => x.ApprovedBy)
-                .Where(x => x.CreatedById == trainerId)
+            var summary = await _context.FIUProgramActivities
+                .Include(a => a.FIUActivity)
+                .Where(a => unitLocationIds.Contains(a.UnitLocationId) &&
+                           a.CreatedAt >= startDate &&
+                           a.CreatedAt <= endDate &&
+                           a.FormStatus == "Approved")
+                .GroupBy(a => new
+                {
+                    a.FIUActivitiesId,
+                    ActivityName = a.FIUActivity.ActivityName,
+                    DisplayOrder = a.FIUActivity.DisplayOrder
+                })
+                .Select(g => new FIUActivitySummaryDto
+                {
+                    SlNo = g.Key.DisplayOrder,
+                    ActivityName = g.Key.ActivityName,
+                    Count = g.Sum(a => a.Number)
+                })
+                .OrderBy(s => s.SlNo)
                 .ToListAsync();
+
+            return summary;
         }
     }
 }
