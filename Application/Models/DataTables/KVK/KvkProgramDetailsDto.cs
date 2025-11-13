@@ -285,6 +285,65 @@ namespace Application.Models.DataTables.KVK
         public List<KvkTeachingAidsCreateDto>? TeachingAids { get; set; }
     }
 
+    /// <summary>
+    /// Hybrid item for Resource Person - can be new (no Id) or existing (has Id)
+    /// Used in update operations to support create/update in one call
+    /// </summary>
+    public class KvkResourcePersonHybridDto
+    {
+        public int? Id { get; set; }  // null = create new, has value = update existing
+        public string? Name { get; set; }
+        public string? Designation { get; set; }
+        public int? ResourceType { get; set; }
+        public int? Responsibility { get; set; }
+        public string? InstitutionOrDepartment { get; set; }
+    }
+
+    /// <summary>
+    /// Hybrid item for Topics Covered
+    /// </summary>
+    public class KvkTopicsCoveredHybridDto
+    {
+        public int? Id { get; set; }  // null = create new, has value = update existing
+        public DateTime? Date { get; set; }
+        public string? Title { get; set; }
+        public string? PhotoUpload { get; set; }
+    }
+
+    /// <summary>
+    /// Hybrid item for Teaching Aids
+    /// </summary>
+    public class KvkTeachingAidsHybridDto
+    {
+        public int? Id { get; set; }  // null = create new, has value = update existing
+        public int? TypeOfAidId { get; set; }
+        public string? OtherTypeOfAid { get; set; }
+        public string? Purpose { get; set; }
+        public int Number { get; set; }
+    }
+
+    /// <summary>
+    /// Composite DTO for updating KvkProgramContentAndResources with all child entities in a single transaction
+    /// Uses Hybrid Pattern:
+    /// - Items WITH Id: UPDATE existing
+    /// - Items WITHOUT Id: CREATE new
+    /// - Items in DB but NOT in arrays: DELETE
+    /// </summary>
+    public class KvkProgramContentWithChildrenUpdateDto
+    {
+        // Parent fields
+        public string? Title { get; set; }
+        public string? Description { get; set; }
+
+        // Child collections - Hybrid Pattern
+        // If item has Id: update it
+        // If item has no Id: create it
+        // If existing item not in array: delete it
+        public List<KvkResourcePersonHybridDto>? ResourcePersons { get; set; }
+        public List<KvkTopicsCoveredHybridDto>? TopicsCovered { get; set; }
+        public List<KvkTeachingAidsHybridDto>? TeachingAids { get; set; }
+    }
+
     // Resource Person DTOs
     public class KvkResourcePersonDto
     {

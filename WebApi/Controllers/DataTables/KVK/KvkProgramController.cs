@@ -142,6 +142,20 @@ namespace WebApi.Controllers.DataTables.KVK
         }
 
         /// <summary>
+        /// Update program content with all child entities using Hybrid Pattern (perfect for "Save & Next" button)
+        /// - Items WITH Id: UPDATE existing
+        /// - Items WITHOUT Id: CREATE new
+        /// - Items in DB but NOT in request: DELETE
+        /// All changes happen in a single transaction with automatic rollback on failure
+        /// </summary>
+        [HttpPut("content/{contentId}/with-children")]
+        public async Task<IActionResult> UpdateProgramContentWithChildren(int contentId, [FromBody] KvkProgramContentWithChildrenUpdateDto dto)
+        {
+            var result = await _service.UpdateProgramContentWithChildrenAsync(contentId, dto);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
+        /// <summary>
         /// Get program content by ID
         /// </summary>
         [HttpGet("content/{contentId}")]

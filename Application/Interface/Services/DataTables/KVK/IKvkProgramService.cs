@@ -34,6 +34,15 @@ namespace Application.Interface.Services.DataTables.KVK
         /// </summary>
         Task<ServiceResult<KvkProgramContentDto>> AddProgramContentWithChildrenAsync(int programId, KvkProgramContentWithChildrenCreateDto dto);
 
+        /// <summary>
+        /// Update KvkProgramContentAndResources with all child entities using Hybrid Pattern in a single transaction
+        /// - Items WITH Id: UPDATE existing
+        /// - Items WITHOUT Id: CREATE new
+        /// - Items in DB but NOT in arrays: DELETE
+        /// Perfect for "Save & Next" button with inline editing
+        /// </summary>
+        Task<ServiceResult<KvkProgramContentDto>> UpdateProgramContentWithChildrenAsync(int contentId, KvkProgramContentWithChildrenUpdateDto dto);
+
         Task<ServiceResult<KvkProgramContentDto>> GetProgramContentByIdAsync(int contentId);
         Task<ServiceResult> DeleteProgramContentAsync(int contentId);
         Task<ServiceResult<List<KvkProgramContentDto>>> GetProgramContentsByProgramIdAsync(int programId);
