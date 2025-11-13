@@ -90,6 +90,23 @@ namespace Application.Interface.Services.DataTables.KVK
         Task<ServiceResult> DeleteOftResultAsync(int oftId);
         Task<ServiceResult<List<KvkOftResultDto>>> GetOftResultsByResultIdAsync(int resultId);
 
+        // E3: Composite Create/Update for Results with Children
+        /// <summary>
+        /// Create KvkResult along with all child entities (FldResults and OftResults) in a single transaction
+        /// Solves the parent-child ID dependency issue by creating parent first, then using its ID for children
+        /// Perfect for "Save & Next" button that needs to save all data at once
+        /// </summary>
+        Task<ServiceResult<KvkResultDto>> CreateResultWithChildrenAsync(int programId, KvkResultWithChildrenCreateDto dto);
+
+        /// <summary>
+        /// Update KvkResult with all child entities using Hybrid Pattern in a single transaction
+        /// - Items WITH Id: UPDATE existing
+        /// - Items WITHOUT Id (null or 0): CREATE new
+        /// - Items in DB but NOT in arrays: DELETE
+        /// Perfect for "Save & Next" button with inline editing capabilities
+        /// </summary>
+        Task<ServiceResult<KvkResultDto>> UpdateResultWithChildrenAsync(int resultId, KvkResultWithChildrenUpdateDto dto);
+
         // ============================
         // SECTION F: REPORTS (Non-FLD/OFT categories)
         // ============================

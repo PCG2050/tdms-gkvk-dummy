@@ -428,6 +428,39 @@ namespace WebApi.Controllers.DataTables.KVK
         }
 
         // ============================
+        // E3: COMPOSITE CREATE/UPDATE FOR RESULTS WITH CHILDREN
+        // ============================
+
+        /// <summary>
+        /// Create KvkResult with all child entities (FldResults and OftResults) in a single transaction
+        /// Solves the parent-child ID dependency - perfect for "Save & Next" button
+        /// </summary>
+        [HttpPost("{programId}/results-with-children")]
+        public async Task<IActionResult> CreateResultWithChildren(
+            int programId,
+            [FromBody] KvkResultWithChildrenCreateDto dto)
+        {
+            var result = await _service.CreateResultWithChildrenAsync(programId, dto);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
+        /// <summary>
+        /// Update KvkResult with all child entities using Hybrid Pattern in a single transaction
+        /// - Items WITH Id: UPDATE existing
+        /// - Items WITHOUT Id: CREATE new
+        /// - Items in DB but NOT in arrays: DELETE
+        /// Perfect for "Save & Next" button with inline editing
+        /// </summary>
+        [HttpPut("results/{resultId}/with-children")]
+        public async Task<IActionResult> UpdateResultWithChildren(
+            int resultId,
+            [FromBody] KvkResultWithChildrenUpdateDto dto)
+        {
+            var result = await _service.UpdateResultWithChildrenAsync(resultId, dto);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
+        // ============================
         // SECTION F: REPORTS (Non-FLD/OFT categories)
         // ============================
 

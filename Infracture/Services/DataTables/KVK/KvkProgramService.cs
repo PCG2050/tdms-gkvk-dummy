@@ -1321,6 +1321,233 @@ namespace Infrastructure.Services.DataTables.KVK
         }
 
         // ============================
+        // E3: COMPOSITE CREATE/UPDATE FOR RESULTS WITH CHILDREN
+        // ============================
+
+        public async Task<ServiceResult<KvkResultDto>> CreateResultWithChildrenAsync(
+            int programId,
+            KvkResultWithChildrenCreateDto dto)
+        {
+            // Step 1: Validate program exists
+            var program = await _programRepository.GetByIdAsync(programId);
+            if (program == null)
+                return ServiceResult<KvkResultDto>.Failure(
+                    "Program not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            // Step 2: Check permissions
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult<KvkResultDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            // Step 3: Validate form status
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+                return ServiceResult<KvkResultDto>.Failure(
+                    "Cannot add results to submitted or approved programs",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            // Step 4: Check if result already exists for this program
+            var existingResult = await _resultRepository.GetByProgramIdAsync(programId);
+            if (existingResult != null)
+                return ServiceResult<KvkResultDto>.Failure(
+                    "Result record already exists for this program. Use update instead.",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            try
+            {
+                // Step 5: Prepare parent entity
+                var parentEntity = new KvkResult
+                {
+                    KvkProgramDetailsId = programId,
+                    UploadExcelUrl = dto.UploadExcelUrl,
+                    UnitLocationId = program.UnitLocationId,
+                    OrganizationId = program.OrganizationId,
+                    CreatedById = _currentUserService.UserId,
+                    CreatedAt = DateTimeOffset.UtcNow
+                };
+
+                // Step 6: Prepare FldResults child entities
+                var fldResultEntities = dto.FldResults?.Select(fld =>
+                {
+                    var entity = _mapper.MapToEntity(fld);
+                    entity.UnitLocationId = program.UnitLocationId;
+                    entity.OrganizationId = program.OrganizationId;
+                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedAt = DateTimeOffset.UtcNow;
+                    return entity;
+                }).ToList();
+
+                // Step 7: Prepare OftResults child entities
+                var oftResultEntities = dto.OftResults?.Select(oft =>
+                {
+                    var entity = _mapper.MapToEntity(oft);
+                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedAt = DateTimeOffset.UtcNow;
+                    return entity;
+                }).ToList();
+
+                // Step 8: Repository handles transaction - creates parent, gets ID, creates children
+                var createdResult = await _resultRepository.CreateWithChildrenAsync(
+                    parentEntity,
+                    fldResultEntities,
+                    oftResultEntities);
+
+                // Step 9: Map to DTO and return
+                var resultDto = _mapper.MapToDto(createdResult);
+                return ServiceResult<KvkResultDto>.Success(resultDto);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<KvkResultDto>.Failure(
+                    $"Failed to create result with children: {ex.Message}",
+                    ServiceErrorStatus.INTERNALERROR);
+            }
+        }
+
+        public async Task<ServiceResult<KvkResultDto>> UpdateResultWithChildrenAsync(
+            int resultId,
+            KvkResultWithChildrenUpdateDto dto)
+        {
+            // Step 1: Get existing result
+            var existingResult = await _resultRepository.GetByIdAsync(resultId);
+            if (existingResult == null)
+                return ServiceResult<KvkResultDto>.Failure(
+                    "Result not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            // Step 2: Get program and check permissions
+            var program = await _programRepository.GetByIdAsync(existingResult.KvkProgramDetailsId);
+            if (program == null)
+                return ServiceResult<KvkResultDto>.Failure(
+                    "Associated program not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult<KvkResultDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            // Step 3: Validate form status
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+                return ServiceResult<KvkResultDto>.Failure(
+                    "Cannot modify results for submitted or approved programs",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            try
+            {
+                // Step 4: Prepare parent entity for update
+                var parentEntity = new KvkResult
+                {
+                    Id = resultId,
+                    KvkProgramDetailsId = existingResult.KvkProgramDetailsId,
+                    UploadExcelUrl = dto.UploadExcelUrl,
+                    UnitLocationId = existingResult.UnitLocationId,
+                    OrganizationId = existingResult.OrganizationId,
+                    UpdatedById = _currentUserService.UserId,
+                    UpdatedAt = DateTimeOffset.UtcNow
+                };
+
+                // Step 5: Prepare FldResults - Hybrid Pattern (items with Id will be updated, without will be created)
+                var fldResultEntities = dto.FldResults?.Select(fld =>
+                {
+                    var entity = new KvkFldResult
+                    {
+                        Id = fld.Id ?? 0,  // 0 means create new, > 0 means update existing
+                        DetailsOfDemoId = fld.DetailsOfDemoId,
+                        FldNumber = fld.FldNumber,
+                        Parameter1 = fld.Parameter1,
+                        Observation1 = fld.Observation1,
+                        Parameter2 = fld.Parameter2,
+                        Observation2 = fld.Observation2,
+                        Parameter3 = fld.Parameter3,
+                        Observation3 = fld.Observation3,
+                        Parameter4 = fld.Parameter4,
+                        Observation4 = fld.Observation4,
+                        Parameter5 = fld.Parameter5,
+                        Observation5 = fld.Observation5,
+                        Yield = fld.Yield,
+                        GrossCost = fld.GrossCost,
+                        GrossReturns = fld.GrossReturns,
+                        NetReturns = fld.NetReturns,
+                        BC = fld.BC,
+                        UnitLocationId = existingResult.UnitLocationId,
+                        OrganizationId = existingResult.OrganizationId
+                    };
+
+                    if (entity.Id > 0)
+                    {
+                        // Update: set update audit fields
+                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        // Create: set create audit fields
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+
+                    return entity;
+                }).ToList();
+
+                // Step 6: Prepare OftResults - Hybrid Pattern
+                var oftResultEntities = dto.OftResults?.Select(oft =>
+                {
+                    var entity = new KvkOftResult
+                    {
+                        Id = oft.Id ?? 0,
+                        DetailsOfDemoId = oft.DetailsOfDemoId,
+                        Parameter1 = oft.Parameter1,
+                        Observation1 = oft.Observation1,
+                        Parameter2 = oft.Parameter2,
+                        Observation2 = oft.Observation2,
+                        Parameter3 = oft.Parameter3,
+                        Observation3 = oft.Observation3,
+                        Parameter4 = oft.Parameter4,
+                        Observation4 = oft.Observation4,
+                        Parameter5 = oft.Parameter5,
+                        Observation5 = oft.Observation5,
+                        Yield = oft.Yield,
+                        GrossCost = oft.GrossCost,
+                        GrossReturns = oft.GrossReturns,
+                        NetReturns = oft.NetReturns,
+                        BC = oft.BC
+                    };
+
+                    if (entity.Id > 0)
+                    {
+                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+
+                    return entity;
+                }).ToList();
+
+                // Step 7: Repository handles transaction - updates parent, creates/updates/deletes children
+                var updatedResult = await _resultRepository.UpdateWithChildrenAsync(
+                    parentEntity,
+                    fldResultEntities,
+                    oftResultEntities);
+
+                // Step 8: Map to DTO and return
+                var resultDto = _mapper.MapToDto(updatedResult);
+                return ServiceResult<KvkResultDto>.Success(resultDto);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<KvkResultDto>.Failure(
+                    $"Failed to update result with children: {ex.Message}",
+                    ServiceErrorStatus.INTERNALERROR);
+            }
+        }
+
+        // ============================
         // SECTION F: REPORTS (Non-FLD/OFT categories)
         // ============================
 
