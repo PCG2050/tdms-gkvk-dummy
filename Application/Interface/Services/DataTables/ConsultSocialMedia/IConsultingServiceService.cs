@@ -19,6 +19,22 @@ namespace Application.Interface.Services.DataTables.ConsultSocialMedia
         Task<ServiceResult> DeleteModeAndOutreachAsync(int modeAndOutreachId);
         Task<ServiceResult<List<ModeAndOutreachDto>>> GetModeAndOutreachesAsync(int consultingServiceId);
 
+        // Composite Create/Update with Children
+        /// <summary>
+        /// Create ConsultingService with all child entities (ModeAndOutreach) in a single transaction
+        /// Solves the parent-child ID dependency - perfect for "Save & Next" button
+        /// </summary>
+        Task<ServiceResult<ConsultingServiceDto>> CreateWithChildrenAsync(ConsultingServiceWithChildrenCreateDto dto);
+
+        /// <summary>
+        /// Update ConsultingService with all child entities using Hybrid Pattern in a single transaction
+        /// - Items WITH Id: UPDATE existing
+        /// - Items WITHOUT Id (null or 0): CREATE new
+        /// - Items in DB but NOT in arrays: DELETE
+        /// Perfect for "Save & Next" button with inline editing
+        /// </summary>
+        Task<ServiceResult<ConsultingServiceDto>> UpdateWithChildrenAsync(int consultingServiceId, ConsultingServiceWithChildrenUpdateDto dto);
+
         // Submission & Approval
         Task<ServiceResult> SubmitForApprovalAsync(int consultingServiceId);
         Task<ServiceResult> ApproveConsultingServiceAsync(int consultingServiceId, string? remarks = null);
