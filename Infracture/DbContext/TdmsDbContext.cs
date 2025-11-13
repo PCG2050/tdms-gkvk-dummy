@@ -137,6 +137,17 @@ namespace Infrastructure.DbContext
         public DbSet<EeuReport> EeuReports { get; set; }
         public DbSet<EeuRecommendation> EeuRecommendations { get; set; }
         #endregion
+        #region FTI
+        public DbSet<FtiProgramDetails> FtiProgramDetails { get; set; }
+        public DbSet<FtiParticipantDemographics> FtiParticipantDemographics { get; set; }
+        public DbSet<FtiProgramContentAndResources> FtiProgramContentAndResources { get; set; }
+        public DbSet<FtiResourcePerson> FtiResourcePersons { get; set; }
+        public DbSet<FtiTopicsCoveredInClass> FtiTopicsCoveredInClass { get; set; }
+        public DbSet<FtiTeachingAidsDeveloped> FtiTeachingAidsDeveloped { get; set; }
+        public DbSet<FtiAdvisoryServices> FtiAdvisoryServices { get; set; }
+        public DbSet<FtiReport> FtiReports { get; set; }
+        public DbSet<FtiRecommendation> FtiRecommendations { get; set; }
+        #endregion
         #region  KVK 
         public DbSet<KvkProgramDetails> KvkProgramDetails { get; set; }
         public DbSet<KvkParticipantDemographics> KvkParticipantDemographics { get; set; }

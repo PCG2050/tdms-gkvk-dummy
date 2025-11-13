@@ -224,6 +224,19 @@ namespace WebApi
 
             builder.Services.AddScoped<IEeuProgramService, EeuProgramService>();
             #endregion
+            #region FTI
+            builder.Services.AddScoped<IFtiProgramDetailsRepository, FtiProgramDetailsRepository>();
+            builder.Services.AddScoped<IFtiParticipantDemographicsRepository, FtiParticipantDemographicsRepository>();
+            builder.Services.AddScoped<IFtiProgramContentRepository, FtiProgramContentRepository>();
+            builder.Services.AddScoped<IFtiResourcePersonRepository, FtiResourcePersonRepository>();
+            builder.Services.AddScoped<IFtiTopicsCoveredRepository, FtiTopicsCoveredRepository>();
+            builder.Services.AddScoped<IFtiTeachingAidsRepository, FtiTeachingAidsRepository>();
+            builder.Services.AddScoped<IFtiAdvisoryServicesRepository, FtiAdvisoryServicesRepository>();
+            builder.Services.AddScoped<IFtiReportRepository, FtiReportRepository>();
+            builder.Services.AddScoped<IFtiRecommendationRepository, FtiRecommendationRepository>();
+
+            builder.Services.AddScoped<IFtiProgramService, FtiProgramService>();
+            #endregion
             #region KVK
             // KVK Repositories
             builder.Services.AddScoped<IKvkProgramDetailsRepository, KvkProgramDetailsRepository>();
