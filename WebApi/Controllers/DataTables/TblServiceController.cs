@@ -347,6 +347,69 @@ namespace WebApi.Controllers.DataTables
         }
 
         // ==========================================
+        // COMPOSITE CREATE/UPDATE WITH CHILDREN
+        // ==========================================
+
+        /// <summary>
+        /// Create TblService with all child entities (TableHostel, RevolvingFundStatus, VisitorDetail) in a single transaction
+        /// Solves the parent-child ID dependency - perfect for "Save & Next" button
+        /// </summary>
+        [HttpPost("with-children")]
+        [Authorize(Roles = RoleString.Trainer)]
+        public async Task<IActionResult> CreateWithChildren([FromBody] TblServiceCreateDto dto)
+        {
+            var result = await _service.CreateWithChildrenAsync(dto);
+            if (!result.IsSuccess)
+            {
+                if (result.ErrorStatus == ServiceErrorStatus.NOTFOUND)
+                    return NotFound(new { message = result.ErrorMessage });
+
+                if (result.ErrorStatus == ServiceErrorStatus.FORBIDDEN)
+                    return Forbid();
+
+                return BadRequest(new { message = result.ErrorMessage });
+            }
+
+            return Ok(new
+            {
+                message = "Service with children created successfully",
+                data = result.Data,
+                status = result.Data.FormStatus
+            });
+        }
+
+        /// <summary>
+        /// Update TblService with all child entities using Hybrid Pattern in a single transaction
+        /// - Items WITH Id: UPDATE existing
+        /// - Items WITHOUT Id: CREATE new
+        /// - Items in DB but NOT in arrays: DELETE
+        /// Perfect for "Save & Next" button with inline editing
+        /// </summary>
+        [HttpPut("{id}/with-children")]
+        [Authorize(Roles = RoleString.Trainer)]
+        public async Task<IActionResult> UpdateWithChildren(int id, [FromBody] TblServiceWithChildrenUpdateDto dto)
+        {
+            var result = await _service.UpdateWithChildrenAsync(id, dto);
+            if (!result.IsSuccess)
+            {
+                if (result.ErrorStatus == ServiceErrorStatus.NOTFOUND)
+                    return NotFound(new { message = result.ErrorMessage });
+
+                if (result.ErrorStatus == ServiceErrorStatus.FORBIDDEN)
+                    return Forbid();
+
+                return BadRequest(new { message = result.ErrorMessage });
+            }
+
+            return Ok(new
+            {
+                message = "Service with children updated successfully",
+                data = result.Data,
+                status = result.Data.FormStatus
+            });
+        }
+
+        // ==========================================
         // SUBMISSION & APPROVAL WORKFLOW
         // ==========================================
 
