@@ -28,6 +28,12 @@ namespace Application.Interface.Services.DataTables.KVK
         // SECTION C: PROGRAM CONTENT & RESOURCES
         // ============================
         Task<ServiceResult<KvkProgramContentDto>> AddProgramContentAsync(int programId, KvkProgramContentCreateDto dto);
+
+        /// <summary>
+        /// Create KvkProgramContentAndResources along with all child entities (ResourcePersons, Topics, TeachingAids) in a single transaction
+        /// </summary>
+        Task<ServiceResult<KvkProgramContentDto>> AddProgramContentWithChildrenAsync(int programId, KvkProgramContentWithChildrenCreateDto dto);
+
         Task<ServiceResult<KvkProgramContentDto>> GetProgramContentByIdAsync(int contentId);
         Task<ServiceResult> DeleteProgramContentAsync(int contentId);
         Task<ServiceResult<List<KvkProgramContentDto>>> GetProgramContentsByProgramIdAsync(int programId);

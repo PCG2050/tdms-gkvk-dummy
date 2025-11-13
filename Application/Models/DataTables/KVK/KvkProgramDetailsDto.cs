@@ -270,6 +270,21 @@ namespace Application.Models.DataTables.KVK
         public string? Description { get; set; }
     }
 
+    /// <summary>
+    /// Composite DTO for creating KvkProgramContentAndResources along with all child entities in a single transaction
+    /// </summary>
+    public class KvkProgramContentWithChildrenCreateDto
+    {
+        // Parent fields
+        public string? Title { get; set; }
+        public string? Description { get; set; }
+
+        // Child collections (optional - can be null or empty if UI doesn't have data yet)
+        public List<KvkResourcePersonCreateDto>? ResourcePersons { get; set; }
+        public List<KvkTopicsCoveredCreateDto>? TopicsCovered { get; set; }
+        public List<KvkTeachingAidsCreateDto>? TeachingAids { get; set; }
+    }
+
     // Resource Person DTOs
     public class KvkResourcePersonDto
     {

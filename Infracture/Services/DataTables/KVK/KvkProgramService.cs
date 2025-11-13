@@ -5,11 +5,13 @@ using Application.Mapper.DataTable.KVK;
 using Application.Models.DataTables.KVK;
 using Application.Services.Common;
 using Infrastructure.Repository;
+using Infrastructure.DbContext;
 
 namespace Infrastructure.Services.DataTables.KVK
 {
     public class KvkProgramService : IKvkProgramService
     {
+        private readonly TdmsDbContext _context;
         private readonly IKvkProgramDetailsRepository _programRepository;
         private readonly IKvkParticipantDemographicsRepository _demographicsRepository;
         private readonly IKvkProgramContentRepository _contentRepository;
@@ -35,6 +37,7 @@ namespace Infrastructure.Services.DataTables.KVK
         private const int KVK_UNIT_ID = 10;
 
         public KvkProgramService(
+            TdmsDbContext context,
             IKvkProgramDetailsRepository programRepository,
             IKvkParticipantDemographicsRepository demographicsRepository,
             IKvkProgramContentRepository contentRepository,
@@ -54,6 +57,7 @@ namespace Infrastructure.Services.DataTables.KVK
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
             KvkProgramMapper mapper)
         {
+            _context = context;
             _programRepository = programRepository;
             _demographicsRepository = demographicsRepository;
             _contentRepository = contentRepository;
@@ -316,6 +320,122 @@ namespace Infrastructure.Services.DataTables.KVK
             var resultDto = _mapper.MapToDto(created);
 
             return ServiceResult<KvkProgramContentDto>.Success(resultDto);
+        }
+
+        /// <summary>
+        /// Create KvkProgramContentAndResources along with all child entities (ResourcePersons, Topics, TeachingAids) in a single transaction
+        /// This solves the problem of needing parent ID before creating children
+        /// </summary>
+        public async Task<ServiceResult<KvkProgramContentDto>> AddProgramContentWithChildrenAsync(
+            int programId,
+            KvkProgramContentWithChildrenCreateDto dto)
+        {
+            // Validate program exists
+            var program = await _programRepository.GetByIdAsync(programId);
+            if (program == null)
+                return ServiceResult<KvkProgramContentDto>.Failure(
+                    "Program not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            // Check permissions
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult<KvkProgramContentDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            // Validate form status
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+                return ServiceResult<KvkProgramContentDto>.Failure(
+                    "Cannot add content to submitted or approved programs",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            // Use database transaction to ensure atomicity
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                // 1. Create parent entity (KvkProgramContentAndResources)
+                var parentEntity = _mapper.MapToEntity(new KvkProgramContentCreateDto
+                {
+                    Title = dto.Title,
+                    Description = dto.Description
+                });
+                parentEntity.KvkProgramDetailsId = programId;
+                parentEntity.UnitLocationId = program.UnitLocationId;
+                parentEntity.OrganizationId = program.OrganizationId;
+                parentEntity.CreatedById = _currentUserService.UserId;
+                parentEntity.CreatedAt = DateTimeOffset.UtcNow;
+
+                _context.KvkProgramContentAndResources.Add(parentEntity);
+                await _context.SaveChangesAsync(); // This generates the ID for parent
+
+                // 2. Create child entities using the generated parent ID
+                var contentId = parentEntity.Id;
+
+                // Create Resource Persons
+                if (dto.ResourcePersons != null && dto.ResourcePersons.Any())
+                {
+                    foreach (var resourcePersonDto in dto.ResourcePersons)
+                    {
+                        var resourcePersonEntity = _mapper.MapToEntity(resourcePersonDto);
+                        resourcePersonEntity.KvkProgramContentAndResourcesId = contentId;
+                        resourcePersonEntity.UnitLocationId = program.UnitLocationId;
+                        resourcePersonEntity.OrganizationId = program.OrganizationId;
+                        resourcePersonEntity.CreatedById = _currentUserService.UserId;
+                        resourcePersonEntity.CreatedAt = DateTimeOffset.UtcNow;
+                        _context.KvkResourcePersons.Add(resourcePersonEntity);
+                    }
+                }
+
+                // Create Topics Covered
+                if (dto.TopicsCovered != null && dto.TopicsCovered.Any())
+                {
+                    foreach (var topicDto in dto.TopicsCovered)
+                    {
+                        var topicEntity = _mapper.MapToEntity(topicDto);
+                        topicEntity.KvkProgramContentAndResourcesId = contentId;
+                        topicEntity.UnitLocationId = program.UnitLocationId;
+                        topicEntity.OrganizationId = program.OrganizationId;
+                        topicEntity.CreatedById = _currentUserService.UserId;
+                        topicEntity.CreatedAt = DateTimeOffset.UtcNow;
+                        _context.KvkTopicsCoveredInClass.Add(topicEntity);
+                    }
+                }
+
+                // Create Teaching Aids
+                if (dto.TeachingAids != null && dto.TeachingAids.Any())
+                {
+                    foreach (var aidDto in dto.TeachingAids)
+                    {
+                        var aidEntity = _mapper.MapToEntity(aidDto);
+                        aidEntity.KvkProgramContentAndResourcesId = contentId;
+                        aidEntity.UnitLocationId = program.UnitLocationId;
+                        aidEntity.OrganizationId = program.OrganizationId;
+                        aidEntity.CreatedById = _currentUserService.UserId;
+                        aidEntity.CreatedAt = DateTimeOffset.UtcNow;
+                        _context.KvkTeachingAidsDeveloped.Add(aidEntity);
+                    }
+                }
+
+                // Save all child entities
+                await _context.SaveChangesAsync();
+
+                // Commit transaction
+                await transaction.CommitAsync();
+
+                // Fetch the complete entity with all children for the response
+                var createdContent = await _contentRepository.GetWithDetailsAsync(contentId);
+                var resultDto = _mapper.MapToDto(createdContent!);
+
+                return ServiceResult<KvkProgramContentDto>.Success(resultDto);
+            }
+            catch (Exception ex)
+            {
+                // Rollback transaction on error
+                await transaction.RollbackAsync();
+                return ServiceResult<KvkProgramContentDto>.Failure(
+                    $"Failed to create program content with children: {ex.Message}",
+                    ServiceErrorStatus.INVALIDOPERATION);
+            }
         }
 
         public async Task<ServiceResult<KvkProgramContentDto>> GetProgramContentByIdAsync(int contentId)

@@ -131,6 +131,17 @@ namespace WebApi.Controllers.DataTables.KVK
         }
 
         /// <summary>
+        /// Add program content entry with all child entities (ResourcePersons, Topics, TeachingAids) in one request
+        /// This endpoint solves the problem of needing parent ID before creating children by handling everything in a single transaction
+        /// </summary>
+        [HttpPost("{programId}/content-with-children")]
+        public async Task<IActionResult> AddProgramContentWithChildren(int programId, [FromBody] KvkProgramContentWithChildrenCreateDto dto)
+        {
+            var result = await _service.AddProgramContentWithChildrenAsync(programId, dto);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
+        /// <summary>
         /// Get program content by ID
         /// </summary>
         [HttpGet("content/{contentId}")]
