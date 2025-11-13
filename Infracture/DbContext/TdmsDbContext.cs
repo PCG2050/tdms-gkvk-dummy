@@ -147,6 +147,10 @@ namespace Infrastructure.DbContext
         public DbSet<FtiAdvisoryServices> FtiAdvisoryServices { get; set; }
         public DbSet<FtiReport> FtiReports { get; set; }
         public DbSet<FtiRecommendation> FtiRecommendations { get; set; }
+        public DbSet<FtiOFT> FtiOFTs { get; set; }
+        public DbSet<FtiFLD> FtiFLDs { get; set; }
+        public DbSet<FtiTrainingProgramme> FtiTrainingProgrammes { get; set; }
+        public DbSet<FtiOtherActivity> FtiOtherActivities { get; set; }
         #endregion
         #region  KVK 
         public DbSet<KvkProgramDetails> KvkProgramDetails { get; set; }
