@@ -363,15 +363,9 @@ namespace Infrastructure.Services.DataTables
                     "Invalid unit location",
                     ServiceErrorStatus.NOTFOUND);
 
-            // Step 2: Check permissions
-            if (!await _entityPermissionService.CanCreateForm(dto.UnitLocationId))
-                return ServiceResult<TblServicesDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
             try
             {
-                // Step 3: Create parent TblService
+                // Step 2: Create parent TblService
                 var parentEntity = _mapper.MapToEntity(dto);
                 parentEntity.OrganizationId = unitLocation.OrganizationId;
                 parentEntity.CreatedById = _currentUserService.UserId;
@@ -381,7 +375,7 @@ namespace Infrastructure.Services.DataTables
                 var createdService = await _tableServiceRepository.CreateAsync(parentEntity);
                 var serviceId = createdService.Id;
 
-                // Step 4: Create TableHostel children if provided
+                // Step 3: Create TableHostel children if provided
                 if (dto.TableHostels != null && dto.TableHostels.Any())
                 {
                     foreach (var hostelDto in dto.TableHostels)
@@ -390,11 +384,11 @@ namespace Infrastructure.Services.DataTables
                         hostelEntity.ServiceId = serviceId;
                         hostelEntity.CreatedById = _currentUserService.UserId;
                         hostelEntity.CreatedAt = DateTimeOffset.UtcNow;
-                        await _tableHostelRepository.CreateAsync(hostelEntity);
+                        await _tableHostelRepository.CreateTableHostelAsync(hostelEntity);
                     }
                 }
 
-                // Step 5: Create RevolvingFundStatus children if provided
+                // Step 4: Create RevolvingFundStatus children if provided
                 if (dto.RevolvingFundStatuses != null && dto.RevolvingFundStatuses.Any())
                 {
                     foreach (var fundDto in dto.RevolvingFundStatuses)
@@ -403,11 +397,11 @@ namespace Infrastructure.Services.DataTables
                         fundEntity.ServiceId = serviceId;
                         fundEntity.CreatedById = _currentUserService.UserId;
                         fundEntity.CreatedAt = DateTimeOffset.UtcNow;
-                        await _revolvingFundRepository.CreateAsync(fundEntity);
+                        await _revolvingFundRepository.CreateRevolvingFundStatusAsync(fundEntity);
                     }
                 }
 
-                // Step 6: Create VisitorDetail children if provided
+                // Step 5: Create VisitorDetail children if provided
                 if (dto.VisitorDetails != null && dto.VisitorDetails.Any())
                 {
                     foreach (var visitorDto in dto.VisitorDetails)
@@ -416,13 +410,13 @@ namespace Infrastructure.Services.DataTables
                         visitorEntity.ServiceId = serviceId;
                         visitorEntity.CreatedById = _currentUserService.UserId;
                         visitorEntity.CreatedAt = DateTimeOffset.UtcNow;
-                        await _visitorDetailsRepository.CreateAsync(visitorEntity);
+                        await _visitorDetailsRepository.CreateVisitorDetailAsync(visitorEntity);
                     }
                 }
 
-                // Step 7: Get complete entity with all children and return
-                var completeDto = await _tableServiceRepository.GetCompleteServiceByIdAsync(serviceId);
-                return ServiceResult<TblServicesDto>.Success(_mapper.MapToDto(completeDto));
+                // Step 6: Get complete entity with all children and return
+                var completeEntity = await _tableServiceRepository.GetWithDetailsAsync(serviceId);
+                return ServiceResult<TblServicesDto>.Success(_mapper.MapToDto(completeEntity));
             }
             catch (Exception ex)
             {
@@ -500,7 +494,7 @@ namespace Infrastructure.Services.DataTables
                             newHostel.ServiceId = serviceId;
                             newHostel.CreatedById = _currentUserService.UserId;
                             newHostel.CreatedAt = DateTimeOffset.UtcNow;
-                            await _tableHostelRepository.CreateAsync(newHostel);
+                            await _tableHostelRepository.CreateTableHostelAsync(newHostel);
                         }
                     }
                 }
@@ -552,7 +546,7 @@ namespace Infrastructure.Services.DataTables
                             newFund.ServiceId = serviceId;
                             newFund.CreatedById = _currentUserService.UserId;
                             newFund.CreatedAt = DateTimeOffset.UtcNow;
-                            await _revolvingFundRepository.CreateAsync(newFund);
+                            await _revolvingFundRepository.CreateRevolvingFundStatusAsync(newFund);
                         }
                     }
                 }
@@ -603,7 +597,7 @@ namespace Infrastructure.Services.DataTables
                             newVisitor.ServiceId = serviceId;
                             newVisitor.CreatedById = _currentUserService.UserId;
                             newVisitor.CreatedAt = DateTimeOffset.UtcNow;
-                            await _visitorDetailsRepository.CreateAsync(newVisitor);
+                            await _visitorDetailsRepository.CreateVisitorDetailAsync(newVisitor);
                         }
                     }
                 }
@@ -616,8 +610,8 @@ namespace Infrastructure.Services.DataTables
                 }
 
                 // Step 8: Get complete entity with all children and return
-                var completeDto = await _tableServiceRepository.GetCompleteServiceByIdAsync(serviceId);
-                return ServiceResult<TblServicesDto>.Success(_mapper.MapToDto(completeDto));
+                var completeEntity = await _tableServiceRepository.GetWithDetailsAsync(serviceId);
+                return ServiceResult<TblServicesDto>.Success(_mapper.MapToDto(completeEntity));
             }
             catch (Exception ex)
             {
