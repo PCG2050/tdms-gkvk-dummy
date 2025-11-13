@@ -102,7 +102,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("ASMVisitorDetails");
+                    b.ToTable("ASMVisitorDetails", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ATIC.AticAdvisoryServices", b =>
@@ -178,7 +178,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("AticAdvisoryServices");
+                    b.ToTable("AticAdvisoryServices", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ATIC.AticParticipantDemographics", b =>
@@ -277,7 +277,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("AticParticipantDemographics");
+                    b.ToTable("AticParticipantDemographics", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ATIC.AticProgramContentAndResources", b =>
@@ -319,7 +319,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("AticProgramContentAndResources");
+                    b.ToTable("AticProgramContentAndResources", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ATIC.AticProgramDetails", b =>
@@ -529,7 +529,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("AticProgramDetails");
+                    b.ToTable("AticProgramDetails", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ATIC.AticRecommendation", b =>
@@ -596,7 +596,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("AticRecommendations");
+                    b.ToTable("AticRecommendations", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ATIC.AticReport", b =>
@@ -662,7 +662,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("AticReports");
+                    b.ToTable("AticReports", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ATIC.AticResourcePerson", b =>
@@ -724,7 +724,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("AticResourcePersons");
+                    b.ToTable("AticResourcePersons", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ATIC.AticSales", b =>
@@ -802,7 +802,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("AticSales");
+                    b.ToTable("AticSales", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ATIC.AticTeachingAidsDeveloped", b =>
@@ -861,7 +861,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("AticTeachingAidsDeveloped");
+                    b.ToTable("AticTeachingAidsDeveloped", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ATIC.AticTopicsCoveredInClass", b =>
@@ -914,7 +914,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("AticTopicsCoveredInClass");
+                    b.ToTable("AticTopicsCoveredInClass", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.DEU.DeuAdvisoryServices", b =>
@@ -990,7 +990,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("DeuAdvisoryServices");
+                    b.ToTable("DeuAdvisoryServices", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.DEU.DeuParticipantDemographics", b =>
@@ -1089,7 +1089,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("DeuParticipantDemographics");
+                    b.ToTable("DeuParticipantDemographics", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.DEU.DeuProgramContentAndResources", b =>
@@ -1131,7 +1131,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("DeuProgramContentAndResources");
+                    b.ToTable("DeuProgramContentAndResources", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.DEU.DeuProgramDetails", b =>
@@ -1342,7 +1342,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("DeuProgramDetails");
+                    b.ToTable("DeuProgramDetails", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.DEU.DeuRecommendation", b =>
@@ -1409,7 +1409,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("DeuRecommendations");
+                    b.ToTable("DeuRecommendations", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.DEU.DeuReport", b =>
@@ -1475,7 +1475,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("DeuReports");
+                    b.ToTable("DeuReports", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.DEU.DeuResourcePerson", b =>
@@ -1537,7 +1537,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("DeuResourcePersons");
+                    b.ToTable("DeuResourcePersons", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.DEU.DeuTeachingAidsDeveloped", b =>
@@ -1596,7 +1596,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("DeuTeachingAidsDeveloped");
+                    b.ToTable("DeuTeachingAidsDeveloped", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.DEU.DeuTopicsCoveredInClass", b =>
@@ -1649,7 +1649,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("DeuTopicsCoveredInClass");
+                    b.ToTable("DeuTopicsCoveredInClass", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.District", b =>
@@ -1679,7 +1679,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("StateId");
 
-                    b.ToTable("Districts");
+                    b.ToTable("Districts", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.EEU.EeuAdvisoryServices", b =>
@@ -1755,7 +1755,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("EeuAdvisoryServices");
+                    b.ToTable("EeuAdvisoryServices", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.EEU.EeuFLD", b =>
@@ -1854,7 +1854,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("EeuFLDs");
+                    b.ToTable("EeuFLDs", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.EEU.EeuOFT", b =>
@@ -1953,7 +1953,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("EeuOFTs");
+                    b.ToTable("EeuOFTs", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.EEU.EeuOtherActivity", b =>
@@ -2024,7 +2024,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("EeuOtherActivities");
+                    b.ToTable("EeuOtherActivities", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.EEU.EeuParticipantDemographics", b =>
@@ -2123,7 +2123,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("EeuParticipantDemographics");
+                    b.ToTable("EeuParticipantDemographics", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.EEU.EeuProgramContentAndResources", b =>
@@ -2165,7 +2165,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("EeuProgramContentAndResources");
+                    b.ToTable("EeuProgramContentAndResources", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.EEU.EeuProgramDetails", b =>
@@ -2375,7 +2375,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("EeuProgramDetails");
+                    b.ToTable("EeuProgramDetails", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.EEU.EeuRecommendation", b =>
@@ -2442,7 +2442,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("EeuRecommendations");
+                    b.ToTable("EeuRecommendations", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.EEU.EeuReport", b =>
@@ -2508,7 +2508,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("EeuReports");
+                    b.ToTable("EeuReports", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.EEU.EeuResourcePerson", b =>
@@ -2570,7 +2570,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("EeuResourcePersons");
+                    b.ToTable("EeuResourcePersons", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.EEU.EeuTeachingAidsDeveloped", b =>
@@ -2629,7 +2629,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("EeuTeachingAidsDeveloped");
+                    b.ToTable("EeuTeachingAidsDeveloped", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.EEU.EeuTopicsCoveredInClass", b =>
@@ -2682,7 +2682,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("EeuTopicsCoveredInClass");
+                    b.ToTable("EeuTopicsCoveredInClass", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.EEU.EeuTrainingProgramme", b =>
@@ -2762,7 +2762,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("EeuTrainingProgrammes");
+                    b.ToTable("EeuTrainingProgrammes", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.FIU.FIUActivity", b =>
@@ -2804,7 +2804,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("DisplayOrder");
 
-                    b.ToTable("FIUActivities");
+                    b.ToTable("FIUActivities", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.FIU.FIUOtherActivity", b =>
@@ -2854,7 +2854,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("FIUOtherActivities");
+                    b.ToTable("FIUOtherActivities", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.FIU.FIUProgramActivity", b =>
@@ -2935,7 +2935,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("FIUProgramActivities");
+                    b.ToTable("FIUProgramActivities", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.FTI.FTIAdvisoryServices", b =>
@@ -3004,7 +3004,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("FTIAdvisoryServices");
+                    b.ToTable("FTIAdvisoryServices", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.FTI.FTIParticipantDemographics", b =>
@@ -3095,7 +3095,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("FTIParticipantDemographics");
+                    b.ToTable("FTIParticipantDemographics", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.FTI.FTIProgramContentAndResources", b =>
@@ -3139,7 +3139,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("FTIProgramContentAndResources");
+                    b.ToTable("FTIProgramContentAndResources", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.FTI.FTIProgramDetails", b =>
@@ -3347,7 +3347,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("FTIProgramDetails");
+                    b.ToTable("FTIProgramDetails", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.FTI.FTIRecommendation", b =>
@@ -3407,7 +3407,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("FTIRecommendations");
+                    b.ToTable("FTIRecommendations", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.FTI.FTIReport", b =>
@@ -3466,7 +3466,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("FTIReports");
+                    b.ToTable("FTIReports", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.FTI.FTIResourcePerson", b =>
@@ -3522,7 +3522,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("FTIResourcePersons");
+                    b.ToTable("FTIResourcePersons", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.FTI.FTITeachingAidsDeveloped", b =>
@@ -3573,7 +3573,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("FTITeachingAidsDeveloped");
+                    b.ToTable("FTITeachingAidsDeveloped", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.FTI.FTITopicsCoveredInClass", b =>
@@ -3620,7 +3620,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("FTITopicsCoveredInClass");
+                    b.ToTable("FTITopicsCoveredInClass", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.FTI.FtiOtherActivity", b =>
@@ -3691,7 +3691,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("FtiOtherActivities");
+                    b.ToTable("FtiOtherActivities", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.FTI.FtiTrainingProgram", b =>
@@ -3775,7 +3775,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("FtiTrainingPrograms");
+                    b.ToTable("FtiTrainingPrograms", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.GenericTables.ConsultingAndSocialMediaService.ConsultingAndSocialMediaService", b =>
@@ -3967,7 +3967,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("TableConsultingAndSocialMediaServices");
+                    b.ToTable("TableConsultingAndSocialMediaServices", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.GenericTables.ConsultingAndSocialMediaService.TableModeAndOutreach", b =>
@@ -4013,7 +4013,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("TableModeAndOutreaches");
+                    b.ToTable("TableModeAndOutreaches", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.GenericTables.ExtensionLiterature", b =>
@@ -4064,7 +4064,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("ExtensionLiteratures");
+                    b.ToTable("ExtensionLiteratures", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.GenericTables.NominationReward", b =>
@@ -4236,7 +4236,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("NominationRewards");
+                    b.ToTable("NominationRewards", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.GenericTables.NominationRewardEntrepreneurInnovation", b =>
@@ -4284,7 +4284,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("NominationRewardEntrepreneurInnovations");
+                    b.ToTable("NominationRewardEntrepreneurInnovations", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.GenericTables.NominationRewardFarmerInnovation", b =>
@@ -4332,7 +4332,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("NominationRewardFarmerInnovations");
+                    b.ToTable("NominationRewardFarmerInnovations", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.GenericTables.NominationRewardIFSEnterpreneur", b =>
@@ -4377,7 +4377,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("NominationRewardIFSEntrepreneurs");
+                    b.ToTable("NominationRewardIFSEntrepreneurs", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.GenericTables.NominationRewardIFSFarmer", b =>
@@ -4422,7 +4422,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("NominationRewardIFSFarmers");
+                    b.ToTable("NominationRewardIFSFarmers", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.GenericTables.NominationRewardOrganicEntrepreneur", b =>
@@ -4467,7 +4467,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("NominationRewardOrganicEntrepreneurs");
+                    b.ToTable("NominationRewardOrganicEntrepreneurs", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.GenericTables.NominationRewardOrganicFarmer", b =>
@@ -4512,7 +4512,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("NominationRewardOrganicFarmers");
+                    b.ToTable("NominationRewardOrganicFarmers", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.GenericTables.Publication", b =>
@@ -4679,7 +4679,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("Publications");
+                    b.ToTable("Publications", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.GenericTables.PublisherDetails", b =>
@@ -4732,7 +4732,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("PublisherDetails");
+                    b.ToTable("PublisherDetails", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.GenericTables.Service.RevolvingFundStatus", b =>
@@ -4780,7 +4780,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("RevolvingFundStatuses");
+                    b.ToTable("RevolvingFundStatuses", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.GenericTables.Service.TableHostel", b =>
@@ -4863,7 +4863,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("TableHostels");
+                    b.ToTable("TableHostels", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.GenericTables.Service.TblService", b =>
@@ -4991,7 +4991,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("Services");
+                    b.ToTable("Services", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.GenericTables.Service.VisitorDetail", b =>
@@ -5086,7 +5086,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("VisitorId");
 
-                    b.ToTable("VisitorDetails");
+                    b.ToTable("VisitorDetails", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.GenericTables.TableOtherActivity", b =>
@@ -5163,7 +5163,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("OtherActivities");
+                    b.ToTable("OtherActivities", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaAdvisoryServices", b =>
@@ -5239,7 +5239,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("IbtvaAdvisoryServices");
+                    b.ToTable("IbtvaAdvisoryServices", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaParticipantDemographics", b =>
@@ -5338,7 +5338,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("IbtvaParticipantDemographics");
+                    b.ToTable("IbtvaParticipantDemographics", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaProgramContentAndResources", b =>
@@ -5380,7 +5380,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("IbtvaProgramContentAndResources");
+                    b.ToTable("IbtvaProgramContentAndResources", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaProgramDetails", b =>
@@ -5590,7 +5590,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("IbtvaProgramDetails");
+                    b.ToTable("IbtvaProgramDetails", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaRecommendation", b =>
@@ -5657,7 +5657,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("IbtvaRecommendations");
+                    b.ToTable("IbtvaRecommendations", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaReport", b =>
@@ -5723,7 +5723,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("IbtvaReports");
+                    b.ToTable("IbtvaReports", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaResourcePerson", b =>
@@ -5785,7 +5785,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("IbtvaResourcePersons");
+                    b.ToTable("IbtvaResourcePersons", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaTeachingAidsDeveloped", b =>
@@ -5844,7 +5844,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("IbtvaTeachingAidsDeveloped");
+                    b.ToTable("IbtvaTeachingAidsDeveloped", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.IBTVA.IbtvaTopicsCoveredInClass", b =>
@@ -5897,7 +5897,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("IbtvaTopicsCoveredInClass");
+                    b.ToTable("IbtvaTopicsCoveredInClass", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Junction.OrganizationUnitLocation", b =>
@@ -5943,7 +5943,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("OrganizationUnitLocations");
+                    b.ToTable("OrganizationUnitLocations", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Junction.TrainerAssignment", b =>
@@ -5984,7 +5984,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("UnitTrainers");
+                    b.ToTable("UnitTrainers", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Junction.UnitHeadAssignment", b =>
@@ -6025,7 +6025,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("UnitHeadAssignments");
+                    b.ToTable("UnitHeadAssignments", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.KVK.KvkAdvisoryServices", b =>
@@ -6101,7 +6101,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("KvkAdvisoryServices");
+                    b.ToTable("KvkAdvisoryServices", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.KVK.KvkFldResult", b =>
@@ -6196,7 +6196,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("KvkFLDResults");
+                    b.ToTable("KvkFLDResults", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.KVK.KvkOftResult", b =>
@@ -6282,7 +6282,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("KvkOFTResults");
+                    b.ToTable("KvkOFTResults", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.KVK.KvkParticipantDemographics", b =>
@@ -6381,7 +6381,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("KvkParticipantDemographics");
+                    b.ToTable("KvkParticipantDemographics", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.KVK.KvkProgramContentAndResources", b =>
@@ -6423,7 +6423,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("KvkProgramContentAndResources");
+                    b.ToTable("KvkProgramContentAndResources", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.KVK.KvkProgramDetails", b =>
@@ -6637,7 +6637,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("KvkProgramDetails");
+                    b.ToTable("KvkProgramDetails", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.KVK.KvkRecommendation", b =>
@@ -6704,7 +6704,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("KvkRecommendations");
+                    b.ToTable("KvkRecommendations", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.KVK.KvkReport", b =>
@@ -6770,7 +6770,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("KvkReports");
+                    b.ToTable("KvkReports", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.KVK.KvkResourcePerson", b =>
@@ -6832,7 +6832,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("KvkResourcePersons");
+                    b.ToTable("KvkResourcePersons", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.KVK.KvkResult", b =>
@@ -6878,7 +6878,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("KvkResults");
+                    b.ToTable("KvkResults", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.KVK.KvkTeachingAidsDeveloped", b =>
@@ -6937,7 +6937,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("KvkTeachingAidsDeveloped");
+                    b.ToTable("KvkTeachingAidsDeveloped", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.KVK.KvkTopicsCoveredInClass", b =>
@@ -6990,7 +6990,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("KvkTopicsCoveredInClass");
+                    b.ToTable("KvkTopicsCoveredInClass", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.CollaborativeProgramOption", b =>
@@ -7015,7 +7015,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CollaborativeProgramOptions");
+                    b.ToTable("CollaborativeProgramOptions", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.Collaborator", b =>
@@ -7040,7 +7040,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Collaborators");
+                    b.ToTable("Collaborators", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.ConsultancyServicesCategory", b =>
@@ -7065,7 +7065,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ConsultancyServicesCategories");
+                    b.ToTable("ConsultancyServicesCategories", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.Contribution", b =>
@@ -7090,7 +7090,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Contributions");
+                    b.ToTable("Contributions", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.EnglishMagazine", b =>
@@ -7115,7 +7115,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EnglishMagazines");
+                    b.ToTable("EnglishMagazines", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.EnglishNewsPaper", b =>
@@ -7140,7 +7140,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EnglishNewsPapers");
+                    b.ToTable("EnglishNewsPapers", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.EventName", b =>
@@ -7165,7 +7165,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EventNames");
+                    b.ToTable("EventNames", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.ExtensionWork", b =>
@@ -7190,7 +7190,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ExtensionWorks");
+                    b.ToTable("ExtensionWorks", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.FLDResult", b =>
@@ -7215,7 +7215,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FLDResults");
+                    b.ToTable("FLDResults", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.InfoType", b =>
@@ -7240,7 +7240,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("InfoTypes");
+                    b.ToTable("InfoTypes", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.KannadaMagazine", b =>
@@ -7265,7 +7265,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("KannadaMagazines");
+                    b.ToTable("KannadaMagazines", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.KannadaNewsPaper", b =>
@@ -7290,7 +7290,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("KannadaNewsPapers");
+                    b.ToTable("KannadaNewsPapers", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.Mode", b =>
@@ -7315,7 +7315,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Modes");
+                    b.ToTable("Modes", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.ModeOutreach", b =>
@@ -7340,7 +7340,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ModeOutreaches");
+                    b.ToTable("ModeOutreaches", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.NominationCategory", b =>
@@ -7365,7 +7365,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("NominationCategories");
+                    b.ToTable("NominationCategories", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.NominationType", b =>
@@ -7390,7 +7390,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("NominationTypes");
+                    b.ToTable("NominationTypes", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.OFTResult", b =>
@@ -7415,7 +7415,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("OFTResults");
+                    b.ToTable("OFTResults", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.Participant", b =>
@@ -7440,7 +7440,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Participants");
+                    b.ToTable("Participants", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.ParticipantDealer", b =>
@@ -7465,7 +7465,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ParticipantDealer");
+                    b.ToTable("ParticipantDealer", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.ParticipatedSource", b =>
@@ -7490,7 +7490,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ParticipatedSources");
+                    b.ToTable("ParticipatedSources", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.Particular", b =>
@@ -7515,7 +7515,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Particulars");
+                    b.ToTable("Particulars", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.Position", b =>
@@ -7540,7 +7540,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Positions");
+                    b.ToTable("Positions", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.ProgramCategory", b =>
@@ -7565,7 +7565,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProgramCategories");
+                    b.ToTable("ProgramCategories", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.ProgramType", b =>
@@ -7590,7 +7590,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProgramTypes");
+                    b.ToTable("ProgramTypes", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.ProjectCategory", b =>
@@ -7615,7 +7615,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProjectCategories");
+                    b.ToTable("ProjectCategories", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.PublicationCategory", b =>
@@ -7640,7 +7640,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PublicationCategories");
+                    b.ToTable("PublicationCategories", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.QuantityUnit", b =>
@@ -7665,7 +7665,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("QuantityUnits");
+                    b.ToTable("QuantityUnits", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.Region", b =>
@@ -7690,7 +7690,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Regions");
+                    b.ToTable("Regions", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.RelatedTo", b =>
@@ -7715,7 +7715,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RelatedTos");
+                    b.ToTable("RelatedTos", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.ResourceType", b =>
@@ -7740,7 +7740,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ResourceTypes");
+                    b.ToTable("ResourceTypes", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.Responsibility", b =>
@@ -7765,7 +7765,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Responsibilities");
+                    b.ToTable("Responsibilities", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.ServiceCategory", b =>
@@ -7790,7 +7790,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ServiceCategories");
+                    b.ToTable("ServiceCategories", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.ServiceTheme", b =>
@@ -7815,7 +7815,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ServiceThemes");
+                    b.ToTable("ServiceThemes", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.SourceOfFund", b =>
@@ -7840,7 +7840,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SourcesOfFunds");
+                    b.ToTable("SourcesOfFunds", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.SponsoredOrganization", b =>
@@ -7865,7 +7865,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SponsoredOrganizations");
+                    b.ToTable("SponsoredOrganizations", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.Status", b =>
@@ -7890,7 +7890,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Statuses");
+                    b.ToTable("Statuses", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.TargetFarmer", b =>
@@ -7915,7 +7915,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TargetFarmers");
+                    b.ToTable("TargetFarmers", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.ThematicArea", b =>
@@ -7940,7 +7940,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ThematicAreas");
+                    b.ToTable("ThematicAreas", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.Theme", b =>
@@ -7965,7 +7965,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Themes");
+                    b.ToTable("Themes", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.TypeOfAid", b =>
@@ -7990,7 +7990,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TypeOfAids");
+                    b.ToTable("TypeOfAids", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.VillageAdoptiveProgram", b =>
@@ -8015,7 +8015,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("VillageAdoptivePrograms");
+                    b.ToTable("VillageAdoptivePrograms", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MasterData.Visitor", b =>
@@ -8040,7 +8040,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Visitors");
+                    b.ToTable("Visitors", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.NAEP.NaepAdvisoryServices", b =>
@@ -8116,7 +8116,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("NaepAdvisoryServices");
+                    b.ToTable("NaepAdvisoryServices", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.NAEP.NaepParticipantDemographics", b =>
@@ -8215,7 +8215,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("NaepParticipantDemographics");
+                    b.ToTable("NaepParticipantDemographics", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.NAEP.NaepProgramContentAndResources", b =>
@@ -8257,7 +8257,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("NaepProgramContentAndResources");
+                    b.ToTable("NaepProgramContentAndResources", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.NAEP.NaepProgramDetails", b =>
@@ -8468,7 +8468,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("NaepProgramDetails");
+                    b.ToTable("NaepProgramDetails", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.NAEP.NaepRecommendation", b =>
@@ -8535,7 +8535,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("NaepRecommendations");
+                    b.ToTable("NaepRecommendations", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.NAEP.NaepReport", b =>
@@ -8601,7 +8601,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("NaepReports");
+                    b.ToTable("NaepReports", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.NAEP.NaepResourcePerson", b =>
@@ -8663,7 +8663,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("NaepResourcePersons");
+                    b.ToTable("NaepResourcePersons", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.NAEP.NaepTeachingAidsDeveloped", b =>
@@ -8722,7 +8722,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("NaepTeachingAidsDeveloped");
+                    b.ToTable("NaepTeachingAidsDeveloped", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.NAEP.NaepTopicsCoveredInClass", b =>
@@ -8775,7 +8775,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("NaepTopicsCoveredInClass");
+                    b.ToTable("NaepTopicsCoveredInClass", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Organization", b =>
@@ -8825,7 +8825,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("Organizations");
+                    b.ToTable("Organizations", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.STU.StuAdvisoryServices", b =>
@@ -8901,7 +8901,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("StuAdvisoryServices");
+                    b.ToTable("StuAdvisoryServices", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.STU.StuParticipantDemographics", b =>
@@ -9000,7 +9000,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("StuParticipantDemographics");
+                    b.ToTable("StuParticipantDemographics", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.STU.StuProgramContentAndResources", b =>
@@ -9042,7 +9042,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("StuProgramContentAndResources");
+                    b.ToTable("StuProgramContentAndResources", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.STU.StuProgramDetails", b =>
@@ -9252,7 +9252,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("StuProgramDetails");
+                    b.ToTable("StuProgramDetails", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.STU.StuRecommendation", b =>
@@ -9319,7 +9319,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("StuRecommendations");
+                    b.ToTable("StuRecommendations", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.STU.StuReport", b =>
@@ -9385,7 +9385,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("StuReports");
+                    b.ToTable("StuReports", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.STU.StuResourcePerson", b =>
@@ -9447,7 +9447,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("StuResourcePersons");
+                    b.ToTable("StuResourcePersons", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.STU.StuTeachingAidsDeveloped", b =>
@@ -9506,7 +9506,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("StuTeachingAidsDeveloped");
+                    b.ToTable("StuTeachingAidsDeveloped", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.STU.StuTopicsCoveredInClass", b =>
@@ -9559,7 +9559,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("StuTopicsCoveredInClass");
+                    b.ToTable("StuTopicsCoveredInClass", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.State", b =>
@@ -9584,7 +9584,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("States");
+                    b.ToTable("States", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Unit", b =>
@@ -9624,7 +9624,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("Units");
+                    b.ToTable("Units", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.User", b =>
@@ -9728,7 +9728,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.UserSession", b =>
@@ -9780,7 +9780,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserSessions");
+                    b.ToTable("UserSessions", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ASM.ASMVisitorDetails", b =>

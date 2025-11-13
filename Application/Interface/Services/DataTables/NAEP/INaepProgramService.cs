@@ -28,6 +28,10 @@ namespace Application.Interface.Services.DataTables.NAEP
         // SECTION C: PROGRAM CONTENT & RESOURCES
         // ============================
         Task<ServiceResult<NaepProgramContentDto>> AddProgramContentAsync(int programId, NaepProgramContentCreateDto dto);
+
+        Task<ServiceResult<NaepProgramContentDto>> AddProgramContentWithChildrenAsync(int programId, NaepProgramContentWithChildrenCreateDto dto);
+        Task<ServiceResult<NaepProgramContentDto>> UpdateProgramContentWithChildrenAsync(int contentId, NaepProgramContentWithChildrenUpdateDto dto);
+
         Task<ServiceResult<NaepProgramContentDto>> GetProgramContentByIdAsync(int contentId);
         Task<ServiceResult> DeleteProgramContentAsync(int contentId);
         Task<ServiceResult<List<NaepProgramContentDto>>> GetProgramContentsByProgramIdAsync(int programId);

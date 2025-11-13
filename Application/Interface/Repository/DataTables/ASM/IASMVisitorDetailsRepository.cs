@@ -73,5 +73,12 @@ namespace Application.Interface.Repository.DataTables.ASM
     int pageNumber,
     int pageSize);
 
+        //New MOntly Report
+        Task<(ASMVisitorSummaryDto summary, int totalEntries)> GetMonthlyVisitorSummaryAsync(
+       List<int> unitLocationIds,
+       int year,
+       int month);
+
     }
+   
 }

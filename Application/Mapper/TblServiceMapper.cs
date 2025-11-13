@@ -33,7 +33,7 @@ namespace Application.Mapper
         [MapProperty(nameof(TblService.QuantityUnit.Name), nameof(TblServicesDto.QuantityUnitName))]
         [MapProperty(nameof(TblService.ApprovedBy.FirstName), nameof(TblServicesDto.ApprovedByName))]
         [MapProperty(nameof(TblService.CreatedBy.FirstName), nameof(TblServicesDto.CreatedByName))]
-        
+
         public partial TblServicesDto MapToDtoWithDetails(TblService entity);
 
         // ----------------------------
@@ -126,6 +126,137 @@ namespace Application.Mapper
             entity.Female_OBC = dto.Female_OBC;
             entity.Female_GEN = dto.Female_GEN;
             entity.Total = dto.Total;
+        }
+
+        // ----------------------------
+        // Manual mapping for HYBRID DTOs (for composite update pattern)
+        // ----------------------------
+        public void MapUpdateDtoToEntity(TblServiceWithChildrenUpdateDto dto, TblService entity)
+        {
+            if (dto.StartDate.HasValue) entity.StartDate = dto.StartDate;
+            if (dto.EndDate.HasValue) entity.EndDate = dto.EndDate;
+            if (dto.CategoryId.HasValue) entity.CategoryId = dto.CategoryId;
+            if (dto.OtherCategory != null) entity.OtherCategory = dto.OtherCategory;
+            if (dto.ThemeId.HasValue) entity.ThemeId = dto.ThemeId;
+            if (dto.OtherTheme != null) entity.OtherTheme = dto.OtherTheme;
+            if (dto.CropPlantProductName != null) entity.CropPlantProductName = dto.CropPlantProductName;
+            if (dto.Variety != null) entity.Variety = dto.Variety;
+            if (dto.SourceOfFundId.HasValue) entity.SourceOfFundId = dto.SourceOfFundId;
+            if (dto.OtherSourceOfFund != null) entity.OtherSourceOfFund = dto.OtherSourceOfFund;
+            if (dto.Component != null) entity.Component = dto.Component;
+            if (dto.QuantityUnitId.HasValue) entity.QuantityUnitId = dto.QuantityUnitId;
+            if (dto.Number.HasValue) entity.Number = dto.Number.Value;
+            if (dto.AmountGenerated.HasValue) entity.AmountGenerated = dto.AmountGenerated.Value;
+            if (dto.AmountReleased.HasValue) entity.AmountReleased = dto.AmountReleased.Value;
+            if (dto.Date.HasValue) entity.Date = dto.Date.Value;
+            if (dto.RentedTo != null) entity.RentedTo = dto.RentedTo;
+            if (dto.TitleOfActivityConducted != null) entity.TitleOfActivityConducted = dto.TitleOfActivityConducted;
+        }
+
+        public void MapUpdateDtoToEntity(TableHostelHybridDto dto, TableHostel entity)
+        {
+            if (dto.Date.HasValue) entity.Date = dto.Date;
+            entity.Male_SC = dto.Male_SC;
+            entity.Male_ST = dto.Male_ST;
+            entity.Male_OBC = dto.Male_OBC;
+            entity.Male_GEN = dto.Male_GEN;
+            entity.Female_SC = dto.Female_SC;
+            entity.Female_ST = dto.Female_ST;
+            entity.Female_OBC = dto.Female_OBC;
+            entity.Female_GEN = dto.Female_GEN;
+            entity.NumberOfDaysStayed = dto.NumberOfDaysStayed;
+            entity.VillageOrTaluk = dto.VillageOrTaluk;
+            entity.Purpose = dto.Purpose;
+            entity.AmountGenerated = dto.AmountGenerated;
+            if (dto.SubmittedDate.HasValue) entity.SubmittedDate = dto.SubmittedDate.Value;
+        }
+
+        public TableHostel MapToEntity(TableHostelHybridDto dto)
+        {
+            var entity = new TableHostel
+            {
+                Date = dto.Date,
+                Male_SC = dto.Male_SC,
+                Male_ST = dto.Male_ST,
+                Male_OBC = dto.Male_OBC,
+                Male_GEN = dto.Male_GEN,
+                Female_SC = dto.Female_SC,
+                Female_ST = dto.Female_ST,
+                Female_OBC = dto.Female_OBC,
+                Female_GEN = dto.Female_GEN,
+                NumberOfDaysStayed = dto.NumberOfDaysStayed,
+                VillageOrTaluk = dto.VillageOrTaluk,
+                Purpose = dto.Purpose,
+                AmountGenerated = dto.AmountGenerated,
+                SubmittedDate = dto.SubmittedDate ?? DateOnly.FromDateTime(DateTime.UtcNow)
+            };
+            return entity;
+        }
+
+        public void MapUpdateDtoToEntity(RevolvingFundStatusHybridDto dto, RevolvingFundStatus entity)
+        {
+            entity.OpeningBalance = dto.OpeningBalance;
+            entity.Receipt = dto.Receipt;
+            entity.Expenditure = dto.Expenditure;
+            entity.ClosingBalance = dto.ClosingBalance;
+        }
+
+        public RevolvingFundStatus MapToEntity(RevolvingFundStatusHybridDto dto)
+        {
+            return new RevolvingFundStatus
+            {
+                OpeningBalance = dto.OpeningBalance,
+                Receipt = dto.Receipt,
+                Expenditure = dto.Expenditure,
+                ClosingBalance = dto.ClosingBalance
+            };
+        }
+
+        public void MapUpdateDtoToEntity(VisitorDetailHybridDto dto, VisitorDetail entity)
+        {
+            entity.VisitorId = dto.VisitorId;
+            entity.Name = dto.Name;
+            entity.MobileNo = dto.MobileNo;
+            entity.Date = dto.Date;
+            entity.Location = dto.Location;
+            entity.Purpose = dto.Purpose;
+            entity.PurposeOfVisit = dto.PurposeOfVisit;
+            entity.Male_SC = dto.Male_SC;
+            entity.Male_ST = dto.Male_ST;
+            entity.Male_OBC = dto.Male_OBC;
+            entity.Male_GEN = dto.Male_GEN;
+            entity.Female_SC = dto.Female_SC;
+            entity.Female_ST = dto.Female_ST;
+            entity.Female_OBC = dto.Female_OBC;
+            entity.Female_GEN = dto.Female_GEN;
+            entity.Male_Total = dto.Male_Total;
+            entity.Female_Total = dto.Female_Total;
+            entity.Total = dto.Total;
+        }
+
+        public VisitorDetail MapToEntity(VisitorDetailHybridDto dto)
+        {
+            return new VisitorDetail
+            {
+                VisitorId = dto.VisitorId,
+                Name = dto.Name,
+                MobileNo = dto.MobileNo,
+                Date = dto.Date,
+                Location = dto.Location,
+                Purpose = dto.Purpose,
+                PurposeOfVisit = dto.PurposeOfVisit,
+                Male_SC = dto.Male_SC,
+                Male_ST = dto.Male_ST,
+                Male_OBC = dto.Male_OBC,
+                Male_GEN = dto.Male_GEN,
+                Female_SC = dto.Female_SC,
+                Female_ST = dto.Female_ST,
+                Female_OBC = dto.Female_OBC,
+                Female_GEN = dto.Female_GEN,
+                Male_Total = dto.Male_Total,
+                Female_Total = dto.Female_Total,
+                Total = dto.Total
+            };
         }
     }
 }

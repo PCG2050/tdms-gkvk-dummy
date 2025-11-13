@@ -36,7 +36,7 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
             //  generic history service
-            _historyService = new GenericTrainerHistoryService<ConsultingAndSocialMediaService>(currentUserService,trainerAssignmentRepository,organizationUnitRepository);
+            _historyService = new GenericTrainerHistoryService<ConsultingAndSocialMediaService>(currentUserService, trainerAssignmentRepository, organizationUnitRepository);
         }
 
         // ==========================================
@@ -185,7 +185,7 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
             return ServiceResult<ModeAndOutreachDto>.Success(resultDto);
         }
 
-        public async Task<ServiceResult<ModeAndOutreachDto>> UpdateModeAndOutreachAsync(int modeAndOutreachId,ModeAndOutreachCreateDto dto)
+        public async Task<ServiceResult<ModeAndOutreachDto>> UpdateModeAndOutreachAsync(int modeAndOutreachId, ModeAndOutreachCreateDto dto)
         {
             var modeAndOutreach = await _modeAndOutreachRepository.GetByIdAsync(modeAndOutreachId);
 
@@ -250,6 +250,148 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
             var dtos = modeAndOutreaches.Select(m => _mapper.MapToDto(m)).ToList();
 
             return ServiceResult<List<ModeAndOutreachDto>>.Success(dtos);
+        }
+
+        // ==========================================
+        // Composite Create/Update with Children
+        // ==========================================
+
+        public async Task<ServiceResult<ConsultingServiceDto>> CreateWithChildrenAsync(ConsultingServiceWithChildrenCreateDto dto)
+        {
+            // Step 1: Validate unit location access
+            if (!await CanUserAccessUnitLocationAsync(dto.UnitLocationId))
+                return ServiceResult<ConsultingServiceDto>.Failure(
+                    "Access denied to unit location",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            try
+            {
+                // Step 2: Create parent ConsultingService
+                var parentEntity = _mapper.MapToEntity(dto);
+                parentEntity.CreatedById = _currentUserService.UserId;
+                parentEntity.CreatedAt = DateTimeOffset.UtcNow;
+                parentEntity.OrganizationId = _currentUserService.OrganizationId;
+                parentEntity.FormStatus = "Draft";
+
+                var createdService = await _consultingServiceRepository.CreateAsync(parentEntity);
+                var serviceId = createdService.Id;
+
+                // Step 3: Create ModeAndOutreach children if provided
+                if (dto.ModeAndOutreaches != null && dto.ModeAndOutreaches.Any())
+                {
+                    foreach (var modeDto in dto.ModeAndOutreaches)
+                    {
+                        var modeEntity = _mapper.MapToEntity(modeDto);
+                        modeEntity.ConsultingServiceId = serviceId;
+                        modeEntity.CreatedById = _currentUserService.UserId;
+                        modeEntity.CreatedAt = DateTimeOffset.UtcNow;
+                        await _modeAndOutreachRepository.CreateAsync(modeEntity);
+                    }
+                }
+
+                // Step 4: Get complete entity with all children and return
+                var completeEntity = await _consultingServiceRepository.GetWithDetailsAsync(serviceId);
+                return ServiceResult<ConsultingServiceDto>.Success(_mapper.MapToDto(completeEntity));
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<ConsultingServiceDto>.Failure(
+                    $"Failed to create consulting service with children: {ex.Message}",
+                    ServiceErrorStatus.INTERNALERROR);
+            }
+        }
+
+        public async Task<ServiceResult<ConsultingServiceDto>> UpdateWithChildrenAsync(int consultingServiceId, ConsultingServiceWithChildrenUpdateDto dto)
+        {
+            // Step 1: Get existing service
+            var existingService = await _consultingServiceRepository.GetByIdAsync(consultingServiceId);
+            if (existingService == null)
+                return ServiceResult<ConsultingServiceDto>.Failure(
+                    "Consulting service not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            // Step 2: Check permissions
+            if (!await _entityPermissionService.CanModifyForm(existingService))
+                return ServiceResult<ConsultingServiceDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            // Step 3: Validate form status
+            if (existingService.FormStatus != "Draft")
+                return ServiceResult<ConsultingServiceDto>.Failure(
+                    "Cannot modify submitted or approved consulting services",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            try
+            {
+                // Step 4: Update parent ConsultingService
+                _mapper.MapUpdateDtoToEntity(dto, existingService);
+                existingService.UpdatedById = _currentUserService.UserId;
+                existingService.UpdatedAt = DateTimeOffset.UtcNow;
+                await _consultingServiceRepository.UpdateAsync(existingService);
+
+                // Step 5: Handle ModeAndOutreach children - Hybrid Pattern (CREATE/UPDATE/DELETE)
+                var existingModeAndOutreaches = await _modeAndOutreachRepository.GetByConsultingServiceIdAsync(consultingServiceId);
+
+                if (dto.ModeAndOutreaches != null)
+                {
+                    var incomingIds = dto.ModeAndOutreaches
+                        .Where(m => m.Id.HasValue && m.Id.Value > 0)
+                        .Select(m => m.Id!.Value)
+                        .ToList();
+
+                    // DELETE: Items in DB but NOT in incoming array
+                    var itemsToDelete = existingModeAndOutreaches.Where(m => !incomingIds.Contains(m.Id)).ToList();
+                    foreach (var item in itemsToDelete)
+                    {
+                        await _modeAndOutreachRepository.DeleteAsync(item.Id);
+                    }
+
+                    // CREATE or UPDATE
+                    foreach (var modeDto in dto.ModeAndOutreaches)
+                    {
+                        if (modeDto.Id.HasValue && modeDto.Id.Value > 0)
+                        {
+                            // UPDATE existing
+                            var existing = existingModeAndOutreaches.FirstOrDefault(m => m.Id == modeDto.Id.Value);
+                            if (existing != null)
+                            {
+                                _mapper.MapUpdateDtoToEntity(modeDto, existing);
+                                existing.UpdatedById = _currentUserService.UserId;
+                                existing.UpdatedAt = DateTimeOffset.UtcNow;
+                                await _modeAndOutreachRepository.UpdateAsync(existing);
+                            }
+                        }
+                        else
+                        {
+                            // CREATE new
+                            var newMode = _mapper.MapToEntity(modeDto);
+                            newMode.ConsultingServiceId = consultingServiceId;
+                            newMode.CreatedById = _currentUserService.UserId;
+                            newMode.CreatedAt = DateTimeOffset.UtcNow;
+                            await _modeAndOutreachRepository.CreateAsync(newMode);
+                        }
+                    }
+                }
+                else
+                {
+                    // If dto.ModeAndOutreaches is null, delete all existing
+                    foreach (var item in existingModeAndOutreaches)
+                    {
+                        await _modeAndOutreachRepository.DeleteAsync(item.Id);
+                    }
+                }
+
+                // Step 6: Get complete entity with all children and return
+                var completeEntity = await _consultingServiceRepository.GetWithDetailsAsync(consultingServiceId);
+                return ServiceResult<ConsultingServiceDto>.Success(_mapper.MapToDto(completeEntity));
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<ConsultingServiceDto>.Failure(
+                    $"Failed to update consulting service with children: {ex.Message}",
+                    ServiceErrorStatus.INTERNALERROR);
+            }
         }
 
         // ==========================================
@@ -443,7 +585,7 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
                 getUnitLocationId: x => x.UnitLocationId,
                 getTitleOrName: x => x.Title ?? x.Category?.Name,
                 getFormStatus: x => x.FormStatus,
-                getCreatedById: x => x.CreatedById?? 0, 
+                getCreatedById: x => x.CreatedById ?? 0,
                 _unitHeadAssignmentRepository,
                 pageNumber,
                 pageSize);

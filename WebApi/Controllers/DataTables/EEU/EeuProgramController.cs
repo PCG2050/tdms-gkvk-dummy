@@ -1,6 +1,7 @@
 ﻿// EeuProgramController.cs
 using Application.Interface.Services.DataTables.EEU;
 using Application.Models.DataTables.EEU;
+using Application.Models.DataTables.KVK;
 
 
 namespace WebApi.Controllers.DataTables.EEU
@@ -96,6 +97,21 @@ namespace WebApi.Controllers.DataTables.EEU
         public async Task<IActionResult> AddProgramContent(int programId, [FromBody] EeuProgramContentCreateDto dto)
         {
             var result = await _service.AddProgramContentAsync(programId, dto);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
+        [HttpPost("{programId}/content-with-children")]
+        public async Task<IActionResult> AddProgramContentWithChildren(int programId, [FromBody] EeuProgramContentWithChildrenCreateDto dto)
+        {
+            var result = await _service.AddProgramContentWithChildrenAsync(programId, dto);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
+
+        [HttpPut("content/{contentId}/with-children")]
+        public async Task<IActionResult> UpdateProgramContentWithChildren(int contentId, [FromBody] EeuProgramContentWithChildrenUpdateDto dto)
+        {
+            var result = await _service.UpdateProgramContentWithChildrenAsync(contentId, dto);
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 

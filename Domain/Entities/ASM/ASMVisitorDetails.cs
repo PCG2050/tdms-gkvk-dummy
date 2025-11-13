@@ -16,8 +16,7 @@ namespace Domain.Entities.ASM
         public int FarmersCount { get; set; }
         public int StudentsCount { get; set; }
         public int PublicCount { get; set; }       
-        public DateTime SubmittedDate { get; set; }
-
+        public DateOnly SubmittedDate { get; set; }
 
         [Required]
         public int UnitLocationId { get; set; }
@@ -30,7 +29,7 @@ namespace Domain.Entities.ASM
         [JsonIgnore]
         [ForeignKey(nameof(OrganizationId))]
         public Organization? Organization { get; set; }
-        public int? FIUActivitiesId { get; set; }
+        
 
         public DateOnly? StartDate { get; set; }
         public DateOnly? EndDate { get; set; }

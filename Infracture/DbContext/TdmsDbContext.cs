@@ -345,43 +345,7 @@ namespace Infrastructure.DbContext
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<FIUActivity>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.ActivityName).IsRequired().HasMaxLength(200);
-                entity.Property(e => e.ActivityCategory).IsRequired().HasMaxLength(100);
-                entity.HasIndex(e => e.DisplayOrder);
-            });
-
-            modelBuilder.Entity<FIUProgramActivity>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-
-                entity.HasOne(e => e.UnitLocation)
-               .WithMany()
-               .HasForeignKey(e => e.UnitLocationId)
-               .OnDelete(DeleteBehavior.Restrict);
-
-                entity.HasOne(e => e.Organization)
-                    .WithMany()
-                    .HasForeignKey(e => e.OrganizationId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                entity.HasOne(e => e.FIUActivity)
-                    .WithMany(a => a.ProgramActivities)
-                    .HasForeignKey(e => e.FIUActivitiesId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                entity.HasOne(e => e.ApprovedBy)
-                    .WithMany()
-                    .HasForeignKey(e => e.ApprovedById)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                entity.HasIndex(e => e.FormStatus);
-                entity.HasIndex(e => e.CreatedAt);
-
-            });
+          
 
 
             modelBuilder.Entity<TrainerAssignment>()

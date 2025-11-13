@@ -34,7 +34,7 @@ namespace Application.Models
 
         public int? ThemeId { get; set; }
 
-        public string? ThemeName { get; set; }  
+        public string? ThemeName { get; set; }
         [MaxLength(200)]
         public string? OtherTheme { get; set; }
 
@@ -75,7 +75,7 @@ namespace Application.Models
         public string? FormStatusRemarks { get; set; }
 
         public DateTimeOffset? ApprovedAt { get; set; }
-        public int? ApprovedById { get; set; }      
+        public int? ApprovedById { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; }
         public int CreatedById { get; set; }
@@ -89,10 +89,10 @@ namespace Application.Models
 
     public class CompleteTblServicesDto : TblServicesDto
     {
-       public List<TableHostelDto> TableHostels { get; set; } = new();
-       public List<RevolvingFundStatusDto> RevolvingFundStatuses { get; set; } = new();
+        public List<TableHostelDto> TableHostels { get; set; } = new();
+        public List<RevolvingFundStatusDto> RevolvingFundStatuses { get; set; } = new();
 
-       public List<VisitorDetailDto> Visitors { get; set; } = new();
+        public List<VisitorDetailDto> Visitors { get; set; } = new();
     }
 
     public class TblServiceCreateDto
@@ -111,7 +111,7 @@ namespace Application.Models
 
         public int? ThemeId { get; set; }
 
-        
+
         public string? OtherTheme { get; set; }
 
         public string? CropPlantProductName { get; set; }
@@ -148,7 +148,7 @@ namespace Application.Models
         public string? OtherCategory { get; set; }
 
         public int? ThemeId { get; set; }
-        public string? OtherTheme { get; set; }    
+        public string? OtherTheme { get; set; }
 
 
         public string? CropPlantProductName { get; set; }
@@ -176,8 +176,8 @@ namespace Application.Models
 
     public class TableHostelDto
     {
-    public int Id { get; set; }
-        public int? ServiceId { get; set; }    
+        public int Id { get; set; }
+        public int? ServiceId { get; set; }
 
         public DateOnly? Date { get; set; }
 
@@ -195,10 +195,10 @@ namespace Application.Models
 
         public int NumberOfDaysStayed { get; set; }
 
-       
+
         public string? VillageOrTaluk { get; set; }
 
-  
+
         public string? Purpose { get; set; }
 
 
@@ -207,7 +207,7 @@ namespace Application.Models
         public DateOnly SubmittedDate { get; set; }
     }
 
-   
+
     public class TableHostelCreateDto
     {
         public DateOnly? Date { get; set; }
@@ -302,7 +302,108 @@ namespace Application.Models
         public int Total { get; set; }
     }
 
+    // ============================
+    // HYBRID DTOs FOR UPDATE OPERATIONS
+    // ============================
 
-    
+    /// <summary>
+    /// Hybrid DTO for TableHostel - can be new (no Id) or existing (has Id)
+    /// Used in update operations to support create/update in one call
+    /// </summary>
+    public class TableHostelHybridDto
+    {
+        public int? Id { get; set; }  // null or 0 = create new, > 0 = update existing
+        public DateOnly? Date { get; set; }
+        public int Male_SC { get; set; }
+        public int Male_ST { get; set; }
+        public int Male_OBC { get; set; }
+        public int Male_GEN { get; set; }
+        public int Female_SC { get; set; }
+        public int Female_ST { get; set; }
+        public int Female_OBC { get; set; }
+        public int Female_GEN { get; set; }
+        public int NumberOfDaysStayed { get; set; }
+        public string? VillageOrTaluk { get; set; }
+        public string? Purpose { get; set; }
+        public decimal AmountGenerated { get; set; }
+        public DateOnly? SubmittedDate { get; set; }
+    }
+
+    /// <summary>
+    /// Hybrid DTO for RevolvingFundStatus
+    /// </summary>
+    public class RevolvingFundStatusHybridDto
+    {
+        public int? Id { get; set; }  // null or 0 = create new, > 0 = update existing
+        public decimal OpeningBalance { get; set; }
+        public int Receipt { get; set; }
+        public decimal Expenditure { get; set; }
+        public double ClosingBalance { get; set; }
+    }
+
+    /// <summary>
+    /// Hybrid DTO for VisitorDetail
+    /// </summary>
+    public class VisitorDetailHybridDto
+    {
+        public int? Id { get; set; }  // null or 0 = create new, > 0 = update existing
+        public int VisitorId { get; set; }
+        public string? Name { get; set; }
+        public int? MobileNo { get; set; }
+        public DateOnly? Date { get; set; }
+        public string? Location { get; set; }
+        public string? Purpose { get; set; }
+        public string? PurposeOfVisit { get; set; }
+        public int Male_SC { get; set; } = 0;
+        public int Male_ST { get; set; } = 0;
+        public int Male_OBC { get; set; } = 0;
+        public int Male_GEN { get; set; } = 0;
+        public int Female_SC { get; set; } = 0;
+        public int Female_ST { get; set; } = 0;
+        public int Female_OBC { get; set; } = 0;
+        public int Female_GEN { get; set; } = 0;
+        public int Male_Total { get; set; }
+        public int Female_Total { get; set; }
+        public int Total { get; set; }
+    }
+
+    /// <summary>
+    /// Composite DTO for updating TblService with all child entities in a single transaction
+    /// Uses Hybrid Pattern:
+    /// - Items WITH Id > 0: UPDATE existing
+    /// - Items WITHOUT Id (null or 0): CREATE new
+    /// - Items in DB but NOT in arrays: DELETE
+    /// Perfect for "Save & Next" button with inline editing
+    /// </summary>
+    public class TblServiceWithChildrenUpdateDto
+    {
+        // Parent fields
+        public DateOnly? StartDate { get; set; }
+        public DateOnly? EndDate { get; set; }
+        public int? CategoryId { get; set; }
+        public string? OtherCategory { get; set; }
+        public int? ThemeId { get; set; }
+        public string? OtherTheme { get; set; }
+        public string? CropPlantProductName { get; set; }
+        public string? Variety { get; set; }
+        public int? SourceOfFundId { get; set; }
+        public string? OtherSourceOfFund { get; set; }
+        public string? Component { get; set; }
+        public int? QuantityUnitId { get; set; }
+        public int? Number { get; set; }
+        public decimal? AmountGenerated { get; set; }
+        public decimal? AmountReleased { get; set; }
+        public DateOnly? Date { get; set; }
+        public string? RentedTo { get; set; }
+        public string? TitleOfActivityConducted { get; set; }
+
+        // Child collections - Hybrid Pattern
+        // If item has Id > 0: update it
+        // If item has no Id (null or 0): create it
+        // If existing item not in array: delete it
+        public List<TableHostelHybridDto>? TableHostels { get; set; }
+        public List<RevolvingFundStatusHybridDto>? RevolvingFundStatuses { get; set; }
+        public List<VisitorDetailHybridDto>? VisitorDetails { get; set; }
+    }
 
 }

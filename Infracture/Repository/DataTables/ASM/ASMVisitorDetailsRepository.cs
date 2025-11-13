@@ -237,43 +237,39 @@ namespace Infrastructure.Repository.DataTables.ASM
 
             return summary;
         }
+        public async Task<(ASMVisitorSummaryDto summary, int totalEntries)> GetMonthlyVisitorSummaryAsync(
+    List<int> unitLocationIds,
+    int year,
+    int month)
+        {
+            var startDate = new DateTimeOffset(year, month, 1, 0, 0, 0, TimeSpan.Zero);
+            var endDate = startDate.AddMonths(1).AddSeconds(-1);
 
-      
+            var query = _context.ASMVisitorDetails
+                .Where(a => unitLocationIds.Contains(a.UnitLocationId) &&
+                           a.CreatedAt >= startDate &&
+                           a.CreatedAt <= endDate &&
+                           (a.FormStatus == "Draft" || a.FormStatus == "Pending" || a.FormStatus == "Approved"));
+
+            // Count total entries
+            var totalEntries = await query.CountAsync();
+
+            // Sum all visitor counts
+            var summary = new ASMVisitorSummaryDto
+            {
+                TotalFarmers = await query.SumAsync(v => v.FarmersCount),
+                TotalStudents = await query.SumAsync(v => v.StudentsCount),
+                TotalPublic = await query.SumAsync(v => v.PublicCount)
+            };
+
+            summary.TotalVisitors = summary.TotalFarmers + summary.TotalStudents + summary.TotalPublic;
+
+            return (summary, totalEntries);
+        }
 
 
-        //public async Task<VisitorStatisticsDto> GetVisitorStatisticsAsync(
-        //    List<int> unitLocationIds,
-        //    DateOnly? startDate = null,
-        //    DateOnly? endDate = null)
-        //{
-        //    var query = _context.ASMVisitorDetails
-        //        .Where(x => unitLocationIds.Contains(x.UnitLocationId) && x.FormStatus == "Approved")
-        //        .AsQueryable();
 
-        //    if (startDate.HasValue)
-        //        query = query.Where(x => x.StartDate >= startDate.Value);
 
-        //    if (endDate.HasValue)
-        //        query = query.Where(x => x.EndDate <= endDate.Value);
-
-        //    var statistics = await query
-        //        .GroupBy(x => 1) // Group all for aggregation
-        //        .Select(g => new VisitorStatisticsDto
-        //        {
-        //            TotalFarmers = g.Sum(x => x.FarmersCount),
-        //            TotalStudents = g.Sum(x => x.StudentsCount),
-        //            TotalPublic = g.Sum(x => x.PublicCount),
-        //            TotalEntries = g.Count()
-        //        })
-        //        .FirstOrDefaultAsync();
-
-        //    return statistics ?? new VisitorStatisticsDto
-        //    {
-        //        TotalFarmers = 0,
-        //        TotalStudents = 0,
-        //        TotalPublic = 0,
-        //        TotalEntries = 0
-        //    };
     }
 
 }

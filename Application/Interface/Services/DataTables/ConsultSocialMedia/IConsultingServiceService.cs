@@ -19,6 +19,15 @@ namespace Application.Interface.Services.DataTables.ConsultSocialMedia
         Task<ServiceResult> DeleteModeAndOutreachAsync(int modeAndOutreachId);
         Task<ServiceResult<List<ModeAndOutreachDto>>> GetModeAndOutreachesAsync(int consultingServiceId);
 
+        // Composite Create/Update with Children
+        /// <summary>
+        /// Create ConsultingService with all child entities (ModeAndOutreach) in a single transaction
+        /// </summary>
+        Task<ServiceResult<ConsultingServiceDto>> CreateWithChildrenAsync(ConsultingServiceWithChildrenCreateDto dto);
+
+
+        Task<ServiceResult<ConsultingServiceDto>> UpdateWithChildrenAsync(int consultingServiceId, ConsultingServiceWithChildrenUpdateDto dto);
+
         // Submission & Approval
         Task<ServiceResult> SubmitForApprovalAsync(int consultingServiceId);
         Task<ServiceResult> ApproveConsultingServiceAsync(int consultingServiceId, string? remarks = null);
@@ -36,7 +45,7 @@ namespace Application.Interface.Services.DataTables.ConsultSocialMedia
         /// </summary>
         Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
             int pageNumber = 1,
-            int pageSize = 10);   
+            int pageSize = 10);
 
 
 

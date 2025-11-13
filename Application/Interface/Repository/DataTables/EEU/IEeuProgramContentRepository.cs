@@ -11,5 +11,15 @@ namespace Application.Interface.Repository.DataTables.EEU
         Task<EeuProgramContentAndResources> CreateAsync(EeuProgramContentAndResources entity);
         Task<EeuProgramContentAndResources> UpdateAsync(EeuProgramContentAndResources entity);
         Task DeleteAsync(int id);
+
+        Task<EeuProgramContentAndResources> CreateWithChildrenAsync(EeuProgramContentAndResources parent,
+          List<EeuResourcePerson>? resourcePersons,
+          List<EeuTopicsCoveredInClass>? topicsCovered,
+          List<EeuTeachingAidsDeveloped>? teachingAids);
+
+        Task<EeuProgramContentAndResources> UpdateWithChildrenAsync(EeuProgramContentAndResources parent,
+            List<EeuResourcePerson>? resourcePersons,
+            List<EeuTopicsCoveredInClass>? topicsCovered,
+            List<EeuTeachingAidsDeveloped>? teachingAids);
     }
 }

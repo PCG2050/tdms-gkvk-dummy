@@ -68,7 +68,6 @@ namespace Infrastructure.Repository.DataTables.KVK
                 await _context.SaveChangesAsync();
             }
         }
-
         /// <summary>
         /// Create parent with all child entities in a single transaction
         /// </summary>
@@ -153,9 +152,7 @@ namespace Infrastructure.Repository.DataTables.KVK
                 if (existing == null)
                     throw new InvalidOperationException($"Content with ID {contentId} not found");
 
-                // 1. Update parent entity
-                existing.Title = parent.Title;
-                existing.Description = parent.Description;
+                // 1. Update parent entity               
                 existing.UpdatedById = parent.UpdatedById;
                 existing.UpdatedAt = parent.UpdatedAt;
                 _context.KvkProgramContentAndResources.Update(existing);

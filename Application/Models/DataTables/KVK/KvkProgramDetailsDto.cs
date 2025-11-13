@@ -603,6 +603,89 @@ namespace Application.Models.DataTables.KVK
         public string? BC { get; set; }
     }
 
+    /// <summary>
+    /// Composite DTO for creating KvkResult along with all child entities (FldResults and OftResults) in a single transaction
+    /// </summary>
+    public class KvkResultWithChildrenCreateDto
+    {
+        // Parent fields
+        public string? UploadExcelUrl { get; set; }
+
+        // Child collections (optional - can be null or empty if UI doesn't have data yet)
+        public List<KvkFldResultCreateDto>? FldResults { get; set; }
+        public List<KvkOftResultCreateDto>? OftResults { get; set; }
+    }
+
+    /// <summary>
+    /// Hybrid item for FLD Result - can be new (no Id) or existing (has Id)
+    /// Used in update operations to support create/update in one call
+    /// </summary>
+    public class KvkFldResultHybridDto
+    {
+        public int? Id { get; set; }  // null or 0 = create new, has value = update existing
+        public int DetailsOfDemoId { get; set; }
+        public int FldNumber { get; set; }
+        public string? Parameter1 { get; set; }
+        public string? Observation1 { get; set; }
+        public string? Parameter2 { get; set; }
+        public string? Observation2 { get; set; }
+        public string? Parameter3 { get; set; }
+        public string? Observation3 { get; set; }
+        public string? Parameter4 { get; set; }
+        public string? Observation4 { get; set; }
+        public string? Parameter5 { get; set; }
+        public string? Observation5 { get; set; }
+        public decimal? Yield { get; set; }
+        public decimal? GrossCost { get; set; }
+        public decimal? GrossReturns { get; set; }
+        public decimal? NetReturns { get; set; }
+        public string? BC { get; set; }
+    }
+
+    /// <summary>
+    /// Hybrid item for OFT Result
+    /// </summary>
+    public class KvkOftResultHybridDto
+    {
+        public int? Id { get; set; }  // null or 0 = create new, has value = update existing
+        public int DetailsOfDemoId { get; set; }
+        public string? Parameter1 { get; set; }
+        public string? Observation1 { get; set; }
+        public string? Parameter2 { get; set; }
+        public string? Observation2 { get; set; }
+        public string? Parameter3 { get; set; }
+        public string? Observation3 { get; set; }
+        public string? Parameter4 { get; set; }
+        public string? Observation4 { get; set; }
+        public string? Parameter5 { get; set; }
+        public string? Observation5 { get; set; }
+        public decimal? Yield { get; set; }
+        public decimal? GrossCost { get; set; }
+        public decimal? GrossReturns { get; set; }
+        public decimal? NetReturns { get; set; }
+        public string? BC { get; set; }
+    }
+
+    /// <summary>
+    /// Composite DTO for updating KvkResult with all child entities in a single transaction
+    /// Uses Hybrid Pattern:
+    /// - Items WITH Id: UPDATE existing
+    /// - Items WITHOUT Id (null or 0): CREATE new
+    /// - Items in DB but NOT in arrays: DELETE
+    /// </summary>
+    public class KvkResultWithChildrenUpdateDto
+    {
+        // Parent fields
+        public string? UploadExcelUrl { get; set; }
+
+        // Child collections - Hybrid Pattern
+        // If item has Id > 0: update it
+        // If item has no Id (null or 0): create it
+        // If existing item not in array: delete it
+        public List<KvkFldResultHybridDto>? FldResults { get; set; }
+        public List<KvkOftResultHybridDto>? OftResults { get; set; }
+    }
+
     // ============================
     // REPORT DTOs (Non-FLD/OFT)
     // ============================

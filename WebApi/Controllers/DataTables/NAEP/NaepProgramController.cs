@@ -1,5 +1,6 @@
 ﻿// NaepProgramController.cs
 using Application.Interface.Services.DataTables.NAEP;
+using Application.Models.DataTables.KVK;
 using Application.Models.DataTables.NAEP;
 
 
@@ -96,6 +97,21 @@ namespace WebApi.Controllers.DataTables.NAEP
         public async Task<IActionResult> AddProgramContent(int programId, [FromBody] NaepProgramContentCreateDto dto)
         {
             var result = await _service.AddProgramContentAsync(programId, dto);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
+        [HttpPost("{programId}/content-with-children")]
+        public async Task<IActionResult> AddProgramContentWithChildren(int programId, [FromBody] NaepProgramContentWithChildrenCreateDto dto)
+        {
+            var result = await _service.AddProgramContentWithChildrenAsync(programId, dto);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
+
+        [HttpPut("content/{contentId}/with-children")]
+        public async Task<IActionResult> UpdateProgramContentWithChildren(int contentId, [FromBody] NaepProgramContentWithChildrenUpdateDto dto)
+        {
+            var result = await _service.UpdateProgramContentWithChildrenAsync(contentId, dto);
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 

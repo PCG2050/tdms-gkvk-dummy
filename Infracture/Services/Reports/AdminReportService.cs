@@ -29,6 +29,7 @@ namespace Infrastructure.Services.Reports
         private readonly IStuProgramDetailsRepository _stuRepository;
         private readonly IAticProgramDetailsRepository _aticRepository;
         //private readonly IFtiProgramDetailsRepository _ftiRepository;
+        private readonly IASMVisitorDetailsRepository _asmRepository;
 
         private readonly IPublicationRepository _publicationRepository;
         private readonly INominationRewardRepository _nominationRewardRepository;
@@ -55,7 +56,8 @@ namespace Infrastructure.Services.Reports
             IAticProgramDetailsRepository aticRepository,
             IEeuProgramDetailsRepository eeuRepository,
             IDeuProgramDetailsRepository deuRepository,
-            IFIUProgramActivityRepository fiuRepository  // NEW
+            IFIUProgramActivityRepository fiuRepository,
+            IASMVisitorDetailsRepository asmRepository
             )
         {
             _currentUserService = currentUserService;
@@ -73,7 +75,8 @@ namespace Infrastructure.Services.Reports
             _aticRepository = aticRepository;
             _eeuRepository = eeuRepository;
             _deuRepository = deuRepository;
-            _fiuRepository = fiuRepository;  // NEW
+            _fiuRepository = fiuRepository;
+            _asmRepository = asmRepository;
         }
 
         public async Task<ServiceResult<ReportFilterOptionsDto>> GetFilterOptionsAsync()
@@ -174,14 +177,56 @@ namespace Infrastructure.Services.Reports
                 // Return early for FIU units (don't query other tables)
                 return ServiceResult<AdminReportResponseDto>.Success(report);
             }
-          
 
-        
+            // ========== NEW: ASM UNIT LOGIC ==========
+           
+            if (location.UnitId == UnitConstants.ASM_UNIT_ID)
+            {
+                var (summary, totalEntries) = await _asmRepository.GetMonthlyVisitorSummaryAsync(
+                    new List<int> { filter.UnitLocationId },
+                    filter.Year,
+                    filter.Month
+                );
 
-            // ========== END FIU SPECIFIC LOGIC ==========
+                
+                var visitorItems = new List<ASMVisitorReportItemDto>
+            {
+                new ASMVisitorReportItemDto
+                {
+                    SlNo = 1,
+                    Particulars = "Farmers",
+                    NoOfVisitors = summary.TotalFarmers
+                },
+                new ASMVisitorReportItemDto
+                {
+                    SlNo = 2,
+                    Particulars = "Students",
+                    NoOfVisitors = summary.TotalStudents
+                },
+                new ASMVisitorReportItemDto
+                {
+                    SlNo = 3,
+                    Particulars = "Other public visitors",
+                    NoOfVisitors = summary.TotalPublic
+                }
+            };
+
+                report.ASMActivities = new ReportASMActivitiesDto
+                {
+                    Visitors = visitorItems,
+                    TotalVisitors = summary.TotalVisitors,
+                    TotalEntries = totalEntries
+                };
+
+                report.TotalEntries = totalEntries;
+                return ServiceResult<AdminReportResponseDto>.Success(report);
+            }
+
+
+           
 
             // ========== EXISTING LOGIC FOR OTHER UNITS ==========
-            // (Only execute for non-FIU units)
+           
 
             // ========== NOMINATION & REWARDS ==========
             var nominations = await _nominationRewardRepository.GetAllAsync();

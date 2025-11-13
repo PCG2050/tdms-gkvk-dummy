@@ -45,6 +45,26 @@ namespace Application.Interface.Services.DataTables
         Task<ServiceResult<List<VisitorDetailDto>>> GetVisitorDetailsAsync(int serviceId);
 
         // ============================
+        // COMPOSITE CREATE/UPDATE WITH CHILDREN
+        // ============================
+
+        /// <summary>
+        /// Create TblService with all child entities (TableHostel, RevolvingFundStatus, VisitorDetail) in a single transaction
+        /// Solves the parent-child ID dependency - perfect for "Save & Next" button
+        /// Note: TblServiceCreateDto already has optional child lists, this method uses them properly
+        /// </summary>
+        Task<ServiceResult<TblServicesDto>> CreateWithChildrenAsync(TblServiceCreateDto dto);
+
+        /// <summary>
+        /// Update TblService with all child entities using Hybrid Pattern in a single transaction
+        /// - Items WITH Id: UPDATE existing
+        /// - Items WITHOUT Id (null or 0): CREATE new
+        /// - Items in DB but NOT in arrays: DELETE
+        /// Perfect for "Save & Next" button with inline editing
+        /// </summary>
+        Task<ServiceResult<TblServicesDto>> UpdateWithChildrenAsync(int serviceId, TblServiceWithChildrenUpdateDto dto);
+
+        // ============================
         // SUBMISSION & APPROVAL WORKFLOW
         // ============================
 

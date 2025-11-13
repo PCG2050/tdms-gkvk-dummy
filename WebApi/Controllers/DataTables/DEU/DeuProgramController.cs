@@ -1,6 +1,7 @@
 ﻿// DeuProgramController.cs
 using Application.Interface.Services.DataTables.DEU;
 using Application.Models.DataTables.DEU;
+using Application.Models.DataTables.KVK;
 
 
 namespace WebApi.Controllers.DataTables.DEU
@@ -96,6 +97,21 @@ namespace WebApi.Controllers.DataTables.DEU
         public async Task<IActionResult> AddProgramContent(int programId, [FromBody] DeuProgramContentCreateDto dto)
         {
             var result = await _service.AddProgramContentAsync(programId, dto);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
+        [HttpPost("{programId}/content-with-children")]
+        public async Task<IActionResult> AddProgramContentWithChildren(int programId, [FromBody] DeuProgramContentWithChildrenCreateDto dto)
+        {
+            var result = await _service.AddProgramContentWithChildrenAsync(programId, dto);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
+
+        [HttpPut("content/{contentId}/with-children")]
+        public async Task<IActionResult> UpdateProgramContentWithChildren(int contentId, [FromBody] DeuProgramContentWithChildrenUpdateDto dto)
+        {
+            var result = await _service.UpdateProgramContentWithChildrenAsync(contentId, dto);
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
