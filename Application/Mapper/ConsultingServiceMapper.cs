@@ -3,8 +3,8 @@ namespace Application.Mapper
 {
     [Mapper]
     public partial class ConsultingServiceMapper
-    {    
-       
+    {
+
         public partial ConsultingServiceDto MapToDto(ConsultingAndSocialMediaService entity);
         public partial CompleteConsultingServiceDto MapToCompleteDto(ConsultingAndSocialMediaService entity);
         public partial ModeAndOutreachDto MapToDto(TableModeAndOutreach entity);
@@ -32,32 +32,9 @@ namespace Application.Mapper
         [MapProperty(nameof(ConsultingAndSocialMediaService.ExtensionActivity.Name), nameof(ConsultingServiceDto.ExtensionActivityName))]
         [MapProperty(nameof(ConsultingAndSocialMediaService.Particulars.Name), nameof(ConsultingServiceDto.ParticularsName))]
         [MapProperty(nameof(ConsultingAndSocialMediaService.ModeOutreach.Name), nameof(ConsultingServiceDto.ModeOutreachName))]
-        [MapProperty(nameof(ConsultingAndSocialMediaService.ApprovedBy.FirstName ), nameof(ConsultingServiceDto.ApprovedByName))]
+        [MapProperty(nameof(ConsultingAndSocialMediaService.ApprovedBy.FirstName), nameof(ConsultingServiceDto.ApprovedByName))]
         [MapProperty(nameof(ConsultingAndSocialMediaService.CreatedBy.FirstName), nameof(ConsultingServiceDto.CreatedByName))]
         public partial ConsultingServiceDto MapToDtoWithDetails(ConsultingAndSocialMediaService entity);
-
-
-        //public partial ConsultingServiceDto MapToDtoWithDetails(ConsultingAndSocialMediaService entity)
-        //{
-        //    // Use the existing MapToDto method to map base properties,
-        //    // then manually set the navigation properties as per the MapProperty attributes.
-        //    var dto = MapToDto(entity);
-
-        //    dto.UnitName = GetUnitName(entity.UnitLocation);
-        //    dto.DistrictName = GetDistrictName(entity.UnitLocation);
-        //    dto.StateName = GetStateName(entity.UnitLocation);
-        //    dto.OrganizationName = entity.Organization?.Name;
-        //    dto.CategoryName = entity.Category?.Name;
-        //    dto.RelatedToName = entity.RelatedTo?.Name;
-        //    dto.ExtensionActivityName = entity.ExtensionActivity?.Name;
-        //    dto.ParticularsName = entity.Particulars?.Name;
-        //    dto.ModeOutreachName = entity.ModeOutreach?.Name;
-        //    dto.ApprovedByName = entity.ApprovedBy?.FirstName;
-        //    dto.CreatedByName = entity.CreatedBy?.FirstName;
-
-        //    return dto;
-        //}
-
 
         // Manual Mapping for Update DTO
 

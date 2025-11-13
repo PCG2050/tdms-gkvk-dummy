@@ -447,9 +447,7 @@ namespace Infrastructure.Services.DataTables.KVK
                 // Prepare parent entity for update
                 var parentEntity = new KvkProgramContentAndResources
                 {
-                    Id = contentId,
-                    Title = dto.Title,
-                    Description = dto.Description,
+                    Id = contentId,                
                     UpdatedById = _currentUserService.UserId,
                     UpdatedAt = DateTimeOffset.UtcNow
                 };
@@ -896,7 +894,7 @@ namespace Infrastructure.Services.DataTables.KVK
             if (aid == null)
                 return ServiceResult.Failure("Teaching aid not found", ServiceErrorStatus.NOTFOUND);
 
-            var content = await _contentRepository.GetByIdAsync(aid.KvkProgramContentAndResourcesId??0);
+            var content = await _contentRepository.GetByIdAsync(aid.KvkProgramContentAndResourcesId ?? 0);
             var program = await _programRepository.GetByIdAsync(content?.KvkProgramDetailsId ?? 0);
 
             if (program == null || !await _entityPermissionService.CanModifyForm(program))

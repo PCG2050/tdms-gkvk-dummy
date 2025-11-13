@@ -28,6 +28,9 @@ namespace Application.Interface.Services.DataTables.EEU
         // SECTION C: PROGRAM CONTENT & RESOURCES
         // ============================
         Task<ServiceResult<EeuProgramContentDto>> AddProgramContentAsync(int programId, EeuProgramContentCreateDto dto);
+        Task<ServiceResult<EeuProgramContentDto>> AddProgramContentWithChildrenAsync(int programId, EeuProgramContentWithChildrenCreateDto dto);
+        Task<ServiceResult<EeuProgramContentDto>> UpdateProgramContentWithChildrenAsync(int contentId, EeuProgramContentWithChildrenUpdateDto dto);
+
         Task<ServiceResult<EeuProgramContentDto>> GetProgramContentByIdAsync(int contentId);
         Task<ServiceResult> DeleteProgramContentAsync(int contentId);
         Task<ServiceResult<List<EeuProgramContentDto>>> GetProgramContentsByProgramIdAsync(int programId);

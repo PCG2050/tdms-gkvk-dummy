@@ -1,41 +1,3 @@
-using Application.Interface.Repository.DataTables.ATIC;
-using Application.Interface.Repository.DataTables.DEU;
-using Application.Interface.Repository.DataTables.EEU;
-using Application.Interface.Repository.DataTables.NAEP;
-using Application.Interface.Repository.DataTables.STU;
-using Application.Interface.Repository.DataTables.KVK;
-using Application.Interface.Services.DataTables.ATIC;
-using Application.Interface.Services.DataTables.DEU;
-using Application.Interface.Services.DataTables.EEU;
-using Application.Interface.Services.DataTables.NAEP;
-using Application.Interface.Services.DataTables.STU;
-using Application.Interface.Services.DataTables.KVK;
-using Application.Mapper.DataTable.ATIC;
-using Application.Mapper.DataTable.DEU;
-using Application.Mapper.DataTable.EEU;
-using Application.Mapper.DataTable.NAEP;
-using Application.Mapper.DataTable.STU;
-using Application.Mapper.DataTable.KVK;
-using Infrastructure.Repository.DataTables.ATIC;
-using Infrastructure.Repository.DataTables.DEU;
-using Infrastructure.Repository.DataTables.EEU;
-using Infrastructure.Repository.DataTables.NAEP;
-using Infrastructure.Repository.DataTables.STU;
-using Infrastructure.Repository.DataTables.KVK;
-using Infrastructure.Services.DataTables.ATIC;
-using Infrastructure.Services.DataTables.DEU;
-using Infrastructure.Services.DataTables.EEU;
-using Infrastructure.Services.DataTables.NAEP;
-using Infrastructure.Services.DataTables.KVK;
-using Application.Interface.Services.DataTables;
-using Application.Interface.Services.Reports;
-using Infrastructure.Services.Reports;
-using Application.Mapper.Datatable.FIU;
-using Application.Interface.Services.DataTables.FIU;
-using Infrastructure.Services.DataTables.FIU;
-using Application.Interface.Repository.DataTables.FIU;
-using Infrastructure.Repository.DataTables.FIU;
-
 namespace WebApi
 {
     public class Program
@@ -146,43 +108,12 @@ namespace WebApi
             builder.Services.AddScoped<IEntityPermissionService, EntityPermissionService>();
 
             //Tables
-            //builder.Services.AddScoped<I
-            //TrainingProgrammeRepository, FtiTrainingProgrammeRepository>();
-            //builder.Services.AddScoped<IFtiTrainingProgrammeService, FtiTrainingProgrammeService>();
-            builder.Services.AddScoped<IFtiOtherActivitiesRepository, FtiOtherActivitiesRepository>();
-            //builder.Services.AddScoped<IFtiOtherActivityService, FtiOtherActivityService>();
-            
-
-            //builder.Services.AddScoped<IStuTrainingProgrammeRepository, StuTrainingProgrammeRepository>();
-            //builder.Services.AddScoped<IStuTrainingProgrammeService, StuTrainingProgrammeService>();
-            //builder.Services.AddScoped<IStuSposoredTrainingProgrammeRepository, StuSponsoredTrainingProgrammeRepository>();
-            //builder.Services.AddScoped<IStuSponsoredTrainingProgrammeService, StuSponsoredTrainingProgrammeService>();
-
-            //builder.Services.AddScoped<IDaesiProgrammeRepository, DaesiProgramRepository>();
-            //builder.Services.AddScoped<IDaesiProgrammeService, DaesiProgrammeService>();
-
-            //builder.Services.AddScoped<IIbtvaProgrammeRepository, IbtvaProgrammeRepository>();
-            //builder.Services.AddScoped<IIbtvaProgrammeService, IbtvaProgrammeService>();         
-            builder.Services.AddScoped<IAticSalesRepository, AticSalesRepository>();
-
-
-            //builder.Services.AddScoped<IDeuCourseRepository, DeuCourseRepository>();
+       
+            builder.Services.AddScoped<IFtiOtherActivitiesRepository, FtiOtherActivitiesRepository>();                  
+            builder.Services.AddScoped<IAticSalesRepository, AticSalesRepository>();         
             builder.Services.AddScoped<IAsmVisitRepository, AsmVisitRepository>();
 
-            //builder.Services.AddScoped<INaepDetailsRepository, NaepDetailsRepository>();
-
-            //builder.Services.AddScoped<IEeuOftRepository, EeuOftRepository>();
-            //builder.Services.AddScoped<IEeuFldRepository, EeuFldRepository>();
-            //builder.Services.AddScoped<IEeuTrainingProgrammeRepository, EeuTrainingProgrammeRepository>();
-
-           
-            builder.Services.AddScoped<IAticSalesService, AticSalesService>();
-            builder.Services.AddScoped<IAsmVisitService, AsmVisitService>();
-            //builder.Services.AddScoped<IDeuCourseService, DeuCourseService>();
-            //builder.Services.AddScoped<INaepDetailsService, NaepDetailsService>();
-            //builder.Services.AddScoped<IEeuOftService, EeuOftService>();
-            //builder.Services.AddScoped<IEeuFldService, EeuFldService>();
-            //builder.Services.AddScoped<IEeuTrainingProgrammeService, EeuTrainingProgrammeService>();
+        
 
             // Mappers
             builder.Services.AddSingleton<IbtvaProgramMapper>();
@@ -193,8 +124,9 @@ namespace WebApi
             builder.Services.AddSingleton<StuProgramMapper>();
             builder.Services.AddSingleton<KvkProgramMapper>();
             builder.Services.AddSingleton<FIUProgramActivityMapper>();
+            builder.Services.AddSingleton<ASMVisitorDetailsMapper>();
 
-            
+
             builder.Services.AddSingleton<ConsultingServiceMapper>();
             builder.Services.AddSingleton<PublicationMapper>();
             builder.Services.AddSingleton<TblServiceMapper>();
@@ -205,7 +137,12 @@ namespace WebApi
             builder.Services.AddScoped<IFIUActivityRepository, FIUActivityRepository>();
             builder.Services.AddScoped<IFIUProgramActivityRepository, FIUProgramActivityRepository>();
             builder.Services.AddScoped<IFIUProgramActivityService, FIUProgramActivityService>();
-            #endregion 
+            #endregion
+
+            #region ASM
+            builder.Services.AddScoped<IASMVisitorDetailsRepository, ASMVisitorDetailsRepository>();
+            builder.Services.AddScoped<IASMVisitorDetailsService, ASMVisitorDetailsService>();
+            #endregion
 
             #region STU
             builder.Services.AddScoped<IStuProgramDetailsRepository, StuProgramDetailsRepository>();

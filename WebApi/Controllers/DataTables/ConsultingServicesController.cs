@@ -1,5 +1,10 @@
-﻿
-
+﻿using Application.Interface.Services.DataTables;
+using Application.Interface.Services.DataTables.ConsultSocialMedia;
+using Application.Models;
+using Application.Models.DataTables;
+using Domain.Entities.Enum;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers.DataTables
 {
@@ -133,8 +138,8 @@ namespace WebApi.Controllers.DataTables
             var result = await _consultingServiceService.UpdateModeAndOutreachAsync(id, dto);
 
             if (!result.IsSuccess)
-                return BadRequest(new { message = result.ErrorMessage });            
-            
+                return BadRequest(new { message = result.ErrorMessage });
+
             return Ok(new { message = "Mode and outreach updated successfully", data = result.Data });
         }
 
@@ -158,6 +163,73 @@ namespace WebApi.Controllers.DataTables
                 return NotFound(new { message = result.ErrorMessage });
 
             return Ok(new { data = result.Data });
+        }
+
+        // ==========================================
+        // Composite Create/Update with Children (Hybrid Pattern)
+        // ==========================================
+
+        /// <summary>
+        /// Create ConsultingService with all child entities (ModeAndOutreach) in a single transaction.
+        /// Perfect for "Save & Next" button - solves parent-child ID dependency.
+        /// </summary>
+        [HttpPost("with-children")]
+        [Authorize(Roles = RoleString.Trainer)]
+        public async Task<IActionResult> CreateConsultingServiceWithChildren([FromBody] ConsultingServiceWithChildrenCreateDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new { message = "Invalid data", errors = ModelState });
+
+            var result = await _consultingServiceService.CreateWithChildrenAsync(dto);
+
+            if (!result.IsSuccess)
+            {
+                if (result.ErrorStatus == ServiceErrorStatus.FORBIDDEN)
+                    return Forbid();
+
+                return BadRequest(new { message = result.ErrorMessage });
+            }
+
+            return Ok(new
+            {
+                message = "Consulting service created successfully with all children. Submit when ready.",
+                consultingServiceId = result.Data!.Id,
+                data = result.Data
+            });
+        }
+
+        /// <summary>
+        /// Update ConsultingService with all child entities using Hybrid Pattern.
+        /// - Items WITH Id: UPDATE existing
+        /// - Items WITHOUT Id (null or 0): CREATE new
+        /// - Items in DB but NOT in arrays: DELETE
+        /// Perfect for "Save & Next" button with inline editing.
+        /// </summary>
+        [HttpPut("{id}/with-children")]
+        [Authorize(Roles = RoleString.Trainer)]
+        public async Task<IActionResult> UpdateConsultingServiceWithChildren(int id, [FromBody] ConsultingServiceWithChildrenUpdateDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new { message = "Invalid data", errors = ModelState });
+
+            var result = await _consultingServiceService.UpdateWithChildrenAsync(id, dto);
+
+            if (!result.IsSuccess)
+            {
+                if (result.ErrorStatus == ServiceErrorStatus.NOTFOUND)
+                    return NotFound(new { message = result.ErrorMessage });
+
+                if (result.ErrorStatus == ServiceErrorStatus.FORBIDDEN)
+                    return Forbid();
+
+                return BadRequest(new { message = result.ErrorMessage });
+            }
+
+            return Ok(new
+            {
+                message = "Consulting service and children updated successfully. Submit when ready.",
+                data = result.Data
+            });
         }
 
         // ==========================================
@@ -252,34 +324,6 @@ namespace WebApi.Controllers.DataTables
             return Ok(new { data = result.Items, pagination = result });
         }
 
-        [HttpGet("my-history")]
-        [Authorize(Roles = RoleString.Trainer)]
-        public async Task<IActionResult> GetMyHistory(
-         [FromQuery] int pageNumber = 1,
-         [FromQuery] int pageSize = 10)
-        {
-            var result = await _consultingServiceService.GetTrainerHistoryAsync(pageNumber, pageSize);
-            return Ok(result);
-        }
-
-        /// <summary>
-        /// Get pending approvals for Unit Head
-        /// Shows all entries in Pending status for unit locations
-        /// assigned to the logged-in Unit Head
-        /// </summary>
-        /// <param name="pageNumber">Page number (default: 1)</param>
-        /// <param name="pageSize">Items per page (default: 20)</param>
-        /// <response code="200">Paginated list of pending approvals</response>
-        [HttpGet("pending-approvals")]
-        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
-        public async Task<IActionResult> GetPendingApprovals(
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 10)
-        {
-            var result = await _consultingServiceService.GetPendingApprovalsAsync(pageNumber, pageSize);
-            return Ok(result);
-        }
-
     }
- 
+
 }

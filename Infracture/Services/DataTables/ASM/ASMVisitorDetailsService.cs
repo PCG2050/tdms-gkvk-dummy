@@ -67,6 +67,8 @@ namespace Infrastructure.Services.DataTables.ASM
                 FormStatus = "Draft"
             };
 
+         
+
             var savedEntity = await _repository.AddAsync(entity);
             var dto = _mapper.MapToDto(savedEntity);
 
@@ -129,7 +131,6 @@ namespace Infrastructure.Services.DataTables.ASM
             if (updateDto.PublicCount.HasValue)
                 entity.PublicCount = updateDto.PublicCount.Value;
 
-            // Auto-set SubmittedDate to current date
             entity.SubmittedDate = DateOnly.FromDateTime(DateTime.UtcNow);
 
             entity.UpdatedById = _currentUserService.UserId;

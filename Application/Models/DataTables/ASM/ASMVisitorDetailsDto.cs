@@ -13,11 +13,7 @@ namespace Application.Models.DataTables.ASM
         public int OrganizationId { get; set; }
 
         [StringLength(200)]
-        public string? InstituteName { get; set; }
-
-        public DateOnly? StartDate { get; set; }
-        public DateOnly? EndDate { get; set; }
-
+        public string? InstituteName { get; set; } 
         public int FarmersCount { get; set; }
         public int StudentsCount { get; set; }
         public int PublicCount { get; set; }
@@ -73,6 +69,8 @@ namespace Application.Models.DataTables.ASM
 
         [Range(0, int.MaxValue, ErrorMessage = "Public count must be a positive number")]
         public int PublicCount { get; set; }
+
+        public DateTime SubmittedDate { get; set; }
     }
 
     /// <summary>
@@ -96,5 +94,7 @@ namespace Application.Models.DataTables.ASM
 
         [Range(0, int.MaxValue, ErrorMessage = "Public count must be a positive number")]
         public int? PublicCount { get; set; }
+
+        public DateTime? SubmittedDate { get; set; }
     }
 }

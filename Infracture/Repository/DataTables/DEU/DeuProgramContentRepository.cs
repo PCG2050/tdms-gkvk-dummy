@@ -15,19 +15,28 @@ namespace Infrastructure.Repository.DataTables.DEU
             _context = context;
         }
 
+        public async Task<DeuProgramContentAndResources> CreateAsync(DeuProgramContentAndResources entity)
+        {
+            _context.DeuProgramContentAndResources.Add(entity);
+            await _context.SaveChangesAsync();
+            return entity;
+        }
+
         public async Task<DeuProgramContentAndResources?> GetByIdAsync(int id)
         {
-            return await _context.DeuProgramContentAndResources.FindAsync(id);
+            return await _context.DeuProgramContentAndResources
+                .Include(c => c.ProgramDetails)
+                .FirstOrDefaultAsync(c => c.Id == id);
         }
 
         public async Task<DeuProgramContentAndResources?> GetWithDetailsAsync(int id)
         {
             return await _context.DeuProgramContentAndResources
+                .Include(c => c.ProgramDetails)
                 .Include(c => c.ResourcePersons!)
                 .Include(c => c.TopicsCovered!)
                 .Include(c => c.TeachingAids!)
                     .ThenInclude(ta => ta.TypeOfAid)
-                .Include(c => c.ProgramDetails)
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
 
@@ -39,14 +48,8 @@ namespace Infrastructure.Repository.DataTables.DEU
                 .Include(c => c.TeachingAids!)
                     .ThenInclude(ta => ta.TypeOfAid)
                 .Where(c => c.DeuProgramDetailsId == programId)
+                .OrderByDescending(c => c.CreatedAt)
                 .ToListAsync();
-        }
-
-        public async Task<DeuProgramContentAndResources> CreateAsync(DeuProgramContentAndResources entity)
-        {
-            _context.DeuProgramContentAndResources.Add(entity);
-            await _context.SaveChangesAsync();
-            return entity;
         }
 
         public async Task<DeuProgramContentAndResources> UpdateAsync(DeuProgramContentAndResources entity)
@@ -65,7 +68,6 @@ namespace Infrastructure.Repository.DataTables.DEU
                 await _context.SaveChangesAsync();
             }
         }
-
         /// <summary>
         /// Create parent with all child entities in a single transaction
         /// </summary>
@@ -150,7 +152,7 @@ namespace Infrastructure.Repository.DataTables.DEU
                 if (existing == null)
                     throw new InvalidOperationException($"Content with ID {contentId} not found");
 
-                // 1. Update parent entity (if needed, DEU doesn't have Title/Description on content)
+                // 1. Update parent entity               
                 existing.UpdatedById = parent.UpdatedById;
                 existing.UpdatedAt = parent.UpdatedAt;
                 _context.DeuProgramContentAndResources.Update(existing);

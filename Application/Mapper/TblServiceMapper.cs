@@ -33,7 +33,7 @@ namespace Application.Mapper
         [MapProperty(nameof(TblService.QuantityUnit.Name), nameof(TblServicesDto.QuantityUnitName))]
         [MapProperty(nameof(TblService.ApprovedBy.FirstName), nameof(TblServicesDto.ApprovedByName))]
         [MapProperty(nameof(TblService.CreatedBy.FirstName), nameof(TblServicesDto.CreatedByName))]
-        
+
         public partial TblServicesDto MapToDtoWithDetails(TblService entity);
 
         // ----------------------------

@@ -37,6 +37,8 @@ namespace Application.Models.Reports
 
         // NEW: FIU Activities (only populated for FIU unit)
         public ReportFIUActivitiesDto? FIUActivities { get; set; }
+
+        public ReportASMActivitiesDto? ASMActivities { get;set; }
     }
 
     // ========================================
@@ -63,6 +65,37 @@ namespace Application.Models.Reports
         public int SlNo { get; set; }
         public string ActivityName { get; set; } = string.Empty;
         public int Count { get; set; }
+    }
+
+    /// <summary>
+    /// ASM Monthly Visitor Summary for Reports
+    /// </summary>
+    public class ASMVisitorSummaryDto
+    {
+        public int TotalFarmers { get; set; }
+        public int TotalStudents { get; set; }
+        public int TotalPublic { get; set; }
+        public int TotalVisitors { get; set; }
+    }
+
+    /// <summary>
+    /// ASM Report Display Item (for table rows)
+    /// </summary>
+    public class ASMVisitorReportItemDto
+    {
+        public int SlNo { get; set; }
+        public string Particulars { get; set; } = string.Empty;
+        public int NoOfVisitors { get; set; }
+    }
+
+    /// <summary>
+    /// Complete ASM Report Data
+    /// </summary>
+    public class ReportASMActivitiesDto
+    {
+        public List<ASMVisitorReportItemDto> Visitors { get; set; } = new();
+        public int TotalVisitors { get; set; }
+        public int TotalEntries { get; set; }  // Number of DB entries
     }
 
 

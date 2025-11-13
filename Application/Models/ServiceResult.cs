@@ -62,6 +62,7 @@ namespace Application.Models
         INVALIDOPERATION,
         CONFLICT,
         BADREQUEST,
-        VALIDATIONERROR
+        VALIDATIONERROR,
+        INTERNALERROR
     }
 }

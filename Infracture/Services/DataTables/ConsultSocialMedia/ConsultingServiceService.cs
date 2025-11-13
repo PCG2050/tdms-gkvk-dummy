@@ -36,7 +36,7 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
             //  generic history service
-            _historyService = new GenericTrainerHistoryService<ConsultingAndSocialMediaService>(currentUserService,trainerAssignmentRepository,organizationUnitRepository);
+            _historyService = new GenericTrainerHistoryService<ConsultingAndSocialMediaService>(currentUserService, trainerAssignmentRepository, organizationUnitRepository);
         }
 
         // ==========================================
@@ -185,7 +185,7 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
             return ServiceResult<ModeAndOutreachDto>.Success(resultDto);
         }
 
-        public async Task<ServiceResult<ModeAndOutreachDto>> UpdateModeAndOutreachAsync(int modeAndOutreachId,ModeAndOutreachCreateDto dto)
+        public async Task<ServiceResult<ModeAndOutreachDto>> UpdateModeAndOutreachAsync(int modeAndOutreachId, ModeAndOutreachCreateDto dto)
         {
             var modeAndOutreach = await _modeAndOutreachRepository.GetByIdAsync(modeAndOutreachId);
 
@@ -585,7 +585,7 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
                 getUnitLocationId: x => x.UnitLocationId,
                 getTitleOrName: x => x.Title ?? x.Category?.Name,
                 getFormStatus: x => x.FormStatus,
-                getCreatedById: x => x.CreatedById?? 0, 
+                getCreatedById: x => x.CreatedById ?? 0,
                 _unitHeadAssignmentRepository,
                 pageNumber,
                 pageSize);

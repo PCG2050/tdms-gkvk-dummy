@@ -11,5 +11,16 @@ namespace Application.Interface.Repository.DataTables.NAEP
         Task<NaepProgramContentAndResources> CreateAsync(NaepProgramContentAndResources entity);
         Task<NaepProgramContentAndResources> UpdateAsync(NaepProgramContentAndResources entity);
         Task DeleteAsync(int id);
+
+        Task<NaepProgramContentAndResources> CreateWithChildrenAsync(NaepProgramContentAndResources parent,
+          List<NaepResourcePerson>? resourcePersons,
+          List<NaepTopicsCoveredInClass>? topicsCovered,
+          List<NaepTeachingAidsDeveloped>? teachingAids);
+
+        Task<NaepProgramContentAndResources> UpdateWithChildrenAsync(NaepProgramContentAndResources parent,
+            List<NaepResourcePerson>? resourcePersons,
+            List<NaepTopicsCoveredInClass>? topicsCovered,
+            List<NaepTeachingAidsDeveloped>? teachingAids);
+
     }
 }

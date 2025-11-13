@@ -67,7 +67,7 @@ namespace Infrastructure.Services.DataTables
 
             return ServiceResult<TblServicesDto>.Success(dto);
         }
-        
+
 
         public async Task<ServiceResult<CompleteTblServicesDto>> GetCompleteTblServiceAsync(int id)
         {
@@ -203,7 +203,7 @@ namespace Infrastructure.Services.DataTables
 
         public async Task<ServiceResult> DeleteTableHostelAsync(int tableHostelId)
         {
-           var tableHostel = await _tableHostelRepository.GetTableHostelByIdAsync(tableHostelId);
+            var tableHostel = await _tableHostelRepository.GetTableHostelByIdAsync(tableHostelId);
 
             if (tableHostel == null)
                 return ServiceResult.Failure("Table Hostel not found", ServiceErrorStatus.NOTFOUND);
@@ -692,7 +692,7 @@ namespace Infrastructure.Services.DataTables
             return ServiceResult.Success();
         }
 
-        
+
 
         // ============================
         // PAGINATION

@@ -34,7 +34,7 @@ namespace Application.Models
 
         public int? ThemeId { get; set; }
 
-        public string? ThemeName { get; set; }  
+        public string? ThemeName { get; set; }
         [MaxLength(200)]
         public string? OtherTheme { get; set; }
 
@@ -75,7 +75,7 @@ namespace Application.Models
         public string? FormStatusRemarks { get; set; }
 
         public DateTimeOffset? ApprovedAt { get; set; }
-        public int? ApprovedById { get; set; }      
+        public int? ApprovedById { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; }
         public int CreatedById { get; set; }
@@ -89,10 +89,10 @@ namespace Application.Models
 
     public class CompleteTblServicesDto : TblServicesDto
     {
-       public List<TableHostelDto> TableHostels { get; set; } = new();
-       public List<RevolvingFundStatusDto> RevolvingFundStatuses { get; set; } = new();
+        public List<TableHostelDto> TableHostels { get; set; } = new();
+        public List<RevolvingFundStatusDto> RevolvingFundStatuses { get; set; } = new();
 
-       public List<VisitorDetailDto> Visitors { get; set; } = new();
+        public List<VisitorDetailDto> Visitors { get; set; } = new();
     }
 
     public class TblServiceCreateDto
@@ -111,7 +111,7 @@ namespace Application.Models
 
         public int? ThemeId { get; set; }
 
-        
+
         public string? OtherTheme { get; set; }
 
         public string? CropPlantProductName { get; set; }
@@ -148,7 +148,7 @@ namespace Application.Models
         public string? OtherCategory { get; set; }
 
         public int? ThemeId { get; set; }
-        public string? OtherTheme { get; set; }    
+        public string? OtherTheme { get; set; }
 
 
         public string? CropPlantProductName { get; set; }
@@ -176,8 +176,8 @@ namespace Application.Models
 
     public class TableHostelDto
     {
-    public int Id { get; set; }
-        public int? ServiceId { get; set; }    
+        public int Id { get; set; }
+        public int? ServiceId { get; set; }
 
         public DateOnly? Date { get; set; }
 
@@ -195,10 +195,10 @@ namespace Application.Models
 
         public int NumberOfDaysStayed { get; set; }
 
-       
+
         public string? VillageOrTaluk { get; set; }
 
-  
+
         public string? Purpose { get; set; }
 
 
@@ -207,7 +207,7 @@ namespace Application.Models
         public DateOnly SubmittedDate { get; set; }
     }
 
-   
+
     public class TableHostelCreateDto
     {
         public DateOnly? Date { get; set; }
