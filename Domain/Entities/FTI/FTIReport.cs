@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities.FTI
 {
-    public  class FTIReport : AuditableBaseEntity
+    public class FTIReport : AuditableBaseEntity
     {
         [Required]
-        public int FTIProgramDetailsID { get; set; }
-
-        [ForeignKey(nameof(FTIProgramDetailsID))]
-        public FTIProgramDetails ProgramDetails { get; set; }
+        public int? FTIProgramDetailsId { get; set; }
+        [JsonIgnore]
+        [ForeignKey(nameof(FTIProgramDetailsId))]
+        public FTIProgramDetails? ProgramDetails { get; set; }
 
         // Report details
         [MaxLength(150)]
@@ -35,5 +35,8 @@ namespace Domain.Entities.FTI
 
         [MaxLength(1000)]
         public string? SignificantOutcome { get; set; }
+        public int? UnitLocationId { get; set; }
+
+        public int? OrganizationId { get; set; }
     }
 }
