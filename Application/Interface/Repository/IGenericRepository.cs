@@ -1,4 +1,4 @@
-﻿using Application;
+﻿using Application.Constants;
 using Application.Models;
 using Domain.Entities;
 namespace Infrastructure.Repository

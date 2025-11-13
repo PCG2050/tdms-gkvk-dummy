@@ -20,11 +20,11 @@ namespace Application.Interface
         Task<List<User>> GetOrganizationUnitTrainers(int unitId);
         Task<List<User>> GetOrganizationTrainers();
         Task<User> GetCurrentUserDetailsAsync();
-        Task<PaginatedResult<TrainerDetailsDto>> GetPaginatedOrganizationTrainers(int pageNumber = Constants.PAGINATION_PAGE_NUMBER_DEFAULT, int pageSize = Constants.PAGINATION_PAGE_SIZE_DEFAULT);
+        Task<PaginatedResult<TrainerDetailsDto>> GetPaginatedOrganizationTrainers(int pageNumber = Constants.Constants.PAGINATION_PAGE_NUMBER_DEFAULT, int pageSize = Constants.Constants.PAGINATION_PAGE_SIZE_DEFAULT);
 
-        Task<PaginatedResult<FlatTrainerDetailsDto>> GetPaginatedOrgTrainers(int pageNumber = Constants.PAGINATION_PAGE_SIZE_DEFAULT, int pageSize = Constants.PAGINATION_PAGE_SIZE_DEFAULT);
+        Task<PaginatedResult<FlatTrainerDetailsDto>> GetPaginatedOrgTrainers(int pageNumber = Constants.Constants.PAGINATION_PAGE_SIZE_DEFAULT, int pageSize = Constants.Constants.PAGINATION_PAGE_SIZE_DEFAULT);
 
-        Task<PaginatedResult<UnitHeadDetailsDto>> GetPaginatedOrganizationUnitHeads(int pageNumber = Constants.PAGINATION_PAGE_NUMBER_DEFAULT, int pageSize = Constants.PAGINATION_PAGE_SIZE_DEFAULT);
+        Task<PaginatedResult<UnitHeadDetailsDto>> GetPaginatedOrganizationUnitHeads(int pageNumber = Constants.Constants.PAGINATION_PAGE_NUMBER_DEFAULT, int pageSize = Constants.Constants.PAGINATION_PAGE_SIZE_DEFAULT);
 
         Task<List<FlatUnitHeadDetailsDto>> GetPaginatedOrgUnitHeads();
         Task<List<FlatUnitHeadDetailsDto>> GetPaginatedTrainers();

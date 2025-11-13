@@ -1,5 +1,4 @@
-﻿
-using Application.Interface.Repository.DataTables.FIU;
+﻿using Application.Interface.Repository.DataTables.FIU;
 using Application.Interface.Services.DataTables.FIU;
 using Application.Mapper.Datatable.FIU;
 using Application.Models.DataTables.FIU;
@@ -288,7 +287,8 @@ namespace Infrastructure.Services.DataTables.FIU
                 unitLocationIds = new List<int> { requestDto.UnitLocationId.Value };
             }
 
-            var activitySummary = await _activityRepository.GetMonthlyActivitySummaryAsync(
+            // Deconstruct tuple returned by repository into the list and the totalEntries value
+            var (activities, totalEntries) = await _activityRepository.GetMonthlyActivitySummaryAsync(
                 unitLocationIds,
                 requestDto.Year,
                 requestDto.Month);
@@ -300,9 +300,9 @@ namespace Infrastructure.Services.DataTables.FIU
                 Year = requestDto.Year,
                 Month = requestDto.Month,
                 MonthName = monthName,
-                Activities = activitySummary,
-                TotalActivities = activitySummary.Count,
-                TotalCount = activitySummary.Sum(a => a.Count)
+                Activities = activities,
+                TotalActivities = activities.Count,
+                TotalCount = activities.Sum(a => a.Count)
             };
 
             return ServiceResult<FIUMonthlyReportDto>.Success(report);

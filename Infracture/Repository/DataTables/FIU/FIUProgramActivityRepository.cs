@@ -4,6 +4,7 @@ using Application.Models.DataTables.FIU;
 using Domain.Entities.FIU;
 using Infrastructure.DbContext;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Infrastructure.Repository.DataTables.FIU
 {
@@ -146,26 +147,23 @@ namespace Infrastructure.Repository.DataTables.FIU
                 .ToDictionaryAsync(x => x.Status, x => x.Count);
         }
 
-        public async Task<List<FIUActivitySummaryDto>> GetMonthlyActivitySummaryAsync(
-            List<int> unitLocationIds,
-            int year,
-            int month)
+        public async Task<(List<FIUActivitySummaryDto> activities, int totalEntries)> GetMonthlyActivitySummaryAsync(
+        List<int> unitLocationIds, int year, int month)
         {
             var startDate = new DateTimeOffset(year, month, 1, 0, 0, 0, TimeSpan.Zero);
             var endDate = startDate.AddMonths(1).AddSeconds(-1);
 
-            var summary = await _context.FIUProgramActivities
+            var query = _context.FIUProgramActivities
                 .Include(a => a.FIUActivity)
                 .Where(a => unitLocationIds.Contains(a.UnitLocationId) &&
                            a.CreatedAt >= startDate &&
                            a.CreatedAt <= endDate &&
-                           a.FormStatus == "Approved")
-                .GroupBy(a => new
-                {
-                    a.FIUActivitiesId,
-                    ActivityName = a.FIUActivity.ActivityName,
-                    DisplayOrder = a.FIUActivity.DisplayOrder
-                })
+                           (a.FormStatus == "Draft" || a.FormStatus == "Pending" || a.FormStatus == "Approved"));
+
+            var totalEntries = await query.CountAsync(); 
+
+            var summary = await query
+                .GroupBy(a => new { a.FIUActivitiesId, ActivityName = a.FIUActivity.ActivityName, DisplayOrder = a.FIUActivity.DisplayOrder })
                 .Select(g => new FIUActivitySummaryDto
                 {
                     SlNo = g.Key.DisplayOrder,
@@ -175,7 +173,7 @@ namespace Infrastructure.Repository.DataTables.FIU
                 .OrderBy(s => s.SlNo)
                 .ToListAsync();
 
-            return summary;
+            return (summary, totalEntries);
         }
     }
 }

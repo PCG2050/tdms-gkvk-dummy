@@ -31,7 +31,7 @@ namespace Application.Interface.Repository.DataTables.FIU
         Task<Dictionary<string, int>> GetStatsByStatusAsync(List<int> unitLocationIds);
 
         // Monthly Report
-        Task<List<FIUActivitySummaryDto>> GetMonthlyActivitySummaryAsync(
+        Task<(List<FIUActivitySummaryDto> activities, int totalEntries)> GetMonthlyActivitySummaryAsync(
             List<int> unitLocationIds,
             int year,
             int month);

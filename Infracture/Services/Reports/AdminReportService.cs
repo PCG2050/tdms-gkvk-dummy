@@ -1,6 +1,7 @@
 ﻿using Application.Interface;
 using Application.Interface.Repository;
 using Application.Interface.Repository.DataTables;
+using Application.Interface.Repository.DataTables.FIU;
 using Application.Interface.Repository.DataTables.TblService;
 using Application.Interface.Services.Reports;
 using Application.Models;
@@ -19,7 +20,7 @@ namespace Infrastructure.Services.Reports
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
-       
+
         private readonly IDeuProgramDetailsRepository _deuRepository;
         private readonly IEeuProgramDetailsRepository _eeuRepository;
         private readonly IKvkProgramDetailsRepository _kvkRepository;
@@ -34,6 +35,9 @@ namespace Infrastructure.Services.Reports
 
         private readonly IConsultingServiceRepository _consultingRepository;
         private readonly ITableServiceRepository _tblServiceRepository;
+
+        // NEW: FIU Repository
+        private readonly IFIUProgramActivityRepository _fiuRepository;
 
         public AdminReportService(
             ICurrentUserService currentUserService,
@@ -50,7 +54,8 @@ namespace Infrastructure.Services.Reports
             IStuProgramDetailsRepository stuRepository,
             IAticProgramDetailsRepository aticRepository,
             IEeuProgramDetailsRepository eeuRepository,
-            IDeuProgramDetailsRepository deuRepository
+            IDeuProgramDetailsRepository deuRepository,
+            IFIUProgramActivityRepository fiuRepository  // NEW
             )
         {
             _currentUserService = currentUserService;
@@ -68,6 +73,7 @@ namespace Infrastructure.Services.Reports
             _aticRepository = aticRepository;
             _eeuRepository = eeuRepository;
             _deuRepository = deuRepository;
+            _fiuRepository = fiuRepository;  // NEW
         }
 
         public async Task<ServiceResult<ReportFilterOptionsDto>> GetFilterOptionsAsync()
@@ -141,6 +147,42 @@ namespace Infrastructure.Services.Reports
                 GeneratedAt = DateTime.UtcNow
             };
 
+            // ========== NEW: CHECK IF FIU UNIT AND ADD FIU ACTIVITIES ==========
+           
+            if (location.UnitId == UnitConstants.FIU_UNIT_ID)
+            {
+                // Get FIU monthly summary
+                var (fiuActivities, totalEntries) = await _fiuRepository.GetMonthlyActivitySummaryAsync(new List<int> { filter.UnitLocationId }, filter.Year, filter.Month);
+                
+               
+                    report.FIUActivities = new ReportFIUActivitiesDto
+                    {
+                        Activities = fiuActivities.Select(a => new ReportFIUActivityItemDto
+                        {
+                            SlNo = a.SlNo,
+                            ActivityName = a.ActivityName,
+                            Count = a.Count
+                        }).ToList(),
+                        TotalActivities = fiuActivities.Count,
+                        TotalCount = fiuActivities.Sum(a => a.Count),
+                        TotalEntries = totalEntries
+
+                    };
+
+                // IMPORTANT: Set total entries to FIU count
+                report.TotalEntries = totalEntries;
+                // Return early for FIU units (don't query other tables)
+                return ServiceResult<AdminReportResponseDto>.Success(report);
+            }
+          
+
+        
+
+            // ========== END FIU SPECIFIC LOGIC ==========
+
+            // ========== EXISTING LOGIC FOR OTHER UNITS ==========
+            // (Only execute for non-FIU units)
+
             // ========== NOMINATION & REWARDS ==========
             var nominations = await _nominationRewardRepository.GetAllAsync();
             report.Nominations = nominations
@@ -149,15 +191,14 @@ namespace Infrastructure.Services.Reports
                            x.CreatedAt >= startDate && x.CreatedAt < endDate)
                 .Select(x => new ReportNominationDto
                 {
-                    Type = x.Type?.Name?? "-" ,
+                    Type = x.Type?.Name ?? "-",
                     AwardName = x.AwardName ?? "-",
                     Category = x.NominationCategory?.Name ?? "-",
                     Date = x.StartDate?.ToString("dd/MM/yyyy") ?? "-"
                 })
                 .ToList();
 
-            // ========== TODO: ADD OTHER TABLES ==========
-            // Publications
+            // ========== PUBLICATIONS ==========
             var publications = await _publicationRepository.GetAllAsync();
             report.Publications = publications
                 .Where(x => x.UnitLocationId == filter.UnitLocationId &&
@@ -171,8 +212,8 @@ namespace Infrastructure.Services.Reports
                 })
                 .ToList();
 
-            // Programs (DEU, EEU, FTI, KVK, STU, ATIC, NAEP)
-            //DEU Programs
+            // ========== PROGRAMS ==========
+            // DEU Programs
             var deuPrograms = await _deuRepository.GetAllAsync();
             report.Programs.AddRange(deuPrograms
                 .Where(x => x.UnitLocationId == filter.UnitLocationId &&
@@ -184,7 +225,7 @@ namespace Infrastructure.Services.Reports
                     Title = x.Title ?? "-",
                     DateFrom = x.StartDate != default(DateOnly) ? x.StartDate.ToString("dd/MM/yyyy") : "-",
                     DateTo = x.EndDate != default(DateOnly) ? x.EndDate.ToString("dd/MM/yyyy") : "-",
-                    Duration = x.Duration ?? "-" ,
+                    Duration = x.Duration ?? "-",
                     Participants = x.ParticipantDemographics?.Sum(pd => pd.Total ?? 0) ?? 0,
                     Status = x.Status?.Name ?? "-"
                 }));
@@ -239,6 +280,7 @@ namespace Infrastructure.Services.Reports
                     Participants = x.ParticipantDemographics?.Sum(pd => pd.Total ?? 0) ?? 0,
                     Status = x.Status?.Name ?? "-"
                 }));
+
             // STU Programs
             var stuPrograms = await _stuRepository.GetAllAsync();
             report.Programs.AddRange(stuPrograms
@@ -273,9 +315,7 @@ namespace Infrastructure.Services.Reports
                     Status = x.Status?.Name ?? "-"
                 }));
 
-
-
-            // Consultancy
+            // ========== CONSULTANCY ==========
             var consultancies = await _consultingRepository.GetAllAsync();
             report.Consultancies = consultancies
                 .Where(x => x.UnitLocationId == filter.UnitLocationId &&
@@ -288,7 +328,8 @@ namespace Infrastructure.Services.Reports
                     Date = x.Date != default(DateTime) ? x.Date.ToString("dd/MM/yyyy") : "-"
                 })
                 .ToList();
-            // Services
+
+            // ========== SERVICES ==========
             //var services = await _tblServiceRepository.GetAllAsync();
             //report.Services = services
             //    .Where(x => x.UnitLocationId == filter.UnitLocationId &&
@@ -304,10 +345,7 @@ namespace Infrastructure.Services.Reports
             //        Amount = x.AmountGenerated })
             //    .ToList();
 
-       
-
-
-            // Other Activities
+            // ========== OTHER ACTIVITIES ==========
             //var otherActivities = await _otherActivitiesRepository.GetAllAsync();
             //report.OtherActivities = otherActivities
             //    .Where(x => x.UnitLocationId == filter.UnitLocationId &&

@@ -26,6 +26,7 @@ global using Application.Interface.Services.Common;
 global using Application.Interface.Services.DataTables;
 global using Application.Mapper;
 global using Application.Models;
+global using Application.Constants;
 global using Domain.Entities.Enum;
 
 global using Application.Interface.Repository.DataTables;

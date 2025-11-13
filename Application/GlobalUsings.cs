@@ -16,6 +16,7 @@ global using Application.Models.DataTables.EEU;
 global using Application.Models.DataTables.NAEP;
 global using Application.Models.DataTables.ATIC;
 global using Application.Models.DataTables.KVK;
+global using Application.Constants;
 
 //Entities
 global using Domain.Entities;
@@ -26,6 +27,7 @@ global using Domain.Entities.EEU;
 global using Domain.Entities.NAEP;
 global using Domain.Entities.ATIC;
 global using Domain.Entities.KVK;
+
 
 //Mapper
 global using Application.Mapper.DataTable.DEU;

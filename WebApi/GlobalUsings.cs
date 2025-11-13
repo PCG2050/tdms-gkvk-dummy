@@ -49,3 +49,4 @@ global using Infrastructure.Services.DataTables.ConsultSocialMedia;
 global using Application.Interface.Repository.DataTables.TblService;
 global using Application.Mapper.DataTable.IBTVA;
 global using Application.Interface.Services.DataTables.IBTVA;
+global using Application.Constants;
