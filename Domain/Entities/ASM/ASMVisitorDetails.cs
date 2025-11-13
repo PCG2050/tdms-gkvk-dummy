@@ -15,8 +15,8 @@ namespace Domain.Entities.ASM
 
         public int FarmersCount { get; set; }
         public int StudentsCount { get; set; }
-        public int PublicCount { get; set; }       
-        public DateTime SubmittedDate { get; set; }
+        public int PublicCount { get; set; }
+        public DateOnly SubmittedDate { get; set; }
 
 
         [Required]

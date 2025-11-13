@@ -60,7 +60,7 @@ namespace Infrastructure.Services.DataTables.ASM
                 FarmersCount = createDto.FarmersCount,
                 StudentsCount = createDto.StudentsCount,
                 PublicCount = createDto.PublicCount,
-                SubmittedDate = createDto.SubmittedDate,
+                SubmittedDate = DateOnly.FromDateTime(DateTime.UtcNow),
                 CreatedById = _currentUserService.UserId,
                 CreatedAt = DateTimeOffset.UtcNow,
                 OrganizationId = _currentUserService.OrganizationId,
@@ -129,8 +129,8 @@ namespace Infrastructure.Services.DataTables.ASM
             if (updateDto.PublicCount.HasValue)
                 entity.PublicCount = updateDto.PublicCount.Value;
 
-            if (updateDto.SubmittedDate.HasValue)
-                entity.SubmittedDate = updateDto.SubmittedDate.Value;
+            // Auto-set SubmittedDate to current date
+            entity.SubmittedDate = DateOnly.FromDateTime(DateTime.UtcNow);
 
             entity.UpdatedById = _currentUserService.UserId;
             entity.UpdatedAt = DateTimeOffset.UtcNow;

@@ -24,7 +24,7 @@ namespace Application.Models.DataTables.ASM
 
         public int TotalVisitors => FarmersCount + StudentsCount + PublicCount;
 
-        public DateTime SubmittedDate { get; set; }
+        public DateOnly SubmittedDate { get; set; }
 
         // Status tracking
         [MaxLength(50)]
@@ -73,8 +73,6 @@ namespace Application.Models.DataTables.ASM
 
         [Range(0, int.MaxValue, ErrorMessage = "Public count must be a positive number")]
         public int PublicCount { get; set; }
-
-        public DateTime SubmittedDate { get; set; }
     }
 
     /// <summary>
@@ -98,7 +96,5 @@ namespace Application.Models.DataTables.ASM
 
         [Range(0, int.MaxValue, ErrorMessage = "Public count must be a positive number")]
         public int? PublicCount { get; set; }
-
-        public DateTime? SubmittedDate { get; set; }
     }
 }
