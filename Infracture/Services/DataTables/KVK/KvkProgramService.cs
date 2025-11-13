@@ -5,13 +5,11 @@ using Application.Mapper.DataTable.KVK;
 using Application.Models.DataTables.KVK;
 using Application.Services.Common;
 using Infrastructure.Repository;
-using Infrastructure.DbContext;
 
 namespace Infrastructure.Services.DataTables.KVK
 {
     public class KvkProgramService : IKvkProgramService
     {
-        private readonly TdmsDbContext _context;
         private readonly IKvkProgramDetailsRepository _programRepository;
         private readonly IKvkParticipantDemographicsRepository _demographicsRepository;
         private readonly IKvkProgramContentRepository _contentRepository;
@@ -37,7 +35,6 @@ namespace Infrastructure.Services.DataTables.KVK
         private const int KVK_UNIT_ID = 10;
 
         public KvkProgramService(
-            TdmsDbContext context,
             IKvkProgramDetailsRepository programRepository,
             IKvkParticipantDemographicsRepository demographicsRepository,
             IKvkProgramContentRepository contentRepository,
@@ -57,7 +54,6 @@ namespace Infrastructure.Services.DataTables.KVK
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
             KvkProgramMapper mapper)
         {
-            _context = context;
             _programRepository = programRepository;
             _demographicsRepository = demographicsRepository;
             _contentRepository = contentRepository;
@@ -349,11 +345,9 @@ namespace Infrastructure.Services.DataTables.KVK
                     "Cannot add content to submitted or approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
-            // Use database transaction to ensure atomicity
-            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                // 1. Create parent entity (KvkProgramContentAndResources)
+                // Prepare parent entity
                 var parentEntity = _mapper.MapToEntity(new KvkProgramContentCreateDto
                 {
                     Title = dto.Title,
@@ -365,73 +359,49 @@ namespace Infrastructure.Services.DataTables.KVK
                 parentEntity.CreatedById = _currentUserService.UserId;
                 parentEntity.CreatedAt = DateTimeOffset.UtcNow;
 
-                _context.KvkProgramContentAndResources.Add(parentEntity);
-                await _context.SaveChangesAsync(); // This generates the ID for parent
-
-                // 2. Create child entities using the generated parent ID
-                var contentId = parentEntity.Id;
-
-                // Create Resource Persons
-                if (dto.ResourcePersons != null && dto.ResourcePersons.Any())
+                // Prepare child entities
+                var resourcePersons = dto.ResourcePersons?.Select(rp =>
                 {
-                    foreach (var resourcePersonDto in dto.ResourcePersons)
-                    {
-                        var resourcePersonEntity = _mapper.MapToEntity(resourcePersonDto);
-                        resourcePersonEntity.KvkProgramContentAndResourcesId = contentId;
-                        resourcePersonEntity.UnitLocationId = program.UnitLocationId;
-                        resourcePersonEntity.OrganizationId = program.OrganizationId;
-                        resourcePersonEntity.CreatedById = _currentUserService.UserId;
-                        resourcePersonEntity.CreatedAt = DateTimeOffset.UtcNow;
-                        _context.KvkResourcePersons.Add(resourcePersonEntity);
-                    }
-                }
+                    var entity = _mapper.MapToEntity(rp);
+                    entity.UnitLocationId = program.UnitLocationId;
+                    entity.OrganizationId = program.OrganizationId;
+                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedAt = DateTimeOffset.UtcNow;
+                    return entity;
+                }).ToList();
 
-                // Create Topics Covered
-                if (dto.TopicsCovered != null && dto.TopicsCovered.Any())
+                var topicsCovered = dto.TopicsCovered?.Select(tc =>
                 {
-                    foreach (var topicDto in dto.TopicsCovered)
-                    {
-                        var topicEntity = _mapper.MapToEntity(topicDto);
-                        topicEntity.KvkProgramContentAndResourcesId = contentId;
-                        topicEntity.UnitLocationId = program.UnitLocationId;
-                        topicEntity.OrganizationId = program.OrganizationId;
-                        topicEntity.CreatedById = _currentUserService.UserId;
-                        topicEntity.CreatedAt = DateTimeOffset.UtcNow;
-                        _context.KvkTopicsCoveredInClass.Add(topicEntity);
-                    }
-                }
+                    var entity = _mapper.MapToEntity(tc);
+                    entity.UnitLocationId = program.UnitLocationId;
+                    entity.OrganizationId = program.OrganizationId;
+                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedAt = DateTimeOffset.UtcNow;
+                    return entity;
+                }).ToList();
 
-                // Create Teaching Aids
-                if (dto.TeachingAids != null && dto.TeachingAids.Any())
+                var teachingAids = dto.TeachingAids?.Select(ta =>
                 {
-                    foreach (var aidDto in dto.TeachingAids)
-                    {
-                        var aidEntity = _mapper.MapToEntity(aidDto);
-                        aidEntity.KvkProgramContentAndResourcesId = contentId;
-                        aidEntity.UnitLocationId = program.UnitLocationId;
-                        aidEntity.OrganizationId = program.OrganizationId;
-                        aidEntity.CreatedById = _currentUserService.UserId;
-                        aidEntity.CreatedAt = DateTimeOffset.UtcNow;
-                        _context.KvkTeachingAidsDeveloped.Add(aidEntity);
-                    }
-                }
+                    var entity = _mapper.MapToEntity(ta);
+                    entity.UnitLocationId = program.UnitLocationId;
+                    entity.OrganizationId = program.OrganizationId;
+                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedAt = DateTimeOffset.UtcNow;
+                    return entity;
+                }).ToList();
 
-                // Save all child entities
-                await _context.SaveChangesAsync();
+                // Repository handles transaction internally
+                var createdContent = await _contentRepository.CreateWithChildrenAsync(
+                    parentEntity,
+                    resourcePersons,
+                    topicsCovered,
+                    teachingAids);
 
-                // Commit transaction
-                await transaction.CommitAsync();
-
-                // Fetch the complete entity with all children for the response
-                var createdContent = await _contentRepository.GetWithDetailsAsync(contentId);
-                var resultDto = _mapper.MapToDto(createdContent!);
-
+                var resultDto = _mapper.MapToDto(createdContent);
                 return ServiceResult<KvkProgramContentDto>.Success(resultDto);
             }
             catch (Exception ex)
             {
-                // Rollback transaction on error
-                await transaction.RollbackAsync();
                 return ServiceResult<KvkProgramContentDto>.Failure(
                     $"Failed to create program content with children: {ex.Message}",
                     ServiceErrorStatus.INVALIDOPERATION);
@@ -472,186 +442,112 @@ namespace Infrastructure.Services.DataTables.KVK
                     "Cannot update content in submitted or approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
-            // Use database transaction for atomicity
-            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                // 1. Update parent entity
-                content.Title = dto.Title;
-                content.Description = dto.Description;
-                content.UpdatedById = _currentUserService.UserId;
-                content.UpdatedAt = DateTimeOffset.UtcNow;
-                _context.KvkProgramContentAndResources.Update(content);
-
-                // 2. Process Resource Persons (Hybrid Pattern)
-                if (dto.ResourcePersons != null)
+                // Prepare parent entity for update
+                var parentEntity = new KvkProgramContentAndResources
                 {
-                    var existingPersons = content.ResourcePersons?.ToList() ?? new List<KvkResourcePerson>();
-                    var incomingIds = dto.ResourcePersons.Where(p => p.Id.HasValue).Select(p => p.Id!.Value).ToList();
+                    Id = contentId,
+                    Title = dto.Title,
+                    Description = dto.Description,
+                    UpdatedById = _currentUserService.UserId,
+                    UpdatedAt = DateTimeOffset.UtcNow
+                };
 
-                    // DELETE: Items in DB but not in incoming array
-                    var personsToDelete = existingPersons.Where(p => !incomingIds.Contains(p.Id)).ToList();
-                    foreach (var person in personsToDelete)
-                    {
-                        _context.KvkResourcePersons.Remove(person);
-                    }
-
-                    // CREATE or UPDATE
-                    foreach (var personDto in dto.ResourcePersons)
-                    {
-                        if (personDto.Id.HasValue)
-                        {
-                            // UPDATE existing
-                            var existingPerson = existingPersons.FirstOrDefault(p => p.Id == personDto.Id.Value);
-                            if (existingPerson != null)
-                            {
-                                existingPerson.Name = personDto.Name;
-                                existingPerson.Designation = personDto.Designation;
-                                existingPerson.ResourceType = personDto.ResourceType;
-                                existingPerson.Responsibility = personDto.Responsibility;
-                                existingPerson.InstitutionOrDepartment = personDto.InstitutionOrDepartment;
-                                existingPerson.UpdatedById = _currentUserService.UserId;
-                                existingPerson.UpdatedAt = DateTimeOffset.UtcNow;
-                                _context.KvkResourcePersons.Update(existingPerson);
-                            }
-                        }
-                        else
-                        {
-                            // CREATE new
-                            var newPerson = new KvkResourcePerson
-                            {
-                                KvkProgramContentAndResourcesId = contentId,
-                                Name = personDto.Name,
-                                Designation = personDto.Designation,
-                                ResourceType = personDto.ResourceType,
-                                Responsibility = personDto.Responsibility,
-                                InstitutionOrDepartment = personDto.InstitutionOrDepartment,
-                                UnitLocationId = program.UnitLocationId,
-                                OrganizationId = program.OrganizationId,
-                                CreatedById = _currentUserService.UserId,
-                                CreatedAt = DateTimeOffset.UtcNow
-                            };
-                            _context.KvkResourcePersons.Add(newPerson);
-                        }
-                    }
-                }
-
-                // 3. Process Topics Covered (Hybrid Pattern)
-                if (dto.TopicsCovered != null)
+                // Prepare child entities (hybrid: mix of new and existing)
+                var resourcePersons = dto.ResourcePersons?.Select(rp =>
                 {
-                    var existingTopics = content.TopicsCovered?.ToList() ?? new List<KvkTopicsCoveredInClass>();
-                    var incomingIds = dto.TopicsCovered.Where(t => t.Id.HasValue).Select(t => t.Id!.Value).ToList();
-
-                    // DELETE: Items in DB but not in incoming array
-                    var topicsToDelete = existingTopics.Where(t => !incomingIds.Contains(t.Id)).ToList();
-                    foreach (var topic in topicsToDelete)
+                    var entity = new KvkResourcePerson
                     {
-                        _context.KvkTopicsCoveredInClass.Remove(topic);
+                        Id = rp.Id ?? 0, // 0 means new
+                        Name = rp.Name,
+                        Designation = rp.Designation,
+                        ResourceType = rp.ResourceType,
+                        Responsibility = rp.Responsibility,
+                        InstitutionOrDepartment = rp.InstitutionOrDepartment,
+                        UnitLocationId = program.UnitLocationId,
+                        OrganizationId = program.OrganizationId
+                    };
+
+                    if (entity.Id == 0)
+                    {
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedAt = DateTimeOffset.UtcNow;
                     }
 
-                    // CREATE or UPDATE
-                    foreach (var topicDto in dto.TopicsCovered)
-                    {
-                        if (topicDto.Id.HasValue)
-                        {
-                            // UPDATE existing
-                            var existingTopic = existingTopics.FirstOrDefault(t => t.Id == topicDto.Id.Value);
-                            if (existingTopic != null)
-                            {
-                                existingTopic.Date = topicDto.Date;
-                                existingTopic.Title = topicDto.Title;
-                                existingTopic.PhotoUpload = topicDto.PhotoUpload;
-                                existingTopic.UpdatedById = _currentUserService.UserId;
-                                existingTopic.UpdatedAt = DateTimeOffset.UtcNow;
-                                _context.KvkTopicsCoveredInClass.Update(existingTopic);
-                            }
-                        }
-                        else
-                        {
-                            // CREATE new
-                            var newTopic = new KvkTopicsCoveredInClass
-                            {
-                                KvkProgramContentAndResourcesId = contentId,
-                                Date = topicDto.Date,
-                                Title = topicDto.Title,
-                                PhotoUpload = topicDto.PhotoUpload,
-                                UnitLocationId = program.UnitLocationId,
-                                OrganizationId = program.OrganizationId,
-                                CreatedById = _currentUserService.UserId,
-                                CreatedAt = DateTimeOffset.UtcNow
-                            };
-                            _context.KvkTopicsCoveredInClass.Add(newTopic);
-                        }
-                    }
-                }
+                    return entity;
+                }).ToList();
 
-                // 4. Process Teaching Aids (Hybrid Pattern)
-                if (dto.TeachingAids != null)
+                var topicsCovered = dto.TopicsCovered?.Select(tc =>
                 {
-                    var existingAids = content.TeachingAids?.ToList() ?? new List<KvkTeachingAidsDeveloped>();
-                    var incomingIds = dto.TeachingAids.Where(a => a.Id.HasValue).Select(a => a.Id!.Value).ToList();
-
-                    // DELETE: Items in DB but not in incoming array
-                    var aidsToDelete = existingAids.Where(a => !incomingIds.Contains(a.Id)).ToList();
-                    foreach (var aid in aidsToDelete)
+                    var entity = new KvkTopicsCoveredInClass
                     {
-                        _context.KvkTeachingAidsDeveloped.Remove(aid);
+                        Id = tc.Id ?? 0,
+                        Date = tc.Date,
+                        Title = tc.Title,
+                        PhotoUpload = tc.PhotoUpload,
+                        UnitLocationId = program.UnitLocationId,
+                        OrganizationId = program.OrganizationId
+                    };
+
+                    if (entity.Id == 0)
+                    {
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedAt = DateTimeOffset.UtcNow;
                     }
 
-                    // CREATE or UPDATE
-                    foreach (var aidDto in dto.TeachingAids)
+                    return entity;
+                }).ToList();
+
+                var teachingAids = dto.TeachingAids?.Select(ta =>
+                {
+                    var entity = new KvkTeachingAidsDeveloped
                     {
-                        if (aidDto.Id.HasValue)
-                        {
-                            // UPDATE existing
-                            var existingAid = existingAids.FirstOrDefault(a => a.Id == aidDto.Id.Value);
-                            if (existingAid != null)
-                            {
-                                existingAid.TypeOfAidId = aidDto.TypeOfAidId;
-                                existingAid.OtherTypeOfAid = aidDto.OtherTypeOfAid;
-                                existingAid.Purpose = aidDto.Purpose;
-                                existingAid.Number = aidDto.Number;
-                                existingAid.UpdatedById = _currentUserService.UserId;
-                                existingAid.UpdatedAt = DateTimeOffset.UtcNow;
-                                _context.KvkTeachingAidsDeveloped.Update(existingAid);
-                            }
-                        }
-                        else
-                        {
-                            // CREATE new
-                            var newAid = new KvkTeachingAidsDeveloped
-                            {
-                                KvkProgramContentAndResourcesId = contentId,
-                                TypeOfAidId = aidDto.TypeOfAidId,
-                                OtherTypeOfAid = aidDto.OtherTypeOfAid,
-                                Purpose = aidDto.Purpose,
-                                Number = aidDto.Number,
-                                UnitLocationId = program.UnitLocationId,
-                                OrganizationId = program.OrganizationId,
-                                CreatedById = _currentUserService.UserId,
-                                CreatedAt = DateTimeOffset.UtcNow
-                            };
-                            _context.KvkTeachingAidsDeveloped.Add(newAid);
-                        }
+                        Id = ta.Id ?? 0,
+                        TypeOfAidId = ta.TypeOfAidId,
+                        OtherTypeOfAid = ta.OtherTypeOfAid,
+                        Purpose = ta.Purpose,
+                        Number = ta.Number,
+                        UnitLocationId = program.UnitLocationId,
+                        OrganizationId = program.OrganizationId
+                    };
+
+                    if (entity.Id == 0)
+                    {
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
                     }
-                }
+                    else
+                    {
+                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
 
-                // Save all changes
-                await _context.SaveChangesAsync();
+                    return entity;
+                }).ToList();
 
-                // Commit transaction
-                await transaction.CommitAsync();
+                // Repository handles transaction internally
+                var updatedContent = await _contentRepository.UpdateWithChildrenAsync(
+                    parentEntity,
+                    resourcePersons,
+                    topicsCovered,
+                    teachingAids);
 
-                // Fetch updated entity with all children for response
-                var updatedContent = await _contentRepository.GetWithDetailsAsync(contentId);
-                var resultDto = _mapper.MapToDto(updatedContent!);
-
+                var resultDto = _mapper.MapToDto(updatedContent);
                 return ServiceResult<KvkProgramContentDto>.Success(resultDto);
             }
             catch (Exception ex)
             {
-                // Rollback transaction on error
-                await transaction.RollbackAsync();
                 return ServiceResult<KvkProgramContentDto>.Failure(
                     $"Failed to update program content with children: {ex.Message}",
                     ServiceErrorStatus.INVALIDOPERATION);
