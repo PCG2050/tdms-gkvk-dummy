@@ -27,8 +27,6 @@ namespace Infrastructure.DbContext
         public DbSet<User> Users { get; set; }
         public DbSet<UserSession> UserSessions { get; set; }
         public DbSet<Unit> Units { get; set; }
-        public DbSet<FtiTrainingProgram> FtiTrainingPrograms { get; set; }
-        public DbSet<FtiOtherActivity> FtiOtherActivities { get; set; }
         #region STU
        
         //public DbSet<DaesiProgramme> DaesiProgrammes { get; set; }
