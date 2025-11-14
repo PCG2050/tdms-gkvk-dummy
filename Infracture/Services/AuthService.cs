@@ -42,6 +42,11 @@ namespace Infrastructure.Services
                 throw new InvalidOperationException("Account is deactivated");
             }
 
+            // Determine refresh token expiry based on RememberMe
+            // RememberMe = false → 1 day (expires with access token)
+            // RememberMe = true → configured days (default 30 days)
+            var refreshTokenExpiryDays = request.RememberMe ? _refreshTokenExpiryDays : 1;
+
             // Create new session
             var session = new UserSession
             {
@@ -53,7 +58,7 @@ namespace Infrastructure.Services
                 DeviceId = deviceInfo.DeviceId,
                 Location = deviceInfo.Location,
                 CreatedAt = DateTime.UtcNow,
-                ExpiresAt = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays),
+                ExpiresAt = DateTime.UtcNow.AddDays(refreshTokenExpiryDays),
                 LastUsedAt = DateTime.UtcNow,
                 IsActive = true
             };
