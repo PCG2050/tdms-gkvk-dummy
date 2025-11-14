@@ -369,6 +369,78 @@ namespace Application.Models.DataTables.ATIC
         public int? Number { get; set; }
     }
 
+    // ==================== COMPOSITE DTOs - HYBRID PATTERN ====================
+
+    /// <summary>
+    /// Composite DTO for creating AticProgramContentAndResources with all child entities in a single transaction
+    /// </summary>
+    public class AticProgramContentWithChildrenCreateDto
+    {
+        // Parent fields (none for ProgramContent)
+
+        // Child collections (optional - can be null or empty if UI doesn't have data yet)
+        public List<AticResourcePersonCreateDto>? ResourcePersons { get; set; }
+        public List<AticTopicsCoveredCreateDto>? TopicsCovered { get; set; }
+        public List<AticTeachingAidsCreateDto>? TeachingAids { get; set; }
+    }
+
+    /// <summary>
+    /// Hybrid item for Resource Person - can be new (no Id) or existing (has Id)
+    /// Used in update operations to support create/update in one call
+    /// </summary>
+    public class AticResourcePersonHybridDto
+    {
+        public int? Id { get; set; }  // null = create new, has value = update existing
+        public string? Name { get; set; }
+        public string? Designation { get; set; }
+        public int? ResourceType { get; set; }
+        public int? Responsibility { get; set; }
+        public string? InstitutionOrDepartment { get; set; }
+    }
+
+    /// <summary>
+    /// Hybrid item for Topics Covered
+    /// </summary>
+    public class AticTopicsCoveredHybridDto
+    {
+        public int? Id { get; set; }  // null = create new, has value = update existing
+        public DateTime? Date { get; set; }
+        public string? Title { get; set; }
+        public string? PhotoUpload { get; set; }
+    }
+
+    /// <summary>
+    /// Hybrid item for Teaching Aids
+    /// </summary>
+    public class AticTeachingAidsHybridDto
+    {
+        public int? Id { get; set; }  // null = create new, has value = update existing
+        public int? TypeOfAidId { get; set; }
+        public string? OtherTypeOfAid { get; set; }
+        public string? Purpose { get; set; }
+        public int? Number { get; set; }
+    }
+
+    /// <summary>
+    /// Composite DTO for updating AticProgramContentAndResources with all child entities in a single transaction
+    /// Uses Hybrid Pattern:
+    /// - Items WITH Id: UPDATE existing
+    /// - Items WITHOUT Id (null): CREATE new
+    /// - Items in DB but NOT in arrays: DELETE
+    /// </summary>
+    public class AticProgramContentWithChildrenUpdateDto
+    {
+        // Parent fields (none for ProgramContent)
+
+        // Child collections - Hybrid Pattern
+        // If item has Id: update it
+        // If item has no Id (null): create it
+        // If existing item not in array: delete it
+        public List<AticResourcePersonHybridDto>? ResourcePersons { get; set; }
+        public List<AticTopicsCoveredHybridDto>? TopicsCovered { get; set; }
+        public List<AticTeachingAidsHybridDto>? TeachingAids { get; set; }
+    }
+
     // ==================== ADVISORY SERVICES (Section D) ====================
     
     public class AticAdvisoryServicesCreateDto
