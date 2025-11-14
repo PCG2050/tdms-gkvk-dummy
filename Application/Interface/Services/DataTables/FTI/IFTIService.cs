@@ -32,6 +32,10 @@ namespace Application.Interface.Services.DataTables.FTI
         Task<ServiceResult> DeleteProgramContentAsync(int contentId);
         Task<ServiceResult<List<FTIProgramContentDto>>> GetProgramContentsByProgramIdAsync(int programId);
 
+        // Hybrid pattern methods for bulk create/update operations
+        Task<ServiceResult<FTIProgramContentDto>> AddProgramContentWithChildrenAsync(int programId, FTIProgramContentWithChildrenCreateDto dto);
+        Task<ServiceResult<FTIProgramContentDto>> UpdateProgramContentWithChildrenAsync(int contentId, FTIProgramContentWithChildrenUpdateDto dto);
+
         // ============================
         // SECTION C1: RESOURCE PERSONS
         // ============================

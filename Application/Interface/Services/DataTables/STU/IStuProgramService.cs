@@ -32,6 +32,10 @@ namespace Application.Interface.Services.DataTables.STU
         Task<ServiceResult> DeleteProgramContentAsync(int contentId);
         Task<ServiceResult<List<StuProgramContentDto>>> GetProgramContentsByProgramIdAsync(int programId);
 
+        // Hybrid pattern methods for bulk create/update operations
+        Task<ServiceResult<StuProgramContentDto>> AddProgramContentWithChildrenAsync(int programId, StuProgramContentWithChildrenCreateDto dto);
+        Task<ServiceResult<StuProgramContentDto>> UpdateProgramContentWithChildrenAsync(int contentId, StuProgramContentWithChildrenUpdateDto dto);
+
         // ============================
         // SECTION C1: RESOURCE PERSONS
         // ============================

@@ -11,5 +11,18 @@ namespace Application.Interface.Repository.DataTables.FTI
         Task<FTIProgramContentAndResources> CreateAsync(FTIProgramContentAndResources entity);
         Task<FTIProgramContentAndResources> UpdateAsync(FTIProgramContentAndResources entity);
         Task DeleteAsync(int id);
+
+        // Hybrid pattern methods for bulk create/update operations
+        Task<FTIProgramContentAndResources> CreateWithChildrenAsync(
+            FTIProgramContentAndResources parent,
+            List<FTIResourcePerson>? resourcePersons,
+            List<FTITopicsCoveredInClass>? topicsCovered,
+            List<FTITeachingAidsDeveloped>? teachingAids);
+
+        Task<FTIProgramContentAndResources> UpdateWithChildrenAsync(
+            FTIProgramContentAndResources parent,
+            List<FTIResourcePerson>? resourcePersons,
+            List<FTITopicsCoveredInClass>? topicsCovered,
+            List<FTITeachingAidsDeveloped>? teachingAids);
     }
 }

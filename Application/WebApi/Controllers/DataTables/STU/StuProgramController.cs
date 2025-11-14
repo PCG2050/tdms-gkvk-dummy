@@ -113,6 +113,21 @@ namespace WebApi.Controllers.DataTables.STU
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
+        // Hybrid pattern endpoints for bulk create/update operations
+        [HttpPost("{programId}/content-with-children")]
+        public async Task<IActionResult> AddProgramContentWithChildren(int programId, [FromBody] StuProgramContentWithChildrenCreateDto dto)
+        {
+            var result = await _service.AddProgramContentWithChildrenAsync(programId, dto);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
+        [HttpPut("content/{contentId}/with-children")]
+        public async Task<IActionResult> UpdateProgramContentWithChildren(int contentId, [FromBody] StuProgramContentWithChildrenUpdateDto dto)
+        {
+            var result = await _service.UpdateProgramContentWithChildrenAsync(contentId, dto);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
         // C1: Resource Persons
         [HttpPost("content/{contentId}/resource-persons")]
         public async Task<IActionResult> AddResourcePerson(int contentId, [FromBody] StuResourcePersonCreateDto dto)

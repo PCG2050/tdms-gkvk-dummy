@@ -364,6 +364,237 @@ namespace Infrastructure.Services.DataTables.IBTVA
             return ServiceResult<List<IbtvaProgramContentDto>>.Success(dtos);
         }
 
+        /// <summary>
+        /// Create IbtvaProgramContentAndResources with all child entities in a single transaction
+        /// </summary>
+        public async Task<ServiceResult<IbtvaProgramContentDto>> AddProgramContentWithChildrenAsync(
+            int programId,
+            IbtvaProgramContentWithChildrenCreateDto dto)
+        {
+            // Validate program exists
+            var program = await _programRepository.GetByIdAsync(programId);
+            if (program == null)
+                return ServiceResult<IbtvaProgramContentDto>.Failure(
+                    "Program not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            // Check permissions
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult<IbtvaProgramContentDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            // Validate form status
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+                return ServiceResult<IbtvaProgramContentDto>.Failure(
+                    "Cannot add content to submitted or approved programs",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            try
+            {
+                // Prepare parent entity
+                var parentEntity = new IbtvaProgramContentAndResources
+                {
+                    IbtvaProgramDetailsId = programId,
+                    UnitLocationId = program.UnitLocationId,
+                    OrganizationId = program.OrganizationId,
+                    CreatedById = _currentUserService.UserId,
+                    CreatedAt = DateTimeOffset.UtcNow
+                };
+
+                // Prepare child entities
+                var resourcePersons = dto.ResourcePersons?.Select(rp =>
+                {
+                    var entity = _mapper.MapToEntity(rp);
+                    entity.UnitLocationId = program.UnitLocationId;
+                    entity.OrganizationId = program.OrganizationId;
+                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedAt = DateTimeOffset.UtcNow;
+                    return entity;
+                }).ToList();
+
+                var topicsCovered = dto.TopicsCovered?.Select(tc =>
+                {
+                    var entity = _mapper.MapToEntity(tc);
+                    entity.UnitLocationId = program.UnitLocationId;
+                    entity.OrganizationId = program.OrganizationId;
+                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedAt = DateTimeOffset.UtcNow;
+                    return entity;
+                }).ToList();
+
+                var teachingAids = dto.TeachingAids?.Select(ta =>
+                {
+                    var entity = _mapper.MapToEntity(ta);
+                    entity.UnitLocationId = program.UnitLocationId;
+                    entity.OrganizationId = program.OrganizationId;
+                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedAt = DateTimeOffset.UtcNow;
+                    return entity;
+                }).ToList();
+
+                // Repository handles transaction internally
+                var createdContent = await _contentRepository.CreateWithChildrenAsync(
+                    parentEntity,
+                    resourcePersons,
+                    topicsCovered,
+                    teachingAids);
+
+                var resultDto = _mapper.MapToDto(createdContent);
+                return ServiceResult<IbtvaProgramContentDto>.Success(resultDto);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<IbtvaProgramContentDto>.Failure(
+                    $"Failed to create program content with children: {ex.Message}",
+                    ServiceErrorStatus.INVALIDOPERATION);
+            }
+        }
+
+        /// <summary>
+        /// Update IbtvaProgramContentAndResources with all child entities using Hybrid Pattern
+        /// - Items WITH Id: UPDATE existing
+        /// - Items WITHOUT Id: CREATE new
+        /// - Items in DB but NOT in arrays: DELETE
+        /// </summary>
+        public async Task<ServiceResult<IbtvaProgramContentDto>> UpdateProgramContentWithChildrenAsync(
+            int contentId,
+            IbtvaProgramContentWithChildrenUpdateDto dto)
+        {
+            // Validate content exists
+            var content = await _contentRepository.GetWithDetailsAsync(contentId);
+            if (content == null)
+                return ServiceResult<IbtvaProgramContentDto>.Failure(
+                    "Content not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            // Validate program and permissions
+            var program = await _programRepository.GetByIdAsync(content.IbtvaProgramDetailsId ?? 0);
+            if (program == null)
+                return ServiceResult<IbtvaProgramContentDto>.Failure(
+                    "Program not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult<IbtvaProgramContentDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+                return ServiceResult<IbtvaProgramContentDto>.Failure(
+                    "Cannot update content in submitted or approved programs",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            try
+            {
+                // Prepare parent entity for update
+                var parentEntity = new IbtvaProgramContentAndResources
+                {
+                    Id = contentId,
+                    UpdatedById = _currentUserService.UserId,
+                    UpdatedAt = DateTimeOffset.UtcNow
+                };
+
+                // Prepare child entities (hybrid: mix of new and existing)
+                var resourcePersons = dto.ResourcePersons?.Select(rp =>
+                {
+                    var entity = new IbtvaResourcePerson
+                    {
+                        Id = rp.Id ?? 0, // 0 means new
+                        Name = rp.Name,
+                        Designation = rp.Designation,
+                        ResourceType = rp.ResourceType,
+                        Responsibility = rp.Responsibility,
+                        InstitutionOrDepartment = rp.InstitutionOrDepartment,
+                        UnitLocationId = program.UnitLocationId,
+                        OrganizationId = program.OrganizationId
+                    };
+
+                    if (entity.Id == 0)
+                    {
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
+
+                    return entity;
+                }).ToList();
+
+                var topicsCovered = dto.TopicsCovered?.Select(tc =>
+                {
+                    var entity = new IbtvaTopicsCoveredInClass
+                    {
+                        Id = tc.Id ?? 0,
+                        Date = tc.Date,
+                        Title = tc.Title,
+                        PhotoUpload = tc.PhotoUpload,
+                        UnitLocationId = program.UnitLocationId,
+                        OrganizationId = program.OrganizationId
+                    };
+
+                    if (entity.Id == 0)
+                    {
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
+
+                    return entity;
+                }).ToList();
+
+                var teachingAids = dto.TeachingAids?.Select(ta =>
+                {
+                    var entity = new IbtvaTeachingAidsDeveloped
+                    {
+                        Id = ta.Id ?? 0,
+                        TypeOfAidId = ta.TypeOfAidId,
+                        OtherTypeOfAid = ta.OtherTypeOfAid,
+                        Purpose = ta.Purpose,
+                        Number = ta.Number,
+                        UnitLocationId = program.UnitLocationId,
+                        OrganizationId = program.OrganizationId
+                    };
+
+                    if (entity.Id == 0)
+                    {
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
+
+                    return entity;
+                }).ToList();
+
+                // Repository handles transaction internally
+                var updatedContent = await _contentRepository.UpdateWithChildrenAsync(
+                    parentEntity,
+                    resourcePersons,
+                    topicsCovered,
+                    teachingAids);
+
+                var resultDto = _mapper.MapToDto(updatedContent);
+                return ServiceResult<IbtvaProgramContentDto>.Success(resultDto);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<IbtvaProgramContentDto>.Failure(
+                    $"Failed to update program content with children: {ex.Message}",
+                    ServiceErrorStatus.INVALIDOPERATION);
+            }
+        }
+
         // ============================
         // SECTION C1: RESOURCE PERSONS
         // ============================
