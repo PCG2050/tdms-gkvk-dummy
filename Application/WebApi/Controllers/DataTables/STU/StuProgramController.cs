@@ -21,6 +21,18 @@ namespace WebApi.Controllers.DataTables.STU
         // SECTION A: PROGRAM DETAILS
         // ============================
 
+        /// <summary>
+        /// Creates a new STU program
+        /// </summary>
+        /// <remarks>
+        /// Developer Notes:
+        /// Use these endpoints for current KVK module development:
+        /// - POST /api/StuProgram (create program)
+        /// - PUT /api/StuProgram/{id} (update program)
+        /// - GET /api/StuProgram/{id} (get single program)
+        /// - GET /api/StuProgram/{id}/complete (get program with all related data)
+        /// - DELETE /api/StuProgram/{id} (delete program)
+        /// </remarks>
         [HttpPost]
         public async Task<IActionResult> CreateProgram([FromBody] StuProgramCreateDto dto)
         {
@@ -92,6 +104,20 @@ namespace WebApi.Controllers.DataTables.STU
         // SECTION C: PROGRAM CONTENT
         // ============================
 
+        /// <summary>
+        /// Adds program content (deprecated - use hybrid endpoint instead)
+        /// </summary>
+        /// <remarks>
+        /// Developer Notes:
+        /// For current KVK module development, use HYBRID PATTERN endpoints instead:
+        /// - POST /api/StuProgram/{programId}/content-with-children (create content with all children)
+        /// - PUT /api/StuProgram/content/{contentId}/with-children (update content with all children)
+        /// - GET /api/StuProgram/content/{contentId} (get content)
+        /// - DELETE /api/StuProgram/content/{contentId} (delete content)
+        ///
+        /// Avoid using individual child endpoints (C1, C2, C3) - they are deprecated.
+        /// The hybrid endpoints handle all children (Resource Persons, Topics, Teaching Aids) in one transaction.
+        /// </remarks>
         [HttpPost("{programId}/content")]
         public async Task<IActionResult> AddProgramContent(int programId, [FromBody] StuProgramContentCreateDto dto)
         {
@@ -114,6 +140,14 @@ namespace WebApi.Controllers.DataTables.STU
         }
 
         // Hybrid pattern endpoints for bulk create/update operations
+        /// <summary>
+        /// Creates program content with all children in one transaction (RECOMMENDED)
+        /// </summary>
+        /// <remarks>
+        /// This is the RECOMMENDED endpoint for creating program content.
+        /// It creates the parent content and all children (Resource Persons, Topics, Teaching Aids) atomically.
+        /// Use this instead of individual POST endpoints for content and children.
+        /// </remarks>
         [HttpPost("{programId}/content-with-children")]
         public async Task<IActionResult> AddProgramContentWithChildren(int programId, [FromBody] StuProgramContentWithChildrenCreateDto dto)
         {
@@ -121,6 +155,18 @@ namespace WebApi.Controllers.DataTables.STU
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
+        /// <summary>
+        /// Updates program content with all children using hybrid pattern (RECOMMENDED)
+        /// </summary>
+        /// <remarks>
+        /// This is the RECOMMENDED endpoint for updating program content.
+        /// It uses the hybrid pattern:
+        /// - Items WITH Id are UPDATED
+        /// - Items WITHOUT Id (null or 0) are CREATED
+        /// - Items in DB but NOT in the request are DELETED
+        /// All operations are performed in one atomic transaction.
+        /// Use this instead of individual PUT/POST/DELETE endpoints for children.
+        /// </remarks>
         [HttpPut("content/{contentId}/with-children")]
         public async Task<IActionResult> UpdateProgramContentWithChildren(int contentId, [FromBody] StuProgramContentWithChildrenUpdateDto dto)
         {
