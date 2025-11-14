@@ -32,6 +32,10 @@ namespace Application.Interface.Services.DataTables.ATIC
         Task<ServiceResult> DeleteProgramContentAsync(int contentId);
         Task<ServiceResult<List<AticProgramContentDto>>> GetProgramContentsByProgramIdAsync(int programId);
 
+        // Hybrid pattern methods for bulk create/update operations
+        Task<ServiceResult<AticProgramContentDto>> AddProgramContentWithChildrenAsync(int programId, AticProgramContentWithChildrenCreateDto dto);
+        Task<ServiceResult<AticProgramContentDto>> UpdateProgramContentWithChildrenAsync(int contentId, AticProgramContentWithChildrenUpdateDto dto);
+
         // ============================
         // SECTION C1: RESOURCE PERSONS
         // ============================

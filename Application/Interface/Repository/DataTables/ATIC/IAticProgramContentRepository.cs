@@ -12,5 +12,18 @@ namespace Application.Interface.Repository.DataTables.ATIC
         Task<AticProgramContentAndResources> CreateAsync(AticProgramContentAndResources entity);
         Task<AticProgramContentAndResources> UpdateAsync(AticProgramContentAndResources entity);
         Task DeleteAsync(int id);
+
+        // Hybrid pattern methods for bulk create/update operations
+        Task<AticProgramContentAndResources> CreateWithChildrenAsync(
+            AticProgramContentAndResources parent,
+            List<AticResourcePerson>? resourcePersons,
+            List<AticTopicsCoveredInClass>? topicsCovered,
+            List<AticTeachingAidsDeveloped>? teachingAids);
+
+        Task<AticProgramContentAndResources> UpdateWithChildrenAsync(
+            AticProgramContentAndResources parent,
+            List<AticResourcePerson>? resourcePersons,
+            List<AticTopicsCoveredInClass>? topicsCovered,
+            List<AticTeachingAidsDeveloped>? teachingAids);
     }
 }
