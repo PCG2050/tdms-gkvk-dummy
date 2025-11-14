@@ -77,8 +77,10 @@ namespace Application.Models.DataTables.ASM
     /// DTO for updating an existing ASMVisitorDetails entry
     /// All fields are optional - only provided fields will be updated
     /// </summary>
-    public class ASMVisitorDetailsUpdateDto
+    public class ASMVisitorDetailsUpdateDto : IUpdateDto
     {
+        public int Id { get; set; }
+
         [StringLength(200)]
         public string? InstituteName { get; set; }
 

@@ -22,10 +22,10 @@ namespace Application.Mapper.Datatable.FIU
 
         public void MapUpdateDtoToEntity(FIUProgramActivityUpdateDto dto, FIUProgramActivity entity)
         {
-            entity.FIUActivitiesId = dto.FIUActivitiesId;
-            entity.Number = dto.Number;
-            entity.UploadMediaUrl = dto.UploadMediaUrl;
-            entity.Remarks = dto.Remarks;
+            if (dto.FIUActivitiesId.HasValue) entity.FIUActivitiesId = dto.FIUActivitiesId.Value;
+            if (dto.Number.HasValue) entity.Number = dto.Number.Value;
+            if (dto.UploadMediaUrl != null) entity.UploadMediaUrl = dto.UploadMediaUrl;
+            if (dto.Remarks != null) entity.Remarks = dto.Remarks;
         }
 
         public FIUProgramActivityResponseDto MapEntityToResponseDto(FIUProgramActivity entity)
