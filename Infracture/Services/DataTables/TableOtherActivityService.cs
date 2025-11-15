@@ -55,7 +55,7 @@ namespace Infrastructure.Services.DataTables
             activity.CreatedById = _currentUserService.UserId;
             activity.CreatedAt = DateTimeOffset.UtcNow;
             activity.OrganizationId = _currentUserService.OrganizationId;
-            activity.FormStatus = "Draft";
+            activity.FormStatus = "Pending";  // AUTO-SUBMIT: Status automatically set to Pending
 
             await _repository.AddAsync(activity);
             await _repository.SaveChangesAsync();
@@ -96,14 +96,20 @@ namespace Infrastructure.Services.DataTables
                     "Access denied or activity cannot be modified in current status",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (activity.FormStatus != "Draft" && activity.FormStatus != "Rejected")
+            if (activity.FormStatus != "Draft" && activity.FormStatus != "Rejected" && activity.FormStatus != "Pending")
                 return ServiceResult<TableOtherActivityDto>.Failure(
-                    "Cannot modify activities in Pending or Approved status",
+                    "Cannot modify activities in Approved status",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             _mapper.MapToExistingEntity(updateDto, activity);
             activity.UpdatedById = _currentUserService.UserId;
             activity.UpdatedAt = DateTimeOffset.UtcNow;
+
+            // AUTO-SUBMIT: Automatically change status to Pending when updated
+            if (activity.FormStatus == "Draft" || activity.FormStatus == "Rejected")
+            {
+                activity.FormStatus = "Pending";
+            }
 
             await _repository.UpdateAsync(activity);
             await _repository.SaveChangesAsync();
@@ -123,9 +129,9 @@ namespace Infrastructure.Services.DataTables
             if (!await _entityPermissionService.CanDeleteForm(activity))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (activity.FormStatus != "Draft")
+            if (activity.FormStatus != "Draft" && activity.FormStatus != "Rejected" && activity.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Only Draft activities can be deleted",
+                    "Cannot delete Approved activities",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             await _repository.DeleteAsync(activity);
@@ -135,39 +141,9 @@ namespace Infrastructure.Services.DataTables
         }
 
         // ==========================================
-        // SUBMISSION & APPROVAL WORKFLOW
+        // APPROVAL WORKFLOW
         // ==========================================
-
-        public async Task<ServiceResult> SubmitForApprovalAsync(int id)
-        {
-            var activity = await _repository.GetByIdAsync(id);
-
-            if (activity == null)
-                return ServiceResult.Failure("Activity not found", ServiceErrorStatus.NOTFOUND);
-
-            if (!await _entityPermissionService.CanModifyForm(activity))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (activity.FormStatus != "Draft")
-                return ServiceResult.Failure(
-                    "Only Draft activities can be submitted",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            // Validate required fields before submission
-            if (string.IsNullOrWhiteSpace(activity.Title))
-                return ServiceResult.Failure(
-                    "Title is required before submission",
-                    ServiceErrorStatus.VALIDATIONERROR);
-
-            activity.FormStatus = "Pending";
-            activity.UpdatedById = _currentUserService.UserId;
-            activity.UpdatedAt = DateTimeOffset.UtcNow;
-
-            await _repository.UpdateAsync(activity);
-            await _repository.SaveChangesAsync();
-
-            return ServiceResult.Success();
-        }
+        // Note: SubmitForApprovalAsync removed - auto-submit on create/update now
 
         public async Task<ServiceResult> ApproveAsync(int id, string? remarks = null)
         {

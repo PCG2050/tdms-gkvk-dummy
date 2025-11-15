@@ -19,13 +19,13 @@ namespace WebApi.Controllers.DataTables
     /// - Each entry is linked to a specific UnitLocation
     /// 
     /// STATUS WORKFLOW:
-    /// - Draft: Initial state when created, can edit freely
-    /// - Pending: Submitted for Unit Head approval (via Submit endpoint)
+    /// - Pending: Auto-submitted when created or updated, awaits Unit Head approval
     /// - Approved: Unit Head approved, cannot edit
     /// - Rejected: Unit Head rejected with remarks, trainer can edit and resubmit
-    /// 
+    /// - On create/update: Status automatically changes to Pending
+    ///
     /// PERMISSIONS:
-    /// - Trainers: Create, edit (Draft/Rejected only), submit, view own
+    /// - Trainers: Create, edit (Pending/Rejected), view own
     /// - UnitHeads: Approve/reject, view all in their unit locations
     /// - Admins: Full access across organization
     /// </summary>
@@ -46,7 +46,7 @@ namespace WebApi.Controllers.DataTables
 
         /// <summary>
         /// Create new OtherActivity entry (Trainer only)
-        /// Initial status: Draft
+        /// Status: Automatically set to Pending (auto-submit)
         /// Auto-sets CreatedById, CreatedAt, and OrganizationId
         /// </summary>
         /// <remarks>
@@ -109,8 +109,10 @@ namespace WebApi.Controllers.DataTables
         }
 
         /// <summary>
-        /// Update OtherActivity (Trainer only, Draft or Rejected status only)
-        /// Cannot update Pending or Approved activities
+        /// Update OtherActivity (Trainer only)
+        /// Can update activities in Pending, Rejected status
+        /// Status auto-changes to Pending on update
+        /// Cannot update Approved activities
         /// </summary>
         /// <param name="id">Activity ID</param>
         /// <param name="updateDto">Updated activity data</param>
@@ -151,8 +153,8 @@ namespace WebApi.Controllers.DataTables
         }
 
         /// <summary>
-        /// Delete OtherActivity (Trainer only, Draft status only)
-        /// Cannot delete submitted or approved activities
+        /// Delete OtherActivity (Trainer only, Pending or Rejected status only)
+        /// Cannot delete Approved activities
         /// </summary>
         /// <param name="id">Activity ID</param>
         /// <response code="200">Activity deleted successfully</response>
@@ -176,28 +178,8 @@ namespace WebApi.Controllers.DataTables
         }
 
         // ==========================================
-        // SUBMISSION & APPROVAL WORKFLOW
+        // APPROVAL WORKFLOW
         // ==========================================
-
-        /// <summary>
-        /// Submit OtherActivity for approval (Trainer only)
-        /// Changes status: Draft → Pending
-        /// After submission, activity cannot be edited until approved/rejected
-        /// </summary>
-        /// <param name="id">Activity ID</param>
-        /// <response code="200">Activity submitted successfully</response>
-        /// <response code="400">Cannot submit (validation error or wrong status)</response>
-        [HttpPost("{id}/submit")]
-        [Authorize(Roles = RoleString.Trainer)]
-        public async Task<IActionResult> Submit(int id)
-        {
-            var result = await _service.SubmitForApprovalAsync(id);
-
-            if (!result.IsSuccess)
-                return BadRequest(new { message = result.ErrorMessage });
-
-            return Ok(new { message = "Activity submitted for approval successfully" });
-        }
 
         /// <summary>
         /// Approve OtherActivity (Unit Head/Admin only)
@@ -317,7 +299,7 @@ namespace WebApi.Controllers.DataTables
         /// <param name="pageNumber">Page number (default: 1)</param>
         /// <param name="pageSize">Items per page (default: 10)</param>
         /// <response code="200">Paginated list filtered by status</response>
-        [HttpGet("by-status/{status}")]
+        [HttpGet("status/{status}")]
         [Authorize]
         public async Task<IActionResult> GetByStatus(
             string status,
