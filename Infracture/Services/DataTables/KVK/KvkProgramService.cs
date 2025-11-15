@@ -1108,6 +1108,99 @@ namespace Infrastructure.Services.DataTables.KVK
             return ServiceResult<KvkRecommendationDto>.Success(dto);
         }
 
+        // ============================
+        // STATUS MANAGEMENT & SUBMISSION
+        // ============================
+
+        public async Task<ServiceResult> SubmitForApprovalAsync(int programId)
+        {
+            var program = await _programRepository.GetByIdAsync(programId);
+
+            if (program == null)
+                return ServiceResult.Failure("Program not found", ServiceErrorStatus.NOTFOUND);
+
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
+
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+                return ServiceResult.Failure(
+                    "Only draft or rejected programs can be submitted",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            program.FormStatus = "Pending";
+            program.UpdatedById = _currentUserService.UserId;
+            program.UpdatedAt = DateTimeOffset.UtcNow;
+
+            await _programRepository.UpdateAsync(program);
+            return ServiceResult.Success();
+        }
+
+        public async Task<ServiceResult> ApproveAsync(int programId, string? remarks = null)
+        {
+            var program = await _programRepository.GetByIdAsync(programId);
+
+            if (program == null)
+                return ServiceResult.Failure("Program not found", ServiceErrorStatus.NOTFOUND);
+
+            // Only UnitHead or Admin can approve
+            if (_currentUserService.Role != Role.UNITHEAD && _currentUserService.Role != Role.ADMIN)
+                return ServiceResult.Failure(
+                    "Only Unit Heads and Admins can approve programs",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
+
+            if (program.FormStatus != "Pending")
+                return ServiceResult.Failure(
+                    "Only pending programs can be approved",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            program.FormStatus = "Approved";
+            program.FormStatusRemarks = remarks;
+            program.ApprovedById = _currentUserService.UserId;
+            program.ApprovedAt = DateTimeOffset.UtcNow;
+            program.UpdatedById = _currentUserService.UserId;
+            program.UpdatedAt = DateTimeOffset.UtcNow;
+
+            await _programRepository.UpdateAsync(program);
+            return ServiceResult.Success();
+        }
+
+        public async Task<ServiceResult> RejectAsync(int programId, string remarks)
+        {
+            var program = await _programRepository.GetByIdAsync(programId);
+
+            if (program == null)
+                return ServiceResult.Failure("Program not found", ServiceErrorStatus.NOTFOUND);
+
+            // Only UnitHead or Admin can reject
+            if (_currentUserService.Role != Role.UNITHEAD && _currentUserService.Role != Role.ADMIN)
+                return ServiceResult.Failure(
+                    "Only Unit Heads and Admins can reject programs",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
+
+            if (program.FormStatus != "Pending")
+                return ServiceResult.Failure(
+                    "Only pending programs can be rejected",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            if (string.IsNullOrWhiteSpace(remarks))
+                return ServiceResult.Failure(
+                    "Remarks are required for rejection",
+                    ServiceErrorStatus.BADREQUEST);
+
+            program.FormStatus = "Rejected";
+            program.FormStatusRemarks = remarks;
+            program.UpdatedById = _currentUserService.UserId;
+            program.UpdatedAt = DateTimeOffset.UtcNow;
+
+            await _programRepository.UpdateAsync(program);
+            return ServiceResult.Success();
+        }
 
         // ============================
         // LISTING & FILTERING

@@ -88,6 +88,25 @@ namespace Application.Interface.Services.DataTables.KVK
         Task<ServiceResult<KvkRecommendationDto>> GetRecommendationByProgramIdAsync(int programId);
 
         // ============================
+        // STATUS MANAGEMENT
+        // ============================
+
+        /// <summary>
+        /// Submit program for approval (Trainer role - changes status from Draft to Pending)
+        /// </summary>
+        Task<ServiceResult> SubmitForApprovalAsync(int programId);
+
+        /// <summary>
+        /// Approve program (UnitHead/Admin roles - changes status from Pending to Approved)
+        /// </summary>
+        Task<ServiceResult> ApproveAsync(int programId, string? remarks = null);
+
+        /// <summary>
+        /// Reject program (UnitHead/Admin roles - changes status from Pending to Rejected)
+        /// </summary>
+        Task<ServiceResult> RejectAsync(int programId, string remarks);
+
+        // ============================
         // LISTING & FILTERING
         // ============================
 

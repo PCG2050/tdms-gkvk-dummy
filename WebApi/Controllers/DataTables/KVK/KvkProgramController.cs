@@ -305,6 +305,45 @@ namespace WebApi.Controllers.DataTables.KVK
         }
 
         // ============================
+        // STATUS MANAGEMENT
+        // ============================
+
+        /// <summary>
+        /// Submit program for approval (Trainer) - changes status from Draft/Rejected to Pending
+        /// </summary>
+        [HttpPost("{programId}/submit")]
+        public async Task<IActionResult> SubmitForApproval(int programId)
+        {
+            var result = await _service.SubmitForApprovalAsync(programId);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
+        /// <summary>
+        /// Approve program (UnitHead/Admin) - changes status from Pending to Approved
+        /// </summary>
+        [HttpPost("{programId}/approve")]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
+        public async Task<IActionResult> Approve(int programId, [FromBody] ApprovalDto dto)
+        {
+            var result = await _service.ApproveAsync(programId, dto?.Remarks);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
+        /// <summary>
+        /// Reject program (UnitHead/Admin) - changes status from Pending to Rejected
+        /// </summary>
+        [HttpPost("{programId}/reject")]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
+        public async Task<IActionResult> Reject(int programId, [FromBody] RejectionDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto?.Remarks))
+                return BadRequest(new { message = "Remarks are required for rejection" });
+
+            var result = await _service.RejectAsync(programId, dto.Remarks);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
+        // ============================
         // LISTING & FILTERING
         // ============================
 
@@ -395,5 +434,19 @@ namespace WebApi.Controllers.DataTables.KVK
                 _ => 500
             };
         }
+    }
+
+    // ============================
+    // DTOs FOR STATUS MANAGEMENT
+    // ============================
+
+    public class ApprovalDto
+    {
+        public string? Remarks { get; set; }
+    }
+
+    public class RejectionDto
+    {
+        public string Remarks { get; set; } = string.Empty;
     }
 }
