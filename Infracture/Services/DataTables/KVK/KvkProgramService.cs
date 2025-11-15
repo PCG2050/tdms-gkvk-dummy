@@ -1061,6 +1061,15 @@ namespace Infrastructure.Services.DataTables.KVK
                 var created = await _recommendationRepository.CreateAsync(entity);
                 var resultDto = _mapper.MapToDto(created);
 
+                // AUTO-SUBMIT: Since Recommendation is the last section, automatically change status to Pending
+                if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
+                {
+                    program.FormStatus = "Pending";
+                    program.UpdatedById = _currentUserService.UserId;
+                    program.UpdatedAt = DateTimeOffset.UtcNow;
+                    await _programRepository.UpdateAsync(program);
+                }
+
                 return ServiceResult<KvkRecommendationDto>.Success(resultDto);
             }
             else
@@ -1083,6 +1092,15 @@ namespace Infrastructure.Services.DataTables.KVK
 
                 var updated = await _recommendationRepository.UpdateAsync(existing);
                 var resultDto = _mapper.MapToDto(updated);
+
+                // AUTO-SUBMIT: Since Recommendation is the last section, automatically change status to Pending
+                if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
+                {
+                    program.FormStatus = "Pending";
+                    program.UpdatedById = _currentUserService.UserId;
+                    program.UpdatedAt = DateTimeOffset.UtcNow;
+                    await _programRepository.UpdateAsync(program);
+                }
 
                 return ServiceResult<KvkRecommendationDto>.Success(resultDto);
             }
