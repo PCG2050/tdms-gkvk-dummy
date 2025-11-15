@@ -145,7 +145,7 @@ namespace Infrastructure.Services.DataTables.KVK
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<KvkProgramDetailsDto>.Failure(
                     "Cannot modify programs that are not in Draft or Rejected status",
                     ServiceErrorStatus.INVALIDOPERATION);
@@ -199,9 +199,9 @@ namespace Infrastructure.Services.DataTables.KVK
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<KvkParticipantDemographicsDto>.Failure(
-                    "Cannot add demographics to submitted or approved programs",
+                    "Cannot add demographics to approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             var entity = _mapper.MapToEntity(dto);
@@ -232,9 +232,9 @@ namespace Infrastructure.Services.DataTables.KVK
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<KvkParticipantDemographicsDto>.Failure(
-                    "Cannot modify demographics for submitted or approved programs",
+                    "Cannot modify demographics for approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             _mapper.MapUpdateDtoToEntity(dto, demographics);
@@ -260,7 +260,7 @@ namespace Infrastructure.Services.DataTables.KVK
 
             if (program.FormStatus != "Draft")
                 return ServiceResult.Failure(
-                    "Cannot delete demographics from submitted or approved programs",
+                    "Cannot delete demographics from approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             await _demographicsRepository.DeleteAsync(demographicsId);
@@ -308,9 +308,9 @@ namespace Infrastructure.Services.DataTables.KVK
                     ServiceErrorStatus.FORBIDDEN);
 
             // Validate form status
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<KvkProgramContentDto>.Failure(
-                    "Cannot add content to submitted or approved programs",
+                    "Cannot add content to approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             try
@@ -405,9 +405,9 @@ namespace Infrastructure.Services.DataTables.KVK
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<KvkProgramContentDto>.Failure(
-                    "Cannot update content in submitted or approved programs",
+                    "Cannot update content in approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             try
@@ -546,7 +546,7 @@ namespace Infrastructure.Services.DataTables.KVK
 
             if (program.FormStatus != "Draft")
                 return ServiceResult.Failure(
-                    "Cannot delete content from submitted or approved programs",
+                    "Cannot delete content from approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             await _contentRepository.DeleteAsync(contentId);
@@ -588,9 +588,9 @@ namespace Infrastructure.Services.DataTables.KVK
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<KvkAdvisoryServicesDto>.Failure(
-                    "Cannot modify advisory services for submitted or approved programs",
+                    "Cannot modify advisory services for approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             var existing = await _advisoryRepository.GetByProgramIdAsync(programId);
@@ -692,9 +692,9 @@ namespace Infrastructure.Services.DataTables.KVK
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Cannot modify results for submitted or approved programs",
+                    "Cannot modify results for approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             result.UploadExcelUrl = excelUrl;
@@ -727,9 +727,9 @@ namespace Infrastructure.Services.DataTables.KVK
                     ServiceErrorStatus.FORBIDDEN);
 
             // Step 3: Validate form status
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<KvkResultDto>.Failure(
-                    "Cannot add results to submitted or approved programs",
+                    "Cannot add results to approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             // Step 4: Check if result already exists for this program
@@ -814,9 +814,9 @@ namespace Infrastructure.Services.DataTables.KVK
                     ServiceErrorStatus.FORBIDDEN);
 
             // Step 3: Validate form status
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<KvkResultDto>.Failure(
-                    "Cannot modify results for submitted or approved programs",
+                    "Cannot modify results for approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             try
@@ -958,9 +958,9 @@ namespace Infrastructure.Services.DataTables.KVK
                     $"Reports are not available for FLD/OFT categories (CategoryId {FLD_CATEGORY_ID} or {OFT_CATEGORY_ID}). Use Results endpoint instead.",
                     ServiceErrorStatus.INVALIDOPERATION);
 
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<KvkReportDto>.Failure(
-                    "Cannot modify reports for submitted or approved programs",
+                    "Cannot modify reports for approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             var existing = await _reportRepository.GetByProgramIdAsync(programId);
@@ -1043,9 +1043,9 @@ namespace Infrastructure.Services.DataTables.KVK
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<KvkRecommendationDto>.Failure(
-                    "Cannot modify recommendations for submitted or approved programs",
+                    "Cannot modify recommendations for approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             var existing = await _recommendationRepository.GetByProgramIdAsync(programId);
@@ -1140,7 +1140,7 @@ namespace Infrastructure.Services.DataTables.KVK
             if (!await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
                     "Only draft or rejected programs can be submitted",
                     ServiceErrorStatus.INVALIDOPERATION);
