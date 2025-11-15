@@ -136,7 +136,7 @@ namespace Infrastructure.Services.DataTables.NAEP
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<NaepProgramDetailsDto>.Failure(
                     "Cannot edit programs that have been submitted",
                     ServiceErrorStatus.INVALIDOPERATION);
@@ -163,7 +163,7 @@ namespace Infrastructure.Services.DataTables.NAEP
             if (!await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
                     "Only draft programs can be deleted",
                     ServiceErrorStatus.INVALIDOPERATION);
@@ -192,9 +192,9 @@ namespace Infrastructure.Services.DataTables.NAEP
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<NaepParticipantDemographicsDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             var demographics = _mapper.MapToEntity(dto);
@@ -227,9 +227,9 @@ namespace Infrastructure.Services.DataTables.NAEP
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<NaepParticipantDemographicsDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             NaepProgramMapper.MapUpdateDtoToEntity(dto, demographics);
@@ -253,9 +253,9 @@ namespace Infrastructure.Services.DataTables.NAEP
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             await _demographicsRepository.DeleteAsync(demographicsId);
@@ -297,9 +297,9 @@ namespace Infrastructure.Services.DataTables.NAEP
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<NaepProgramContentDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             var content = _mapper.MapToEntity(dto);
@@ -339,9 +339,9 @@ namespace Infrastructure.Services.DataTables.NAEP
                     ServiceErrorStatus.FORBIDDEN);
 
             // Validate form status
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending" && program.FormStatus != "Rejected")
                 return ServiceResult<NaepProgramContentDto>.Failure(
-                    "Cannot add content to submitted or approved programs",
+                    "Cannot add content to approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             try
@@ -436,9 +436,9 @@ namespace Infrastructure.Services.DataTables.NAEP
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending" && program.FormStatus != "Rejected")
                 return ServiceResult<NaepProgramContentDto>.Failure(
-                    "Cannot update content in submitted or approved programs",
+                    "Cannot update content in approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             try
@@ -576,9 +576,9 @@ namespace Infrastructure.Services.DataTables.NAEP
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             await _contentRepository.DeleteAsync(contentId);
@@ -621,9 +621,9 @@ namespace Infrastructure.Services.DataTables.NAEP
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<NaepResourcePersonDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             var person = _mapper.MapToEntity(dto);
@@ -658,9 +658,9 @@ namespace Infrastructure.Services.DataTables.NAEP
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<NaepResourcePersonDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             // Apply updates from DTO
@@ -692,9 +692,9 @@ namespace Infrastructure.Services.DataTables.NAEP
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             await _resourcePersonRepository.DeleteAsync(personId);
@@ -737,9 +737,9 @@ namespace Infrastructure.Services.DataTables.NAEP
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<NaepTopicsCoveredDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             var topic = _mapper.MapToEntity(dto);
@@ -774,9 +774,9 @@ namespace Infrastructure.Services.DataTables.NAEP
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<NaepTopicsCoveredDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             if (dto.Date.HasValue) topic.Date = dto.Date;
@@ -805,9 +805,9 @@ namespace Infrastructure.Services.DataTables.NAEP
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             await _topicsRepository.DeleteAsync(topicId);
@@ -850,9 +850,9 @@ namespace Infrastructure.Services.DataTables.NAEP
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<NaepTeachingAidsDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             var aid = _mapper.MapToEntity(dto);
@@ -887,9 +887,9 @@ namespace Infrastructure.Services.DataTables.NAEP
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<NaepTeachingAidsDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             if (dto.TypeOfAidId.HasValue) aid.TypeOfAidId = dto.TypeOfAidId;
@@ -919,9 +919,9 @@ namespace Infrastructure.Services.DataTables.NAEP
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             await _teachingAidsRepository.DeleteAsync(aidId);
@@ -963,9 +963,9 @@ namespace Infrastructure.Services.DataTables.NAEP
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<NaepAdvisoryServicesDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             // Check if advisory services already exist
@@ -1005,9 +1005,9 @@ namespace Infrastructure.Services.DataTables.NAEP
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<NaepAdvisoryServicesDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             if (dto.NoOfFacebookSMS.HasValue) advisory.NoOfFacebookSMS = dto.NoOfFacebookSMS.Value;
@@ -1042,9 +1042,9 @@ namespace Infrastructure.Services.DataTables.NAEP
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             await _advisoryRepository.DeleteAsync(advisoryId);
@@ -1090,9 +1090,9 @@ namespace Infrastructure.Services.DataTables.NAEP
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<NaepReportDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             // Check if report already exists
@@ -1132,9 +1132,9 @@ namespace Infrastructure.Services.DataTables.NAEP
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<NaepReportDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             if (dto.ProgressReportReportingYear != null) report.ProgressReportReportingYear = dto.ProgressReportReportingYear;
@@ -1164,9 +1164,9 @@ namespace Infrastructure.Services.DataTables.NAEP
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.CONFLICT);
 
             await _reportRepository.DeleteAsync(reportId);
@@ -1212,9 +1212,9 @@ namespace Infrastructure.Services.DataTables.NAEP
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<NaepRecommendationDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             // Check if recommendation already exists
@@ -1254,9 +1254,9 @@ namespace Infrastructure.Services.DataTables.NAEP
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<NaepRecommendationDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.CONFLICT);
 
             if (dto.ProblemsIdentified != null) recommendation.ProblemsIdentified = dto.ProblemsIdentified;
@@ -1286,9 +1286,9 @@ namespace Infrastructure.Services.DataTables.NAEP
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             await _recommendationRepository.DeleteAsync(recommendationId);
@@ -1328,7 +1328,7 @@ namespace Infrastructure.Services.DataTables.NAEP
             if (!await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
                     "Only draft programs can be submitted",
                     ServiceErrorStatus.INVALIDOPERATION);
