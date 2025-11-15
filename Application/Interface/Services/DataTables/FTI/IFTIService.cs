@@ -36,29 +36,6 @@ namespace Application.Interface.Services.DataTables.FTI
         Task<ServiceResult<FTIProgramContentDto>> AddProgramContentWithChildrenAsync(int programId, FTIProgramContentWithChildrenCreateDto dto);
         Task<ServiceResult<FTIProgramContentDto>> UpdateProgramContentWithChildrenAsync(int contentId, FTIProgramContentWithChildrenUpdateDto dto);
 
-        // ============================
-        // SECTION C1: RESOURCE PERSONS
-        // ============================
-        Task<ServiceResult<FTIResourcePersonDto>> AddResourcePersonAsync(int contentId, FTIResourcePersonCreateDto dto);
-        Task<ServiceResult<FTIResourcePersonDto>> UpdateResourcePersonAsync(int personId, FTIResourcePersonUpdateDto dto);
-        Task<ServiceResult> DeleteResourcePersonAsync(int personId);
-        Task<ServiceResult<List<FTIResourcePersonDto>>> GetResourcePersonsByContentIdAsync(int contentId);
-
-        // ============================
-        // SECTION C2: TOPICS COVERED
-        // ============================
-        Task<ServiceResult<FTITopicsCoveredDto>> AddTopicAsync(int contentId, FTITopicsCoveredCreateDto dto);
-        Task<ServiceResult<FTITopicsCoveredDto>> UpdateTopicAsync(int topicId, FTITopicsCoveredUpdateDto dto);
-        Task<ServiceResult> DeleteTopicAsync(int topicId);
-        Task<ServiceResult<List<FTITopicsCoveredDto>>> GetTopicsByContentIdAsync(int contentId);
-
-        // ============================
-        // SECTION C3: TEACHING AIDS
-        // ============================
-        Task<ServiceResult<FTITeachingAidsDto>> AddTeachingAidAsync(int contentId, FTITeachingAidsCreateDto dto);
-        Task<ServiceResult<FTITeachingAidsDto>> UpdateTeachingAidAsync(int aidId, FTITeachingAidsUpdateDto dto);
-        Task<ServiceResult> DeleteTeachingAidAsync(int aidId);
-        Task<ServiceResult<List<FTITeachingAidsDto>>> GetTeachingAidsByContentIdAsync(int contentId);
 
         // ============================
         // SECTION D: ADVISORY SERVICES
