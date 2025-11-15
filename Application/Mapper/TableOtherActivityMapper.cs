@@ -12,6 +12,7 @@ namespace Application.Mapper
         /// <summary>
         /// Map CreateDto to Entity
         /// Used when creating a new activity
+        /// Note: FormStatus is set by the service (auto-submit to Pending)
         /// </summary>
         public TableOtherActivity MapToEntity(TableOtherActivityCreateDto dto)
         {
@@ -22,8 +23,8 @@ namespace Application.Mapper
                 EndDate = dto.EndDate,
                 Title = dto.Title,
                 Description = dto.Description,
-                UploadPath = dto.UploadPath,
-                FormStatus = "Draft" // Always start as Draft
+                UploadPath = dto.UploadPath
+                // FormStatus is set by the service layer, not here
             };
         }
 
