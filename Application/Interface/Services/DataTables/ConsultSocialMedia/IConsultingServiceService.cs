@@ -13,13 +13,7 @@ namespace Application.Interface.Services.DataTables.ConsultSocialMedia
         Task<ServiceResult<ConsultingServiceDto>> UpdateAsync(int id, ConsultingServiceUpdateDto updateDto);
         Task<ServiceResult> DeleteAsync(int id);
 
-        // ModeAndOutreach Management
-        Task<ServiceResult<ModeAndOutreachDto>> AddModeAndOutreachAsync(int consultingServiceId, ModeAndOutreachCreateDto dto);
-        Task<ServiceResult<ModeAndOutreachDto>> UpdateModeAndOutreachAsync(int modeAndOutreachId, ModeAndOutreachCreateDto dto);
-        Task<ServiceResult> DeleteModeAndOutreachAsync(int modeAndOutreachId);
-        Task<ServiceResult<List<ModeAndOutreachDto>>> GetModeAndOutreachesAsync(int consultingServiceId);
-
-        // Composite Create/Update with Children
+        // Composite Create/Update with Children (Hybrid Pattern)
         /// <summary>
         /// Create ConsultingService with all child entities (ModeAndOutreach) in a single transaction
         /// </summary>
