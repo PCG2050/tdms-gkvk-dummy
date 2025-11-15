@@ -286,38 +286,6 @@ namespace Infrastructure.Services.DataTables.KVK
         // SECTION C: PROGRAM CONTENT & RESOURCES
         // ============================
 
-        public async Task<ServiceResult<KvkProgramContentDto>> AddProgramContentAsync(
-            int programId,
-            KvkProgramContentCreateDto dto)
-        {
-            var program = await _programRepository.GetByIdAsync(programId);
-
-            if (program == null)
-                return ServiceResult<KvkProgramContentDto>.Failure(
-                    "Program not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            if (!await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<KvkProgramContentDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
-                return ServiceResult<KvkProgramContentDto>.Failure(
-                    "Cannot add content to submitted or approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            var entity = _mapper.MapToEntity(dto);
-            entity.KvkProgramDetailsId = programId;
-            entity.CreatedById = _currentUserService.UserId;
-            entity.CreatedAt = DateTimeOffset.UtcNow;
-
-            var created = await _contentRepository.CreateAsync(entity);
-            var resultDto = _mapper.MapToDto(created);
-
-            return ServiceResult<KvkProgramContentDto>.Success(resultDto);
-        }
-
         /// <summary>
         /// Create KvkProgramContentAndResources along with all child entities (ResourcePersons, Topics, TeachingAids) in a single transaction
         /// This solves the problem of needing parent ID before creating children
@@ -601,331 +569,6 @@ namespace Infrastructure.Services.DataTables.KVK
         }
 
         // ============================
-        // C1: RESOURCE PERSONS
-        // ============================
-
-        public async Task<ServiceResult<KvkResourcePersonDto>> AddResourcePersonAsync(
-            int contentId,
-            KvkResourcePersonCreateDto dto)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<KvkResourcePersonDto>.Failure(
-                    "Program content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var program = await _programRepository.GetByIdAsync(content.KvkProgramDetailsId ?? 0);
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<KvkResourcePersonDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
-                return ServiceResult<KvkResourcePersonDto>.Failure(
-                    "Cannot add resource persons to submitted or approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            var entity = _mapper.MapToEntity(dto);
-            entity.KvkProgramContentAndResourcesId = contentId;
-            entity.CreatedById = _currentUserService.UserId;
-            entity.CreatedAt = DateTimeOffset.UtcNow;
-
-            var created = await _resourcePersonRepository.CreateAsync(entity);
-            var resultDto = _mapper.MapToDto(created);
-
-            return ServiceResult<KvkResourcePersonDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult<KvkResourcePersonDto>> UpdateResourcePersonAsync(
-            int personId,
-            KvkResourcePersonUpdateDto dto)
-        {
-            var person = await _resourcePersonRepository.GetByIdAsync(personId);
-
-            if (person == null)
-                return ServiceResult<KvkResourcePersonDto>.Failure(
-                    "Resource person not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(person.KvkProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.KvkProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<KvkResourcePersonDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
-                return ServiceResult<KvkResourcePersonDto>.Failure(
-                    "Cannot modify resource persons for submitted or approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            _mapper.MapUpdateDtoToEntity(dto, person);
-            person.UpdatedById = _currentUserService.UserId;
-            person.UpdatedAt = DateTimeOffset.UtcNow;
-
-            var updated = await _resourcePersonRepository.UpdateAsync(person);
-            var resultDto = _mapper.MapToDto(updated);
-
-            return ServiceResult<KvkResourcePersonDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult> DeleteResourcePersonAsync(int personId)
-        {
-            var person = await _resourcePersonRepository.GetByIdAsync(personId);
-
-            if (person == null)
-                return ServiceResult.Failure("Resource person not found", ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(person.KvkProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.KvkProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult.Failure(
-                    "Cannot delete resource persons from submitted or approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            await _resourcePersonRepository.DeleteAsync(personId);
-            return ServiceResult.Success();
-        }
-
-        public async Task<ServiceResult<List<KvkResourcePersonDto>>> GetResourcePersonsByContentIdAsync(int contentId)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<List<KvkResourcePersonDto>>.Failure(
-                    "Content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var persons = await _resourcePersonRepository.GetByContentIdAsync(contentId);
-            var dtos = persons.Select(p => _mapper.MapToDto(p)).ToList();
-
-            return ServiceResult<List<KvkResourcePersonDto>>.Success(dtos);
-        }
-
-        // ============================
-        // C2: TOPICS COVERED
-        // ============================
-
-        public async Task<ServiceResult<KvkTopicsCoveredDto>> AddTopicAsync(
-            int contentId,
-            KvkTopicsCoveredCreateDto dto)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<KvkTopicsCoveredDto>.Failure(
-                    "Program content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var program = await _programRepository.GetByIdAsync(content.KvkProgramDetailsId ?? 0);
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<KvkTopicsCoveredDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
-                return ServiceResult<KvkTopicsCoveredDto>.Failure(
-                    "Cannot add topics to submitted or approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            var entity = _mapper.MapToEntity(dto);
-            entity.KvkProgramContentAndResourcesId = contentId;
-            entity.CreatedById = _currentUserService.UserId;
-            entity.CreatedAt = DateTimeOffset.UtcNow;
-
-            var created = await _topicsRepository.CreateAsync(entity);
-            var resultDto = _mapper.MapToDto(created);
-
-            return ServiceResult<KvkTopicsCoveredDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult<KvkTopicsCoveredDto>> UpdateTopicAsync(
-            int topicId,
-            KvkTopicsCoveredUpdateDto dto)
-        {
-            var topic = await _topicsRepository.GetByIdAsync(topicId);
-
-            if (topic == null)
-                return ServiceResult<KvkTopicsCoveredDto>.Failure(
-                    "Topic not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(topic.KvkProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.KvkProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<KvkTopicsCoveredDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
-                return ServiceResult<KvkTopicsCoveredDto>.Failure(
-                    "Cannot modify topics for submitted or approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            _mapper.MapUpdateDtoToEntity(dto, topic);
-            topic.UpdatedById = _currentUserService.UserId;
-            topic.UpdatedAt = DateTimeOffset.UtcNow;
-
-            var updated = await _topicsRepository.UpdateAsync(topic);
-            var resultDto = _mapper.MapToDto(updated);
-
-            return ServiceResult<KvkTopicsCoveredDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult> DeleteTopicAsync(int topicId)
-        {
-            var topic = await _topicsRepository.GetByIdAsync(topicId);
-
-            if (topic == null)
-                return ServiceResult.Failure("Topic not found", ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(topic.KvkProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.KvkProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult.Failure(
-                    "Cannot delete topics from submitted or approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            await _topicsRepository.DeleteAsync(topicId);
-            return ServiceResult.Success();
-        }
-
-        public async Task<ServiceResult<List<KvkTopicsCoveredDto>>> GetTopicsByContentIdAsync(int contentId)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<List<KvkTopicsCoveredDto>>.Failure(
-                    "Content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var topics = await _topicsRepository.GetByContentIdAsync(contentId);
-            var dtos = topics.Select(t => _mapper.MapToDto(t)).ToList();
-
-            return ServiceResult<List<KvkTopicsCoveredDto>>.Success(dtos);
-        }
-
-        // ============================
-        // C3: TEACHING AIDS
-        // ============================
-
-        public async Task<ServiceResult<KvkTeachingAidsDto>> AddTeachingAidAsync(
-            int contentId,
-            KvkTeachingAidsCreateDto dto)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<KvkTeachingAidsDto>.Failure(
-                    "Program content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var program = await _programRepository.GetByIdAsync(content.KvkProgramDetailsId ?? 0);
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<KvkTeachingAidsDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
-                return ServiceResult<KvkTeachingAidsDto>.Failure(
-                    "Cannot add teaching aids to submitted or approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            var entity = _mapper.MapToEntity(dto);
-            entity.KvkProgramContentAndResourcesId = contentId;
-            entity.CreatedById = _currentUserService.UserId;
-            entity.CreatedAt = DateTimeOffset.UtcNow;
-
-            var created = await _teachingAidsRepository.CreateAsync(entity);
-            var resultDto = _mapper.MapToDto(created);
-
-            return ServiceResult<KvkTeachingAidsDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult<KvkTeachingAidsDto>> UpdateTeachingAidAsync(
-            int aidId,
-            KvkTeachingAidsUpdateDto dto)
-        {
-            var aid = await _teachingAidsRepository.GetByIdAsync(aidId);
-
-            if (aid == null)
-                return ServiceResult<KvkTeachingAidsDto>.Failure(
-                    "Teaching aid not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(aid.KvkProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.KvkProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<KvkTeachingAidsDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
-                return ServiceResult<KvkTeachingAidsDto>.Failure(
-                    "Cannot modify teaching aids for submitted or approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            _mapper.MapUpdateDtoToEntity(dto, aid);
-            aid.UpdatedById = _currentUserService.UserId;
-            aid.UpdatedAt = DateTimeOffset.UtcNow;
-
-            var updated = await _teachingAidsRepository.UpdateAsync(aid);
-            var resultDto = _mapper.MapToDto(updated);
-
-            return ServiceResult<KvkTeachingAidsDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult> DeleteTeachingAidAsync(int aidId)
-        {
-            var aid = await _teachingAidsRepository.GetByIdAsync(aidId);
-
-            if (aid == null)
-                return ServiceResult.Failure("Teaching aid not found", ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(aid.KvkProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.KvkProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult.Failure(
-                    "Cannot delete teaching aids from submitted or approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            await _teachingAidsRepository.DeleteAsync(aidId);
-            return ServiceResult.Success();
-        }
-
-        public async Task<ServiceResult<List<KvkTeachingAidsDto>>> GetTeachingAidsByContentIdAsync(int contentId)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<List<KvkTeachingAidsDto>>.Failure(
-                    "Content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var aids = await _teachingAidsRepository.GetByContentIdAsync(contentId);
-            var dtos = aids.Select(a => _mapper.MapToDto(a)).ToList();
-
-            return ServiceResult<List<KvkTeachingAidsDto>>.Success(dtos);
-        }
-
-
-        // ============================
         // SECTION D: ADVISORY SERVICES
         // ============================
 
@@ -1013,50 +656,6 @@ namespace Infrastructure.Services.DataTables.KVK
         // SECTION E: RESULTS (FLD/OFT - CategoryId 18 or 24 ONLY)
         // ============================
 
-        public async Task<ServiceResult<KvkResultDto>> GetOrCreateResultAsync(int programId)
-        {
-            var program = await _programRepository.GetByIdAsync(programId);
-
-            if (program == null)
-                return ServiceResult<KvkResultDto>.Failure(
-                    "Program not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            if (!await _entityPermissionService.CanViewForm(program))
-                return ServiceResult<KvkResultDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            // Check if category allows Results (FLD/OFT only)
-            if (program.CategoryId != FLD_CATEGORY_ID && program.CategoryId != OFT_CATEGORY_ID)
-                return ServiceResult<KvkResultDto>.Failure(
-                    $"Results are only available for FLD (CategoryId {FLD_CATEGORY_ID}) or OFT (CategoryId {OFT_CATEGORY_ID}) categories. This program has CategoryId {program.CategoryId}.",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            var existing = await _resultRepository.GetByProgramIdAsync(programId);
-
-            if (existing != null)
-            {
-                var existingDto = _mapper.MapToDto(existing);
-                return ServiceResult<KvkResultDto>.Success(existingDto);
-            }
-
-            // Create new Result record
-            var entity = new KvkResult
-            {
-                KvkProgramDetailsId = programId,
-                UnitLocationId = program.UnitLocationId,
-                OrganizationId = program.OrganizationId,
-                CreatedById = _currentUserService.UserId,
-                CreatedAt = DateTimeOffset.UtcNow
-            };
-
-            var created = await _resultRepository.CreateAsync(entity);
-            var dto = _mapper.MapToDto(created);
-
-            return ServiceResult<KvkResultDto>.Success(dto);
-        }
-
         public async Task<ServiceResult<KvkResultDto>> GetResultByIdAsync(int resultId)
         {
             var result = await _resultRepository.GetWithDetailsAsync(resultId);
@@ -1098,224 +697,6 @@ namespace Infrastructure.Services.DataTables.KVK
 
             await _resultRepository.UpdateAsync(result);
             return ServiceResult.Success();
-        }
-
-        // ============================
-        // E1: FLD RESULTS
-        // ============================
-
-        public async Task<ServiceResult<KvkFldResultDto>> AddFldResultAsync(
-            int resultId,
-            KvkFldResultCreateDto dto)
-        {
-            var result = await _resultRepository.GetByIdAsync(resultId);
-
-            if (result == null)
-                return ServiceResult<KvkFldResultDto>.Failure(
-                    "Result record not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var program = await _programRepository.GetByIdAsync(result.KvkProgramDetailsId);
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<KvkFldResultDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
-                return ServiceResult<KvkFldResultDto>.Failure(
-                    "Cannot add FLD results to submitted or approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            var entity = _mapper.MapToEntity(dto);
-            entity.KvkResultId = resultId;
-            entity.UnitLocationId = result.UnitLocationId;
-            entity.OrganizationId = result.OrganizationId;
-            entity.CreatedById = _currentUserService.UserId;
-            entity.CreatedAt = DateTimeOffset.UtcNow;
-
-            var created = await _fldResultRepository.CreateAsync(entity);
-            var resultDto = _mapper.MapToDto(created);
-
-            return ServiceResult<KvkFldResultDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult<KvkFldResultDto>> UpdateFldResultAsync(
-            int fldId,
-            KvkFldResultUpdateDto dto)
-        {
-            var fldResult = await _fldResultRepository.GetByIdAsync(fldId);
-
-            if (fldResult == null)
-                return ServiceResult<KvkFldResultDto>.Failure(
-                    "FLD result not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var result = await _resultRepository.GetByIdAsync(fldResult.KvkResultId);
-            var program = await _programRepository.GetByIdAsync(result?.KvkProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<KvkFldResultDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
-                return ServiceResult<KvkFldResultDto>.Failure(
-                    "Cannot modify FLD results for submitted or approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            _mapper.MapUpdateDtoToEntity(dto, fldResult);
-            fldResult.UpdatedById = _currentUserService.UserId;
-            fldResult.UpdatedAt = DateTimeOffset.UtcNow;
-
-            var updated = await _fldResultRepository.UpdateAsync(fldResult);
-            var resultDto = _mapper.MapToDto(updated);
-
-            return ServiceResult<KvkFldResultDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult> DeleteFldResultAsync(int fldId)
-        {
-            var fldResult = await _fldResultRepository.GetByIdAsync(fldId);
-
-            if (fldResult == null)
-                return ServiceResult.Failure("FLD result not found", ServiceErrorStatus.NOTFOUND);
-
-            var result = await _resultRepository.GetByIdAsync(fldResult.KvkResultId);
-            var program = await _programRepository.GetByIdAsync(result?.KvkProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult.Failure(
-                    "Cannot delete FLD results from submitted or approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            await _fldResultRepository.DeleteAsync(fldId);
-            return ServiceResult.Success();
-        }
-
-        public async Task<ServiceResult<List<KvkFldResultDto>>> GetFldResultsByResultIdAsync(int resultId)
-        {
-            var result = await _resultRepository.GetByIdAsync(resultId);
-
-            if (result == null)
-                return ServiceResult<List<KvkFldResultDto>>.Failure(
-                    "Result not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var fldResults = await _fldResultRepository.GetByResultIdAsync(resultId);
-            var dtos = fldResults.Select(f => _mapper.MapToDto(f)).ToList();
-
-            return ServiceResult<List<KvkFldResultDto>>.Success(dtos);
-        }
-
-        // ============================
-        // E2: OFT RESULTS
-        // ============================
-
-        public async Task<ServiceResult<KvkOftResultDto>> AddOftResultAsync(
-            int resultId,
-            KvkOftResultCreateDto dto)
-        {
-            var result = await _resultRepository.GetByIdAsync(resultId);
-
-            if (result == null)
-                return ServiceResult<KvkOftResultDto>.Failure(
-                    "Result record not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var program = await _programRepository.GetByIdAsync(result.KvkProgramDetailsId);
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<KvkOftResultDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
-                return ServiceResult<KvkOftResultDto>.Failure(
-                    "Cannot add OFT results to submitted or approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            var entity = _mapper.MapToEntity(dto);
-            entity.KvkResultId = resultId;
-            entity.CreatedById = _currentUserService.UserId;
-            entity.CreatedAt = DateTimeOffset.UtcNow;
-
-            var created = await _oftResultRepository.CreateAsync(entity);
-            var resultDto = _mapper.MapToDto(created);
-
-            return ServiceResult<KvkOftResultDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult<KvkOftResultDto>> UpdateOftResultAsync(
-            int oftId,
-            KvkOftResultUpdateDto dto)
-        {
-            var oftResult = await _oftResultRepository.GetByIdAsync(oftId);
-
-            if (oftResult == null)
-                return ServiceResult<KvkOftResultDto>.Failure(
-                    "OFT result not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var result = await _resultRepository.GetByIdAsync(oftResult.KvkResultId);
-            var program = await _programRepository.GetByIdAsync(result?.KvkProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<KvkOftResultDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
-                return ServiceResult<KvkOftResultDto>.Failure(
-                    "Cannot modify OFT results for submitted or approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            _mapper.MapUpdateDtoToEntity(dto, oftResult);
-            oftResult.UpdatedById = _currentUserService.UserId;
-            oftResult.UpdatedAt = DateTimeOffset.UtcNow;
-
-            var updated = await _oftResultRepository.UpdateAsync(oftResult);
-            var resultDto = _mapper.MapToDto(updated);
-
-            return ServiceResult<KvkOftResultDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult> DeleteOftResultAsync(int oftId)
-        {
-            var oftResult = await _oftResultRepository.GetByIdAsync(oftId);
-
-            if (oftResult == null)
-                return ServiceResult.Failure("OFT result not found", ServiceErrorStatus.NOTFOUND);
-
-            var result = await _resultRepository.GetByIdAsync(oftResult.KvkResultId);
-            var program = await _programRepository.GetByIdAsync(result?.KvkProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult.Failure(
-                    "Cannot delete OFT results from submitted or approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            await _oftResultRepository.DeleteAsync(oftId);
-            return ServiceResult.Success();
-        }
-
-        public async Task<ServiceResult<List<KvkOftResultDto>>> GetOftResultsByResultIdAsync(int resultId)
-        {
-            var result = await _resultRepository.GetByIdAsync(resultId);
-
-            if (result == null)
-                return ServiceResult<List<KvkOftResultDto>>.Failure(
-                    "Result not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var oftResults = await _oftResultRepository.GetByResultIdAsync(resultId);
-            var dtos = oftResults.Select(o => _mapper.MapToDto(o)).ToList();
-
-            return ServiceResult<List<KvkOftResultDto>>.Success(dtos);
         }
 
         // ============================
@@ -1709,6 +1090,141 @@ namespace Infrastructure.Services.DataTables.KVK
             return ServiceResult<KvkRecommendationDto>.Success(dto);
         }
 
+
+        // ============================
+        // LISTING & FILTERING
+        // ============================
+
+        public async Task<PaginatedResult<KvkProgramListItemDto>> GetPaginatedAsync(
+            int pageNumber,
+            int pageSize,
+            DateOnly? startDate,
+            DateOnly? endDate,
+            int? categoryId,
+            string? searchTerm,
+            string? formStatus,
+            int? createdById,
+            int? unitLocationId)
+        {
+            var query = _programRepository.GetQueryable()
+                .Include(x => x.Category)
+                .Include(x => x.Type)
+                .Include(x => x.CreatedBy)
+                .Include(x => x.UnitLocation)
+                .AsQueryable();
+
+            // Apply filters
+            if (startDate.HasValue)
+                query = query.Where(x => x.StartDate >= startDate.Value);
+
+            if (endDate.HasValue)
+                query = query.Where(x => x.EndDate <= endDate.Value);
+
+            if (categoryId.HasValue)
+                query = query.Where(x => x.CategoryId == categoryId.Value);
+
+            if (!string.IsNullOrWhiteSpace(formStatus))
+                query = query.Where(x => x.FormStatus == formStatus);
+
+            if (createdById.HasValue)
+                query = query.Where(x => x.CreatedById == createdById.Value);
+
+            if (unitLocationId.HasValue)
+                query = query.Where(x => x.UnitLocationId == unitLocationId.Value);
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                var lowerSearchTerm = searchTerm.ToLower();
+                query = query.Where(x =>
+                    (x.Title != null && x.Title.ToLower().Contains(lowerSearchTerm)) ||
+                    (x.Location != null && x.Location.ToLower().Contains(lowerSearchTerm)));
+            }
+
+            // Get total count
+            var totalCount = await query.CountAsync();
+
+            // Apply pagination
+            var items = await query
+                .OrderByDescending(x => x.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(x => new KvkProgramListItemDto
+                {
+                    Id = x.Id,
+                    Title = x.Title,
+                    StartDate = x.StartDate,
+                    EndDate = x.EndDate,
+                    CategoryName = x.Category != null ? x.Category.Name : null,
+                    TypeName = x.Type != null ? x.Type.Name : null,
+                    Location = x.Location,
+                    FormStatus = x.FormStatus,
+                    CreatedByName = x.CreatedBy != null ? x.CreatedBy.Name : null,
+                    CreatedAt = x.CreatedAt,
+                    UnitName = x.UnitLocation != null ? x.UnitLocation.Name : null
+                })
+                .ToListAsync();
+
+            return new PaginatedResult<KvkProgramListItemDto>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+        }
+
+        public async Task<PaginatedResult<KvkProgramListItemDto>> GetByStatusAsync(
+            string status,
+            int pageNumber,
+            int pageSize)
+        {
+            var query = _programRepository.GetQueryable()
+                .Include(x => x.Category)
+                .Include(x => x.Type)
+                .Include(x => x.CreatedBy)
+                .Include(x => x.UnitLocation)
+                .Where(x => x.FormStatus == status);
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .OrderByDescending(x => x.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(x => new KvkProgramListItemDto
+                {
+                    Id = x.Id,
+                    Title = x.Title,
+                    StartDate = x.StartDate,
+                    EndDate = x.EndDate,
+                    CategoryName = x.Category != null ? x.Category.Name : null,
+                    TypeName = x.Type != null ? x.Type.Name : null,
+                    Location = x.Location,
+                    FormStatus = x.FormStatus,
+                    CreatedByName = x.CreatedBy != null ? x.CreatedBy.Name : null,
+                    CreatedAt = x.CreatedAt,
+                    UnitName = x.UnitLocation != null ? x.UnitLocation.Name : null
+                })
+                .ToListAsync();
+
+            return new PaginatedResult<KvkProgramListItemDto>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+        }
+
+        public async Task<Dictionary<string, int>> GetStatusSummaryAsync()
+        {
+            var summary = await _programRepository.GetQueryable()
+                .GroupBy(x => x.FormStatus)
+                .Select(g => new { Status = g.Key, Count = g.Count() })
+                .ToListAsync();
+
+            return summary.ToDictionary(x => x.Status, x => x.Count);
+        }
 
         // -------------------------------------------------------
         // HISTORY: Using Generic Service

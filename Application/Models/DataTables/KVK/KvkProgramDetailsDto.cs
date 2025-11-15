@@ -177,6 +177,24 @@ namespace Application.Models.DataTables.KVK
         public KvkRecommendationDto? Recommendation { get; set; }
     }
 
+    /// <summary>
+    /// Lightweight DTO for list/search results
+    /// </summary>
+    public class KvkProgramListItemDto
+    {
+        public int Id { get; set; }
+        public string? Title { get; set; }
+        public DateOnly StartDate { get; set; }
+        public DateOnly EndDate { get; set; }
+        public string? CategoryName { get; set; }
+        public string? TypeName { get; set; }
+        public string? Location { get; set; }
+        public string FormStatus { get; set; } = "Draft";
+        public string? CreatedByName { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
+        public string? UnitName { get; set; }
+    }
+
     // ============================
     // DEMOGRAPHICS DTOs
     // ============================

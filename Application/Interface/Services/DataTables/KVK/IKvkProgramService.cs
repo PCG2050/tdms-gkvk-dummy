@@ -27,7 +27,6 @@ namespace Application.Interface.Services.DataTables.KVK
         // ============================
         // SECTION C: PROGRAM CONTENT & RESOURCES
         // ============================
-        Task<ServiceResult<KvkProgramContentDto>> AddProgramContentAsync(int programId, KvkProgramContentCreateDto dto);
 
         /// <summary>
         /// Create KvkProgramContentAndResources along with all child entities (ResourcePersons, Topics, TeachingAids) in a single transaction
@@ -47,24 +46,6 @@ namespace Application.Interface.Services.DataTables.KVK
         Task<ServiceResult> DeleteProgramContentAsync(int contentId);
         Task<ServiceResult<List<KvkProgramContentDto>>> GetProgramContentsByProgramIdAsync(int programId);
 
-        // C1: Resource Persons
-        Task<ServiceResult<KvkResourcePersonDto>> AddResourcePersonAsync(int contentId, KvkResourcePersonCreateDto dto);
-        Task<ServiceResult<KvkResourcePersonDto>> UpdateResourcePersonAsync(int personId, KvkResourcePersonUpdateDto dto);
-        Task<ServiceResult> DeleteResourcePersonAsync(int personId);
-        Task<ServiceResult<List<KvkResourcePersonDto>>> GetResourcePersonsByContentIdAsync(int contentId);
-
-        // C2: Topics Covered
-        Task<ServiceResult<KvkTopicsCoveredDto>> AddTopicAsync(int contentId, KvkTopicsCoveredCreateDto dto);
-        Task<ServiceResult<KvkTopicsCoveredDto>> UpdateTopicAsync(int topicId, KvkTopicsCoveredUpdateDto dto);
-        Task<ServiceResult> DeleteTopicAsync(int topicId);
-        Task<ServiceResult<List<KvkTopicsCoveredDto>>> GetTopicsByContentIdAsync(int contentId);
-
-        // C3: Teaching Aids
-        Task<ServiceResult<KvkTeachingAidsDto>> AddTeachingAidAsync(int contentId, KvkTeachingAidsCreateDto dto);
-        Task<ServiceResult<KvkTeachingAidsDto>> UpdateTeachingAidAsync(int aidId, KvkTeachingAidsUpdateDto dto);
-        Task<ServiceResult> DeleteTeachingAidAsync(int aidId);
-        Task<ServiceResult<List<KvkTeachingAidsDto>>> GetTeachingAidsByContentIdAsync(int contentId);
-
         // ============================
         // SECTION D: ADVISORY SERVICES
         // ============================
@@ -74,21 +55,8 @@ namespace Application.Interface.Services.DataTables.KVK
         // ============================
         // SECTION E: RESULTS (FLD/OFT - CategoryId 18 or 24)
         // ============================
-        Task<ServiceResult<KvkResultDto>> GetOrCreateResultAsync(int programId);
         Task<ServiceResult<KvkResultDto>> GetResultByIdAsync(int resultId);
         Task<ServiceResult> UpdateResultExcelAsync(int resultId, string excelUrl);
-
-        // E1: FLD Results
-        Task<ServiceResult<KvkFldResultDto>> AddFldResultAsync(int resultId, KvkFldResultCreateDto dto);
-        Task<ServiceResult<KvkFldResultDto>> UpdateFldResultAsync(int fldId, KvkFldResultUpdateDto dto);
-        Task<ServiceResult> DeleteFldResultAsync(int fldId);
-        Task<ServiceResult<List<KvkFldResultDto>>> GetFldResultsByResultIdAsync(int resultId);
-
-        // E2: OFT Results
-        Task<ServiceResult<KvkOftResultDto>> AddOftResultAsync(int resultId, KvkOftResultCreateDto dto);
-        Task<ServiceResult<KvkOftResultDto>> UpdateOftResultAsync(int oftId, KvkOftResultUpdateDto dto);
-        Task<ServiceResult> DeleteOftResultAsync(int oftId);
-        Task<ServiceResult<List<KvkOftResultDto>>> GetOftResultsByResultIdAsync(int resultId);
 
         // E3: Composite Create/Update for Results with Children
         /// <summary>
@@ -118,6 +86,37 @@ namespace Application.Interface.Services.DataTables.KVK
         // ============================
         Task<ServiceResult<KvkRecommendationDto>> AddOrUpdateRecommendationAsync(int programId, KvkRecommendationCreateDto dto);
         Task<ServiceResult<KvkRecommendationDto>> GetRecommendationByProgramIdAsync(int programId);
+
+        // ============================
+        // LISTING & FILTERING
+        // ============================
+
+        /// <summary>
+        /// Search and filter KVK programs with pagination (Admin/UnitHead)
+        /// </summary>
+        Task<PaginatedResult<KvkProgramListItemDto>> GetPaginatedAsync(
+            int pageNumber,
+            int pageSize,
+            DateOnly? startDate,
+            DateOnly? endDate,
+            int? categoryId,
+            string? searchTerm,
+            string? formStatus,
+            int? createdById,
+            int? unitLocationId);
+
+        /// <summary>
+        /// Get programs by status with pagination
+        /// </summary>
+        Task<PaginatedResult<KvkProgramListItemDto>> GetByStatusAsync(
+            string status,
+            int pageNumber,
+            int pageSize);
+
+        /// <summary>
+        /// Get summary of programs grouped by status
+        /// </summary>
+        Task<Dictionary<string, int>> GetStatusSummaryAsync();
 
         /// <summary>
         /// Get trainer's submission history with pagination
