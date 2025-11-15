@@ -415,7 +415,7 @@ namespace Infrastructure.Services.DataTables.KVK
                 // Prepare parent entity for update
                 var parentEntity = new KvkProgramContentAndResources
                 {
-                    Id = contentId,                
+                    Id = contentId,
                     UpdatedById = _currentUserService.UserId,
                     UpdatedAt = DateTimeOffset.UtcNow
                 };
@@ -1287,16 +1287,16 @@ namespace Infrastructure.Services.DataTables.KVK
                     TypeName = x.Type != null ? x.Type.Name : null,
                     Location = x.Location,
                     FormStatus = x.FormStatus,
-                    CreatedByName = x.CreatedBy != null ? x.CreatedBy.Name : null,
+                    CreatedByName = x.CreatedBy != null ? x.CreatedBy.FirstName : null,
                     CreatedAt = x.CreatedAt,
-                    UnitName = x.UnitLocation != null ? x.UnitLocation.Name : null
+                    UnitName = x.UnitLocation != null ? x.UnitLocation.Unit.Name : null
                 })
                 .ToListAsync();
 
             return new PaginatedResult<KvkProgramListItemDto>
             {
                 Items = items,
-                TotalCount = totalCount,
+                TotalItems = totalCount,
                 PageNumber = pageNumber,
                 PageSize = pageSize
             };
@@ -1330,16 +1330,16 @@ namespace Infrastructure.Services.DataTables.KVK
                     TypeName = x.Type != null ? x.Type.Name : null,
                     Location = x.Location,
                     FormStatus = x.FormStatus,
-                    CreatedByName = x.CreatedBy != null ? x.CreatedBy.Name : null,
+                    CreatedByName = x.CreatedBy != null ? x.CreatedBy.FirstName : null,
                     CreatedAt = x.CreatedAt,
-                    UnitName = x.UnitLocation != null ? x.UnitLocation.Name : null
+                    UnitName = x.UnitLocation != null ? x.UnitLocation.Unit.Name : null
                 })
                 .ToListAsync();
 
             return new PaginatedResult<KvkProgramListItemDto>
             {
                 Items = items,
-                TotalCount = totalCount,
+                TotalItems = totalCount,
                 PageNumber = pageNumber,
                 PageSize = pageSize
             };
