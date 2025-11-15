@@ -384,9 +384,9 @@ namespace Infrastructure.Services.DataTables.ATIC
                     ServiceErrorStatus.FORBIDDEN);
 
             // Validate form status
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<AticProgramContentDto>.Failure(
-                    "Cannot add content to submitted or approved programs",
+                    "Cannot add content to approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             try
@@ -395,6 +395,7 @@ namespace Infrastructure.Services.DataTables.ATIC
                 var parentEntity = new AticProgramContentAndResources
                 {
                     AticProgramDetailsId = programId,
+                    Title = dto.Title,
                     UnitLocationId = program.UnitLocationId,
                     OrganizationId = program.OrganizationId,
                     CreatedById = _currentUserService.UserId,
@@ -479,9 +480,9 @@ namespace Infrastructure.Services.DataTables.ATIC
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<AticProgramContentDto>.Failure(
-                    "Cannot update content in submitted or approved programs",
+                    "Cannot update content in approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             try
@@ -490,6 +491,7 @@ namespace Infrastructure.Services.DataTables.ATIC
                 var parentEntity = new AticProgramContentAndResources
                 {
                     Id = contentId,
+                    Title = dto.Title,
                     UpdatedById = _currentUserService.UserId,
                     UpdatedAt = DateTimeOffset.UtcNow
                 };
@@ -592,349 +594,6 @@ namespace Infrastructure.Services.DataTables.ATIC
                     $"Failed to update program content with children: {ex.Message}",
                     ServiceErrorStatus.INVALIDOPERATION);
             }
-        }
-
-        // ============================
-        // SECTION C1: RESOURCE PERSONS
-        // ============================
-
-        public async Task<ServiceResult<AticResourcePersonDto>> AddResourcePersonAsync(
-            int contentId,
-            AticResourcePersonCreateDto dto)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<AticResourcePersonDto>.Failure(
-                    "Program content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var program = await _programRepository.GetByIdAsync(content.AticProgramDetailsId ?? 0);
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<AticResourcePersonDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
-                return ServiceResult<AticResourcePersonDto>.Failure(
-                    "Cannot modify approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            var person = _mapper.MapToEntity(dto);
-            person.AticProgramContentAndResourcesId = contentId;
-            person.OrganizationId = _currentUserService.OrganizationId;
-            person.UnitLocationId = program.UnitLocationId;
-            person.CreatedById = _currentUserService.UserId;
-            person.CreatedAt = DateTimeOffset.UtcNow;
-
-            await _resourcePersonRepository.CreateAsync(person);
-
-            var resultDto = _mapper.MapToDto(person);
-            return ServiceResult<AticResourcePersonDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult<AticResourcePersonDto>> UpdateResourcePersonAsync(
-            int personId,
-            AticResourcePersonUpdateDto dto)
-        {
-            var person = await _resourcePersonRepository.GetByIdAsync(personId);
-
-            if (person == null)
-                return ServiceResult<AticResourcePersonDto>.Failure(
-                    "Resource person not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(person.AticProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.AticProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<AticResourcePersonDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
-                return ServiceResult<AticResourcePersonDto>.Failure(
-                    "Cannot modify approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            // Apply updates from DTO
-            if (dto.Name != null) person.Name = dto.Name;
-            if (dto.Designation != null) person.Designation = dto.Designation;
-            if (dto.ResourceType.HasValue) person.ResourceType = dto.ResourceType;
-            if (dto.Responsibility.HasValue) person.Responsibility = dto.Responsibility;
-            if (dto.InstitutionOrDepartment != null) person.InstitutionOrDepartment = dto.InstitutionOrDepartment;
-
-            person.UpdatedById = _currentUserService.UserId;
-            person.UpdatedAt = DateTimeOffset.UtcNow;
-
-            await _resourcePersonRepository.UpdateAsync(person);
-
-            var resultDto = _mapper.MapToDto(person);
-            return ServiceResult<AticResourcePersonDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult> DeleteResourcePersonAsync(int personId)
-        {
-            var person = await _resourcePersonRepository.GetByIdAsync(personId);
-
-            if (person == null)
-                return ServiceResult.Failure("Resource person not found", ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(person.AticProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.AticProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
-                return ServiceResult.Failure(
-                    "Cannot modify approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            await _resourcePersonRepository.DeleteAsync(personId);
-            return ServiceResult.Success();
-        }
-
-        public async Task<ServiceResult<List<AticResourcePersonDto>>> GetResourcePersonsByContentIdAsync(int contentId)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<List<AticResourcePersonDto>>.Failure(
-                    "Content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var persons = await _resourcePersonRepository.GetByContentIdAsync(contentId);
-            var dtos = persons.Select(p => _mapper.MapToDto(p)).ToList();
-
-            return ServiceResult<List<AticResourcePersonDto>>.Success(dtos);
-        }
-
-        // ============================
-        // SECTION C2: TOPICS COVERED
-        // ============================
-
-        public async Task<ServiceResult<AticTopicsCoveredDto>> AddTopicAsync(
-            int contentId,
-            AticTopicsCoveredCreateDto dto)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<AticTopicsCoveredDto>.Failure(
-                    "Program content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var program = await _programRepository.GetByIdAsync(content.AticProgramDetailsId ?? 0);
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<AticTopicsCoveredDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
-                return ServiceResult<AticTopicsCoveredDto>.Failure(
-                    "Cannot modify approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            var topic = _mapper.MapToEntity(dto);
-            topic.AticProgramContentAndResourcesId = contentId;
-            topic.OrganizationId = _currentUserService.OrganizationId;
-            topic.UnitLocationId = program.UnitLocationId;
-            topic.CreatedById = _currentUserService.UserId;
-            topic.CreatedAt = DateTimeOffset.UtcNow;
-
-            await _topicsRepository.CreateAsync(topic);
-
-            var resultDto = _mapper.MapToDto(topic);
-            return ServiceResult<AticTopicsCoveredDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult<AticTopicsCoveredDto>> UpdateTopicAsync(
-            int topicId,
-            AticTopicsCoveredUpdateDto dto)
-        {
-            var topic = await _topicsRepository.GetByIdAsync(topicId);
-
-            if (topic == null)
-                return ServiceResult<AticTopicsCoveredDto>.Failure(
-                    "Topic not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(topic.AticProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.AticProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<AticTopicsCoveredDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
-                return ServiceResult<AticTopicsCoveredDto>.Failure(
-                    "Cannot modify approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            if (dto.Date.HasValue) topic.Date = dto.Date;
-            if (dto.Title != null) topic.Title = dto.Title;
-            if (dto.PhotoUpload != null) topic.PhotoUpload = dto.PhotoUpload;
-
-            topic.UpdatedById = _currentUserService.UserId;
-            topic.UpdatedAt = DateTimeOffset.UtcNow;
-
-            await _topicsRepository.UpdateAsync(topic);
-
-            var resultDto = _mapper.MapToDto(topic);
-            return ServiceResult<AticTopicsCoveredDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult> DeleteTopicAsync(int topicId)
-        {
-            var topic = await _topicsRepository.GetByIdAsync(topicId);
-
-            if (topic == null)
-                return ServiceResult.Failure("Topic not found", ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(topic.AticProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.AticProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
-                return ServiceResult.Failure(
-                    "Cannot modify approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            await _topicsRepository.DeleteAsync(topicId);
-            return ServiceResult.Success();
-        }
-
-        public async Task<ServiceResult<List<AticTopicsCoveredDto>>> GetTopicsByContentIdAsync(int contentId)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<List<AticTopicsCoveredDto>>.Failure(
-                    "Content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var topics = await _topicsRepository.GetByContentIdAsync(contentId);
-            var dtos = topics.Select(t => _mapper.MapToDto(t)).ToList();
-
-            return ServiceResult<List<AticTopicsCoveredDto>>.Success(dtos);
-        }
-
-        // ============================
-        // SECTION C3: TEACHING AIDS
-        // ============================
-
-        public async Task<ServiceResult<AticTeachingAidsDto>> AddTeachingAidAsync(
-            int contentId,
-            AticTeachingAidsCreateDto dto)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<AticTeachingAidsDto>.Failure(
-                    "Program content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var program = await _programRepository.GetByIdAsync(content.AticProgramDetailsId ?? 0);
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<AticTeachingAidsDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
-                return ServiceResult<AticTeachingAidsDto>.Failure(
-                    "Cannot modify approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            var aid = _mapper.MapToEntity(dto);
-            aid.AticProgramContentAndResourcesId = contentId;
-            aid.OrganizationId = _currentUserService.OrganizationId;
-            aid.UnitLocationId = program.UnitLocationId;
-            aid.CreatedById = _currentUserService.UserId;
-            aid.CreatedAt = DateTimeOffset.UtcNow;
-
-            await _teachingAidsRepository.CreateAsync(aid);
-
-            var resultDto = _mapper.MapToDto(aid);
-            return ServiceResult<AticTeachingAidsDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult<AticTeachingAidsDto>> UpdateTeachingAidAsync(
-            int aidId,
-            AticTeachingAidsUpdateDto dto)
-        {
-            var aid = await _teachingAidsRepository.GetByIdAsync(aidId);
-
-            if (aid == null)
-                return ServiceResult<AticTeachingAidsDto>.Failure(
-                    "Teaching aid not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(aid.AticProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.AticProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<AticTeachingAidsDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
-                return ServiceResult<AticTeachingAidsDto>.Failure(
-                    "Cannot modify approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            if (dto.TypeOfAidId.HasValue) aid.TypeOfAidId = dto.TypeOfAidId;
-            if (dto.OtherTypeOfAid != null) aid.OtherTypeOfAid = dto.OtherTypeOfAid;
-            if (dto.Purpose != null) aid.Purpose = dto.Purpose;
-            if (dto.Number.HasValue) aid.Number = dto.Number.Value;
-
-            aid.UpdatedById = _currentUserService.UserId;
-            aid.UpdatedAt = DateTimeOffset.UtcNow;
-
-            await _teachingAidsRepository.UpdateAsync(aid);
-
-            var resultDto = _mapper.MapToDto(aid);
-            return ServiceResult<AticTeachingAidsDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult> DeleteTeachingAidAsync(int aidId)
-        {
-            var aid = await _teachingAidsRepository.GetByIdAsync(aidId);
-
-            if (aid == null)
-                return ServiceResult.Failure("Teaching aid not found", ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(aid.AticProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.AticProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
-                return ServiceResult.Failure(
-                    "Cannot modify approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            await _teachingAidsRepository.DeleteAsync(aidId);
-            return ServiceResult.Success();
-        }
-
-        public async Task<ServiceResult<List<AticTeachingAidsDto>>> GetTeachingAidsByContentIdAsync(int contentId)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<List<AticTeachingAidsDto>>.Failure(
-                    "Content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var aids = await _teachingAidsRepository.GetByContentIdAsync(contentId);
-            var dtos = aids.Select(a => _mapper.MapToDto(a)).ToList();
-
-            return ServiceResult<List<AticTeachingAidsDto>>.Success(dtos);
         }
 
         // ============================

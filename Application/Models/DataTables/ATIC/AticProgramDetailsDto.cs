@@ -376,7 +376,8 @@ namespace Application.Models.DataTables.ATIC
     /// </summary>
     public class AticProgramContentWithChildrenCreateDto
     {
-        // Parent fields (none for ProgramContent)
+        // Parent fields
+        public string? Title { get; set; }
 
         // Child collections (optional - can be null or empty if UI doesn't have data yet)
         public List<AticResourcePersonCreateDto>? ResourcePersons { get; set; }
@@ -430,7 +431,8 @@ namespace Application.Models.DataTables.ATIC
     /// </summary>
     public class AticProgramContentWithChildrenUpdateDto
     {
-        // Parent fields (none for ProgramContent)
+        // Parent fields
+        public string? Title { get; set; }
 
         // Child collections - Hybrid Pattern
         // If item has Id: update it

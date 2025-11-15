@@ -113,90 +113,23 @@ namespace WebApi.Controllers.DataTables.ATIC
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
-        // C1: Resource Persons
-        [HttpPost("content/{contentId}/resource-persons")]
-        public async Task<IActionResult> AddResourcePerson(int contentId, [FromBody] AticResourcePersonCreateDto dto)
+        /// <summary>
+        /// Creates program content with all children in one transaction (RECOMMENDED)
+        /// </summary>
+        [HttpPost("{programId}/content-with-children")]
+        public async Task<IActionResult> AddProgramContentWithChildren(int programId, [FromBody] AticProgramContentWithChildrenCreateDto dto)
         {
-            var result = await _service.AddResourcePersonAsync(contentId, dto);
+            var result = await _service.AddProgramContentWithChildrenAsync(programId, dto);
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
-        [HttpPut("resource-persons/{personId}")]
-        public async Task<IActionResult> UpdateResourcePerson(int personId, [FromBody] AticResourcePersonUpdateDto dto)
+        /// <summary>
+        /// Updates program content with all children using hybrid pattern (RECOMMENDED)
+        /// </summary>
+        [HttpPut("content/{contentId}/with-children")]
+        public async Task<IActionResult> UpdateProgramContentWithChildren(int contentId, [FromBody] AticProgramContentWithChildrenUpdateDto dto)
         {
-            var result = await _service.UpdateResourcePersonAsync(personId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpDelete("resource-persons/{personId}")]
-        public async Task<IActionResult> DeleteResourcePerson(int personId)
-        {
-            var result = await _service.DeleteResourcePersonAsync(personId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpGet("content/{contentId}/resource-persons")]
-        public async Task<IActionResult> GetResourcePersons(int contentId)
-        {
-            var result = await _service.GetResourcePersonsByContentIdAsync(contentId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        // C2: Topics Covered
-        [HttpPost("content/{contentId}/topics")]
-        public async Task<IActionResult> AddTopic(int contentId, [FromBody] AticTopicsCoveredCreateDto dto)
-        {
-            var result = await _service.AddTopicAsync(contentId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpPut("topics/{topicId}")]
-        public async Task<IActionResult> UpdateTopic(int topicId, [FromBody] AticTopicsCoveredUpdateDto dto)
-        {
-            var result = await _service.UpdateTopicAsync(topicId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpDelete("topics/{topicId}")]
-        public async Task<IActionResult> DeleteTopic(int topicId)
-        {
-            var result = await _service.DeleteTopicAsync(topicId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpGet("content/{contentId}/topics")]
-        public async Task<IActionResult> GetTopics(int contentId)
-        {
-            var result = await _service.GetTopicsByContentIdAsync(contentId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        // C3: Teaching Aids
-        [HttpPost("content/{contentId}/teaching-aids")]
-        public async Task<IActionResult> AddTeachingAid(int contentId, [FromBody] AticTeachingAidsCreateDto dto)
-        {
-            var result = await _service.AddTeachingAidAsync(contentId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpPut("teaching-aids/{aidId}")]
-        public async Task<IActionResult> UpdateTeachingAid(int aidId, [FromBody] AticTeachingAidsUpdateDto dto)
-        {
-            var result = await _service.UpdateTeachingAidAsync(aidId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpDelete("teaching-aids/{aidId}")]
-        public async Task<IActionResult> DeleteTeachingAid(int aidId)
-        {
-            var result = await _service.DeleteTeachingAidAsync(aidId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpGet("content/{contentId}/teaching-aids")]
-        public async Task<IActionResult> GetTeachingAids(int contentId)
-        {
-            var result = await _service.GetTeachingAidsByContentIdAsync(contentId);
+            var result = await _service.UpdateProgramContentWithChildrenAsync(contentId, dto);
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 

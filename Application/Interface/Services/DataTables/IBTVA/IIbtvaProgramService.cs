@@ -32,33 +32,14 @@ namespace Application.Interface.Services.DataTables.IBTVA
         Task<ServiceResult> DeleteProgramContentAsync(int contentId);
         Task<ServiceResult<List<IbtvaProgramContentDto>>> GetProgramContentsByProgramIdAsync(int programId);
 
-        // Hybrid pattern methods for bulk create/update operations
+        // Hybrid pattern methods for bulk create/update operations (RECOMMENDED)
         Task<ServiceResult<IbtvaProgramContentDto>> AddProgramContentWithChildrenAsync(int programId, IbtvaProgramContentWithChildrenCreateDto dto);
         Task<ServiceResult<IbtvaProgramContentDto>> UpdateProgramContentWithChildrenAsync(int contentId, IbtvaProgramContentWithChildrenUpdateDto dto);
 
         // ============================
-        // SECTION C1: RESOURCE PERSONS
+        // SECTION C1-C3: RESOURCE PERSONS, TOPICS, TEACHING AIDS
+        // Individual CRUD methods REMOVED - Use hybrid endpoints instead
         // ============================
-        Task<ServiceResult<IbtvaResourcePersonDto>> AddResourcePersonAsync(int contentId, IbtvaResourcePersonCreateDto dto);
-        Task<ServiceResult<IbtvaResourcePersonDto>> UpdateResourcePersonAsync(int personId, IbtvaResourcePersonUpdateDto dto);
-        Task<ServiceResult> DeleteResourcePersonAsync(int personId);
-        Task<ServiceResult<List<IbtvaResourcePersonDto>>> GetResourcePersonsByContentIdAsync(int contentId);
-
-        // ============================
-        // SECTION C2: TOPICS COVERED
-        // ============================
-        Task<ServiceResult<IbtvaTopicsCoveredDto>> AddTopicAsync(int contentId, IbtvaTopicsCoveredCreateDto dto);
-        Task<ServiceResult<IbtvaTopicsCoveredDto>> UpdateTopicAsync(int topicId, IbtvaTopicsCoveredUpdateDto dto);
-        Task<ServiceResult> DeleteTopicAsync(int topicId);
-        Task<ServiceResult<List<IbtvaTopicsCoveredDto>>> GetTopicsByContentIdAsync(int contentId);
-
-        // ============================
-        // SECTION C3: TEACHING AIDS
-        // ============================
-        Task<ServiceResult<IbtvaTeachingAidsDto>> AddTeachingAidAsync(int contentId, IbtvaTeachingAidsCreateDto dto);
-        Task<ServiceResult<IbtvaTeachingAidsDto>> UpdateTeachingAidAsync(int aidId, IbtvaTeachingAidsUpdateDto dto);
-        Task<ServiceResult> DeleteTeachingAidAsync(int aidId);
-        Task<ServiceResult<List<IbtvaTeachingAidsDto>>> GetTeachingAidsByContentIdAsync(int contentId);
 
         // ============================
         // SECTION D: ADVISORY SERVICES
