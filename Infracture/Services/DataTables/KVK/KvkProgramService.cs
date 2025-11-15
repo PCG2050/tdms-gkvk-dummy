@@ -610,18 +610,24 @@ namespace Infrastructure.Services.DataTables.KVK
             }
             else
             {
-                // Update existing
-                existing.NoOfFacebookSMS = dto.NoOfFacebookSMS ?? 0;
-                existing.NoOfSMSSentToRegisteredFarmers = dto.NoOfSMSSentToRegisteredFarmers ?? 0;
-                existing.NoOfWhatsappGroups = dto.NoOfWhatsappGroups ?? 0;
-                existing.NoOfWhatsappSMS = dto.NoOfWhatsappSMS ?? 0;
-                existing.NoOfAnsweredWhatsappQueries = dto.NoOfAnsweredWhatsappQueries ?? 0;
-                existing.NoOfPhoneCalls = dto.NoOfPhoneCalls ?? 0;
-                existing.NoOfFaceToFaceDiscussions = dto.NoOfFaceToFaceDiscussions ?? 0;
-                existing.NoOfGroupDiscussions = dto.NoOfGroupDiscussions ?? 0;
-                existing.NoOfEmailsSent = dto.NoOfEmailsSent ?? 0;
-                existing.NoOfNewspaperCoverage = dto.NoOfNewspaperCoverage ?? 0;
-                existing.NoOfBeneficiaries = dto.NoOfBeneficiaries ?? 0;
+                // Update existing using mapper
+                var updateDto = new KvkAdvisoryServicesUpdateDto
+                {
+                    Id = existing.Id,
+                    NoOfFacebookSMS = dto.NoOfFacebookSMS,
+                    NoOfSMSSentToRegisteredFarmers = dto.NoOfSMSSentToRegisteredFarmers,
+                    NoOfWhatsappGroups = dto.NoOfWhatsappGroups,
+                    NoOfWhatsappSMS = dto.NoOfWhatsappSMS,
+                    NoOfAnsweredWhatsappQueries = dto.NoOfAnsweredWhatsappQueries,
+                    NoOfPhoneCalls = dto.NoOfPhoneCalls,
+                    NoOfFaceToFaceDiscussions = dto.NoOfFaceToFaceDiscussions,
+                    NoOfGroupDiscussions = dto.NoOfGroupDiscussions,
+                    NoOfEmailsSent = dto.NoOfEmailsSent,
+                    NoOfNewspaperCoverage = dto.NoOfNewspaperCoverage,
+                    NoOfBeneficiaries = dto.NoOfBeneficiaries
+                };
+
+                _mapper.MapUpdateDtoToEntity(updateDto, existing);
                 existing.UpdatedById = _currentUserService.UserId;
                 existing.UpdatedAt = DateTimeOffset.UtcNow;
 
@@ -974,13 +980,19 @@ namespace Infrastructure.Services.DataTables.KVK
             }
             else
             {
-                // Update existing
-                existing.ProgressReportReportingYear = dto.ProgressReportReportingYear;
-                existing.Date = dto.Date;
-                existing.UploadPhoto = dto.UploadPhoto;
-                existing.PhotosGeotaggedPhotoOrUploadPhoto = dto.PhotosGeotaggedPhotoOrUploadPhoto;
-                existing.UploadVideo = dto.UploadVideo;
-                existing.SignificantOutcome = dto.SignificantOutcome;
+                // Update existing using mapper
+                var updateDto = new KvkReportUpdateDto
+                {
+                    Id = existing.Id,
+                    ProgressReportReportingYear = dto.ProgressReportReportingYear,
+                    Date = dto.Date,
+                    UploadPhoto = dto.UploadPhoto,
+                    PhotosGeotaggedPhotoOrUploadPhoto = dto.PhotosGeotaggedPhotoOrUploadPhoto,
+                    UploadVideo = dto.UploadVideo,
+                    SignificantOutcome = dto.SignificantOutcome
+                };
+
+                _mapper.MapUpdateDtoToEntity(updateDto, existing);
                 existing.UpdatedById = _currentUserService.UserId;
                 existing.UpdatedAt = DateTimeOffset.UtcNow;
 
@@ -1053,13 +1065,19 @@ namespace Infrastructure.Services.DataTables.KVK
             }
             else
             {
-                // Update existing
-                existing.ProblemsIdentified = dto.ProblemsIdentified;
-                existing.Recommendation = dto.Recommendation;
-                existing.ActionTaken = dto.ActionTaken;
-                existing.SignificantAchievement = dto.SignificantAchievement;
-                existing.SuccessStories = dto.SuccessStories;
-                existing.ImpactOutcome = dto.ImpactOutcome;
+                // Update existing using mapper
+                var updateDto = new KvkRecommendationUpdateDto
+                {
+                    Id = existing.Id,
+                    ProblemsIdentified = dto.ProblemsIdentified,
+                    Recommendation = dto.Recommendation,
+                    ActionTaken = dto.ActionTaken,
+                    SignificantAchievement = dto.SignificantAchievement,
+                    SuccessStories = dto.SuccessStories,
+                    ImpactOutcome = dto.ImpactOutcome
+                };
+
+                _mapper.MapUpdateDtoToEntity(updateDto, existing);
                 existing.UpdatedById = _currentUserService.UserId;
                 existing.UpdatedAt = DateTimeOffset.UtcNow;
 
