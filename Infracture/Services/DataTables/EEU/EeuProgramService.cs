@@ -1231,6 +1231,15 @@ namespace Infrastructure.Services.DataTables.EEU
 
             await _recommendationRepository.CreateAsync(recommendation);
 
+            // AUTO-SUBMIT: Since Recommendation is the last section, automatically change status to Pending
+            if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
+            {
+                program.FormStatus = "Pending";
+                program.UpdatedById = _currentUserService.UserId;
+                program.UpdatedAt = DateTimeOffset.UtcNow;
+                await _programRepository.UpdateAsync(program);
+            }
+
             var resultDto = _mapper.MapToDto(recommendation);
             return ServiceResult<EeuRecommendationDto>.Success(resultDto);
         }
@@ -1268,6 +1277,15 @@ namespace Infrastructure.Services.DataTables.EEU
             recommendation.UpdatedAt = DateTimeOffset.UtcNow;
 
             await _recommendationRepository.UpdateAsync(recommendation);
+
+            // AUTO-SUBMIT: Since Recommendation is the last section, automatically change status to Pending
+            if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
+            {
+                program.FormStatus = "Pending";
+                program.UpdatedById = _currentUserService.UserId;
+                program.UpdatedAt = DateTimeOffset.UtcNow;
+                await _programRepository.UpdateAsync(program);
+            }
 
             var resultDto = _mapper.MapToDto(recommendation);
             return ServiceResult<EeuRecommendationDto>.Success(resultDto);

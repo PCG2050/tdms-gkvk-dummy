@@ -1233,6 +1233,15 @@ namespace Infrastructure.Services.DataTables.NAEP
 
             await _recommendationRepository.CreateAsync(recommendation);
 
+            // AUTO-SUBMIT: Since Recommendation is the last section, automatically change status to Pending
+            if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
+            {
+                program.FormStatus = "Pending";
+                program.UpdatedById = _currentUserService.UserId;
+                program.UpdatedAt = DateTimeOffset.UtcNow;
+                await _programRepository.UpdateAsync(program);
+            }
+
             var resultDto = _mapper.MapToDto(recommendation);
             return ServiceResult<NaepRecommendationDto>.Success(resultDto);
         }
@@ -1270,6 +1279,15 @@ namespace Infrastructure.Services.DataTables.NAEP
             recommendation.UpdatedAt = DateTimeOffset.UtcNow;
 
             await _recommendationRepository.UpdateAsync(recommendation);
+
+            // AUTO-SUBMIT: Since Recommendation is the last section, automatically change status to Pending
+            if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
+            {
+                program.FormStatus = "Pending";
+                program.UpdatedById = _currentUserService.UserId;
+                program.UpdatedAt = DateTimeOffset.UtcNow;
+                await _programRepository.UpdateAsync(program);
+            }
 
             var resultDto = _mapper.MapToDto(recommendation);
             return ServiceResult<NaepRecommendationDto>.Success(resultDto);
