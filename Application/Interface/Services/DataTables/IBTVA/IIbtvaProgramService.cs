@@ -32,6 +32,10 @@ namespace Application.Interface.Services.DataTables.IBTVA
         Task<ServiceResult> DeleteProgramContentAsync(int contentId);
         Task<ServiceResult<List<IbtvaProgramContentDto>>> GetProgramContentsByProgramIdAsync(int programId);
 
+        // Hybrid pattern methods for bulk create/update operations
+        Task<ServiceResult<IbtvaProgramContentDto>> AddProgramContentWithChildrenAsync(int programId, IbtvaProgramContentWithChildrenCreateDto dto);
+        Task<ServiceResult<IbtvaProgramContentDto>> UpdateProgramContentWithChildrenAsync(int contentId, IbtvaProgramContentWithChildrenUpdateDto dto);
+
         // ============================
         // SECTION C1: RESOURCE PERSONS
         // ============================

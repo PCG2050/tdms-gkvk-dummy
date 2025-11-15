@@ -11,22 +11,26 @@ namespace Domain.Entities.FTI
 {
     public class FTITeachingAidsDeveloped : AuditableBaseEntity
     {
-
         [Required]
-        public int FTIProgramContentAndResourcesID { get; set; }
-
-        [ForeignKey(nameof(FTIProgramContentAndResourcesID))]
-        public FTIProgramContentAndResources ProgramContentAndResources { get; set; }
-
-        [MaxLength(200)]
-        public string? TypeOfAidDeveloped { get; set; }
+        public int? FTIProgramContentAndResourcesId { get; set; }
+        [JsonIgnore]
+        [ForeignKey(nameof(FTIProgramContentAndResourcesId))]
+        public FTIProgramContentAndResources? ProgramContentAndResources { get; set; }
 
         [MaxLength(200)]
-        public string? Other { get; set; }
+        public int? TypeOfAidId { get; set; }
+        [JsonIgnore]
+        public TypeOfAid? TypeOfAid { get; set; }
+
+        [MaxLength(200)]
+        public string? OtherTypeOfAid { get; set; }
 
         [MaxLength(300)]
         public string? Purpose { get; set; }
 
         public int? Number { get; set; }
+        public int? UnitLocationId { get; set; }
+
+        public int? OrganizationId { get; set; }
     }
 }

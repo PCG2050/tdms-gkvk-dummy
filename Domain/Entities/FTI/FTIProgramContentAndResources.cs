@@ -12,23 +12,17 @@ namespace Domain.Entities.FTI
 {
     public class FTIProgramContentAndResources : AuditableBaseEntity
     {
-        // FK to parent program
-        [Required]
-        public int? FTIProgramDetailsID { get; set; }
+        public int? FTIProgramDetailsId { get; set; }
+        [JsonIgnore]
+        [ForeignKey(nameof(FTIProgramDetailsId))]
+        public FTIProgramDetails? ProgramDetails { get; set; }
+        public int? UnitLocationId { get; set; }
 
-        [ForeignKey(nameof(FTIProgramDetailsID))]
-        public FTIProgramDetails ProgramDetails { get; set; }
-
-        // Optionally add fields describing the content/resources record
-        [MaxLength(250)]
-        public string? Title { get; set; }
-
-        [MaxLength(500)]
-        public string? Description { get; set; }
+        public int? OrganizationId { get; set; }
 
         // Navigation children
-        public ICollection<FTIResourcePerson> ResourcePersons { get; set; }
-        public ICollection<FTITopicsCoveredInClass> TopicsCovered { get; set; }
-        public ICollection<FTITeachingAidsDeveloped> TeachingAids { get; set; }
+        public ICollection<FTIResourcePerson>? ResourcePersons { get; set; }
+        public ICollection<FTITopicsCoveredInClass>? TopicsCovered { get; set; }
+        public ICollection<FTITeachingAidsDeveloped>? TeachingAids { get; set; }
     }
 }

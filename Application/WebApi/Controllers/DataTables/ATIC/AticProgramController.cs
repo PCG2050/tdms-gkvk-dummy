@@ -21,6 +21,18 @@ namespace WebApi.Controllers.DataTables.ATIC
         // SECTION A: PROGRAM DETAILS
         // ============================
 
+        /// <summary>
+        /// Creates a new ATIC program
+        /// </summary>
+        /// <remarks>
+        /// Developer Notes:
+        /// Use these endpoints for current KVK module development:
+        /// - POST /api/AticProgram (create program)
+        /// - PUT /api/AticProgram/{id} (update program)
+        /// - GET /api/AticProgram/{id} (get single program)
+        /// - GET /api/AticProgram/{id}/complete (get program with all related data)
+        /// - DELETE /api/AticProgram/{id} (delete program)
+        /// </remarks>
         [HttpPost]
         public async Task<IActionResult> CreateProgram([FromBody] AticProgramCreateDto dto)
         {
@@ -92,6 +104,20 @@ namespace WebApi.Controllers.DataTables.ATIC
         // SECTION C: PROGRAM CONTENT
         // ============================
 
+        /// <summary>
+        /// Adds program content (deprecated - use hybrid endpoint instead)
+        /// </summary>
+        /// <remarks>
+        /// Developer Notes:
+        /// For current KVK module development, use HYBRID PATTERN endpoints instead:
+        /// - POST /api/AticProgram/{programId}/content-with-children (create content with all children)
+        /// - PUT /api/AticProgram/content/{contentId}/with-children (update content with all children)
+        /// - GET /api/AticProgram/content/{contentId} (get content)
+        /// - DELETE /api/AticProgram/content/{contentId} (delete content)
+        ///
+        /// Avoid using individual child endpoints (C1, C2, C3) - they are deprecated.
+        /// The hybrid endpoints handle all children (Resource Persons, Topics, Teaching Aids) in one transaction.
+        /// </remarks>
         [HttpPost("{programId}/content")]
         public async Task<IActionResult> AddProgramContent(int programId, [FromBody] AticProgramContentCreateDto dto)
         {
@@ -110,6 +136,41 @@ namespace WebApi.Controllers.DataTables.ATIC
         public async Task<IActionResult> DeleteProgramContent(int contentId)
         {
             var result = await _service.DeleteProgramContentAsync(contentId);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
+        // Hybrid pattern endpoints for bulk create/update operations
+        /// <summary>
+        /// Creates program content with all children in one transaction (RECOMMENDED)
+        /// </summary>
+        /// <remarks>
+        /// This is the RECOMMENDED endpoint for creating program content.
+        /// It creates the parent content and all children (Resource Persons, Topics, Teaching Aids) atomically.
+        /// Use this instead of individual POST endpoints for content and children.
+        /// </remarks>
+        [HttpPost("{programId}/content-with-children")]
+        public async Task<IActionResult> AddProgramContentWithChildren(int programId, [FromBody] AticProgramContentWithChildrenCreateDto dto)
+        {
+            var result = await _service.AddProgramContentWithChildrenAsync(programId, dto);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
+        /// <summary>
+        /// Updates program content with all children using hybrid pattern (RECOMMENDED)
+        /// </summary>
+        /// <remarks>
+        /// This is the RECOMMENDED endpoint for updating program content.
+        /// It uses the hybrid pattern:
+        /// - Items WITH Id are UPDATED
+        /// - Items WITHOUT Id (null or 0) are CREATED
+        /// - Items in DB but NOT in the request are DELETED
+        /// All operations are performed in one atomic transaction.
+        /// Use this instead of individual PUT/POST/DELETE endpoints for children.
+        /// </remarks>
+        [HttpPut("content/{contentId}/with-children")]
+        public async Task<IActionResult> UpdateProgramContentWithChildren(int contentId, [FromBody] AticProgramContentWithChildrenUpdateDto dto)
+        {
+            var result = await _service.UpdateProgramContentWithChildrenAsync(contentId, dto);
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 

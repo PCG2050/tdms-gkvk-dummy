@@ -1,28 +1,28 @@
-﻿// StuProgramContentRepository.cs
-using Application.Interface.Repository.DataTables.DEU;
-using Domain.Entities.DEU;
+// FTIProgramContentRepository.cs
+using Application.Interface.Repository.DataTables.FTI;
+using Domain.Entities.FTI;
 using Infrastructure.DbContext;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Repository.DataTables.STU
+namespace Infrastructure.Repository.DataTables.FTI
 {
-    public class StuProgramContentRepository : IStuProgramContentRepository
+    public class FTIProgramContentRepository : IFTIProgramContentRepository
     {
         private readonly TdmsDbContext _context;
 
-        public StuProgramContentRepository(TdmsDbContext context)
+        public FTIProgramContentRepository(TdmsDbContext context)
         {
             _context = context;
         }
 
-        public async Task<StuProgramContentAndResources?> GetByIdAsync(int id)
+        public async Task<FTIProgramContentAndResources?> GetByIdAsync(int id)
         {
-            return await _context.StuProgramContentAndResources.FindAsync(id);
+            return await _context.FTIProgramContentAndResources.FindAsync(id);
         }
 
-        public async Task<StuProgramContentAndResources?> GetWithDetailsAsync(int id)
+        public async Task<FTIProgramContentAndResources?> GetWithDetailsAsync(int id)
         {
-            return await _context.StuProgramContentAndResources
+            return await _context.FTIProgramContentAndResources
                 .Include(c => c.ResourcePersons!)
                 .Include(c => c.TopicsCovered!)
                 .Include(c => c.TeachingAids!)
@@ -31,37 +31,37 @@ namespace Infrastructure.Repository.DataTables.STU
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
 
-        public async Task<List<StuProgramContentAndResources>> GetByProgramIdAsync(int programId)
+        public async Task<List<FTIProgramContentAndResources>> GetByProgramIdAsync(int programId)
         {
-            return await _context.StuProgramContentAndResources
+            return await _context.FTIProgramContentAndResources
                 .Include(c => c.ResourcePersons!)
                 .Include(c => c.TopicsCovered!)
                 .Include(c => c.TeachingAids!)
                     .ThenInclude(ta => ta.TypeOfAid)
-                .Where(c => c.StuProgramDetailsId == programId)
+                .Where(c => c.FTIProgramDetailsId == programId)
                 .ToListAsync();
         }
 
-        public async Task<StuProgramContentAndResources> CreateAsync(StuProgramContentAndResources entity)
+        public async Task<FTIProgramContentAndResources> CreateAsync(FTIProgramContentAndResources entity)
         {
-            _context.StuProgramContentAndResources.Add(entity);
+            _context.FTIProgramContentAndResources.Add(entity);
             await _context.SaveChangesAsync();
             return entity;
         }
 
-        public async Task<StuProgramContentAndResources> UpdateAsync(StuProgramContentAndResources entity)
+        public async Task<FTIProgramContentAndResources> UpdateAsync(FTIProgramContentAndResources entity)
         {
-            _context.StuProgramContentAndResources.Update(entity);
+            _context.FTIProgramContentAndResources.Update(entity);
             await _context.SaveChangesAsync();
             return entity;
         }
 
         public async Task DeleteAsync(int id)
         {
-            var entity = await _context.StuProgramContentAndResources.FindAsync(id);
+            var entity = await _context.FTIProgramContentAndResources.FindAsync(id);
             if (entity != null)
             {
-                _context.StuProgramContentAndResources.Remove(entity);
+                _context.FTIProgramContentAndResources.Remove(entity);
                 await _context.SaveChangesAsync();
             }
         }
@@ -69,17 +69,17 @@ namespace Infrastructure.Repository.DataTables.STU
         /// <summary>
         /// Create parent with all child entities in a single transaction
         /// </summary>
-        public async Task<StuProgramContentAndResources> CreateWithChildrenAsync(
-            StuProgramContentAndResources parent,
-            List<StuResourcePerson>? resourcePersons,
-            List<StuTopicsCoveredInClass>? topicsCovered,
-            List<StuTeachingAidsDeveloped>? teachingAids)
+        public async Task<FTIProgramContentAndResources> CreateWithChildrenAsync(
+            FTIProgramContentAndResources parent,
+            List<FTIResourcePerson>? resourcePersons,
+            List<FTITopicsCoveredInClass>? topicsCovered,
+            List<FTITeachingAidsDeveloped>? teachingAids)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
                 // 1. Create parent entity
-                _context.StuProgramContentAndResources.Add(parent);
+                _context.FTIProgramContentAndResources.Add(parent);
                 await _context.SaveChangesAsync(); // Generates parent ID
 
                 var contentId = parent.Id;
@@ -89,8 +89,8 @@ namespace Infrastructure.Repository.DataTables.STU
                 {
                     foreach (var person in resourcePersons)
                     {
-                        person.StuProgramContentAndResourcesId = contentId;
-                        _context.StuResourcePersons.Add(person);
+                        person.FTIProgramContentAndResourcesId = contentId;
+                        _context.FTIResourcePersons.Add(person);
                     }
                 }
 
@@ -98,8 +98,8 @@ namespace Infrastructure.Repository.DataTables.STU
                 {
                     foreach (var topic in topicsCovered)
                     {
-                        topic.StuProgramContentAndResourcesId = contentId;
-                        _context.StuTopicsCoveredInClass.Add(topic);
+                        topic.FTIProgramContentAndResourcesId = contentId;
+                        _context.FTITopicsCoveredInClass.Add(topic);
                     }
                 }
 
@@ -107,8 +107,8 @@ namespace Infrastructure.Repository.DataTables.STU
                 {
                     foreach (var aid in teachingAids)
                     {
-                        aid.StuProgramContentAndResourcesId = contentId;
-                        _context.StuTeachingAidsDeveloped.Add(aid);
+                        aid.FTIProgramContentAndResourcesId = contentId;
+                        _context.FTITeachingAidsDeveloped.Add(aid);
                     }
                 }
 
@@ -134,11 +134,11 @@ namespace Infrastructure.Repository.DataTables.STU
         /// - Updates existing children (Id > 0)
         /// - Deletes children not in lists
         /// </summary>
-        public async Task<StuProgramContentAndResources> UpdateWithChildrenAsync(
-            StuProgramContentAndResources parent,
-            List<StuResourcePerson>? resourcePersons,
-            List<StuTopicsCoveredInClass>? topicsCovered,
-            List<StuTeachingAidsDeveloped>? teachingAids)
+        public async Task<FTIProgramContentAndResources> UpdateWithChildrenAsync(
+            FTIProgramContentAndResources parent,
+            List<FTIResourcePerson>? resourcePersons,
+            List<FTITopicsCoveredInClass>? topicsCovered,
+            List<FTITeachingAidsDeveloped>? teachingAids)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
@@ -153,19 +153,19 @@ namespace Infrastructure.Repository.DataTables.STU
                 // 1. Update parent entity
                 existing.UpdatedById = parent.UpdatedById;
                 existing.UpdatedAt = parent.UpdatedAt;
-                _context.StuProgramContentAndResources.Update(existing);
+                _context.FTIProgramContentAndResources.Update(existing);
 
                 // 2. Process Resource Persons (Hybrid Pattern)
                 if (resourcePersons != null)
                 {
-                    var existingPersons = existing.ResourcePersons?.ToList() ?? new List<StuResourcePerson>();
+                    var existingPersons = existing.ResourcePersons?.ToList() ?? new List<FTIResourcePerson>();
                     var incomingIds = resourcePersons.Where(p => p.Id > 0).Select(p => p.Id).ToList();
 
                     // DELETE: Items in DB but not in incoming array
                     var personsToDelete = existingPersons.Where(p => !incomingIds.Contains(p.Id)).ToList();
                     foreach (var person in personsToDelete)
                     {
-                        _context.StuResourcePersons.Remove(person);
+                        _context.FTIResourcePersons.Remove(person);
                     }
 
                     // CREATE or UPDATE
@@ -184,14 +184,14 @@ namespace Infrastructure.Repository.DataTables.STU
                                 existingPerson.InstitutionOrDepartment = person.InstitutionOrDepartment;
                                 existingPerson.UpdatedById = person.UpdatedById;
                                 existingPerson.UpdatedAt = person.UpdatedAt;
-                                _context.StuResourcePersons.Update(existingPerson);
+                                _context.FTIResourcePersons.Update(existingPerson);
                             }
                         }
                         else
                         {
                             // CREATE new
-                            person.StuProgramContentAndResourcesId = contentId;
-                            _context.StuResourcePersons.Add(person);
+                            person.FTIProgramContentAndResourcesId = contentId;
+                            _context.FTIResourcePersons.Add(person);
                         }
                     }
                 }
@@ -199,14 +199,14 @@ namespace Infrastructure.Repository.DataTables.STU
                 // 3. Process Topics Covered (Hybrid Pattern)
                 if (topicsCovered != null)
                 {
-                    var existingTopics = existing.TopicsCovered?.ToList() ?? new List<StuTopicsCoveredInClass>();
+                    var existingTopics = existing.TopicsCovered?.ToList() ?? new List<FTITopicsCoveredInClass>();
                     var incomingIds = topicsCovered.Where(t => t.Id > 0).Select(t => t.Id).ToList();
 
                     // DELETE: Items in DB but not in incoming array
                     var topicsToDelete = existingTopics.Where(t => !incomingIds.Contains(t.Id)).ToList();
                     foreach (var topic in topicsToDelete)
                     {
-                        _context.StuTopicsCoveredInClass.Remove(topic);
+                        _context.FTITopicsCoveredInClass.Remove(topic);
                     }
 
                     // CREATE or UPDATE
@@ -223,14 +223,14 @@ namespace Infrastructure.Repository.DataTables.STU
                                 existingTopic.PhotoUpload = topic.PhotoUpload;
                                 existingTopic.UpdatedById = topic.UpdatedById;
                                 existingTopic.UpdatedAt = topic.UpdatedAt;
-                                _context.StuTopicsCoveredInClass.Update(existingTopic);
+                                _context.FTITopicsCoveredInClass.Update(existingTopic);
                             }
                         }
                         else
                         {
                             // CREATE new
-                            topic.StuProgramContentAndResourcesId = contentId;
-                            _context.StuTopicsCoveredInClass.Add(topic);
+                            topic.FTIProgramContentAndResourcesId = contentId;
+                            _context.FTITopicsCoveredInClass.Add(topic);
                         }
                     }
                 }
@@ -238,14 +238,14 @@ namespace Infrastructure.Repository.DataTables.STU
                 // 4. Process Teaching Aids (Hybrid Pattern)
                 if (teachingAids != null)
                 {
-                    var existingAids = existing.TeachingAids?.ToList() ?? new List<StuTeachingAidsDeveloped>();
+                    var existingAids = existing.TeachingAids?.ToList() ?? new List<FTITeachingAidsDeveloped>();
                     var incomingIds = teachingAids.Where(a => a.Id > 0).Select(a => a.Id).ToList();
 
                     // DELETE: Items in DB but not in incoming array
                     var aidsToDelete = existingAids.Where(a => !incomingIds.Contains(a.Id)).ToList();
                     foreach (var aid in aidsToDelete)
                     {
-                        _context.StuTeachingAidsDeveloped.Remove(aid);
+                        _context.FTITeachingAidsDeveloped.Remove(aid);
                     }
 
                     // CREATE or UPDATE
@@ -263,14 +263,14 @@ namespace Infrastructure.Repository.DataTables.STU
                                 existingAid.Number = aid.Number;
                                 existingAid.UpdatedById = aid.UpdatedById;
                                 existingAid.UpdatedAt = aid.UpdatedAt;
-                                _context.StuTeachingAidsDeveloped.Update(existingAid);
+                                _context.FTITeachingAidsDeveloped.Update(existingAid);
                             }
                         }
                         else
                         {
                             // CREATE new
-                            aid.StuProgramContentAndResourcesId = contentId;
-                            _context.StuTeachingAidsDeveloped.Add(aid);
+                            aid.FTIProgramContentAndResourcesId = contentId;
+                            _context.FTITeachingAidsDeveloped.Add(aid);
                         }
                     }
                 }

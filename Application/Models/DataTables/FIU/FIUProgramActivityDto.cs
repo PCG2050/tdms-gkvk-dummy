@@ -28,12 +28,10 @@ namespace Application.Models.DataTables.FIU
         [Required]
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Activity type is required")]
-        public int FIUActivitiesId { get; set; }
+        public int? FIUActivitiesId { get; set; }
 
-        [Required(ErrorMessage = "Number is required")]
         [Range(1, 100000, ErrorMessage = "Number must be between 1 and 100000")]
-        public int Number { get; set; }
+        public int? Number { get; set; }
 
         [MaxLength(500)]
         public string? UploadMediaUrl { get; set; }

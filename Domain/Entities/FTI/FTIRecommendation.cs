@@ -11,12 +11,11 @@ namespace Domain.Entities.FTI
 {
     public class FTIRecommendation : AuditableBaseEntity
     {
-        // FK to parent KVK program
         [Required]
-        public int FTIProgramDetailsID { get; set; }
+        public int? FTIProgramDetailsId { get; set; }
 
-        [ForeignKey(nameof(FTIProgramDetailsID))]
-        public FTIProgramDetails ProgramDetails { get; set; }
+        [ForeignKey(nameof(FTIProgramDetailsId))]
+        public FTIProgramDetails? ProgramDetails { get; set; }
 
         // Recommendation fields
         [MaxLength(1000)]
@@ -36,5 +35,8 @@ namespace Domain.Entities.FTI
 
         [MaxLength(1000)]
         public string? ImpactOutcome { get; set; }
+        public int? UnitLocationId { get; set; }
+
+        public int? OrganizationId { get; set; }
     }
 }

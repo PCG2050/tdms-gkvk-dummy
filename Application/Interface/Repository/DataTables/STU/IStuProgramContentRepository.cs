@@ -11,5 +11,18 @@ namespace Application.Interface.Repository.DataTables.STU
         Task<StuProgramContentAndResources> CreateAsync(StuProgramContentAndResources entity);
         Task<StuProgramContentAndResources> UpdateAsync(StuProgramContentAndResources entity);
         Task DeleteAsync(int id);
+
+        // Hybrid pattern methods for bulk create/update operations
+        Task<StuProgramContentAndResources> CreateWithChildrenAsync(
+            StuProgramContentAndResources parent,
+            List<StuResourcePerson>? resourcePersons,
+            List<StuTopicsCoveredInClass>? topicsCovered,
+            List<StuTeachingAidsDeveloped>? teachingAids);
+
+        Task<StuProgramContentAndResources> UpdateWithChildrenAsync(
+            StuProgramContentAndResources parent,
+            List<StuResourcePerson>? resourcePersons,
+            List<StuTopicsCoveredInClass>? topicsCovered,
+            List<StuTeachingAidsDeveloped>? teachingAids);
     }
 }

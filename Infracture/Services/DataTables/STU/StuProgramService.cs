@@ -364,6 +364,237 @@ namespace Infrastructure.Services.DataTables.EEU
             return ServiceResult<List<StuProgramContentDto>>.Success(dtos);
         }
 
+        /// <summary>
+        /// Create StuProgramContentAndResources with all child entities in a single transaction
+        /// </summary>
+        public async Task<ServiceResult<StuProgramContentDto>> AddProgramContentWithChildrenAsync(
+            int programId,
+            StuProgramContentWithChildrenCreateDto dto)
+        {
+            // Validate program exists
+            var program = await _programRepository.GetByIdAsync(programId);
+            if (program == null)
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    "Program not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            // Check permissions
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            // Validate form status
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    "Cannot add content to submitted or approved programs",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            try
+            {
+                // Prepare parent entity
+                var parentEntity = new StuProgramContentAndResources
+                {
+                    StuProgramDetailsId = programId,
+                    UnitLocationId = program.UnitLocationId,
+                    OrganizationId = program.OrganizationId,
+                    CreatedById = _currentUserService.UserId,
+                    CreatedAt = DateTimeOffset.UtcNow
+                };
+
+                // Prepare child entities
+                var resourcePersons = dto.ResourcePersons?.Select(rp =>
+                {
+                    var entity = _mapper.MapToEntity(rp);
+                    entity.UnitLocationId = program.UnitLocationId;
+                    entity.OrganizationId = program.OrganizationId;
+                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedAt = DateTimeOffset.UtcNow;
+                    return entity;
+                }).ToList();
+
+                var topicsCovered = dto.TopicsCovered?.Select(tc =>
+                {
+                    var entity = _mapper.MapToEntity(tc);
+                    entity.UnitLocationId = program.UnitLocationId;
+                    entity.OrganizationId = program.OrganizationId;
+                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedAt = DateTimeOffset.UtcNow;
+                    return entity;
+                }).ToList();
+
+                var teachingAids = dto.TeachingAids?.Select(ta =>
+                {
+                    var entity = _mapper.MapToEntity(ta);
+                    entity.UnitLocationId = program.UnitLocationId;
+                    entity.OrganizationId = program.OrganizationId;
+                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedAt = DateTimeOffset.UtcNow;
+                    return entity;
+                }).ToList();
+
+                // Repository handles transaction internally
+                var createdContent = await _contentRepository.CreateWithChildrenAsync(
+                    parentEntity,
+                    resourcePersons,
+                    topicsCovered,
+                    teachingAids);
+
+                var resultDto = _mapper.MapToDto(createdContent);
+                return ServiceResult<StuProgramContentDto>.Success(resultDto);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    $"Failed to create program content with children: {ex.Message}",
+                    ServiceErrorStatus.INVALIDOPERATION);
+            }
+        }
+
+        /// <summary>
+        /// Update StuProgramContentAndResources with all child entities using Hybrid Pattern
+        /// - Items WITH Id: UPDATE existing
+        /// - Items WITHOUT Id: CREATE new
+        /// - Items in DB but NOT in arrays: DELETE
+        /// </summary>
+        public async Task<ServiceResult<StuProgramContentDto>> UpdateProgramContentWithChildrenAsync(
+            int contentId,
+            StuProgramContentWithChildrenUpdateDto dto)
+        {
+            // Validate content exists
+            var content = await _contentRepository.GetWithDetailsAsync(contentId);
+            if (content == null)
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    "Content not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            // Validate program and permissions
+            var program = await _programRepository.GetByIdAsync(content.StuProgramDetailsId ?? 0);
+            if (program == null)
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    "Program not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    "Cannot update content in submitted or approved programs",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            try
+            {
+                // Prepare parent entity for update
+                var parentEntity = new StuProgramContentAndResources
+                {
+                    Id = contentId,
+                    UpdatedById = _currentUserService.UserId,
+                    UpdatedAt = DateTimeOffset.UtcNow
+                };
+
+                // Prepare child entities (hybrid: mix of new and existing)
+                var resourcePersons = dto.ResourcePersons?.Select(rp =>
+                {
+                    var entity = new StuResourcePerson
+                    {
+                        Id = rp.Id ?? 0, // 0 means new
+                        Name = rp.Name,
+                        Designation = rp.Designation,
+                        ResourceType = rp.ResourceType,
+                        Responsibility = rp.Responsibility,
+                        InstitutionOrDepartment = rp.InstitutionOrDepartment,
+                        UnitLocationId = program.UnitLocationId,
+                        OrganizationId = program.OrganizationId
+                    };
+
+                    if (entity.Id == 0)
+                    {
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
+
+                    return entity;
+                }).ToList();
+
+                var topicsCovered = dto.TopicsCovered?.Select(tc =>
+                {
+                    var entity = new StuTopicsCoveredInClass
+                    {
+                        Id = tc.Id ?? 0,
+                        Date = tc.Date,
+                        Title = tc.Title,
+                        PhotoUpload = tc.PhotoUpload,
+                        UnitLocationId = program.UnitLocationId,
+                        OrganizationId = program.OrganizationId
+                    };
+
+                    if (entity.Id == 0)
+                    {
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
+
+                    return entity;
+                }).ToList();
+
+                var teachingAids = dto.TeachingAids?.Select(ta =>
+                {
+                    var entity = new StuTeachingAidsDeveloped
+                    {
+                        Id = ta.Id ?? 0,
+                        TypeOfAidId = ta.TypeOfAidId,
+                        OtherTypeOfAid = ta.OtherTypeOfAid,
+                        Purpose = ta.Purpose,
+                        Number = ta.Number,
+                        UnitLocationId = program.UnitLocationId,
+                        OrganizationId = program.OrganizationId
+                    };
+
+                    if (entity.Id == 0)
+                    {
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
+
+                    return entity;
+                }).ToList();
+
+                // Repository handles transaction internally
+                var updatedContent = await _contentRepository.UpdateWithChildrenAsync(
+                    parentEntity,
+                    resourcePersons,
+                    topicsCovered,
+                    teachingAids);
+
+                var resultDto = _mapper.MapToDto(updatedContent);
+                return ServiceResult<StuProgramContentDto>.Success(resultDto);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    $"Failed to update program content with children: {ex.Message}",
+                    ServiceErrorStatus.INVALIDOPERATION);
+            }
+        }
+
         // ============================
         // SECTION C1: RESOURCE PERSONS
         // ============================

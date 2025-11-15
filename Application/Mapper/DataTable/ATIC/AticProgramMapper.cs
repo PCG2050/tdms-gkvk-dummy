@@ -133,6 +133,20 @@ namespace Application.Mapper.DataTable.ATIC
             if (dto.SourceOfFundId.HasValue) entity.SourceOfFundId = dto.SourceOfFundId;
             if (dto.NoOfCourses.HasValue) entity.Funds = dto.NoOfCourses;
             if (dto.Attachments != null) entity.Attachements = dto.Attachments;
+            if (dto.StatusId.HasValue) entity.StatusId = dto.StatusId;
+            if (dto.TotalOutlayRs.HasValue) entity.TotalOutlayRs = dto.TotalOutlayRs;
+            if (dto.Copi != null) entity.Copi = dto.Copi;
+            if (dto.BatchNo.HasValue) entity.BatchNo = dto.BatchNo;
+            if (dto.OrganizerBroucherFile != null) entity.OrganizerBroucherFile = dto.OrganizerBroucherFile;
+            if (dto.OrganizerInstitutionName != null) entity.OrganizerInstitutionName = dto.OrganizerInstitutionName;
+            if (dto.OrganizerInstitutionAddress != null) entity.OrganizerInstitutionAddress = dto.OrganizerInstitutionAddress;
+            if (dto.SourceId.HasValue) entity.SourceId = dto.SourceId;
+            if (dto.ProposalDate.HasValue) entity.ProposalDate = dto.ProposalDate;
+            if (dto.ProposalUploadFile != null) entity.ProposalUploadFile = dto.ProposalUploadFile;
+            if (dto.UniversitySanctionLetterDate.HasValue) entity.UniversitySanctionLetterDate = dto.UniversitySanctionLetterDate;
+            if (dto.UniversitySanctionLetterUploadFile != null) entity.UniversitySanctionLetterUploadFile = dto.UniversitySanctionLetterUploadFile;
+            if (dto.FundsSanctionLetterDate.HasValue) entity.FundsSanctionLetterDate = dto.FundsSanctionLetterDate;
+            if (dto.FundsSanctionLetterUploadFile != null) entity.FundsSanctionLetterUploadFile = dto.FundsSanctionLetterUploadFile;
         }
 
         /// <summary>

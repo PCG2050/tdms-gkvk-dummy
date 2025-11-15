@@ -22,15 +22,22 @@ namespace WebApi.Controllers
         /// <summary>
         /// Authenticate user and create session with device tracking
         /// </summary>
-        /// <param name="request">User login credentials</param>
+        /// <param name="request">User login credentials with optional RememberMe flag</param>
         /// <returns>Access token and refresh token</returns>
         /// <remarks>
         /// Authenticates user credentials and creates a new session with device tracking.
-        /// 
+        ///
+        /// **Request Body:**
+        /// - Email: User email address (Required)
+        /// - Password: User password (Required)
+        /// - RememberMe: Keep user logged in (Optional, default: false)
+        ///   - false: Refresh token expires in 1 day (must re-login after 1 day)
+        ///   - true: Refresh token expires in 30 days (stay logged in for 30 days)
+        ///
         /// **Required Headers:**
         /// - User-Agent: Browser/client identification (Required)
         /// - X-Device-Type: Unique device identifier (Recommended)
-        /// 
+        ///
         /// </remarks>
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginRequestDto request)
@@ -54,6 +61,10 @@ namespace WebApi.Controllers
         /// <summary>
         /// Trainer-specific login that returns unit assignments along with tokens
         /// </summary>
+        /// <remarks>
+        /// Same as regular login but returns trainer-specific data including unit assignments.
+        /// Supports RememberMe field (default: false).
+        /// </remarks>
         [HttpPost("trainer-login")]
         public async Task<IActionResult> TrainerLogin(LoginRequestDto request)
         {

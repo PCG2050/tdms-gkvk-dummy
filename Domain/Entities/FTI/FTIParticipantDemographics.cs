@@ -15,14 +15,15 @@ namespace Domain.Entities.FTI
     {
         // FK to TableKVKProgramDetails
         [Required]
-        public int FTIProgramDetailsID { get; set; }
+        public int? FTIProgramDetailsId { get; set; }
 
-        [ForeignKey(nameof(FTIProgramDetailsID))]
+        [ForeignKey(nameof(FTIProgramDetailsId))]
         public FTIProgramDetails? ProgramDetails { get; set; }
 
         // Participant name/label
         [MaxLength(200)]
-        public int? Participant { get; set; }
+        public int? ParticipantId { get; set; }
+        public ParticipantDealer? Participant { get; set; }
 
         // Male counts
         public int? Male_SC { get; set; }
@@ -50,5 +51,8 @@ namespace Domain.Entities.FTI
 
         // Total participants (store or compute)
         public int? Total { get; set; }
+        public int? UnitLocationId { get; set; }
+
+        public int? OrganizationId { get; set; }
     }
 }

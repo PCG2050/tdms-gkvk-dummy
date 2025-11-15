@@ -12,10 +12,10 @@ namespace Domain.Entities.FTI
     public class FTIResourcePerson : AuditableBaseEntity
     {
         [Required]
-        public int? FTIProgramContentAndResourcesID { get; set; }
-
-        [ForeignKey(nameof(FTIProgramContentAndResourcesID))]
-        public FTIProgramContentAndResources ProgramContentAndResources { get; set; }
+        public int? FTIProgramContentAndResourcesId { get; set; }
+        [JsonIgnore]
+        [ForeignKey(nameof(FTIProgramContentAndResourcesId))]
+        public FTIProgramContentAndResources? ProgramContentAndResources { get; set; }
 
         [MaxLength(200)]
         public string? Name { get; set; }
@@ -31,7 +31,8 @@ namespace Domain.Entities.FTI
 
         [MaxLength(250)]
         public string? InstitutionOrDepartment { get; set; }
+        public int? UnitLocationId { get; set; }
 
-
+        public int? OrganizationId { get; set; }
     }
 }
