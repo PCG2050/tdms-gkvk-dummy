@@ -106,66 +106,6 @@ namespace WebApi.Controllers.DataTables
         }
 
         // ==========================================
-        // ModeAndOutreach Management
-        // ==========================================
-
-        [HttpPost("{consultingServiceId}/mode-and-outreach")]
-        [Authorize(Roles = RoleString.Trainer)]
-        public async Task<IActionResult> AddModeAndOutreach(int consultingServiceId, [FromBody] ModeAndOutreachCreateDto dto)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(new { message = "Invalid data", errors = ModelState });
-
-            var result = await _consultingServiceService.AddModeAndOutreachAsync(consultingServiceId, dto);
-
-            if (!result.IsSuccess)
-                return BadRequest(new { message = result.ErrorMessage });
-
-            return Ok(new
-            {
-                message = "Mode and outreach added successfully. Add more or submit the form.",
-                data = result.Data
-            });
-        }
-
-        [HttpPut("{consultingServiceId}/mode-and-outreach/{id}")]
-        [Authorize(Roles = RoleString.Trainer)]
-        public async Task<IActionResult> UpdateModeAndOutreach(int consultingServiceId, int id, [FromBody] ModeAndOutreachCreateDto dto)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(new { message = "Invalid data", errors = ModelState });
-
-            var result = await _consultingServiceService.UpdateModeAndOutreachAsync(id, dto);
-
-            if (!result.IsSuccess)
-                return BadRequest(new { message = result.ErrorMessage });
-
-            return Ok(new { message = "Mode and outreach updated successfully", data = result.Data });
-        }
-
-        [HttpDelete("{consultingServiceId}/mode-and-outreach/{id}")]
-        [Authorize(Roles = RoleString.Trainer)]
-        public async Task<IActionResult> DeleteModeAndOutreach(int consultingServiceId, int id)
-        {
-            var result = await _consultingServiceService.DeleteModeAndOutreachAsync(id);
-            if (!result.IsSuccess)
-                return BadRequest(new { message = result.ErrorMessage });
-
-            return Ok(new { message = "Mode and outreach deleted successfully" });
-        }
-
-        [HttpGet("{consultingServiceId}/mode-and-outreach")]
-        [Authorize(Roles = RoleString.Trainer)]
-        public async Task<IActionResult> GetModeAndOutreaches(int consultingServiceId)
-        {
-            var result = await _consultingServiceService.GetModeAndOutreachesAsync(consultingServiceId);
-            if (!result.IsSuccess)
-                return NotFound(new { message = result.ErrorMessage });
-
-            return Ok(new { data = result.Data });
-        }
-
-        // ==========================================
         // Composite Create/Update with Children (Hybrid Pattern)
         // ==========================================
 
@@ -236,20 +176,20 @@ namespace WebApi.Controllers.DataTables
         // Submit for Approval
         // ==========================================
 
-        [HttpPost("{id}/submit")]
-        [Authorize(Roles = RoleString.Trainer)]
-        public async Task<IActionResult> SubmitConsultingService(int id)
-        {
-            var result = await _consultingServiceService.SubmitForApprovalAsync(id);
-            if (!result.IsSuccess)
-                return BadRequest(new { message = result.ErrorMessage });
+        //[HttpPost("{id}/submit")]
+        //[Authorize(Roles = RoleString.Trainer)]
+        //public async Task<IActionResult> SubmitConsultingService(int id)
+        //{
+        //    var result = await _consultingServiceService.SubmitForApprovalAsync(id);
+        //    if (!result.IsSuccess)
+        //        return BadRequest(new { message = result.ErrorMessage });
 
-            return Ok(new
-            {
-                message = "Consulting service submitted successfully! It will be reviewed by Unit Head.",
-                status = "Pending"
-            });
-        }
+        //    return Ok(new
+        //    {
+        //        message = "Consulting service submitted successfully! It will be reviewed by Unit Head.",
+        //        status = "Pending"
+        //    });
+        //}
 
         // ==========================================
         // History & Dashboard

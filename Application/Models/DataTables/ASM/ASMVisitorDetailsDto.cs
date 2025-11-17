@@ -1,10 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Application.Interface;
+using System.ComponentModel.DataAnnotations;
+
 
 namespace Application.Models.DataTables.ASM
 {
-    /// <summary>
-    /// DTO for displaying ASMVisitorDetails with full details
-    /// </summary>
+  
     public class ASMVisitorDetailsDto
     {
         public int Id { get; set; }
@@ -13,7 +13,11 @@ namespace Application.Models.DataTables.ASM
         public int OrganizationId { get; set; }
 
         [StringLength(200)]
-        public string? InstituteName { get; set; } 
+        public string? InstituteName { get; set; }
+
+        public DateOnly? StartDate { get; set; }
+        public DateOnly? EndDate { get; set; }
+
         public int FarmersCount { get; set; }
         public int StudentsCount { get; set; }
         public int PublicCount { get; set; }
@@ -46,9 +50,6 @@ namespace Application.Models.DataTables.ASM
         public string? ApprovedByName { get; set; }
     }
 
-    /// <summary>
-    /// DTO for creating a new ASMVisitorDetails entry
-    /// </summary>
     public class ASMVisitorDetailsCreateDto
     {
         [Required]
@@ -69,16 +70,13 @@ namespace Application.Models.DataTables.ASM
 
         [Range(0, int.MaxValue, ErrorMessage = "Public count must be a positive number")]
         public int PublicCount { get; set; }
-
-        public DateTime SubmittedDate { get; set; }
     }
 
     /// <summary>
-    /// DTO for updating an existing ASMVisitorDetails entry
-    /// All fields are optional - only provided fields will be updated
-    /// </summary>
-    public class ASMVisitorDetailsUpdateDto
+ 
+    public class ASMVisitorDetailsUpdateDto :IUpdateDto
     {
+        public int Id { get; set; }
         [StringLength(200)]
         public string? InstituteName { get; set; }
 
@@ -94,7 +92,5 @@ namespace Application.Models.DataTables.ASM
 
         [Range(0, int.MaxValue, ErrorMessage = "Public count must be a positive number")]
         public int? PublicCount { get; set; }
-
-        public DateTime? SubmittedDate { get; set; }
     }
 }

@@ -1,22 +1,19 @@
-﻿using Domain.Entities.FIU;
-using Domain.Entities.KVK;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Domain.Entities.FTI
+﻿namespace Domain.Entities.FTI
 {
-    public class FTIAdvisoryServices : AuditableBaseEntity
+    public class FtiAdvisoryServices : AuditableBaseEntity
     {
         [Required]
+<<<<<<< Updated upstream
         public int? FTIProgramDetailsID { get; set; }
         [JsonIgnore]
         [ForeignKey(nameof(FTIProgramDetailsID))]
         public FTIProgramDetails? ProgramDetails { get; set; }
+=======
+        public int? FtiProgramDetailsId { get; set; }
+        [JsonIgnore]
+        [ForeignKey(nameof(FtiProgramDetailsId))]
+        public FtiProgramDetails? ProgramDetails { get; set; }
+>>>>>>> Stashed changes
 
         // Advisory service metrics
         public int? NoOfFacebookSMS { get; set; }

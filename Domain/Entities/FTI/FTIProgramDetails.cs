@@ -1,17 +1,11 @@
-﻿using Domain.Entities.FIU;
-using Domain.Entities.KVK;
-using Domain.Entities.MasterData;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace Domain.Entities.FTI
 {
+<<<<<<< Updated upstream
     public class FTIProgramDetails : AuditableBaseEntity
+=======
+    public class FtiProgramDetails : ReportEntryBaseEntity
+>>>>>>> Stashed changes
     {
         public int? ProgramTypeId { get; set; }
         // Foreign keys & “Other” text fields
@@ -103,6 +97,7 @@ namespace Domain.Entities.FTI
         [MaxLength(500)]
         public string? FundsSanctionLetterUploadFile { get; set; }
 
+<<<<<<< Updated upstream
         [MaxLength(500)]
         public string? UploadVideo { get; set; }
 
@@ -147,6 +142,14 @@ namespace Domain.Entities.FTI
 
         [MaxLength(500)]
         public string? PaperPosterAbstractLink { get; set; }
+=======
+        public ICollection<FtiParticipantDemographics>? ParticipantDemographics { get; set; }
+
+        public ICollection<FtiProgramContentAndResources>? ProgramContent { get; set; }
+        public FtiAdvisoryServices? AdvisoryServices { get; set; }
+        public FtiRecommendation? Recommendations { get; set; }
+        public FtiReport? Reports { get; set; }
+>>>>>>> Stashed changes
 
 
         public ICollection<FTIRecommendation> Recommendations { get; set; } = new List<FTIRecommendation>();

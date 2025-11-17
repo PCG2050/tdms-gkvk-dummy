@@ -72,10 +72,10 @@ namespace WebApi.Controllers
                 if (user.Role != Role.TRAINER)
                     return Unauthorized(new { message = "This endpoint is only for trainers" });
 
-                // Get trainer assignments with full details
+              
                 var assignments = await _trainerAssignmentRepository.GetByTrainerIdAsync(user.Id);
 
-                // Flatten into UnitLocationDetailsDto
+              
                 var unitLocationDetails = assignments.Select(a => new UnitLocationDetailsDto
                 {
                     UnitLocationId = a.UnitLocationId,
@@ -88,7 +88,7 @@ namespace WebApi.Controllers
                     DistrictName = a.UnitLocation.District.Name
                 }).ToList();
 
-                // Build TrainerWithAssignmentsDto (your existing DTO)
+               
                 var trainerDetails = new TrainerWithAssignmentsDto
                 {
                     TrainerId = user.Id,
@@ -106,7 +106,6 @@ namespace WebApi.Controllers
                     UnitLocationDetails = unitLocationDetails
                 };
 
-                // Wrap with tokens
                 var response = new TrainerLoginResponseDto
                 {
                     AccessToken = tokenResponse.AccessToken,

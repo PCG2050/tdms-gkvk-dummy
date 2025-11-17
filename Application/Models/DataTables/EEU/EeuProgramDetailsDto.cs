@@ -9,7 +9,7 @@ namespace Application.Models.DataTables.EEU
         public int Id { get; set; }
 
         // --- Base Fields (same as CreateDto) ---
-        
+
         public string? Title { get; set; }
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }
@@ -51,7 +51,7 @@ namespace Application.Models.DataTables.EEU
 
         public int UnitLocationId { get; set; }
 
-        public string UnitLocationName {get; set; }
+        public string UnitLocationName { get; set; }
         public string? CategoryName { get; set; }
         public string? ProgramTypeName { get; set; }
         public string? ThemeName { get; set; }
@@ -78,10 +78,10 @@ namespace Application.Models.DataTables.EEU
     {
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }
-        
+
         [Required]
         public int UnitLocationId { get; set; }
-        
+
         public int? ProgramTypeId { get; set; }
         public int? CategoryId { get; set; }
         public string? CategoryOther { get; set; }
@@ -93,11 +93,11 @@ namespace Application.Models.DataTables.EEU
         public string? ThematicAreaOther { get; set; }
         public int? SponsoredOrganization { get; set; }
         public string? SponsoredOrganizationName { get; set; }
-        
-        
+
+
         [MaxLength(250)]
         public string? Title { get; set; }
-        
+
         public int? Mode { get; set; }
         public string? Duration { get; set; }
         public int? RegionId { get; set; }
@@ -108,7 +108,7 @@ namespace Application.Models.DataTables.EEU
         public int? NoOfCourses { get; set; }
         public string? Attachments { get; set; }
 
-       
+
     }
 
     public class EeuProgramUpdateDto : IUpdateDto
@@ -191,25 +191,25 @@ namespace Application.Models.DataTables.EEU
         public int? Male_ST { get; set; }
         public int? Male_OBC { get; set; }
         public int? Male_GEN { get; set; }
-        
+
         // Male hostel
         public int? SC_Male_StayedInHostel { get; set; }
         public int? ST_Male_StayedInHostel { get; set; }
         public int? OBC_Male_StayedInHostel { get; set; }
         public int? GEN_Male_StayedInHostel { get; set; }
-        
+
         // Female counts
         public int? Female_SC { get; set; }
         public int? Female_ST { get; set; }
         public int? Female_OBC { get; set; }
         public int? Female_GEN { get; set; }
-        
+
         // Female hostel
         public int? SC_Female_StayedInHostel { get; set; }
         public int? ST_Female_StayedInHostel { get; set; }
         public int? OBC_Female_StayedInHostel { get; set; }
         public int? GEN_Female_StayedInHostel { get; set; }
-        
+
         public int? Total { get; set; }
     }
 
@@ -236,27 +236,27 @@ namespace Application.Models.DataTables.EEU
         public int? Total { get; set; }
     }
 
-    
+
 
     // ==================== PROGRAM CONTENT (Section C) ====================
-    
+
     public class EeuProgramContentCreateDto
     {
-       public string? Title { get; set; }
-       public string? Description { get; set; }
+        public string? Title { get; set; }
+        public string? Description { get; set; }
 
     }
 
     public class EeuProgramContentUpdateDto : IUpdateDto
     {
         public int Id { get; set; }
-       
+
     }
 
     public class EeuProgramContentDto
     {
         public int Id { get; set; }
-       
+
         public List<EeuResourcePersonDto> ResourcePersons { get; set; }
         public List<EeuTopicsCoveredDto> TopicsCovered { get; set; }
         public List<EeuTeachingAidsDto> TeachingAids { get; set; }
@@ -340,11 +340,11 @@ namespace Application.Models.DataTables.EEU
     {
         [Required]
         public int EeuProgramContentAndResourcesId { get; set; }
-        
+
         [Required]
         [MaxLength(200)]
         public string Name { get; set; }
-        
+
         public string? Designation { get; set; }
         public int? ResourceType { get; set; }
         public int? Responsibility { get; set; }
@@ -371,12 +371,12 @@ namespace Application.Models.DataTables.EEU
     }
 
     // ==================== TOPICS COVERED (Section C - Subsection) ====================
-    
+
     public class EeuTopicsCoveredCreateDto
     {
         [Required]
         public int EeuProgramContentAndResourcesId { get; set; }
-        
+
         public DateTime? Date { get; set; }
         public string? Title { get; set; }
         public string? PhotoUpload { get; set; }
@@ -399,12 +399,12 @@ namespace Application.Models.DataTables.EEU
     }
 
     // ==================== TEACHING AIDS (Section C - Subsection) ====================
-    
+
     public class EeuTeachingAidsCreateDto
     {
         [Required]
         public int EeuProgramContentAndResourcesId { get; set; }
-        
+
         public int? TypeOfAidId { get; set; }
         public string? OtherTypeOfAid { get; set; }
         public string? Purpose { get; set; }
@@ -430,12 +430,12 @@ namespace Application.Models.DataTables.EEU
     }
 
     // ==================== ADVISORY SERVICES (Section D) ====================
-    
+
     public class EeuAdvisoryServicesCreateDto
     {
         [Required]
         public int EeuProgramDetailsId { get; set; }
-        
+
         public int NoOfFacebookSMS { get; set; }
         public int NoOfSMSSentToRegisteredFarmers { get; set; }
         public int NoOfWhatsappGroups { get; set; }
@@ -482,12 +482,12 @@ namespace Application.Models.DataTables.EEU
     }
 
     // ==================== REPORTS (Section E) ====================
-    
+
     public class EeuReportCreateDto
     {
         [Required]
         public int EeuProgramDetailsId { get; set; }
-        
+
         public string? ProgressReportReportingYear { get; set; }
         public DateTime? Date { get; set; }
         public string? UploadPhoto { get; set; }
@@ -519,12 +519,12 @@ namespace Application.Models.DataTables.EEU
     }
 
     // ==================== RECOMMENDATIONS (Section F) ====================
-    
+
     public class EeuRecommendationCreateDto
     {
         [Required]
         public int EeuProgramDetailsId { get; set; }
-        
+
         public string? ProblemsIdentified { get; set; }
         public string? Recommendation { get; set; }
         public string? ActionTaken { get; set; }

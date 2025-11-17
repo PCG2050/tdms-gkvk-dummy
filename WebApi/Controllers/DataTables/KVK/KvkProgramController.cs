@@ -508,6 +508,99 @@ namespace WebApi.Controllers.DataTables.KVK
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
+        // ============================
+        // STATUS MANAGEMENT
+        // ============================
+
+        /// <summary>
+        /// Submit program for approval (Trainer) - changes status from Draft/Rejected to Pending
+        /// </summary>
+        // [HttpPost("{programId}/submit")]
+        // public async Task<IActionResult> SubmitForApproval(int programId)
+        // {
+        //     var result = await _service.SubmitForApprovalAsync(programId);
+        //     return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        // }
+
+        /// <summary>
+        /// Approve program (UnitHead/Admin) - changes status from Pending to Approved
+        /// </summary>
+        [HttpPost("{programId}/approve")]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
+        public async Task<IActionResult> Approve(int programId, [FromBody] ApprovalDto dto)
+        {
+            var result = await _service.ApproveAsync(programId, dto?.Remarks);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
+        /// <summary>
+        /// Reject program (UnitHead/Admin) - changes status from Pending to Rejected
+        /// </summary>
+        [HttpPost("{programId}/reject")]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
+        public async Task<IActionResult> Reject(int programId, [FromBody] RejectionDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto?.Remarks))
+                return BadRequest(new { message = "Remarks are required for rejection" });
+
+            var result = await _service.RejectAsync(programId, dto.Remarks);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
+        // ============================
+        // LISTING & FILTERING
+        // ============================
+
+        /// <summary>
+        /// Search and filter KVK programs with pagination (Admin/UnitHead only)
+        /// </summary>
+        [HttpGet]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
+        public async Task<IActionResult> GetPaginated(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 20,
+            [FromQuery] DateOnly? startDate = null,
+            [FromQuery] DateOnly? endDate = null,
+            [FromQuery] int? categoryId = null,
+            [FromQuery] string? searchTerm = null,
+            [FromQuery] string? formStatus = null,
+            [FromQuery] int? createdById = null,
+            [FromQuery] int? unitLocationId = null)
+        {
+            var result = await _service.GetPaginatedAsync(
+                pageNumber, pageSize, startDate, endDate, categoryId,
+                searchTerm, formStatus, createdById, unitLocationId);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Get programs by status (Admin/UnitHead only)
+        /// </summary>
+        [HttpGet("status/{status}")]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
+        public async Task<IActionResult> GetByStatus(
+            string status,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 20)
+        {
+            var result = await _service.GetByStatusAsync(status, pageNumber, pageSize);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Get summary of programs by status (Admin/UnitHead only)
+        /// </summary>
+        [HttpGet("status-summary")]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
+        public async Task<IActionResult> GetStatusSummary()
+        {
+            var result = await _service.GetStatusSummaryAsync();
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Get trainer's own program history with pagination
+        /// </summary>
         [HttpGet("my-history")]
         [Authorize(Roles = RoleString.Trainer)]
         public async Task<IActionResult> GetMyHistory(

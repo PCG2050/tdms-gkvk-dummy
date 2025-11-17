@@ -358,8 +358,8 @@ namespace Infrastructure.Services.DataTables.DEU
             try
             {
                 // Prepare parent entity
-                var parentEntity = _mapper.MapToEntity(new DeuProgramContentCreateDto { }             
-                   
+                var parentEntity = _mapper.MapToEntity(new DeuProgramContentCreateDto { }
+
                 );
                 parentEntity.DeuProgramDetailsId = programId;
                 parentEntity.UnitLocationId = program.UnitLocationId;

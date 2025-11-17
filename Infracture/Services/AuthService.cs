@@ -42,6 +42,10 @@ namespace Infrastructure.Services
                 throw new InvalidOperationException("Account is deactivated");
             }
 
+<<<<<<< Updated upstream
+=======
+            var refreshTokenExpiryDays = request.RememberMe ? _refreshTokenExpiryDays : 1;
+>>>>>>> Stashed changes
             // Create new session
             var session = new UserSession
             {

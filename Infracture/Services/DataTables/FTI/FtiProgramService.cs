@@ -1,41 +1,46 @@
 ﻿
 
+using Application.Interface.Repository.DataTables.FTI;
+using Application.Interface.Services.DataTables.FTI;
+using Application.Mapper.DataTable.FTI;
+using Application.Models.DataTables.FTI;
 using Application.Services.Common;
+using Domain.Entities.FTI;
 
-namespace Infrastructure.Services.DataTables.EEU
+namespace Infrastructure.Services.DataTables.FTI
 {
-    public class EeuProgramService : IEeuProgramService
+    public class FtiProgramService : IFtiProgramService
     {
-        private readonly IEeuProgramDetailsRepository _programRepository;
-        private readonly IEeuParticipantDemographicsRepository _demographicsRepository;
-        private readonly IEeuProgramContentRepository _contentRepository;
-        private readonly IEeuResourcePersonRepository _resourcePersonRepository;
-        private readonly IEeuTopicsCoveredRepository _topicsRepository;
-        private readonly IEeuTeachingAidsRepository _teachingAidsRepository;
-        private readonly IEeuAdvisoryServicesRepository _advisoryRepository;
-        private readonly IEeuReportRepository _reportRepository;
-        private readonly IEeuRecommendationRepository _recommendationRepository;
+        private readonly IFtiProgramDetailsRepository _programRepository;
+        private readonly IFtiParticipantDemographicsRepository _demographicsRepository;
+        private readonly IFtiProgramContentRepository _contentRepository;
+        private readonly IFtiResourcePersonRepository _resourcePersonRepository;
+        private readonly IFtiTopicsCoveredRepository _topicsRepository;
+        private readonly IFtiTeachingAidsRepository _teachingAidsRepository;
+        private readonly IFtiAdvisoryServicesRepository _advisoryRepository;
+        private readonly IFtiReportRepository _reportRepository;
+        private readonly IFtiRecommendationRepository _recommendationRepository;
         private readonly ICurrentUserService _currentUserService;
         private readonly IEntityPermissionService _entityPermissionService;
-        private readonly EeuProgramMapper _mapper;
+        private readonly FtiProgramMapper _mapper;
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
-        private readonly GenericTrainerHistoryService<EeuProgramDetails> _historyService;
+        private readonly GenericTrainerHistoryService<FtiProgramDetails> _historyService;
 
-        public EeuProgramService(
-            IEeuProgramDetailsRepository programRepository,
-            IEeuParticipantDemographicsRepository demographicsRepository,
-            IEeuProgramContentRepository contentRepository,
-            IEeuResourcePersonRepository resourcePersonRepository,
-            IEeuTopicsCoveredRepository topicsRepository,
-            IEeuTeachingAidsRepository teachingAidsRepository,
-            IEeuAdvisoryServicesRepository advisoryRepository,
-            IEeuReportRepository reportRepository,
-            IEeuRecommendationRepository recommendationRepository,
+        public FtiProgramService(
+            IFtiProgramDetailsRepository programRepository,
+            IFtiParticipantDemographicsRepository demographicsRepository,
+            IFtiProgramContentRepository contentRepository,
+            IFtiResourcePersonRepository resourcePersonRepository,
+            IFtiTopicsCoveredRepository topicsRepository,
+            IFtiTeachingAidsRepository teachingAidsRepository,
+            IFtiAdvisoryServicesRepository advisoryRepository,
+            IFtiReportRepository reportRepository,
+            IFtiRecommendationRepository recommendationRepository,
             ICurrentUserService currentUserService,
             IEntityPermissionService entityPermissionService,
-            EeuProgramMapper mapper,
+            FtiProgramMapper mapper,
             IOrganizationUnitRepository organizationUnitRepository,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
             ITrainerAssignmentRepository trainerAssignmentRepository)
@@ -55,18 +60,18 @@ namespace Infrastructure.Services.DataTables.EEU
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
-            _historyService = new GenericTrainerHistoryService<EeuProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository);
+            _historyService = new GenericTrainerHistoryService<FtiProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository);
         }
 
         // ============================
         // SECTION A: PROGRAM DETAILS
         // ============================
 
-        public async Task<ServiceResult<EeuProgramDetailsDto>> CreateProgramAsync(EeuProgramCreateDto dto)
+        public async Task<ServiceResult<FtiProgramDetailsDto>> CreateProgramAsync(FtiProgramCreateDto dto)
         {
             // Verify access to unit location
             if (!await CanUserAccessUnitLocationAsync(dto.UnitLocationId))
-                return ServiceResult<EeuProgramDetailsDto>.Failure(
+                return ServiceResult<FtiProgramDetailsDto>.Failure(
                     "Access denied to this unit location",
                     ServiceErrorStatus.FORBIDDEN);
 
@@ -81,65 +86,65 @@ namespace Infrastructure.Services.DataTables.EEU
             var result = await _programRepository.GetWithDetailsAsync(program.Id);
             var resultDto = _mapper.MapToDtoWithDetails(result!);
 
-            return ServiceResult<EeuProgramDetailsDto>.Success(resultDto);
+            return ServiceResult<FtiProgramDetailsDto>.Success(resultDto);
         }
 
-        public async Task<ServiceResult<EeuProgramDetailsDto>> GetProgramByIdAsync(int id)
+        public async Task<ServiceResult<FtiProgramDetailsDto>> GetProgramByIdAsync(int id)
         {
             var program = await _programRepository.GetWithDetailsAsync(id);
 
             if (program == null)
-                return ServiceResult<EeuProgramDetailsDto>.Failure(
+                return ServiceResult<FtiProgramDetailsDto>.Failure(
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
             if (!await _entityPermissionService.CanViewForm(program))
-                return ServiceResult<EeuProgramDetailsDto>.Failure(
+                return ServiceResult<FtiProgramDetailsDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
             var dto = _mapper.MapToDtoWithDetails(program);
-            return ServiceResult<EeuProgramDetailsDto>.Success(dto);
+            return ServiceResult<FtiProgramDetailsDto>.Success(dto);
         }
 
-        public async Task<ServiceResult<EeuProgramDetailsCompleteDto>> GetCompleteProgramAsync(int id)
+        public async Task<ServiceResult<FtiProgramDetailsCompleteDto>> GetCompleteProgramAsync(int id)
         {
             var program = await _programRepository.GetWithDetailsAsync(id);
 
             if (program == null)
-                return ServiceResult<EeuProgramDetailsCompleteDto>.Failure(
+                return ServiceResult<FtiProgramDetailsCompleteDto>.Failure(
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
             if (!await _entityPermissionService.CanViewForm(program))
-                return ServiceResult<EeuProgramDetailsCompleteDto>.Failure(
+                return ServiceResult<FtiProgramDetailsCompleteDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
             var dto = _mapper.MapToCompleteDto(program);
-            return ServiceResult<EeuProgramDetailsCompleteDto>.Success(dto);
+            return ServiceResult<FtiProgramDetailsCompleteDto>.Success(dto);
         }
 
-        public async Task<ServiceResult<EeuProgramDetailsDto>> UpdateProgramAsync(int id, EeuProgramUpdateDto dto)
+        public async Task<ServiceResult<FtiProgramDetailsDto>> UpdateProgramAsync(int id, FtiProgramUpdateDto dto)
         {
             var program = await _programRepository.GetWithDetailsAsync(id);
 
             if (program == null)
-                return ServiceResult<EeuProgramDetailsDto>.Failure(
+                return ServiceResult<FtiProgramDetailsDto>.Failure(
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
             if (!await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<EeuProgramDetailsDto>.Failure(
+                return ServiceResult<FtiProgramDetailsDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
-                return ServiceResult<EeuProgramDetailsDto>.Failure(
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+                return ServiceResult<FtiProgramDetailsDto>.Failure(
                     "Cannot edit programs that have been submitted",
                     ServiceErrorStatus.INVALIDOPERATION);
 
-            EeuProgramMapper.MapUpdateDtoToEntity(dto, program);
+            FtiProgramMapper.MapUpdateDtoToEntity(dto, program);
             program.UpdatedById = _currentUserService.UserId;
             program.UpdatedAt = DateTimeOffset.UtcNow;
 
@@ -148,7 +153,7 @@ namespace Infrastructure.Services.DataTables.EEU
             var updatedProgram = await _programRepository.GetWithDetailsAsync(id);
             var resultDto = _mapper.MapToDtoWithDetails(updatedProgram!);
 
-            return ServiceResult<EeuProgramDetailsDto>.Success(resultDto);
+            return ServiceResult<FtiProgramDetailsDto>.Success(resultDto);
         }
 
         public async Task<ServiceResult> DeleteProgramAsync(int id)
@@ -161,7 +166,7 @@ namespace Infrastructure.Services.DataTables.EEU
             if (!await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
                     "Only draft programs can be deleted",
                     ServiceErrorStatus.INVALIDOPERATION);
@@ -174,29 +179,29 @@ namespace Infrastructure.Services.DataTables.EEU
         // SECTION B: PARTICIPANT DEMOGRAPHICS
         // ============================
 
-        public async Task<ServiceResult<EeuParticipantDemographicsDto>> AddDemographicsAsync(
+        public async Task<ServiceResult<FtiParticipantDemographicsDto>> AddDemographicsAsync(
             int programId,
-            EeuParticipantDemographicsCreateDto dto)
+            FtiParticipantDemographicsCreateDto dto)
         {
             var program = await _programRepository.GetByIdAsync(programId);
 
             if (program == null)
-                return ServiceResult<EeuParticipantDemographicsDto>.Failure(
+                return ServiceResult<FtiParticipantDemographicsDto>.Failure(
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
             if (!await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<EeuParticipantDemographicsDto>.Failure(
+                return ServiceResult<FtiParticipantDemographicsDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
-                return ServiceResult<EeuParticipantDemographicsDto>.Failure(
-                    "Cannot modify submitted programs",
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+                return ServiceResult<FtiParticipantDemographicsDto>.Failure(
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             var demographics = _mapper.MapToEntity(dto);
-            demographics.EeuProgramDetailsId = programId;
+            demographics.FtiProgramDetailsId = programId;
             demographics.OrganizationId = _currentUserService.OrganizationId;
             demographics.UnitLocationId = program.UnitLocationId;
             demographics.CreatedById = _currentUserService.UserId;
@@ -205,39 +210,39 @@ namespace Infrastructure.Services.DataTables.EEU
             await _demographicsRepository.CreateAsync(demographics);
 
             var resultDto = _mapper.MapToDto(demographics);
-            return ServiceResult<EeuParticipantDemographicsDto>.Success(resultDto);
+            return ServiceResult<FtiParticipantDemographicsDto>.Success(resultDto);
         }
 
-        public async Task<ServiceResult<EeuParticipantDemographicsDto>> UpdateDemographicsAsync(
+        public async Task<ServiceResult<FtiParticipantDemographicsDto>> UpdateDemographicsAsync(
             int demographicsId,
-            EeuParticipantDemographicsUpdateDto dto)
+            FtiParticipantDemographicsUpdateDto dto)
         {
             var demographics = await _demographicsRepository.GetByIdAsync(demographicsId);
 
             if (demographics == null)
-                return ServiceResult<EeuParticipantDemographicsDto>.Failure(
+                return ServiceResult<FtiParticipantDemographicsDto>.Failure(
                     "Demographics not found",
                     ServiceErrorStatus.NOTFOUND);
 
-            var program = await _programRepository.GetByIdAsync(demographics.EeuProgramDetailsId ?? 0);
+            var program = await _programRepository.GetByIdAsync(demographics.FtiProgramDetailsId ?? 0);
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<EeuParticipantDemographicsDto>.Failure(
+                return ServiceResult<FtiParticipantDemographicsDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
-                return ServiceResult<EeuParticipantDemographicsDto>.Failure(
-                    "Cannot modify submitted programs",
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+                return ServiceResult<FtiParticipantDemographicsDto>.Failure(
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
-            EeuProgramMapper.MapUpdateDtoToEntity(dto, demographics);
+            FtiProgramMapper.MapUpdateDtoToEntity(dto, demographics);
             demographics.UpdatedById = _currentUserService.UserId;
             demographics.UpdatedAt = DateTimeOffset.UtcNow;
 
             await _demographicsRepository.UpdateAsync(demographics);
 
             var resultDto = _mapper.MapToDto(demographics);
-            return ServiceResult<EeuParticipantDemographicsDto>.Success(resultDto);
+            return ServiceResult<FtiParticipantDemographicsDto>.Success(resultDto);
         }
 
         public async Task<ServiceResult> DeleteDemographicsAsync(int demographicsId)
@@ -247,61 +252,61 @@ namespace Infrastructure.Services.DataTables.EEU
             if (demographics == null)
                 return ServiceResult.Failure("Demographics not found", ServiceErrorStatus.NOTFOUND);
 
-            var program = await _programRepository.GetByIdAsync(demographics.EeuProgramDetailsId ?? 0);
+            var program = await _programRepository.GetByIdAsync(demographics.FtiProgramDetailsId ?? 0);
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             await _demographicsRepository.DeleteAsync(demographicsId);
             return ServiceResult.Success();
         }
 
-        public async Task<ServiceResult<List<EeuParticipantDemographicsDto>>> GetDemographicsByProgramIdAsync(int programId)
+        public async Task<ServiceResult<List<FtiParticipantDemographicsDto>>> GetDemographicsByProgramIdAsync(int programId)
         {
             var program = await _programRepository.GetByIdAsync(programId);
 
             if (program == null)
-                return ServiceResult<List<EeuParticipantDemographicsDto>>.Failure(
+                return ServiceResult<List<FtiParticipantDemographicsDto>>.Failure(
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
             var demographics = await _demographicsRepository.GetByProgramIdAsync(programId);
             var dtos = demographics.Select(d => _mapper.MapToDto(d)).ToList();
 
-            return ServiceResult<List<EeuParticipantDemographicsDto>>.Success(dtos);
+            return ServiceResult<List<FtiParticipantDemographicsDto>>.Success(dtos);
         }
 
         // ============================
         // SECTION C: PROGRAM CONTENT & RESOURCES
         // ============================
 
-        public async Task<ServiceResult<EeuProgramContentDto>> AddProgramContentAsync(
+        public async Task<ServiceResult<FtiProgramContentDto>> AddProgramContentAsync(
             int programId,
-            EeuProgramContentCreateDto dto)
+            FtiProgramContentCreateDto dto)
         {
             var program = await _programRepository.GetByIdAsync(programId);
 
             if (program == null)
-                return ServiceResult<EeuProgramContentDto>.Failure(
+                return ServiceResult<FtiProgramContentDto>.Failure(
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
             if (!await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<EeuProgramContentDto>.Failure(
+                return ServiceResult<FtiProgramContentDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
-                return ServiceResult<EeuProgramContentDto>.Failure(
-                    "Cannot modify submitted programs",
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+                return ServiceResult<FtiProgramContentDto>.Failure(
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             var content = _mapper.MapToEntity(dto);
-            content.EeuProgramDetailsId = programId;
+            content.FtiProgramDetailsId = programId;
             content.OrganizationId = _currentUserService.OrganizationId;
             content.UnitLocationId = program.UnitLocationId;
             content.CreatedById = _currentUserService.UserId;
@@ -312,62 +317,95 @@ namespace Infrastructure.Services.DataTables.EEU
             var result = await _contentRepository.GetWithDetailsAsync(content.Id);
             var resultDto = _mapper.MapToDto(result!);
 
-            return ServiceResult<EeuProgramContentDto>.Success(resultDto);
+            return ServiceResult<FtiProgramContentDto>.Success(resultDto);
         }
 
-        public async Task<ServiceResult<EeuProgramContentDto>> GetProgramContentByIdAsync(int contentId)
+        public async Task<ServiceResult<FtiProgramContentDto>> GetProgramContentByIdAsync(int contentId)
         {
             var content = await _contentRepository.GetWithDetailsAsync(contentId);
 
             if (content == null)
-                return ServiceResult<EeuProgramContentDto>.Failure(
+                return ServiceResult<FtiProgramContentDto>.Failure(
                     "Content not found",
                     ServiceErrorStatus.NOTFOUND);
 
             var dto = _mapper.MapToDto(content);
-            return ServiceResult<EeuProgramContentDto>.Success(dto);
+            return ServiceResult<FtiProgramContentDto>.Success(dto);
+        }
+
+        public async Task<ServiceResult> DeleteProgramContentAsync(int contentId)
+        {
+            var content = await _contentRepository.GetByIdAsync(contentId);
+
+            if (content == null)
+                return ServiceResult.Failure("Content not found", ServiceErrorStatus.NOTFOUND);
+
+            var program = await _programRepository.GetByIdAsync(content.FtiProgramDetailsId ?? 0);
+            if (program == null || !await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
+
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+                return ServiceResult.Failure(
+                    "Cannot modify approved programs",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            await _contentRepository.DeleteAsync(contentId);
+            return ServiceResult.Success();
+        }
+
+        public async Task<ServiceResult<List<FtiProgramContentDto>>> GetProgramContentsByProgramIdAsync(int programId)
+        {
+            var program = await _programRepository.GetByIdAsync(programId);
+
+            if (program == null)
+                return ServiceResult<List<FtiProgramContentDto>>.Failure(
+                    "Program not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            var contents = await _contentRepository.GetByProgramIdAsync(programId);
+            var dtos = contents.Select(c => _mapper.MapToDto(c)).ToList();
+
+            return ServiceResult<List<FtiProgramContentDto>>.Success(dtos);
         }
 
         /// <summary>
-        /// Create EeuProgramContentAndResources along with all child entities (ResourcePersons, Topics, TeachingAids) in a single transaction
-        /// This solves the problem of needing parent ID before creating children
+        /// Create FtiProgramContentAndResources with all child entities in a single transaction
         /// </summary>
-        public async Task<ServiceResult<EeuProgramContentDto>> AddProgramContentWithChildrenAsync(
+        public async Task<ServiceResult<FtiProgramContentDto>> AddProgramContentWithChildrenAsync(
             int programId,
-            EeuProgramContentWithChildrenCreateDto dto)
+            FtiProgramContentWithChildrenCreateDto dto)
         {
             // Validate program exists
             var program = await _programRepository.GetByIdAsync(programId);
             if (program == null)
-                return ServiceResult<EeuProgramContentDto>.Failure(
+                return ServiceResult<FtiProgramContentDto>.Failure(
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
             // Check permissions
             if (!await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<EeuProgramContentDto>.Failure(
+                return ServiceResult<FtiProgramContentDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
             // Validate form status
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
-                return ServiceResult<EeuProgramContentDto>.Failure(
-                    "Cannot add content to submitted or approved programs",
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+                return ServiceResult<FtiProgramContentDto>.Failure(
+                    "Cannot add content to approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             try
             {
                 // Prepare parent entity
-                var parentEntity = _mapper.MapToEntity(new EeuProgramContentCreateDto
+                var parentEntity = new FtiProgramContentAndResources
                 {
-                    Title = dto.Title,
-                    Description = dto.Description
-                });
-                parentEntity.EeuProgramDetailsId = programId;
-                parentEntity.UnitLocationId = program.UnitLocationId;
-                parentEntity.OrganizationId = program.OrganizationId;
-                parentEntity.CreatedById = _currentUserService.UserId;
-                parentEntity.CreatedAt = DateTimeOffset.UtcNow;
+                    FtiProgramDetailsId = programId,
+                  
+                    UnitLocationId = program.UnitLocationId,
+                    OrganizationId = program.OrganizationId,
+                    CreatedById = _currentUserService.UserId,
+                    CreatedAt = DateTimeOffset.UtcNow
+                };
 
                 // Prepare child entities
                 var resourcePersons = dto.ResourcePersons?.Select(rp =>
@@ -408,56 +446,57 @@ namespace Infrastructure.Services.DataTables.EEU
                     teachingAids);
 
                 var resultDto = _mapper.MapToDto(createdContent);
-                return ServiceResult<EeuProgramContentDto>.Success(resultDto);
+                return ServiceResult<FtiProgramContentDto>.Success(resultDto);
             }
             catch (Exception ex)
             {
-                return ServiceResult<EeuProgramContentDto>.Failure(
+                return ServiceResult<FtiProgramContentDto>.Failure(
                     $"Failed to create program content with children: {ex.Message}",
                     ServiceErrorStatus.INVALIDOPERATION);
             }
         }
 
         /// <summary>
-        /// Update EeuProgramContentAndResources with all child entities using Hybrid Pattern
+        /// Update FtiProgramContentAndResources with all child entities using Hybrid Pattern
         /// - Items WITH Id: UPDATE existing
         /// - Items WITHOUT Id: CREATE new
         /// - Items in DB but NOT in arrays: DELETE
         /// </summary>
-        public async Task<ServiceResult<EeuProgramContentDto>> UpdateProgramContentWithChildrenAsync(
+        public async Task<ServiceResult<FtiProgramContentDto>> UpdateProgramContentWithChildrenAsync(
             int contentId,
-            EeuProgramContentWithChildrenUpdateDto dto)
+            FtiProgramContentWithChildrenUpdateDto dto)
         {
             // Validate content exists
             var content = await _contentRepository.GetWithDetailsAsync(contentId);
             if (content == null)
-                return ServiceResult<EeuProgramContentDto>.Failure(
+                return ServiceResult<FtiProgramContentDto>.Failure(
                     "Content not found",
                     ServiceErrorStatus.NOTFOUND);
 
             // Validate program and permissions
-            var program = await _programRepository.GetByIdAsync(content.EeuProgramDetailsId ?? 0);
+            var program = await _programRepository.GetByIdAsync(content.FtiProgramDetailsId ?? 0);
             if (program == null)
-                return ServiceResult<EeuProgramContentDto>.Failure(
+                return ServiceResult<FtiProgramContentDto>.Failure(
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
             if (!await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<EeuProgramContentDto>.Failure(
+                return ServiceResult<FtiProgramContentDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
-                return ServiceResult<EeuProgramContentDto>.Failure(
-                    "Cannot update content in submitted or approved programs",
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+                return ServiceResult<FtiProgramContentDto>.Failure(
+                    "Cannot update content in approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             try
             {
                 // Prepare parent entity for update
-                var parentEntity = new EeuProgramContentAndResources
+                var parentEntity = new FtiProgramContentAndResources
                 {
                     Id = contentId,
+                   
                     UpdatedById = _currentUserService.UserId,
                     UpdatedAt = DateTimeOffset.UtcNow
                 };
@@ -465,7 +504,7 @@ namespace Infrastructure.Services.DataTables.EEU
                 // Prepare child entities (hybrid: mix of new and existing)
                 var resourcePersons = dto.ResourcePersons?.Select(rp =>
                 {
-                    var entity = new EeuResourcePerson
+                    var entity = new FtiResourcePerson
                     {
                         Id = rp.Id ?? 0, // 0 means new
                         Name = rp.Name,
@@ -493,7 +532,7 @@ namespace Infrastructure.Services.DataTables.EEU
 
                 var topicsCovered = dto.TopicsCovered?.Select(tc =>
                 {
-                    var entity = new EeuTopicsCoveredInClass
+                    var entity = new FtiTopicsCoveredInClass
                     {
                         Id = tc.Id ?? 0,
                         Date = tc.Date,
@@ -519,7 +558,7 @@ namespace Infrastructure.Services.DataTables.EEU
 
                 var teachingAids = dto.TeachingAids?.Select(ta =>
                 {
-                    var entity = new EeuTeachingAidsDeveloped
+                    var entity = new FtiTeachingAidsDeveloped
                     {
                         Id = ta.Id ?? 0,
                         TypeOfAidId = ta.TypeOfAidId,
@@ -552,429 +591,50 @@ namespace Infrastructure.Services.DataTables.EEU
                     teachingAids);
 
                 var resultDto = _mapper.MapToDto(updatedContent);
-                return ServiceResult<EeuProgramContentDto>.Success(resultDto);
+                return ServiceResult<FtiProgramContentDto>.Success(resultDto);
             }
             catch (Exception ex)
             {
-                return ServiceResult<EeuProgramContentDto>.Failure(
+                return ServiceResult<FtiProgramContentDto>.Failure(
                     $"Failed to update program content with children: {ex.Message}",
                     ServiceErrorStatus.INVALIDOPERATION);
             }
-        }
-
-
-        public async Task<ServiceResult> DeleteProgramContentAsync(int contentId)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult.Failure("Content not found", ServiceErrorStatus.NOTFOUND);
-
-            var program = await _programRepository.GetByIdAsync(content.EeuProgramDetailsId ?? 0);
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            await _contentRepository.DeleteAsync(contentId);
-            return ServiceResult.Success();
-        }
-
-        public async Task<ServiceResult<List<EeuProgramContentDto>>> GetProgramContentsByProgramIdAsync(int programId)
-        {
-            var program = await _programRepository.GetByIdAsync(programId);
-
-            if (program == null)
-                return ServiceResult<List<EeuProgramContentDto>>.Failure(
-                    "Program not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var contents = await _contentRepository.GetByProgramIdAsync(programId);
-            var dtos = contents.Select(c => _mapper.MapToDto(c)).ToList();
-
-            return ServiceResult<List<EeuProgramContentDto>>.Success(dtos);
-        }
-
-        // ============================
-        // SECTION C1: RESOURCE PERSONS
-        // ============================
-
-        public async Task<ServiceResult<EeuResourcePersonDto>> AddResourcePersonAsync(
-            int contentId,
-            EeuResourcePersonCreateDto dto)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<EeuResourcePersonDto>.Failure(
-                    "Program content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var program = await _programRepository.GetByIdAsync(content.EeuProgramDetailsId ?? 0);
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<EeuResourcePersonDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult<EeuResourcePersonDto>.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            var person = _mapper.MapToEntity(dto);
-            person.EeuProgramContentAndResourcesId = contentId;
-            person.OrganizationId = _currentUserService.OrganizationId;
-            person.UnitLocationId = program.UnitLocationId;
-            person.CreatedById = _currentUserService.UserId;
-            person.CreatedAt = DateTimeOffset.UtcNow;
-
-            await _resourcePersonRepository.CreateAsync(person);
-
-            var resultDto = _mapper.MapToDto(person);
-            return ServiceResult<EeuResourcePersonDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult<EeuResourcePersonDto>> UpdateResourcePersonAsync(
-            int personId,
-            EeuResourcePersonUpdateDto dto)
-        {
-            var person = await _resourcePersonRepository.GetByIdAsync(personId);
-
-            if (person == null)
-                return ServiceResult<EeuResourcePersonDto>.Failure(
-                    "Resource person not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(person.EeuProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.EeuProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<EeuResourcePersonDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult<EeuResourcePersonDto>.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            // Apply updates from DTO
-            if (dto.Name != null) person.Name = dto.Name;
-            if (dto.Designation != null) person.Designation = dto.Designation;
-            if (dto.ResourceType.HasValue) person.ResourceType = dto.ResourceType;
-            if (dto.Responsibility.HasValue) person.Responsibility = dto.Responsibility;
-            if (dto.InstitutionOrDepartment != null) person.InstitutionOrDepartment = dto.InstitutionOrDepartment;
-
-            person.UpdatedById = _currentUserService.UserId;
-            person.UpdatedAt = DateTimeOffset.UtcNow;
-
-            await _resourcePersonRepository.UpdateAsync(person);
-
-            var resultDto = _mapper.MapToDto(person);
-            return ServiceResult<EeuResourcePersonDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult> DeleteResourcePersonAsync(int personId)
-        {
-            var person = await _resourcePersonRepository.GetByIdAsync(personId);
-
-            if (person == null)
-                return ServiceResult.Failure("Resource person not found", ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(person.EeuProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.EeuProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            await _resourcePersonRepository.DeleteAsync(personId);
-            return ServiceResult.Success();
-        }
-
-        public async Task<ServiceResult<List<EeuResourcePersonDto>>> GetResourcePersonsByContentIdAsync(int contentId)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<List<EeuResourcePersonDto>>.Failure(
-                    "Content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var persons = await _resourcePersonRepository.GetByContentIdAsync(contentId);
-            var dtos = persons.Select(p => _mapper.MapToDto(p)).ToList();
-
-            return ServiceResult<List<EeuResourcePersonDto>>.Success(dtos);
-        }
-
-        // ============================
-        // SECTION C2: TOPICS COVERED
-        // ============================
-
-        public async Task<ServiceResult<EeuTopicsCoveredDto>> AddTopicAsync(
-            int contentId,
-            EeuTopicsCoveredCreateDto dto)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<EeuTopicsCoveredDto>.Failure(
-                    "Program content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var program = await _programRepository.GetByIdAsync(content.EeuProgramDetailsId ?? 0);
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<EeuTopicsCoveredDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult<EeuTopicsCoveredDto>.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            var topic = _mapper.MapToEntity(dto);
-            topic.EeuProgramContentAndResourcesId = contentId;
-            topic.OrganizationId = _currentUserService.OrganizationId;
-            topic.UnitLocationId = program.UnitLocationId;
-            topic.CreatedById = _currentUserService.UserId;
-            topic.CreatedAt = DateTimeOffset.UtcNow;
-
-            await _topicsRepository.CreateAsync(topic);
-
-            var resultDto = _mapper.MapToDto(topic);
-            return ServiceResult<EeuTopicsCoveredDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult<EeuTopicsCoveredDto>> UpdateTopicAsync(
-            int topicId,
-            EeuTopicsCoveredUpdateDto dto)
-        {
-            var topic = await _topicsRepository.GetByIdAsync(topicId);
-
-            if (topic == null)
-                return ServiceResult<EeuTopicsCoveredDto>.Failure(
-                    "Topic not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(topic.EeuProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.EeuProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<EeuTopicsCoveredDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult<EeuTopicsCoveredDto>.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            if (dto.Date.HasValue) topic.Date = dto.Date;
-            if (dto.Title != null) topic.Title = dto.Title;
-            if (dto.PhotoUpload != null) topic.PhotoUpload = dto.PhotoUpload;
-
-            topic.UpdatedById = _currentUserService.UserId;
-            topic.UpdatedAt = DateTimeOffset.UtcNow;
-
-            await _topicsRepository.UpdateAsync(topic);
-
-            var resultDto = _mapper.MapToDto(topic);
-            return ServiceResult<EeuTopicsCoveredDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult> DeleteTopicAsync(int topicId)
-        {
-            var topic = await _topicsRepository.GetByIdAsync(topicId);
-
-            if (topic == null)
-                return ServiceResult.Failure("Topic not found", ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(topic.EeuProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.EeuProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            await _topicsRepository.DeleteAsync(topicId);
-            return ServiceResult.Success();
-        }
-
-        public async Task<ServiceResult<List<EeuTopicsCoveredDto>>> GetTopicsByContentIdAsync(int contentId)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<List<EeuTopicsCoveredDto>>.Failure(
-                    "Content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var topics = await _topicsRepository.GetByContentIdAsync(contentId);
-            var dtos = topics.Select(t => _mapper.MapToDto(t)).ToList();
-
-            return ServiceResult<List<EeuTopicsCoveredDto>>.Success(dtos);
-        }
-
-        // ============================
-        // SECTION C3: TEACHING AIDS
-        // ============================
-
-        public async Task<ServiceResult<EeuTeachingAidsDto>> AddTeachingAidAsync(
-            int contentId,
-            EeuTeachingAidsCreateDto dto)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<EeuTeachingAidsDto>.Failure(
-                    "Program content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var program = await _programRepository.GetByIdAsync(content.EeuProgramDetailsId ?? 0);
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<EeuTeachingAidsDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult<EeuTeachingAidsDto>.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            var aid = _mapper.MapToEntity(dto);
-            aid.EeuProgramContentAndResourcesId = contentId;
-            aid.OrganizationId = _currentUserService.OrganizationId;
-            aid.UnitLocationId = program.UnitLocationId;
-            aid.CreatedById = _currentUserService.UserId;
-            aid.CreatedAt = DateTimeOffset.UtcNow;
-
-            await _teachingAidsRepository.CreateAsync(aid);
-
-            var resultDto = _mapper.MapToDto(aid);
-            return ServiceResult<EeuTeachingAidsDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult<EeuTeachingAidsDto>> UpdateTeachingAidAsync(
-            int aidId,
-            EeuTeachingAidsUpdateDto dto)
-        {
-            var aid = await _teachingAidsRepository.GetByIdAsync(aidId);
-
-            if (aid == null)
-                return ServiceResult<EeuTeachingAidsDto>.Failure(
-                    "Teaching aid not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(aid.EeuProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.EeuProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<EeuTeachingAidsDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult<EeuTeachingAidsDto>.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            if (dto.TypeOfAidId.HasValue) aid.TypeOfAidId = dto.TypeOfAidId;
-            if (dto.OtherTypeOfAid != null) aid.OtherTypeOfAid = dto.OtherTypeOfAid;
-            if (dto.Purpose != null) aid.Purpose = dto.Purpose;
-            if (dto.Number.HasValue) aid.Number = dto.Number.Value;
-
-            aid.UpdatedById = _currentUserService.UserId;
-            aid.UpdatedAt = DateTimeOffset.UtcNow;
-
-            await _teachingAidsRepository.UpdateAsync(aid);
-
-            var resultDto = _mapper.MapToDto(aid);
-            return ServiceResult<EeuTeachingAidsDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult> DeleteTeachingAidAsync(int aidId)
-        {
-            var aid = await _teachingAidsRepository.GetByIdAsync(aidId);
-
-            if (aid == null)
-                return ServiceResult.Failure("Teaching aid not found", ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(aid.EeuProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.EeuProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            await _teachingAidsRepository.DeleteAsync(aidId);
-            return ServiceResult.Success();
-        }
-
-        public async Task<ServiceResult<List<EeuTeachingAidsDto>>> GetTeachingAidsByContentIdAsync(int contentId)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<List<EeuTeachingAidsDto>>.Failure(
-                    "Content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var aids = await _teachingAidsRepository.GetByContentIdAsync(contentId);
-            var dtos = aids.Select(a => _mapper.MapToDto(a)).ToList();
-
-            return ServiceResult<List<EeuTeachingAidsDto>>.Success(dtos);
         }
 
         // ============================
         // SECTION D: ADVISORY SERVICES
         // ============================
 
-        public async Task<ServiceResult<EeuAdvisoryServicesDto>> AddAdvisoryServicesAsync(
+        public async Task<ServiceResult<FtiAdvisoryServicesDto>> AddAdvisoryServicesAsync(
             int programId,
-            EeuAdvisoryServicesCreateDto dto)
+            FtiAdvisoryServicesCreateDto dto)
         {
             var program = await _programRepository.GetByIdAsync(programId);
 
             if (program == null)
-                return ServiceResult<EeuAdvisoryServicesDto>.Failure(
+                return ServiceResult<FtiAdvisoryServicesDto>.Failure(
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
             if (!await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<EeuAdvisoryServicesDto>.Failure(
+                return ServiceResult<FtiAdvisoryServicesDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
-                return ServiceResult<EeuAdvisoryServicesDto>.Failure(
-                    "Cannot modify submitted programs",
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+                return ServiceResult<FtiAdvisoryServicesDto>.Failure(
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             // Check if advisory services already exist
             var existing = await _advisoryRepository.GetByProgramIdAsync(programId);
             if (existing != null)
-                return ServiceResult<EeuAdvisoryServicesDto>.Failure(
+                return ServiceResult<FtiAdvisoryServicesDto>.Failure(
                     "Advisory services already exist for this program",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             var advisory = _mapper.MapToEntity(dto);
-            advisory.EeuProgramDetailsId = programId;
+            advisory.FtiProgramDetailsId = programId;
             advisory.OrganizationId = _currentUserService.OrganizationId;
             advisory.UnitLocationId = program.UnitLocationId;
             advisory.CreatedById = _currentUserService.UserId;
@@ -983,29 +643,29 @@ namespace Infrastructure.Services.DataTables.EEU
             await _advisoryRepository.CreateAsync(advisory);
 
             var resultDto = _mapper.MapToDto(advisory);
-            return ServiceResult<EeuAdvisoryServicesDto>.Success(resultDto);
+            return ServiceResult<FtiAdvisoryServicesDto>.Success(resultDto);
         }
 
-        public async Task<ServiceResult<EeuAdvisoryServicesDto>> UpdateAdvisoryServicesAsync(
+        public async Task<ServiceResult<FtiAdvisoryServicesDto>> UpdateAdvisoryServicesAsync(
             int advisoryId,
-            EeuAdvisoryServicesUpdateDto dto)
+            FtiAdvisoryServicesUpdateDto dto)
         {
             var advisory = await _advisoryRepository.GetByIdAsync(advisoryId);
 
             if (advisory == null)
-                return ServiceResult<EeuAdvisoryServicesDto>.Failure(
+                return ServiceResult<FtiAdvisoryServicesDto>.Failure(
                     "Advisory services not found",
                     ServiceErrorStatus.NOTFOUND);
 
-            var program = await _programRepository.GetByIdAsync(advisory.EeuProgramDetailsId ?? 0);
+            var program = await _programRepository.GetByIdAsync(advisory.FtiProgramDetailsId ?? 0);
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<EeuAdvisoryServicesDto>.Failure(
+                return ServiceResult<FtiAdvisoryServicesDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
-                return ServiceResult<EeuAdvisoryServicesDto>.Failure(
-                    "Cannot modify submitted programs",
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+                return ServiceResult<FtiAdvisoryServicesDto>.Failure(
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             if (dto.NoOfFacebookSMS.HasValue) advisory.NoOfFacebookSMS = dto.NoOfFacebookSMS.Value;
@@ -1026,7 +686,7 @@ namespace Infrastructure.Services.DataTables.EEU
             await _advisoryRepository.UpdateAsync(advisory);
 
             var resultDto = _mapper.MapToDto(advisory);
-            return ServiceResult<EeuAdvisoryServicesDto>.Success(resultDto);
+            return ServiceResult<FtiAdvisoryServicesDto>.Success(resultDto);
         }
 
         public async Task<ServiceResult> DeleteAdvisoryServicesAsync(int advisoryId)
@@ -1036,72 +696,72 @@ namespace Infrastructure.Services.DataTables.EEU
             if (advisory == null)
                 return ServiceResult.Failure("Advisory services not found", ServiceErrorStatus.NOTFOUND);
 
-            var program = await _programRepository.GetByIdAsync(advisory.EeuProgramDetailsId ?? 0);
+            var program = await _programRepository.GetByIdAsync(advisory.FtiProgramDetailsId ?? 0);
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             await _advisoryRepository.DeleteAsync(advisoryId);
             return ServiceResult.Success();
         }
 
-        public async Task<ServiceResult<EeuAdvisoryServicesDto>> GetAdvisoryServicesByProgramIdAsync(int programId)
+        public async Task<ServiceResult<FtiAdvisoryServicesDto>> GetAdvisoryServicesByProgramIdAsync(int programId)
         {
             var program = await _programRepository.GetByIdAsync(programId);
 
             if (program == null)
-                return ServiceResult<EeuAdvisoryServicesDto>.Failure(
+                return ServiceResult<FtiAdvisoryServicesDto>.Failure(
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
             var advisory = await _advisoryRepository.GetByProgramIdAsync(programId);
             if (advisory == null)
-                return ServiceResult<EeuAdvisoryServicesDto>.Failure(
+                return ServiceResult<FtiAdvisoryServicesDto>.Failure(
                     "Advisory services not found",
                     ServiceErrorStatus.NOTFOUND);
 
             var dto = _mapper.MapToDto(advisory);
-            return ServiceResult<EeuAdvisoryServicesDto>.Success(dto);
+            return ServiceResult<FtiAdvisoryServicesDto>.Success(dto);
         }
 
         // ============================
         // SECTION E: REPORTS
         // ============================
 
-        public async Task<ServiceResult<EeuReportDto>> AddReportAsync(
+        public async Task<ServiceResult<FtiReportDto>> AddReportAsync(
             int programId,
-            EeuReportCreateDto dto)
+            FtiReportCreateDto dto)
         {
             var program = await _programRepository.GetByIdAsync(programId);
 
             if (program == null)
-                return ServiceResult<EeuReportDto>.Failure(
+                return ServiceResult<FtiReportDto>.Failure(
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
             if (!await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<EeuReportDto>.Failure(
+                return ServiceResult<FtiReportDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
-                return ServiceResult<EeuReportDto>.Failure(
-                    "Cannot modify submitted programs",
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+                return ServiceResult<FtiReportDto>.Failure(
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             // Check if report already exists
             var existing = await _reportRepository.GetByProgramIdAsync(programId);
             if (existing != null)
-                return ServiceResult<EeuReportDto>.Failure(
+                return ServiceResult<FtiReportDto>.Failure(
                     "Report already exists for this program",
                     ServiceErrorStatus.CONFLICT);
 
             var report = _mapper.MapToEntity(dto);
-            report.EeuProgramDetailsId = programId;
+            report.FtiProgramDetailsId = programId;
             report.OrganizationId = _currentUserService.OrganizationId;
             report.UnitLocationId = program.UnitLocationId;
             report.CreatedById = _currentUserService.UserId;
@@ -1110,29 +770,29 @@ namespace Infrastructure.Services.DataTables.EEU
             await _reportRepository.CreateAsync(report);
 
             var resultDto = _mapper.MapToDto(report);
-            return ServiceResult<EeuReportDto>.Success(resultDto);
+            return ServiceResult<FtiReportDto>.Success(resultDto);
         }
 
-        public async Task<ServiceResult<EeuReportDto>> UpdateReportAsync(
+        public async Task<ServiceResult<FtiReportDto>> UpdateReportAsync(
             int reportId,
-            EeuReportUpdateDto dto)
+            FtiReportUpdateDto dto)
         {
             var report = await _reportRepository.GetByIdAsync(reportId);
 
             if (report == null)
-                return ServiceResult<EeuReportDto>.Failure(
+                return ServiceResult<FtiReportDto>.Failure(
                     "Report not found",
                     ServiceErrorStatus.NOTFOUND);
 
-            var program = await _programRepository.GetByIdAsync(report.EeuProgramDetailsId ?? 0);
+            var program = await _programRepository.GetByIdAsync(report.FtiProgramDetailsId ?? 0);
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<EeuReportDto>.Failure(
+                return ServiceResult<FtiReportDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
-                return ServiceResult<EeuReportDto>.Failure(
-                    "Cannot modify submitted programs",
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+                return ServiceResult<FtiReportDto>.Failure(
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             if (dto.ProgressReportReportingYear != null) report.ProgressReportReportingYear = dto.ProgressReportReportingYear;
@@ -1148,7 +808,7 @@ namespace Infrastructure.Services.DataTables.EEU
             await _reportRepository.UpdateAsync(report);
 
             var resultDto = _mapper.MapToDto(report);
-            return ServiceResult<EeuReportDto>.Success(resultDto);
+            return ServiceResult<FtiReportDto>.Success(resultDto);
         }
 
         public async Task<ServiceResult> DeleteReportAsync(int reportId)
@@ -1158,72 +818,72 @@ namespace Infrastructure.Services.DataTables.EEU
             if (report == null)
                 return ServiceResult.Failure("Report not found", ServiceErrorStatus.NOTFOUND);
 
-            var program = await _programRepository.GetByIdAsync(report.EeuProgramDetailsId ?? 0);
+            var program = await _programRepository.GetByIdAsync(report.FtiProgramDetailsId ?? 0);
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.CONFLICT);
 
             await _reportRepository.DeleteAsync(reportId);
             return ServiceResult.Success();
         }
 
-        public async Task<ServiceResult<EeuReportDto>> GetReportByProgramIdAsync(int programId)
+        public async Task<ServiceResult<FtiReportDto>> GetReportByProgramIdAsync(int programId)
         {
             var program = await _programRepository.GetByIdAsync(programId);
 
             if (program == null)
-                return ServiceResult<EeuReportDto>.Failure(
+                return ServiceResult<FtiReportDto>.Failure(
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
             var report = await _reportRepository.GetByProgramIdAsync(programId);
             if (report == null)
-                return ServiceResult<EeuReportDto>.Failure(
+                return ServiceResult<FtiReportDto>.Failure(
                     "Report not found",
                     ServiceErrorStatus.NOTFOUND);
 
             var dto = _mapper.MapToDto(report);
-            return ServiceResult<EeuReportDto>.Success(dto);
+            return ServiceResult<FtiReportDto>.Success(dto);
         }
 
         // ============================
         // SECTION F: RECOMMENDATIONS
         // ============================
 
-        public async Task<ServiceResult<EeuRecommendationDto>> AddRecommendationAsync(
+        public async Task<ServiceResult<FtiRecommendationDto>> AddRecommendationAsync(
             int programId,
-            EeuRecommendationCreateDto dto)
+            FtiRecommendationCreateDto dto)
         {
             var program = await _programRepository.GetByIdAsync(programId);
 
             if (program == null)
-                return ServiceResult<EeuRecommendationDto>.Failure(
+                return ServiceResult<FtiRecommendationDto>.Failure(
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
             if (!await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<EeuRecommendationDto>.Failure(
+                return ServiceResult<FtiRecommendationDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
-                return ServiceResult<EeuRecommendationDto>.Failure(
-                    "Cannot modify submitted programs",
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+                return ServiceResult<FtiRecommendationDto>.Failure(
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             // Check if recommendation already exists
             var existing = await _recommendationRepository.GetByProgramIdAsync(programId);
             if (existing != null)
-                return ServiceResult<EeuRecommendationDto>.Failure(
+                return ServiceResult<FtiRecommendationDto>.Failure(
                     "Recommendation already exists for this program",
                     ServiceErrorStatus.CONFLICT);
 
             var recommendation = _mapper.MapToEntity(dto);
-            recommendation.EeuProgramDetailsId = programId;
+            recommendation.FtiProgramDetailsId = programId;
             recommendation.OrganizationId = _currentUserService.OrganizationId;
             recommendation.UnitLocationId = program.UnitLocationId;
             recommendation.CreatedById = _currentUserService.UserId;
@@ -1231,30 +891,39 @@ namespace Infrastructure.Services.DataTables.EEU
 
             await _recommendationRepository.CreateAsync(recommendation);
 
+            // AUTO-SUBMIT: Since Recommendation is the last section, automFtially change status to Pending
+            if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
+            {
+                program.FormStatus = "Pending";
+                program.UpdatedById = _currentUserService.UserId;
+                program.UpdatedAt = DateTimeOffset.UtcNow;
+                await _programRepository.UpdateAsync(program);
+            }
+
             var resultDto = _mapper.MapToDto(recommendation);
-            return ServiceResult<EeuRecommendationDto>.Success(resultDto);
+            return ServiceResult<FtiRecommendationDto>.Success(resultDto);
         }
 
-        public async Task<ServiceResult<EeuRecommendationDto>> UpdateRecommendationAsync(
+        public async Task<ServiceResult<FtiRecommendationDto>> UpdateRecommendationAsync(
             int recommendationId,
-            EeuRecommendationUpdateDto dto)
+            FtiRecommendationUpdateDto dto)
         {
             var recommendation = await _recommendationRepository.GetByIdAsync(recommendationId);
 
             if (recommendation == null)
-                return ServiceResult<EeuRecommendationDto>.Failure(
+                return ServiceResult<FtiRecommendationDto>.Failure(
                     "Recommendation not found",
                     ServiceErrorStatus.NOTFOUND);
 
-            var program = await _programRepository.GetByIdAsync(recommendation.EeuProgramDetailsId ?? 0);
+            var program = await _programRepository.GetByIdAsync(recommendation.FtiProgramDetailsId ?? 0);
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<EeuRecommendationDto>.Failure(
+                return ServiceResult<FtiRecommendationDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
-                return ServiceResult<EeuRecommendationDto>.Failure(
-                    "Cannot modify submitted programs",
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+                return ServiceResult<FtiRecommendationDto>.Failure(
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.CONFLICT);
 
             if (dto.ProblemsIdentified != null) recommendation.ProblemsIdentified = dto.ProblemsIdentified;
@@ -1269,8 +938,17 @@ namespace Infrastructure.Services.DataTables.EEU
 
             await _recommendationRepository.UpdateAsync(recommendation);
 
+            // AUTO-SUBMIT: Since Recommendation is the last section, automFtially change status to Pending
+            if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
+            {
+                program.FormStatus = "Pending";
+                program.UpdatedById = _currentUserService.UserId;
+                program.UpdatedAt = DateTimeOffset.UtcNow;
+                await _programRepository.UpdateAsync(program);
+            }
+
             var resultDto = _mapper.MapToDto(recommendation);
-            return ServiceResult<EeuRecommendationDto>.Success(resultDto);
+            return ServiceResult<FtiRecommendationDto>.Success(resultDto);
         }
 
         public async Task<ServiceResult> DeleteRecommendationAsync(int recommendationId)
@@ -1280,36 +958,36 @@ namespace Infrastructure.Services.DataTables.EEU
             if (recommendation == null)
                 return ServiceResult.Failure("Recommendation not found", ServiceErrorStatus.NOTFOUND);
 
-            var program = await _programRepository.GetByIdAsync(recommendation.EeuProgramDetailsId ?? 0);
+            var program = await _programRepository.GetByIdAsync(recommendation.FtiProgramDetailsId ?? 0);
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             await _recommendationRepository.DeleteAsync(recommendationId);
             return ServiceResult.Success();
         }
 
-        public async Task<ServiceResult<EeuRecommendationDto>> GetRecommendationByProgramIdAsync(int programId)
+        public async Task<ServiceResult<FtiRecommendationDto>> GetRecommendationByProgramIdAsync(int programId)
         {
             var program = await _programRepository.GetByIdAsync(programId);
 
             if (program == null)
-                return ServiceResult<EeuRecommendationDto>.Failure(
+                return ServiceResult<FtiRecommendationDto>.Failure(
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
             var recommendation = await _recommendationRepository.GetByProgramIdAsync(programId);
             if (recommendation == null)
-                return ServiceResult<EeuRecommendationDto>.Failure(
+                return ServiceResult<FtiRecommendationDto>.Failure(
                     "Recommendation not found",
                     ServiceErrorStatus.NOTFOUND);
 
             var dto = _mapper.MapToDto(recommendation);
-            return ServiceResult<EeuRecommendationDto>.Success(dto);
+            return ServiceResult<FtiRecommendationDto>.Success(dto);
         }
 
         // ============================
@@ -1326,7 +1004,7 @@ namespace Infrastructure.Services.DataTables.EEU
             if (!await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
                     "Only draft programs can be submitted",
                     ServiceErrorStatus.INVALIDOPERATION);
@@ -1410,7 +1088,7 @@ namespace Infrastructure.Services.DataTables.EEU
         // PAGINATION & FILTERING
         // ============================
 
-        public async Task<PaginatedResult<EeuProgramDetailsDto>> GetPaginatedAsync(
+        public async Task<PaginatedResult<FtiProgramDetailsDto>> GetPaginatedAsync(
             int pageNumber = 1,
             int pageSize = 10,
             DateOnly? startDate = null,
@@ -1437,14 +1115,14 @@ namespace Infrastructure.Services.DataTables.EEU
 
             var dtos = result.Items.Select(p => _mapper.MapToDtoWithDetails(p)).ToList();
 
-            return new PaginatedResult<EeuProgramDetailsDto>(
+            return new PaginatedResult<FtiProgramDetailsDto>(
                 dtos,
                 result.TotalItems,
                 result.PageNumber,
                 result.PageSize);
         }
 
-        public async Task<PaginatedResult<EeuProgramDetailsDto>> GetByStatusAsync(
+        public async Task<PaginatedResult<FtiProgramDetailsDto>> GetByStatusAsync(
             string status,
             int pageNumber = 1,
             int pageSize = 10)
@@ -1453,7 +1131,7 @@ namespace Infrastructure.Services.DataTables.EEU
             var result = await _programRepository.GetByStatusAsync(unitLocationIds, status, pageNumber, pageSize);
             var dtos = result.Items.Select(p => _mapper.MapToDtoWithDetails(p)).ToList();
 
-            return new PaginatedResult<EeuProgramDetailsDto>(
+            return new PaginatedResult<FtiProgramDetailsDto>(
                 dtos,
                 result.TotalItems,
                 result.PageNumber,

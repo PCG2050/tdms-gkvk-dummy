@@ -1,24 +1,21 @@
-﻿using Domain.Entities.ATIC;
-using Domain.Entities.FIU;
-using Domain.Entities.KVK;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace Domain.Entities.FTI
 {
-    public class FTIParticipantDemographics : AuditableBaseEntity
+    public class FtiParticipantDemographics : AuditableBaseEntity
     {
         // FK to TableKVKProgramDetails
         [Required]
+<<<<<<< Updated upstream
         public int FTIProgramDetailsID { get; set; }
 
         [ForeignKey(nameof(FTIProgramDetailsID))]
         public FTIProgramDetails? ProgramDetails { get; set; }
+=======
+        public int? FtiProgramDetailsId { get; set; }
+
+        [ForeignKey(nameof(FtiProgramDetailsId))]
+        public FtiProgramDetails? ProgramDetails { get; set; }
+>>>>>>> Stashed changes
 
         // Participant name/label
         [MaxLength(200)]

@@ -52,7 +52,7 @@ namespace Application.Mapper
                 UpdatedAt = entity.UpdatedAt,
                 UpdatedById = entity.UpdatedById,
 
-           
+
                 CreatedByName = entity.CreatedBy?.FirstName,
                 ApprovedByName = entity.ApprovedBy?.LastName
             };

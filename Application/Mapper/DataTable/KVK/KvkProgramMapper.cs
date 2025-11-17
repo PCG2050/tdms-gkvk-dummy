@@ -69,7 +69,7 @@ namespace Application.Mapper.DataTable.KVK
             return new KvkProgramContentDto
             {
                 Id = entity.Id,
-                KvkProgramDetailsId = entity.KvkProgramDetailsId ?? 0,             
+                KvkProgramDetailsId = entity.KvkProgramDetailsId ?? 0,
                 ResourcePersons = entity.ResourcePersons?.Select(MapToDto).ToList(),
                 TopicsCovered = entity.TopicsCovered?.Select(MapToDto).ToList(),
                 TeachingAids = entity.TeachingAids?.Select(MapToDto).ToList()
@@ -77,7 +77,7 @@ namespace Application.Mapper.DataTable.KVK
         }
 
         public partial KvkProgramContentAndResources MapToEntity(KvkProgramContentCreateDto dto);
-     
+
 
         // ============================
         // RESOURCE PERSON MAPPINGS

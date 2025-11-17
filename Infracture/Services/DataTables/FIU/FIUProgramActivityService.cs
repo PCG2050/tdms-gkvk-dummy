@@ -78,7 +78,10 @@ namespace Infrastructure.Services.DataTables.FIU
             if (existing.FormStatus != "Draft")
                 return ServiceResult<FIUProgramActivityResponseDto>.Failure("Only draft activities can be updated");
 
-            var fiuActivity = await _fiuActivityRepository.GetByIdAsync(updateDto.FIUActivitiesId);
+            if (!updateDto.FIUActivitiesId.HasValue)
+                return ServiceResult<FIUProgramActivityResponseDto>.Failure("Activity type is required");
+
+            var fiuActivity = await _fiuActivityRepository.GetByIdAsync(updateDto.FIUActivitiesId.Value);
             if (fiuActivity == null || !fiuActivity.IsActive)
                 return ServiceResult<FIUProgramActivityResponseDto>.Failure("Invalid activity type");
 

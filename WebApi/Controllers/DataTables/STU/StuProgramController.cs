@@ -300,12 +300,12 @@ namespace WebApi.Controllers.DataTables.STU
         // STATUS MANAGEMENT
         // ============================
 
-        [HttpPost("{programId}/submit")]
-        public async Task<IActionResult> SubmitForApproval(int programId)
-        {
-            var result = await _service.SubmitForApprovalAsync(programId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
+        // [HttpPost("{programId}/submit")]
+        // public async Task<IActionResult> SubmitForApproval(int programId)
+        // {
+        //     var result = await _service.SubmitForApprovalAsync(programId);
+        //     return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        // }
 
         [HttpPost("{programId}/approve")]
         public async Task<IActionResult> Approve(int programId, [FromBody] ApprovalDto dto)

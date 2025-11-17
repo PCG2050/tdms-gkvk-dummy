@@ -29,7 +29,7 @@ namespace Infrastructure.Repository.DataTables.IBTVA
                     .ThenInclude(ta => ta.TypeOfAid!)
                 .Include(c => c.ProgramDetails)
                 .FirstOrDefaultAsync(c => c.Id == id);
-            
+
         }
 
         public async Task<List<IbtvaProgramContentAndResources>> GetByProgramIdAsync(int programId)

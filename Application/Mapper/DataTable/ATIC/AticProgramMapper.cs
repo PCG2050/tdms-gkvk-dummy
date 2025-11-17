@@ -1,6 +1,5 @@
 ﻿
-using Application.Models.DataTables.DEU;
-using Domain.Entities.DEU;
+
 
 namespace Application.Mapper.DataTable.ATIC
 {

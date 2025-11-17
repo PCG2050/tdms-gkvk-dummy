@@ -316,12 +316,12 @@ namespace WebApi.Controllers.DataTables.NAEP
         // STATUS MANAGEMENT
         // ============================
 
-        [HttpPost("{programId}/submit")]
-        public async Task<IActionResult> SubmitForApproval(int programId)
-        {
-            var result = await _service.SubmitForApprovalAsync(programId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
+        // [HttpPost("{programId}/submit")]
+        // public async Task<IActionResult> SubmitForApproval(int programId)
+        // {
+        //     var result = await _service.SubmitForApprovalAsync(programId);
+        //     return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        // }
 
         [HttpPost("{programId}/approve")]
         public async Task<IActionResult> Approve(int programId, [FromBody] ApprovalDto dto)
@@ -409,7 +409,7 @@ namespace WebApi.Controllers.DataTables.NAEP
                 ServiceErrorStatus.BADREQUEST => 400,
                 ServiceErrorStatus.INVALIDOPERATION => 400,
                 ServiceErrorStatus.CONFLICT => 409,
-                _ => StatusCodes.Status500InternalServerError    
+                _ => StatusCodes.Status500InternalServerError
             };
         }
     }

@@ -1,71 +1,75 @@
-﻿namespace Application.Mapper.DataTable.IBTVA
+﻿
+using Application.Models.DataTables.FTI;
+using Domain.Entities.FTI;
+
+namespace Application.Mapper.DataTable.FTI
 {
     [Mapper]
-    public partial class IbtvaProgramMapper
+    public partial class FtiProgramMapper
     {
         // ============================
         // MAIN PROGRAM DETAILS MAPPINGS
         // ============================
 
-        public partial IbtvaProgramDetailsDto MapToDto(IbtvaProgramDetails entity);
-        public partial IbtvaProgramDetailsCompleteDto MapToCompleteDto(IbtvaProgramDetails entity);
-        public partial IbtvaProgramDetails MapToEntity(IbtvaProgramCreateDto dto);
+        public partial FtiProgramDetailsDto MapToDto(FtiProgramDetails entity);
+        public partial FtiProgramDetailsCompleteDto MapToCompleteDto(FtiProgramDetails entity);
+        public partial FtiProgramDetails MapToEntity(FtiProgramCreateDto dto);
 
         // ============================
         // DEMOGRAPHICS
         // ============================
 
-        public partial IbtvaParticipantDemographicsDto MapToDto(IbtvaParticipantDemographics entity);
-        public partial IbtvaParticipantDemographics MapToEntity(IbtvaParticipantDemographicsCreateDto dto);
+        public partial FtiParticipantDemographicsDto MapToDto(FtiParticipantDemographics entity);
+        public partial FtiParticipantDemographics MapToEntity(FtiParticipantDemographicsCreateDto dto);
 
         // ============================
         // PROGRAM CONTENT
         // ============================
 
-        public partial IbtvaProgramContentDto MapToDto(IbtvaProgramContentAndResources entity);
-        public partial IbtvaProgramContentAndResources MapToEntity(IbtvaProgramContentCreateDto dto);
+        public partial FtiProgramContentDto MapToDto(FtiProgramContentAndResources entity);
+        public partial FtiProgramContentAndResources MapToEntity(FtiProgramContentCreateDto dto);
 
         // ============================
         // RESOURCE PERSON
         // ============================
 
-        public partial IbtvaResourcePersonDto MapToDto(IbtvaResourcePerson entity);
-        public partial IbtvaResourcePerson MapToEntity(IbtvaResourcePersonCreateDto dto);
+        public partial FtiResourcePersonDto MapToDto(FtiResourcePerson entity);
+        public partial FtiResourcePerson MapToEntity(FtiResourcePersonCreateDto dto);
 
         // ============================
         // TOPICS COVERED
         // ============================
 
-        public partial IbtvaTopicsCoveredDto MapToDto(IbtvaTopicsCoveredInClass entity);
-        public partial IbtvaTopicsCoveredInClass MapToEntity(IbtvaTopicsCoveredCreateDto dto);
+        public partial FtiTopicsCoveredDto MapToDto(FtiTopicsCoveredInClass entity);
+        public partial FtiTopicsCoveredInClass MapToEntity(FtiTopicsCoveredCreateDto dto);
 
         // ============================
         // TEACHING AIDS
         // ============================
 
-        public partial IbtvaTeachingAidsDto MapToDto(IbtvaTeachingAidsDeveloped entity);
-        public partial IbtvaTeachingAidsDeveloped MapToEntity(IbtvaTeachingAidsCreateDto dto);
+        public partial FtiTeachingAidsDto MapToDto(FtiTeachingAidsDeveloped entity);
+        public partial FtiTeachingAidsDeveloped MapToEntity(FtiTeachingAidsCreateDto dto);
 
         // ============================
         // ADVISORY SERVICES
         // ============================
 
-        public partial IbtvaAdvisoryServicesDto MapToDto(IbtvaAdvisoryServices entity);
-        public partial IbtvaAdvisoryServices MapToEntity(IbtvaAdvisoryServicesCreateDto dto);
+        public partial FtiAdvisoryServicesDto MapToDto(FtiAdvisoryServices entity);
+        public partial FtiAdvisoryServices MapToEntity(FtiAdvisoryServicesCreateDto dto);
 
         // ============================
         // REPORT
         // ============================
 
-        public partial IbtvaReportDto MapToDto(IbtvaReport entity);
-        public partial IbtvaReport MapToEntity(IbtvaReportCreateDto dto);
+        public partial FtiReportDto MapToDto(FtiReport entity);
+        public partial FtiReport MapToEntity(FtiReportCreateDto dto);
 
         // ============================
         // RECOMMENDATION
         // ============================
 
-        public partial IbtvaRecommendationDto MapToDto(IbtvaRecommendation entity);
-        public partial IbtvaRecommendation MapToEntity(IbtvaRecommendationCreateDto dto);
+        public partial FtiRecommendationDto MapToDto(FtiRecommendation entity);
+        public partial FtiRecommendation MapToEntity(FtiRecommendationCreateDto dto);
 
         // ============================
         // HELPER METHODS FOR NESTED PROPERTIES
@@ -84,27 +88,27 @@
         // MAPPING WITH NAVIGATION DETAILS
         // ============================
 
-        [MapProperty(nameof(IbtvaProgramDetails.UnitLocation), nameof(IbtvaProgramDetailsDto.UnitName), Use = nameof(GetUnitName))]
-        [MapProperty(nameof(IbtvaProgramDetails.UnitLocation), nameof(IbtvaProgramDetailsDto.DistrictName), Use = nameof(GetDistrictName))]
-        [MapProperty(nameof(IbtvaProgramDetails.UnitLocation), nameof(IbtvaProgramDetailsDto.StateName), Use = nameof(GetStateName))]
-        [MapProperty(nameof(IbtvaProgramDetails.Category.Name), nameof(IbtvaProgramDetailsDto.CategoryName))]
-        [MapProperty(nameof(IbtvaProgramDetails.ProgramType.Name), nameof(IbtvaProgramDetailsDto.ProgramTypeName))]
-        [MapProperty(nameof(IbtvaProgramDetails.Theme.Name), nameof(IbtvaProgramDetailsDto.ThemeName))]
-        [MapProperty(nameof(IbtvaProgramDetails.Region.Name), nameof(IbtvaProgramDetailsDto.RegionName))]
-        [MapProperty(nameof(IbtvaProgramDetails.Mode.Name), nameof(IbtvaProgramDetailsDto.ModeName))]
-        [MapProperty(nameof(IbtvaProgramDetails.SourceOfFund.Name), nameof(IbtvaProgramDetailsDto.SourceOfFundName))]
-        [MapProperty(nameof(IbtvaProgramDetails.CreatedBy.FirstName), nameof(IbtvaProgramDetailsDto.CreatedByName))]
-        [MapProperty(nameof(IbtvaProgramDetails.ApprovedBy.FirstName), nameof(IbtvaProgramDetailsDto.ApprovedByName))]
-        public partial IbtvaProgramDetailsDto MapToDtoWithDetails(IbtvaProgramDetails entity);
+        [MapProperty(nameof(FtiProgramDetails.UnitLocation), nameof(FtiProgramDetailsDto.UnitName), Use = nameof(GetUnitName))]
+        [MapProperty(nameof(FtiProgramDetails.UnitLocation), nameof(FtiProgramDetailsDto.DistrictName), Use = nameof(GetDistrictName))]
+        [MapProperty(nameof(FtiProgramDetails.UnitLocation), nameof(FtiProgramDetailsDto.StateName), Use = nameof(GetStateName))]
+        [MapProperty(nameof(FtiProgramDetails.Category.Name), nameof(FtiProgramDetailsDto.CategoryName))]
+        [MapProperty(nameof(FtiProgramDetails.ProgramType.Name), nameof(FtiProgramDetailsDto.ProgramTypeName))]
+        [MapProperty(nameof(FtiProgramDetails.Theme.Name), nameof(FtiProgramDetailsDto.ThemeName))]
+        [MapProperty(nameof(FtiProgramDetails.Region.Name), nameof(FtiProgramDetailsDto.RegionName))]
+        [MapProperty(nameof(FtiProgramDetails.Mode.Name), nameof(FtiProgramDetailsDto.ModeName))]
+        [MapProperty(nameof(FtiProgramDetails.SourceOfFund.Name), nameof(FtiProgramDetailsDto.SourceOfFundName))]
+        [MapProperty(nameof(FtiProgramDetails.CreatedBy.FirstName), nameof(FtiProgramDetailsDto.CreatedByName))]
+        [MapProperty(nameof(FtiProgramDetails.ApprovedBy.FirstName), nameof(FtiProgramDetailsDto.ApprovedByName))]
+        public partial FtiProgramDetailsDto MapToDtoWithDetails(FtiProgramDetails entity);
 
         // ============================
         // MANUAL UPDATE MAPPINGS
         // ============================
 
         /// <summary>
-        /// Maps IbtvaProgramUpdateDto to IbtvaProgramDetails entity (only non-null values)
+        /// Maps FtiProgramUpdateDto to FtiProgramDetails entity (only non-null values)
         /// </summary>
-        public static void MapUpdateDtoToEntity(IbtvaProgramUpdateDto dto, IbtvaProgramDetails entity)
+        public static void MapUpdateDtoToEntity(FtiProgramUpdateDto dto, FtiProgramDetails entity)
         {
             if (dto.StartDate.HasValue) entity.StartDate = dto.StartDate.Value;
             if (dto.EndDate.HasValue) entity.EndDate = dto.EndDate.Value;
@@ -129,12 +133,26 @@
             if (dto.SourceOfFundId.HasValue) entity.SourceOfFundId = dto.SourceOfFundId;
             if (dto.NoOfCourses.HasValue) entity.Funds = dto.NoOfCourses;
             if (dto.Attachments != null) entity.Attachements = dto.Attachments;
+            if (dto.StatusId.HasValue) entity.StatusId = dto.StatusId;
+            if (dto.TotalOutlayRs.HasValue) entity.TotalOutlayRs = dto.TotalOutlayRs;
+            if (dto.Copi != null) entity.Copi = dto.Copi;
+            if (dto.BatchNo.HasValue) entity.BatchNo = dto.BatchNo;
+            if (dto.OrganizerBroucherFile != null) entity.OrganizerBroucherFile = dto.OrganizerBroucherFile;
+            if (dto.OrganizerInstitutionName != null) entity.OrganizerInstitutionName = dto.OrganizerInstitutionName;
+            if (dto.OrganizerInstitutionAddress != null) entity.OrganizerInstitutionAddress = dto.OrganizerInstitutionAddress;
+            if (dto.SourceId.HasValue) entity.SourceId = dto.SourceId;
+            if (dto.ProposalDate.HasValue) entity.ProposalDate = dto.ProposalDate;
+            if (dto.ProposalUploadFile != null) entity.ProposalUploadFile = dto.ProposalUploadFile;
+            if (dto.UniversitySanctionLetterDate.HasValue) entity.UniversitySanctionLetterDate = dto.UniversitySanctionLetterDate;
+            if (dto.UniversitySanctionLetterUploadFile != null) entity.UniversitySanctionLetterUploadFile = dto.UniversitySanctionLetterUploadFile;
+            if (dto.FundsSanctionLetterDate.HasValue) entity.FundsSanctionLetterDate = dto.FundsSanctionLetterDate;
+            if (dto.FundsSanctionLetterUploadFile != null) entity.FundsSanctionLetterUploadFile = dto.FundsSanctionLetterUploadFile;
         }
 
         /// <summary>
-        /// Maps IbtvaParticipantDemographicsUpdateDto to IbtvaParticipantDemographics entity
+        /// Maps FtiParticipantDemographicsUpdateDto to FtiParticipantDemographics entity
         /// </summary>
-        public static void MapUpdateDtoToEntity(IbtvaParticipantDemographicsUpdateDto dto, IbtvaParticipantDemographics entity)
+        public static void MapUpdateDtoToEntity(FtiParticipantDemographicsUpdateDto dto, FtiParticipantDemographics entity)
         {
             if (dto.ParticipantId.HasValue) entity.ParticipantId = dto.ParticipantId;
             if (dto.Male_SC.HasValue) entity.Male_SC = dto.Male_SC;
@@ -157,18 +175,18 @@
         }
 
         /// <summary>
-        /// Maps IbtvaProgramContentUpdateDto to IbtvaProgramContentAndResources entity
+        /// Maps FtiProgramContentUpdateDto to FtiProgramContentAndResources entity
         /// </summary>
-        public static void MapUpdateDtoToEntity(IbtvaProgramContentUpdateDto dto, IbtvaProgramContentAndResources entity)
+        public static void MapUpdateDtoToEntity(FtiProgramContentUpdateDto dto, FtiProgramContentAndResources entity)
         {
             // Currently the update DTO has only Id, but keeping for future expansion
             // Add mappings here if more fields are added to the update DTO
         }
 
         /// <summary>
-        /// Maps IbtvaResourcePersonUpdateDto to IbtvaResourcePerson entity
+        /// Maps FtiResourcePersonUpdateDto to FtiResourcePerson entity
         /// </summary>
-        public static void MapUpdateDtoToEntity(IbtvaResourcePersonUpdateDto dto, IbtvaResourcePerson entity)
+        public static void MapUpdateDtoToEntity(FtiResourcePersonUpdateDto dto, FtiResourcePerson entity)
         {
             if (dto.Name != null) entity.Name = dto.Name;
             if (dto.Designation != null) entity.Designation = dto.Designation;
@@ -178,9 +196,9 @@
         }
 
         /// <summary>
-        /// Maps IbtvaTopicsCoveredUpdateDto to IbtvaTopicsCoveredInClass entity
+        /// Maps FtiTopicsCoveredUpdateDto to FtiTopicsCoveredInClass entity
         /// </summary>
-        public static void MapUpdateDtoToEntity(IbtvaTopicsCoveredUpdateDto dto, IbtvaTopicsCoveredInClass entity)
+        public static void MapUpdateDtoToEntity(FtiTopicsCoveredUpdateDto dto, FtiTopicsCoveredInClass entity)
         {
             if (dto.Date.HasValue) entity.Date = dto.Date;
             if (dto.Title != null) entity.Title = dto.Title;
@@ -188,9 +206,9 @@
         }
 
         /// <summary>
-        /// Maps IbtvaTeachingAidsUpdateDto to IbtvaTeachingAidsDeveloped entity
+        /// Maps FtiTeachingAidsUpdateDto to FtiTeachingAidsDeveloped entity
         /// </summary>
-        public static void MapUpdateDtoToEntity(IbtvaTeachingAidsUpdateDto dto, IbtvaTeachingAidsDeveloped entity)
+        public static void MapUpdateDtoToEntity(FtiTeachingAidsUpdateDto dto, FtiTeachingAidsDeveloped entity)
         {
             if (dto.TypeOfAidId.HasValue) entity.TypeOfAidId = dto.TypeOfAidId;
             if (dto.OtherTypeOfAid != null) entity.OtherTypeOfAid = dto.OtherTypeOfAid;
@@ -199,9 +217,9 @@
         }
 
         /// <summary>
-        /// Maps IbtvaAdvisoryServicesUpdateDto to IbtvaAdvisoryServices entity
+        /// Maps FtiAdvisoryServicesUpdateDto to FtiAdvisoryServices entity
         /// </summary>
-        public static void MapUpdateDtoToEntity(IbtvaAdvisoryServicesUpdateDto dto, IbtvaAdvisoryServices entity)
+        public static void MapUpdateDtoToEntity(FtiAdvisoryServicesUpdateDto dto, FtiAdvisoryServices entity)
         {
             if (dto.NoOfFacebookSMS.HasValue) entity.NoOfFacebookSMS = dto.NoOfFacebookSMS.Value;
             if (dto.NoOfSMSSentToRegisteredFarmers.HasValue) entity.NoOfSMSSentToRegisteredFarmers = dto.NoOfSMSSentToRegisteredFarmers.Value;
@@ -217,9 +235,9 @@
         }
 
         /// <summary>
-        /// Maps IbtvaReportUpdateDto to IbtvaReport entity
+        /// Maps FtiReportUpdateDto to FtiReport entity
         /// </summary>
-        public static void MapUpdateDtoToEntity(IbtvaReportUpdateDto dto, IbtvaReport entity)
+        public static void MapUpdateDtoToEntity(FtiReportUpdateDto dto, FtiReport entity)
         {
             if (dto.ProgressReportReportingYear != null) entity.ProgressReportReportingYear = dto.ProgressReportReportingYear;
             if (dto.Date.HasValue) entity.Date = dto.Date;
@@ -230,9 +248,9 @@
         }
 
         /// <summary>
-        /// Maps IbtvaRecommendationUpdateDto to IbtvaRecommendation entity
+        /// Maps FtiRecommendationUpdateDto to FtiRecommendation entity
         /// </summary>
-        public static void MapUpdateDtoToEntity(IbtvaRecommendationUpdateDto dto, IbtvaRecommendation entity)
+        public static void MapUpdateDtoToEntity(FtiRecommendationUpdateDto dto, FtiRecommendation entity)
         {
             if (dto.ProblemsIdentified != null) entity.ProblemsIdentified = dto.ProblemsIdentified;
             if (dto.Recommendation != null) entity.Recommendation = dto.Recommendation;

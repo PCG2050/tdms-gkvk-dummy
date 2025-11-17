@@ -1,14 +1,6 @@
-﻿using Domain.Entities.KVK;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Domain.Entities.FTI
+﻿namespace Domain.Entities.FTI
 {
+<<<<<<< Updated upstream
     public  class FTIReport : AuditableBaseEntity
     {
         [Required]
@@ -16,6 +8,15 @@ namespace Domain.Entities.FTI
 
         [ForeignKey(nameof(FTIProgramDetailsID))]
         public FTIProgramDetails ProgramDetails { get; set; }
+=======
+    public class FtiReport : AuditableBaseEntity
+    {
+        [Required]
+        public int? FtiProgramDetailsId { get; set; }
+        [JsonIgnore]
+        [ForeignKey(nameof(FtiProgramDetailsId))]
+        public FtiProgramDetails? ProgramDetails { get; set; }
+>>>>>>> Stashed changes
 
         // Report details
         [MaxLength(150)]

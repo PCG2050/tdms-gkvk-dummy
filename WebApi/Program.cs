@@ -1,3 +1,9 @@
+using Application.Interface.Repository.DataTables.FTI;
+using Application.Interface.Services.DataTables.FTI;
+using Application.Mapper.DataTable.FTI;
+using Infrastructure.Repository.DataTables.FTI;
+using Infrastructure.Services.DataTables.FTI;
+
 namespace WebApi
 {
     public class Program
@@ -109,11 +115,10 @@ namespace WebApi
 
             //Tables
        
-            builder.Services.AddScoped<IFtiOtherActivitiesRepository, FtiOtherActivitiesRepository>();                  
+                        
             builder.Services.AddScoped<IAticSalesRepository, AticSalesRepository>();         
             builder.Services.AddScoped<IAsmVisitRepository, AsmVisitRepository>();
-
-        
+                    
 
             // Mappers
             builder.Services.AddSingleton<IbtvaProgramMapper>();
@@ -125,7 +130,7 @@ namespace WebApi
             builder.Services.AddSingleton<KvkProgramMapper>();
             builder.Services.AddSingleton<FIUProgramActivityMapper>();
             builder.Services.AddSingleton<ASMVisitorDetailsMapper>();
-
+            builder.Services.AddSingleton<FtiProgramMapper>();
 
             builder.Services.AddSingleton<ConsultingServiceMapper>();
             builder.Services.AddSingleton<PublicationMapper>();
@@ -142,6 +147,20 @@ namespace WebApi
             #region ASM
             builder.Services.AddScoped<IASMVisitorDetailsRepository, ASMVisitorDetailsRepository>();
             builder.Services.AddScoped<IASMVisitorDetailsService, ASMVisitorDetailsService>();
+            #endregion
+
+            #region FTI
+            builder.Services.AddScoped<IFtiProgramDetailsRepository, FtiProgramDetailsRepository>();
+            builder.Services.AddScoped<IFtiParticipantDemographicsRepository, FtiParticipantDemographicsRepository>();
+            builder.Services.AddScoped<IFtiProgramContentRepository, FtiProgramContentRepository>();
+            builder.Services.AddScoped<IFtiResourcePersonRepository, FtiResourcePersonRepository>();
+            builder.Services.AddScoped<IFtiTopicsCoveredRepository, FtiTopicsCoveredRepository>();
+            builder.Services.AddScoped<IFtiTeachingAidsRepository, FtiTeachingAidsRepository>();
+            builder.Services.AddScoped<IFtiAdvisoryServicesRepository, FtiAdvisoryServicesRepository>();
+            builder.Services.AddScoped<IFtiReportRepository, FtiReportRepository>();
+            builder.Services.AddScoped<IFtiRecommendationRepository, FtiRecommendationRepository>();
+
+            builder.Services.AddScoped<IFtiProgramService, FtiProgramService>();
             #endregion
 
             #region STU

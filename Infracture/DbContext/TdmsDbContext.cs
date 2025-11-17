@@ -27,12 +27,15 @@ namespace Infrastructure.DbContext
         public DbSet<User> Users { get; set; }
         public DbSet<UserSession> UserSessions { get; set; }
         public DbSet<Unit> Units { get; set; }
+<<<<<<< Updated upstream
         public DbSet<FtiTrainingProgram> FtiTrainingPrograms { get; set; }
         public DbSet<FtiOtherActivity> FtiOtherActivities { get; set; }
+=======
+     
+>>>>>>> Stashed changes
         #region STU
        
-        //public DbSet<DaesiProgramme> DaesiProgrammes { get; set; }
-        //public DbSet<DaesiOtherActivity> DaesiOtherActivities { get; set; }
+      
         public DbSet<StuProgramDetails> StuProgramDetails { get; set; }
         public DbSet<StuParticipantDemographics> StuParticipantDemographics { get; set; }
         public DbSet<StuProgramContentAndResources> StuProgramContentAndResources { get; set; }
@@ -41,7 +44,7 @@ namespace Infrastructure.DbContext
         public DbSet<StuTeachingAidsDeveloped> StuTeachingAidsDeveloped { get; set; }
         public DbSet<StuAdvisoryServices> StuAdvisoryServices { get; set; }
         public DbSet<StuReport> StuReports { get; set; }
-        public DbSet<StuRecommendation     > StuRecommendations { get; set; }
+        public DbSet<StuRecommendation> StuRecommendations { get; set; }
 
         #endregion
         #region FIU
@@ -55,20 +58,19 @@ namespace Infrastructure.DbContext
 
         #endregion
         #region FTI
-        public DbSet<FTIProgramDetails> FTIProgramDetails { get; set; }
-        public DbSet<FTIParticipantDemographics> FTIParticipantDemographics { get; set; }
-        public DbSet<FTIProgramContentAndResources> FTIProgramContentAndResources { get; set; }
-        public DbSet<FTIResourcePerson> FTIResourcePersons { get; set; }
-        public DbSet<FTITopicsCoveredInClass> FTITopicsCoveredInClass { get; set; }
-        public DbSet<FTITeachingAidsDeveloped> FTITeachingAidsDeveloped { get; set; }
-        public DbSet<FTIAdvisoryServices> FTIAdvisoryServices { get; set; }
-        public DbSet<FTIReport> FTIReports { get; set; }
-        public DbSet<FTIRecommendation> FTIRecommendations { get; set; }
-
+        public DbSet<FtiProgramDetails> FtiProgramDetails { get; set; }
+        public DbSet<FtiParticipantDemographics> FtiParticipantDemographics { get; set; }
+        public DbSet<FtiProgramContentAndResources> FtiProgramContentAndResources { get; set; }
+        public DbSet<FtiResourcePerson> FtiResourcePersons { get; set; }
+        public DbSet<FtiTopicsCoveredInClass> FtiTopicsCoveredInClass { get; set; }
+        public DbSet<FtiTeachingAidsDeveloped> FtiTeachingAidsDeveloped { get; set; }
+        public DbSet<FtiAdvisoryServices> FtiAdvisoryServices { get; set; }
+        public DbSet<FtiReport> FtiReports { get; set; }
+        public DbSet<FtiRecommendation> FtiRecommendations { get; set; }
         #endregion
         #region IBT&VA
-       
-        
+
+
 
         public DbSet<IbtvaProgramDetails> IbtvaProgramDetails { get; set; }
         public DbSet<IbtvaParticipantDemographics> IbtvaParticipantDemographics { get; set; }
@@ -92,9 +94,6 @@ namespace Infrastructure.DbContext
         public DbSet<AticRecommendation> AticRecommendations { get; set; }
         #endregion
         #region DEU
-        //public DbSet<DeuCourse> DeuCourses { get; set; }
-        //public DbSet<DeuOtherActivity> DeuOtherActivities { get; set; }
-
         public DbSet<DeuProgramDetails> DeuProgramDetails { get; set; }
         public DbSet<DeuParticipantDemographics> DeuParticipantDemographics { get; set; }
         public DbSet<DeuProgramContentAndResources> DeuProgramContentAndResources { get; set; }

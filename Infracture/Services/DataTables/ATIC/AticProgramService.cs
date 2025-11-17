@@ -389,12 +389,27 @@ namespace Infrastructure.Services.DataTables.ATIC
                     "Cannot modify submitted programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
+<<<<<<< Updated upstream
             var person = _mapper.MapToEntity(dto);
             person.AticProgramContentAndResourcesId = contentId;
             person.OrganizationId = _currentUserService.OrganizationId;
             person.UnitLocationId = program.UnitLocationId;
             person.CreatedById = _currentUserService.UserId;
             person.CreatedAt = DateTimeOffset.UtcNow;
+=======
+            try
+            {
+                // Prepare parent entity
+                var parentEntity = new AticProgramContentAndResources
+                {
+                    AticProgramDetailsId = programId,
+                
+                    UnitLocationId = program.UnitLocationId,
+                    OrganizationId = program.OrganizationId,
+                    CreatedById = _currentUserService.UserId,
+                    CreatedAt = DateTimeOffset.UtcNow
+                };
+>>>>>>> Stashed changes
 
             await _resourcePersonRepository.CreateAsync(person);
 
@@ -505,12 +520,25 @@ namespace Infrastructure.Services.DataTables.ATIC
                     "Cannot modify submitted programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
+<<<<<<< Updated upstream
             var topic = _mapper.MapToEntity(dto);
             topic.AticProgramContentAndResourcesId = contentId;
             topic.OrganizationId = _currentUserService.OrganizationId;
             topic.UnitLocationId = program.UnitLocationId;
             topic.CreatedById = _currentUserService.UserId;
             topic.CreatedAt = DateTimeOffset.UtcNow;
+=======
+            try
+            {
+                // Prepare parent entity for update
+                var parentEntity = new AticProgramContentAndResources
+                {
+                    Id = contentId,
+                 
+                    UpdatedById = _currentUserService.UserId,
+                    UpdatedAt = DateTimeOffset.UtcNow
+                };
+>>>>>>> Stashed changes
 
             await _topicsRepository.CreateAsync(topic);
 
