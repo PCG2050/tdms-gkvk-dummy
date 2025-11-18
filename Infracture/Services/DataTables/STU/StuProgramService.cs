@@ -21,6 +21,7 @@ namespace Infrastructure.Services.DataTables.EEU
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
+        private readonly GenericTrainerHistoryService<StuProgramDetails> _historyService;
 
         public StuProgramService(
             IStuProgramDetailsRepository programRepository,
@@ -54,6 +55,9 @@ namespace Infrastructure.Services.DataTables.EEU
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
+
+            // Initialize generic history service
+            _historyService = new GenericTrainerHistoryService<StuProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository);
         }
 
         // ============================
@@ -384,6 +388,71 @@ namespace Infrastructure.Services.DataTables.EEU
             var dtos = contents.Select(c => _mapper.MapToDto(c)).ToList();
 
             return ServiceResult<List<StuProgramContentDto>>.Success(dtos);
+        }
+
+        // ============================
+        // SECTION C4: HYBRID PATTERN METHODS FOR BULK CREATE/UPDATE
+        // ============================
+
+        /// <summary>
+        /// Create program content with all children in one transaction (RECOMMENDED)
+        /// </summary>
+        public async Task<ServiceResult<StuProgramContentDto>> AddProgramContentWithChildrenAsync(
+            int programId,
+            StuProgramContentWithChildrenCreateDto dto)
+        {
+            var program = await _programRepository.GetByIdAsync(programId);
+
+            if (program == null)
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    "Program not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            if (!CanEditProgram(program))
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    "Cannot modify programs in current status",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            // This is a placeholder - full implementation would create content with all children
+            return ServiceResult<StuProgramContentDto>.Failure(
+                "Hybrid pattern not yet implemented for STU",
+                ServiceErrorStatus.INVALIDOPERATION);
+        }
+
+        /// <summary>
+        /// Update program content with all children using hybrid pattern (RECOMMENDED)
+        /// </summary>
+        public async Task<ServiceResult<StuProgramContentDto>> UpdateProgramContentWithChildrenAsync(
+            int contentId,
+            StuProgramContentWithChildrenUpdateDto dto)
+        {
+            var content = await _contentRepository.GetByIdAsync(contentId);
+
+            if (content == null)
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    "Content not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            var program = await _programRepository.GetByIdAsync(content.StuProgramDetailsId ?? 0);
+            if (program == null || !await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            if (!CanEditProgram(program))
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    "Cannot modify programs in current status",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            // This is a placeholder - full implementation would update content with all children
+            return ServiceResult<StuProgramContentDto>.Failure(
+                "Hybrid pattern not yet implemented for STU",
+                ServiceErrorStatus.INVALIDOPERATION);
         }
 
         // ============================
@@ -1262,80 +1331,34 @@ namespace Infrastructure.Services.DataTables.EEU
             int pageNumber = 1,
             int pageSize = 10)
         {
-            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
-            var result = await _programRepository.GetByCreatorIdAsync(
-                _currentUserService.UserId,
-                unitLocationIds,
+            var query = _programRepository.GetQueryable()
+                .Include(x => x.ProgramType);
+
+            return await _historyService.GetTrainerHistoryAsync(
+                query,
+                getUnitLocationId: x => x.UnitLocationId,
+                getTitleOrName: x => x.Title ?? x.ProgramType?.Name,
+                getFormStatus: x => x.FormStatus,
                 pageNumber,
                 pageSize);
-
-            var dtos = result.Items.Select(p => new TrainerHistoryItemDto
-            {
-                Id = p.Id,
-                Title = p.Title,
-                StartDate = p.StartDate,
-                EndDate = p.EndDate,
-                UnitLocationId = p.UnitLocationId,
-                UnitLocationName = p.UnitLocation != null
-                    ? $"{p.UnitLocation.Unit?.Name} - {p.UnitLocation.District?.Name}"
-                    : null,
-                UnitName = p.UnitLocation?.Unit?.Name,
-                DistrictName = p.UnitLocation?.District?.Name,
-                FormStatus = p.FormStatus,
-                FormStatusRemarks = p.FormStatusRemarks,
-                CreatedAt = p.CreatedAt,
-                UpdatedAt = p.UpdatedAt,
-                ApprovedAt = p.ApprovedAt,
-                ApprovedByName = p.ApprovedBy != null
-                    ? $"{p.ApprovedBy.FirstName} {p.ApprovedBy.LastName}"
-                    : null,
-                ProgramTypeName = p.ProgramType?.Name
-            }).ToList();
-
-            return new PaginatedResult<TrainerHistoryItemDto>(
-                dtos,
-                result.TotalItems,
-                result.PageNumber,
-                result.PageSize);
         }
 
         public async Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
             int pageNumber = 1,
             int pageSize = 10)
         {
-            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
-            var result = await _programRepository.GetPendingApprovalsAsync(
-                unitLocationIds,
-                null,
+            var query = _programRepository.GetQueryable()
+                .Include(x => x.ProgramType);
+
+            return await _historyService.GetPendingApprovalsAsync(
+                query,
+                getUnitLocationId: x => x.UnitLocationId,
+                getTitleOrName: x => x.Title ?? x.ProgramType?.Name,
+                getFormStatus: x => x.FormStatus,
+                getCreatedById: x => x.CreatedById ?? 0,
+                _unitHeadAssignmentRepository,
                 pageNumber,
                 pageSize);
-
-            var dtos = result.Items.Select(p => new PendingApprovalItemDto
-            {
-                Id = p.Id,
-                Title = p.Title,
-                StartDate = p.StartDate,
-                EndDate = p.EndDate,
-                UnitLocationId = p.UnitLocationId,
-                UnitLocationName = p.UnitLocation != null
-                    ? $"{p.UnitLocation.Unit?.Name} - {p.UnitLocation.District?.Name}"
-                    : null,
-                UnitName = p.UnitLocation?.Unit?.Name,
-                DistrictName = p.UnitLocation?.District?.Name,
-                FormStatus = p.FormStatus,
-                CreatedAt = p.CreatedAt,
-                CreatedByName = p.CreatedBy != null
-                    ? $"{p.CreatedBy.FirstName} {p.CreatedBy.LastName}"
-                    : null,
-                CreatedById = p.CreatedById,
-                ProgramTypeName = p.ProgramType?.Name
-            }).ToList();
-
-            return new PaginatedResult<PendingApprovalItemDto>(
-                dtos,
-                result.TotalItems,
-                result.PageNumber,
-                result.PageSize);
         }
 
         public async Task<PaginatedResult<StuProgramDetailsDto>> GetByTrainerAsync(
@@ -1344,21 +1367,43 @@ namespace Infrastructure.Services.DataTables.EEU
             int pageNumber = 1,
             int pageSize = 10)
         {
+            // Get accessible unit locations for the current user
             var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
-            var result = await _programRepository.GetByTrainerAndUnitLocationAsync(
-                trainerId,
-                unitLocationId,
-                unitLocationIds,
-                pageNumber,
-                pageSize);
 
-            var dtos = result.Items.Select(p => _mapper.MapToDtoWithDetails(p)).ToList();
+            var query = _programRepository.GetQueryable()
+                .Include(x => x.ProgramType)
+                .Include(x => x.Category)
+                .Include(x => x.Type)
+                .Include(x => x.Theme)
+                .Include(x => x.ThematicArea)
+                .Include(x => x.CreatedBy)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.Unit)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.District)
+                .Where(x => x.CreatedById == trainerId)
+                .Where(x => unitLocationIds.Contains(x.UnitLocationId));
+
+            // Apply unit location filter if provided
+            if (unitLocationId.HasValue)
+            {
+                query = query.Where(x => x.UnitLocationId == unitLocationId.Value);
+            }
+
+            var totalCount = await query.CountAsync();
+            var programs = await query
+                .OrderByDescending(x => x.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var dtos = programs.Select(p => _mapper.MapToDtoWithDetails(p)).ToList();
 
             return new PaginatedResult<StuProgramDetailsDto>(
                 dtos,
-                result.TotalItems,
-                result.PageNumber,
-                result.PageSize);
+                totalCount,
+                pageNumber,
+                pageSize);
         }
 
         // ============================

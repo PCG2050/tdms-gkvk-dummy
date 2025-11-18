@@ -1467,22 +1467,15 @@ namespace Infrastructure.Services.DataTables.KVK
                 Title = p.Title,
                 StartDate = p.StartDate,
                 EndDate = p.EndDate,
-                Area = p.Area,
-                UnitLocationId = p.UnitLocationId,
-                UnitLocationName = p.UnitLocation != null
-                    ? $"{p.UnitLocation.Unit?.Name} - {p.UnitLocation.District?.Name}"
-                    : null,
-                CategoryId = p.CategoryId,
                 CategoryName = p.Category?.Name,
-                TypeId = p.TypeId,
                 TypeName = p.Type?.Name,
+                Location = p.Location,
                 FormStatus = p.FormStatus,
-                FormStatusRemarks = p.FormStatusRemarks,
                 CreatedAt = p.CreatedAt,
-                CreatedById = p.CreatedById,
                 CreatedByName = p.CreatedBy != null
                     ? $"{p.CreatedBy.FirstName} {p.CreatedBy.LastName}"
-                    : null
+                    : null,
+                UnitName = p.UnitLocation?.Unit?.Name
             }).ToList();
 
             return new PaginatedResult<KvkProgramListItemDto>
