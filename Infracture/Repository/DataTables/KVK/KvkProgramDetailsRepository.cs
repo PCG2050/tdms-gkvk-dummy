@@ -150,6 +150,46 @@ namespace Infrastructure.Repository.DataTables.KVK
                 .OrderByDescending(p => p.CreatedAt)
                 .ToListAsync();
         }
+
+        public async Task<PaginatedResult<KvkProgramDetails>> GetByTrainerAndUnitLocationAsync(
+            int trainerId,
+            int? unitLocationId = null,
+            List<int>? accessibleUnitLocationIds = null,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            var query = _context.KvkProgramDetails
+                .Include(p => p.ProgramType)
+                .Include(p => p.Category)
+                .Include(p => p.UnitLocation)
+                    .ThenInclude(ul => ul.Unit)
+                .Include(p => p.UnitLocation)
+                    .ThenInclude(ul => ul.District)
+                .Include(p => p.CreatedBy)
+                .Include(p => p.ApprovedBy)
+                .Where(p => p.CreatedById == trainerId);
+
+            // Filter by accessible unit locations if provided
+            if (accessibleUnitLocationIds != null && accessibleUnitLocationIds.Any())
+            {
+                query = query.Where(p => accessibleUnitLocationIds.Contains(p.UnitLocationId));
+            }
+
+            // Filter by specific unit location if provided
+            if (unitLocationId.HasValue)
+            {
+                query = query.Where(p => p.UnitLocationId == unitLocationId.Value);
+            }
+
+            var totalItems = await query.CountAsync();
+            var items = await query
+                .OrderByDescending(p => p.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PaginatedResult<KvkProgramDetails>(items, totalItems, pageNumber, pageSize);
+        }
     }
 
 }
