@@ -57,6 +57,10 @@ using System.Threading.Tasks;
             // Many-to-many relationships with newspapers
             public ICollection<PublicationKannadaNewsPaper> PublicationKannadaNewsPapers { get; set; } = [];
             public ICollection<PublicationEnglishNewsPaper> PublicationEnglishNewsPapers { get; set; } = [];
+
+            // Many-to-many relationships with magazines
+            public ICollection<PublicationKannadaMagazine> PublicationKannadaMagazines { get; set; } = [];
+            public ICollection<PublicationEnglishMagazine> PublicationEnglishMagazines { get; set; } = [];
         }
     }
 

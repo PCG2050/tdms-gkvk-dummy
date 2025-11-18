@@ -13,14 +13,17 @@
 
         [MapperIgnoreSource(nameof(PublicationCreateDto.KannadaNewsPaperIds))]
         [MapperIgnoreSource(nameof(PublicationCreateDto.EnglishNewsPaperIds))]
+        [MapperIgnoreSource(nameof(PublicationCreateDto.KannadaMagazineIds))]
+        [MapperIgnoreSource(nameof(PublicationCreateDto.EnglishMagazineIds))]
         public partial Publication MapToEntity(PublicationCreateDto dto);
 
         public partial PublisherDetails MapToEntity(PublisherDetailsCreateDto dto);
         public partial ExtensionLiterature MapToEntity(ExtensionLiteratureCreateDto dto);
 
-        // Helper method to map newspaper IDs to junction entities after creation
-        public static void MapNewspaperIdsToEntity(PublicationCreateDto dto, Publication entity)
+        // Helper method to map newspaper and magazine IDs to junction entities after creation
+        public static void MapNewspaperAndMagazineIdsToEntity(PublicationCreateDto dto, Publication entity)
         {
+            // Map newspapers
             if (dto.KannadaNewsPaperIds != null && dto.KannadaNewsPaperIds.Any())
             {
                 foreach (var newspaperId in dto.KannadaNewsPaperIds)
@@ -39,6 +42,29 @@
                     entity.PublicationEnglishNewsPapers.Add(new PublicationEnglishNewsPaper
                     {
                         EnglishNewsPaperId = newspaperId
+                    });
+                }
+            }
+
+            // Map magazines
+            if (dto.KannadaMagazineIds != null && dto.KannadaMagazineIds.Any())
+            {
+                foreach (var magazineId in dto.KannadaMagazineIds)
+                {
+                    entity.PublicationKannadaMagazines.Add(new PublicationKannadaMagazine
+                    {
+                        KannadaMagazineId = magazineId
+                    });
+                }
+            }
+
+            if (dto.EnglishMagazineIds != null && dto.EnglishMagazineIds.Any())
+            {
+                foreach (var magazineId in dto.EnglishMagazineIds)
+                {
+                    entity.PublicationEnglishMagazines.Add(new PublicationEnglishMagazine
+                    {
+                        EnglishMagazineId = magazineId
                     });
                 }
             }
@@ -69,6 +95,19 @@
         private List<string> GetEnglishNewsPaperNames(Publication publication)
             => publication.PublicationEnglishNewsPapers?.Select(p => p.EnglishNewsPaper?.NewsPaperName ?? string.Empty).ToList() ?? new List<string>();
 
+        // Helper methods for magazine many-to-many mappings
+        private List<int> GetKannadaMagazineIds(Publication publication)
+            => publication.PublicationKannadaMagazines?.Select(p => p.KannadaMagazineId).ToList() ?? new List<int>();
+
+        private List<string> GetKannadaMagazineNames(Publication publication)
+            => publication.PublicationKannadaMagazines?.Select(p => p.KannadaMagazine?.MagazineName ?? string.Empty).ToList() ?? new List<string>();
+
+        private List<int> GetEnglishMagazineIds(Publication publication)
+            => publication.PublicationEnglishMagazines?.Select(p => p.EnglishMagazineId).ToList() ?? new List<int>();
+
+        private List<string> GetEnglishMagazineNames(Publication publication)
+            => publication.PublicationEnglishMagazines?.Select(p => p.EnglishMagazine?.MagazineName ?? string.Empty).ToList() ?? new List<string>();
+
         // ----------------------------
         // Mapping with Navigation Details
         // ----------------------------
@@ -84,6 +123,10 @@
         [MapProperty(nameof(Publication), nameof(PublicationDto.KannadaNewsPaperNames), Use = nameof(GetKannadaNewsPaperNames))]
         [MapProperty(nameof(Publication), nameof(PublicationDto.EnglishNewsPaperIds), Use = nameof(GetEnglishNewsPaperIds))]
         [MapProperty(nameof(Publication), nameof(PublicationDto.EnglishNewsPaperNames), Use = nameof(GetEnglishNewsPaperNames))]
+        [MapProperty(nameof(Publication), nameof(PublicationDto.KannadaMagazineIds), Use = nameof(GetKannadaMagazineIds))]
+        [MapProperty(nameof(Publication), nameof(PublicationDto.KannadaMagazineNames), Use = nameof(GetKannadaMagazineNames))]
+        [MapProperty(nameof(Publication), nameof(PublicationDto.EnglishMagazineIds), Use = nameof(GetEnglishMagazineIds))]
+        [MapProperty(nameof(Publication), nameof(PublicationDto.EnglishMagazineNames), Use = nameof(GetEnglishMagazineNames))]
         public partial PublicationDto MapToDtoWithDetails(Publication entity);
 
         // ----------------------------
@@ -126,6 +169,34 @@
                     {
                         PublicationId = entity.Id,
                         EnglishNewsPaperId = newspaperId
+                    });
+                }
+            }
+
+            // Handle many-to-many magazine relationships
+            // Note: Null means no change, empty list clears all, populated list replaces all
+            if (dto.KannadaMagazineIds != null)
+            {
+                entity.PublicationKannadaMagazines.Clear();
+                foreach (var magazineId in dto.KannadaMagazineIds)
+                {
+                    entity.PublicationKannadaMagazines.Add(new PublicationKannadaMagazine
+                    {
+                        PublicationId = entity.Id,
+                        KannadaMagazineId = magazineId
+                    });
+                }
+            }
+
+            if (dto.EnglishMagazineIds != null)
+            {
+                entity.PublicationEnglishMagazines.Clear();
+                foreach (var magazineId in dto.EnglishMagazineIds)
+                {
+                    entity.PublicationEnglishMagazines.Add(new PublicationEnglishMagazine
+                    {
+                        PublicationId = entity.Id,
+                        EnglishMagazineId = magazineId
                     });
                 }
             }

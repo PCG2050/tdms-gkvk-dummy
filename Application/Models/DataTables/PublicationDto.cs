@@ -60,6 +60,13 @@ namespace Application.Models.DataTables
         public List<int> EnglishNewsPaperIds { get; set; } = new();
         public List<string> EnglishNewsPaperNames { get; set; } = new();
 
+        // Magazine collections (many-to-many)
+        public List<int> KannadaMagazineIds { get; set; } = new();
+        public List<string> KannadaMagazineNames { get; set; } = new();
+
+        public List<int> EnglishMagazineIds { get; set; } = new();
+        public List<string> EnglishMagazineNames { get; set; } = new();
+
         // Publication Details
         public string? MJASFormat { get; set; }
         public string? PublicationTitle { get; set; }
@@ -126,6 +133,10 @@ namespace Application.Models.DataTables
         // Newspaper IDs (many-to-many)
         public List<int> KannadaNewsPaperIds { get; set; } = new();
         public List<int> EnglishNewsPaperIds { get; set; } = new();
+
+        // Magazine IDs (many-to-many)
+        public List<int> KannadaMagazineIds { get; set; } = new();
+        public List<int> EnglishMagazineIds { get; set; } = new();
 
         // Publication fields
         [MaxLength(200)]
@@ -212,6 +223,10 @@ namespace Application.Models.DataTables
         // Newspaper IDs (many-to-many) - null means no update, empty list clears all, populated list replaces all
         public List<int>? KannadaNewsPaperIds { get; set; }
         public List<int>? EnglishNewsPaperIds { get; set; }
+
+        // Magazine IDs (many-to-many) - null means no update, empty list clears all, populated list replaces all
+        public List<int>? KannadaMagazineIds { get; set; }
+        public List<int>? EnglishMagazineIds { get; set; }
 
         [MaxLength(200)]
         public string? MJASFormat { get; set; }
