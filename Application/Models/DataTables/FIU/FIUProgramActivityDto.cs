@@ -135,6 +135,46 @@ namespace Application.Models.DataTables.FIU
         public int? UnitLocationId { get; set; }
     }
 
+    /// <summary>
+    /// DTO for batch creating FIU activities
+    /// All entries are automatically created with status "Pending"
+    /// </summary>
+    public class FIUProgramActivityBatchCreateDto
+    {
+        [Required]
+        public List<FIUProgramActivityCreateDto> Activities { get; set; } = new();
+    }
 
+    /// <summary>
+    /// DTO for batch updating FIU activities
+    /// All entries are automatically set to status "Pending" after update
+    /// </summary>
+    public class FIUProgramActivityBatchUpdateDto
+    {
+        [Required]
+        public List<FIUProgramActivityUpdateDto> Activities { get; set; } = new();
+    }
+
+    /// <summary>
+    /// DTO for batch operation results
+    /// </summary>
+    public class FIUProgramActivityBatchResultDto
+    {
+        public List<FIUProgramActivityResponseDto> SuccessfulEntries { get; set; } = new();
+        public List<FIUBatchErrorDto> FailedEntries { get; set; } = new();
+        public int TotalProcessed { get; set; }
+        public int SuccessCount { get; set; }
+        public int FailureCount { get; set; }
+    }
+
+    /// <summary>
+    /// DTO for individual batch operation errors
+    /// </summary>
+    public class FIUBatchErrorDto
+    {
+        public int Index { get; set; }
+        public string ErrorMessage { get; set; } = string.Empty;
+        public object? OriginalData { get; set; }
+    }
 
 }

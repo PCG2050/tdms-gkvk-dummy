@@ -12,13 +12,14 @@ namespace Application.Interface.Services.DataTables.FIU
     public interface IFIUProgramActivityService
     {
         // CRUD Operations
-        Task<ServiceResult<FIUProgramActivityResponseDto>> CreateAsync(FIUProgramActivityCreateDto createDto);
-        Task<ServiceResult<FIUProgramActivityResponseDto>> UpdateAsync(FIUProgramActivityUpdateDto updateDto);
         Task<ServiceResult<FIUProgramActivityResponseDto>> GetByIdAsync(int id);
         Task<ServiceResult<bool>> DeleteAsync(int id);
 
+        // Batch Operations
+        Task<ServiceResult<FIUProgramActivityBatchResultDto>> CreateBatchAsync(FIUProgramActivityBatchCreateDto batchCreateDto);
+        Task<ServiceResult<FIUProgramActivityBatchResultDto>> UpdateBatchAsync(FIUProgramActivityBatchUpdateDto batchUpdateDto);
+
         // Workflow
-        Task<ServiceResult<FIUProgramActivityResponseDto>> SubmitForApprovalAsync(int id);
         Task<ServiceResult<FIUProgramActivityResponseDto>> ApproveAsync(int id, string? remarks);
         Task<ServiceResult<FIUProgramActivityResponseDto>> RejectAsync(int id, string remarks);
 

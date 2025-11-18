@@ -40,56 +40,187 @@ namespace Infrastructure.Services.DataTables.FIU
             _historyService = new GenericTrainerHistoryService<FIUProgramActivity>(currentUserService, trainerAssignmentRepository, organizationUnitRepository);
         }
 
-        public async Task<ServiceResult<FIUProgramActivityResponseDto>> CreateAsync(FIUProgramActivityCreateDto createDto)
+        // ==========================================
+        // BATCH CRUD OPERATIONS
+        // ==========================================
+
+        public async Task<ServiceResult<FIUProgramActivityBatchResultDto>> CreateBatchAsync(FIUProgramActivityBatchCreateDto batchCreateDto)
         {
             if (_currentUserService.Role != Role.TRAINER)
-                return ServiceResult<FIUProgramActivityResponseDto>.Failure("Only trainers can create activities");
+                return ServiceResult<FIUProgramActivityBatchResultDto>.Failure("Only trainers can create activities");
 
-            var hasAccess = await _trainerAssignmentRepository
-                .IsTrainerAssignedToLocationAsync(_currentUserService.UserId, createDto.UnitLocationId);
+            var result = new FIUProgramActivityBatchResultDto
+            {
+                TotalProcessed = batchCreateDto.Activities.Count
+            };
 
-            if (!hasAccess)
-                return ServiceResult<FIUProgramActivityResponseDto>.Failure("You don't have access to this unit location");
+            if (batchCreateDto.Activities == null || !batchCreateDto.Activities.Any())
+            {
+                return ServiceResult<FIUProgramActivityBatchResultDto>.Failure("No activities provided for batch creation");
+            }
 
-            var fiuActivity = await _fiuActivityRepository.GetByIdAsync(createDto.FIUActivitiesId);
-            if (fiuActivity == null || !fiuActivity.IsActive)
-                return ServiceResult<FIUProgramActivityResponseDto>.Failure("Invalid activity type");
+            for (int i = 0; i < batchCreateDto.Activities.Count; i++)
+            {
+                var createDto = batchCreateDto.Activities[i];
 
-            var activity = _mapper.MapCreateDtoToEntity(createDto);
-            activity.OrganizationId = _currentUserService.OrganizationId;
-            activity.CreatedById = _currentUserService.UserId;
-            activity.FormStatus = "Draft";
+                try
+                {
+                    var hasAccess = await _trainerAssignmentRepository
+                        .IsTrainerAssignedToLocationAsync(_currentUserService.UserId, createDto.UnitLocationId);
 
-            var created = await _activityRepository.CreateAsync(activity);
-            var response = _mapper.MapEntityToResponseDto(created);
+                    if (!hasAccess)
+                    {
+                        result.FailedEntries.Add(new FIUBatchErrorDto
+                        {
+                            Index = i,
+                            ErrorMessage = "You don't have access to this unit location",
+                            OriginalData = createDto
+                        });
+                        result.FailureCount++;
+                        continue;
+                    }
 
-            return ServiceResult<FIUProgramActivityResponseDto>.Success(response, "Activity created successfully");
+                    var fiuActivity = await _fiuActivityRepository.GetByIdAsync(createDto.FIUActivitiesId);
+                    if (fiuActivity == null || !fiuActivity.IsActive)
+                    {
+                        result.FailedEntries.Add(new FIUBatchErrorDto
+                        {
+                            Index = i,
+                            ErrorMessage = "Invalid activity type",
+                            OriginalData = createDto
+                        });
+                        result.FailureCount++;
+                        continue;
+                    }
+
+                    var activity = _mapper.MapCreateDtoToEntity(createDto);
+                    activity.OrganizationId = _currentUserService.OrganizationId;
+                    activity.CreatedById = _currentUserService.UserId;
+                    activity.FormStatus = "Pending";
+                    activity.SubmittedAt = DateTimeOffset.UtcNow;
+
+                    var created = await _activityRepository.CreateAsync(activity);
+                    var response = _mapper.MapEntityToResponseDto(created);
+                    result.SuccessfulEntries.Add(response);
+                    result.SuccessCount++;
+                }
+                catch (Exception ex)
+                {
+                    result.FailedEntries.Add(new FIUBatchErrorDto
+                    {
+                        Index = i,
+                        ErrorMessage = ex.Message,
+                        OriginalData = createDto
+                    });
+                    result.FailureCount++;
+                }
+            }
+
+            return ServiceResult<FIUProgramActivityBatchResultDto>.Success(result, "Batch creation completed");
         }
 
-        public async Task<ServiceResult<FIUProgramActivityResponseDto>> UpdateAsync(FIUProgramActivityUpdateDto updateDto)
+        public async Task<ServiceResult<FIUProgramActivityBatchResultDto>> UpdateBatchAsync(FIUProgramActivityBatchUpdateDto batchUpdateDto)
         {
-            var existing = await _activityRepository.GetByIdAsync(updateDto.Id);
-            if (existing == null)
-                return ServiceResult<FIUProgramActivityResponseDto>.Failure("Activity not found");
+            var result = new FIUProgramActivityBatchResultDto
+            {
+                TotalProcessed = batchUpdateDto.Activities.Count
+            };
 
-            if (existing.CreatedById != _currentUserService.UserId)
-                return ServiceResult<FIUProgramActivityResponseDto>.Failure("You can only update your own activities");
+            if (batchUpdateDto.Activities == null || !batchUpdateDto.Activities.Any())
+            {
+                return ServiceResult<FIUProgramActivityBatchResultDto>.Failure("No activities provided for batch update");
+            }
 
-            if (existing.FormStatus != "Draft")
-                return ServiceResult<FIUProgramActivityResponseDto>.Failure("Only draft activities can be updated");
+            for (int i = 0; i < batchUpdateDto.Activities.Count; i++)
+            {
+                var updateDto = batchUpdateDto.Activities[i];
 
-            if (!updateDto.FIUActivitiesId.HasValue)
-                return ServiceResult<FIUProgramActivityResponseDto>.Failure("Activity type is required");
+                try
+                {
+                    var existing = await _activityRepository.GetByIdAsync(updateDto.Id);
+                    if (existing == null)
+                    {
+                        result.FailedEntries.Add(new FIUBatchErrorDto
+                        {
+                            Index = i,
+                            ErrorMessage = $"Activity with ID {updateDto.Id} not found",
+                            OriginalData = updateDto
+                        });
+                        result.FailureCount++;
+                        continue;
+                    }
 
-            var fiuActivity = await _fiuActivityRepository.GetByIdAsync(updateDto.FIUActivitiesId.Value);
-            if (fiuActivity == null || !fiuActivity.IsActive)
-                return ServiceResult<FIUProgramActivityResponseDto>.Failure("Invalid activity type");
+                    if (existing.CreatedById != _currentUserService.UserId)
+                    {
+                        result.FailedEntries.Add(new FIUBatchErrorDto
+                        {
+                            Index = i,
+                            ErrorMessage = "You can only update your own activities",
+                            OriginalData = updateDto
+                        });
+                        result.FailureCount++;
+                        continue;
+                    }
 
-            _mapper.MapUpdateDtoToEntity(updateDto, existing);
-            var updated = await _activityRepository.UpdateAsync(existing);
-            var response = _mapper.MapEntityToResponseDto(updated);
+                    if (existing.FormStatus == "Approved")
+                    {
+                        result.FailedEntries.Add(new FIUBatchErrorDto
+                        {
+                            Index = i,
+                            ErrorMessage = "Cannot modify approved activities",
+                            OriginalData = updateDto
+                        });
+                        result.FailureCount++;
+                        continue;
+                    }
 
-            return ServiceResult<FIUProgramActivityResponseDto>.Success(response, "Activity updated successfully");
+                    if (!updateDto.FIUActivitiesId.HasValue)
+                    {
+                        result.FailedEntries.Add(new FIUBatchErrorDto
+                        {
+                            Index = i,
+                            ErrorMessage = "Activity type is required",
+                            OriginalData = updateDto
+                        });
+                        result.FailureCount++;
+                        continue;
+                    }
+
+                    var fiuActivity = await _fiuActivityRepository.GetByIdAsync(updateDto.FIUActivitiesId.Value);
+                    if (fiuActivity == null || !fiuActivity.IsActive)
+                    {
+                        result.FailedEntries.Add(new FIUBatchErrorDto
+                        {
+                            Index = i,
+                            ErrorMessage = "Invalid activity type",
+                            OriginalData = updateDto
+                        });
+                        result.FailureCount++;
+                        continue;
+                    }
+
+                    _mapper.MapUpdateDtoToEntity(updateDto, existing);
+                    existing.FormStatus = "Pending";
+                    existing.SubmittedAt = DateTimeOffset.UtcNow;
+
+                    var updated = await _activityRepository.UpdateAsync(existing);
+                    var response = _mapper.MapEntityToResponseDto(updated);
+                    result.SuccessfulEntries.Add(response);
+                    result.SuccessCount++;
+                }
+                catch (Exception ex)
+                {
+                    result.FailedEntries.Add(new FIUBatchErrorDto
+                    {
+                        Index = i,
+                        ErrorMessage = ex.Message,
+                        OriginalData = updateDto
+                    });
+                    result.FailureCount++;
+                }
+            }
+
+            return ServiceResult<FIUProgramActivityBatchResultDto>.Success(result, "Batch update completed");
         }
 
         public async Task<ServiceResult<FIUProgramActivityResponseDto>> GetByIdAsync(int id)
@@ -115,32 +246,11 @@ namespace Infrastructure.Services.DataTables.FIU
             if (activity.CreatedById != _currentUserService.UserId)
                 return ServiceResult<bool>.Failure("You can only delete your own activities");
 
-            if (activity.FormStatus != "Draft")
-                return ServiceResult<bool>.Failure("Only draft activities can be deleted");
+            if (activity.FormStatus == "Approved")
+                return ServiceResult<bool>.Failure("Cannot delete approved activities");
 
             var deleted = await _activityRepository.DeleteAsync(id);
             return ServiceResult<bool>.Success(deleted, "Activity deleted successfully");
-        }
-
-        public async Task<ServiceResult<FIUProgramActivityResponseDto>> SubmitForApprovalAsync(int id)
-        {
-            var activity = await _activityRepository.GetByIdAsync(id);
-            if (activity == null)
-                return ServiceResult<FIUProgramActivityResponseDto>.Failure("Activity not found");
-
-            if (activity.CreatedById != _currentUserService.UserId)
-                return ServiceResult<FIUProgramActivityResponseDto>.Failure("You can only submit your own activities");
-
-            if (activity.FormStatus != "Draft")
-                return ServiceResult<FIUProgramActivityResponseDto>.Failure("Only draft activities can be submitted");
-
-            activity.FormStatus = "Pending";
-            activity.SubmittedAt = DateTimeOffset.UtcNow;
-
-            var updated = await _activityRepository.UpdateAsync(activity);
-            var response = _mapper.MapEntityToResponseDto(updated);
-
-            return ServiceResult<FIUProgramActivityResponseDto>.Success(response, "Activity submitted for approval");
         }
 
         public async Task<ServiceResult<FIUProgramActivityResponseDto>> ApproveAsync(int id, string? remarks)
