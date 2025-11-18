@@ -174,19 +174,7 @@ namespace Infrastructure.Services.DataTables.FIU
                         continue;
                     }
 
-                    if (!updateDto.FIUActivitiesId.HasValue)
-                    {
-                        result.FailedEntries.Add(new FIUBatchErrorDto
-                        {
-                            Index = i,
-                            ErrorMessage = "Activity type is required",
-                            OriginalData = updateDto
-                        });
-                        result.FailureCount++;
-                        continue;
-                    }
-
-                    var fiuActivity = await _fiuActivityRepository.GetByIdAsync(updateDto.FIUActivitiesId.Value);
+                    var fiuActivity = await _fiuActivityRepository.GetByIdAsync(updateDto.FIUActivitiesId);
                     if (fiuActivity == null || !fiuActivity.IsActive)
                     {
                         result.FailedEntries.Add(new FIUBatchErrorDto
