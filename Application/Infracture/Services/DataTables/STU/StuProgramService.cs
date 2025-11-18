@@ -70,7 +70,19 @@ namespace Infrastructure.Services.DataTables.EEU
             program.OrganizationId = _currentUserService.OrganizationId;
             program.CreatedById = _currentUserService.UserId;
             program.CreatedAt = DateTimeOffset.UtcNow;
-            program.FormStatus = "Draft";
+
+            // Auto-approve forms created by Unit Heads
+            if (_currentUserService.Role == Role.UNITHEAD)
+            {
+                program.FormStatus = "Approved";
+                program.ApprovedById = _currentUserService.UserId;
+                program.ApprovedAt = DateTimeOffset.UtcNow;
+                program.FormStatusRemarks = "Auto-approved (Unit Head)";
+            }
+            else
+            {
+                program.FormStatus = "Draft";
+            }
 
             await _programRepository.CreateAsync(program);
 
@@ -130,10 +142,23 @@ namespace Infrastructure.Services.DataTables.EEU
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            // Allow edit for Draft, Rejected, or Approved (if unit head is the creator)
+            if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
+            {
+                // Trainers can edit Draft and Rejected forms
+            }
+            else if (program.FormStatus == "Approved" &&
+                     _currentUserService.Role == Role.UNITHEAD &&
+                     program.CreatedById == _currentUserService.UserId)
+            {
+                // Unit heads can edit their own approved forms
+            }
+            else
+            {
                 return ServiceResult<StuProgramDetailsDto>.Failure(
-                    "Cannot edit programs that have been submitted",
+                    "Cannot edit programs in current status",
                     ServiceErrorStatus.INVALIDOPERATION);
+            }
 
             StuProgramMapper.MapUpdateDtoToEntity(dto, program);
             program.UpdatedById = _currentUserService.UserId;
@@ -186,9 +211,9 @@ namespace Infrastructure.Services.DataTables.EEU
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (!CanEditProgram(program))
                 return ServiceResult<StuParticipantDemographicsDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify programs in current status",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             var demographics = _mapper.MapToEntity(dto);
@@ -1228,6 +1253,113 @@ namespace Infrastructure.Services.DataTables.EEU
         }
 
         // ============================
+        // HISTORY & APPROVALS
+        // ============================
+
+        public async Task<PaginatedResult<TrainerHistoryItemDto>> GetTrainerHistoryAsync(
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+            var result = await _programRepository.GetByCreatorIdAsync(
+                _currentUserService.UserId,
+                unitLocationIds,
+                pageNumber,
+                pageSize);
+
+            var dtos = result.Items.Select(p => new TrainerHistoryItemDto
+            {
+                Id = p.Id,
+                Title = p.Title,
+                StartDate = p.StartDate,
+                EndDate = p.EndDate,
+                UnitLocationId = p.UnitLocationId,
+                UnitLocationName = p.UnitLocation != null
+                    ? $"{p.UnitLocation.Unit?.Name} - {p.UnitLocation.District?.Name}"
+                    : null,
+                UnitName = p.UnitLocation?.Unit?.Name,
+                DistrictName = p.UnitLocation?.District?.Name,
+                FormStatus = p.FormStatus,
+                FormStatusRemarks = p.FormStatusRemarks,
+                CreatedAt = p.CreatedAt,
+                UpdatedAt = p.UpdatedAt,
+                ApprovedAt = p.ApprovedAt,
+                ApprovedByName = p.ApprovedBy != null
+                    ? $"{p.ApprovedBy.FirstName} {p.ApprovedBy.LastName}"
+                    : null,
+                ProgramTypeName = p.ProgramType?.Name
+            }).ToList();
+
+            return new PaginatedResult<TrainerHistoryItemDto>(
+                dtos,
+                result.TotalItems,
+                result.PageNumber,
+                result.PageSize);
+        }
+
+        public async Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+            var result = await _programRepository.GetPendingApprovalsAsync(
+                unitLocationIds,
+                null,
+                pageNumber,
+                pageSize);
+
+            var dtos = result.Items.Select(p => new PendingApprovalItemDto
+            {
+                Id = p.Id,
+                Title = p.Title,
+                StartDate = p.StartDate,
+                EndDate = p.EndDate,
+                UnitLocationId = p.UnitLocationId,
+                UnitLocationName = p.UnitLocation != null
+                    ? $"{p.UnitLocation.Unit?.Name} - {p.UnitLocation.District?.Name}"
+                    : null,
+                UnitName = p.UnitLocation?.Unit?.Name,
+                DistrictName = p.UnitLocation?.District?.Name,
+                FormStatus = p.FormStatus,
+                CreatedAt = p.CreatedAt,
+                CreatedByName = p.CreatedBy != null
+                    ? $"{p.CreatedBy.FirstName} {p.CreatedBy.LastName}"
+                    : null,
+                CreatedById = p.CreatedById,
+                ProgramTypeName = p.ProgramType?.Name
+            }).ToList();
+
+            return new PaginatedResult<PendingApprovalItemDto>(
+                dtos,
+                result.TotalItems,
+                result.PageNumber,
+                result.PageSize);
+        }
+
+        public async Task<PaginatedResult<StuProgramDetailsDto>> GetByTrainerAsync(
+            int trainerId,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+            var result = await _programRepository.GetByTrainerAndUnitLocationAsync(
+                trainerId,
+                unitLocationId,
+                unitLocationIds,
+                pageNumber,
+                pageSize);
+
+            var dtos = result.Items.Select(p => _mapper.MapToDtoWithDetails(p)).ToList();
+
+            return new PaginatedResult<StuProgramDetailsDto>(
+                dtos,
+                result.TotalItems,
+                result.PageNumber,
+                result.PageSize);
+        }
+
+        // ============================
         // HELPER METHODS
         // ============================
 
@@ -1253,6 +1385,24 @@ namespace Infrastructure.Services.DataTables.EEU
             }
 
             return new List<int>();
+        }
+
+        /// <summary>
+        /// Check if the program can be edited based on status and user role
+        /// </summary>
+        private bool CanEditProgram(StuProgramDetails program)
+        {
+            // Draft and Rejected can always be edited (if user has permission)
+            if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
+                return true;
+
+            // Approved forms can only be edited by unit heads who created them
+            if (program.FormStatus == "Approved" &&
+                _currentUserService.Role == Role.UNITHEAD &&
+                program.CreatedById == _currentUserService.UserId)
+                return true;
+
+            return false;
         }
     }
 }

@@ -41,5 +41,10 @@ namespace Application.Interface
         //New method for unitheads to get trainers they created
         Task<List<TrainerDetailsDto>> GetAllTrainersCreatedByUnitHead(int unitHeadId);
 
+        /// <summary>
+        /// Get all trainers assigned to a specific unit location
+        /// </summary>
+        Task<List<TrainerDetailsDto>> GetTrainersByUnitLocationAsync(int unitLocationId);
+
     }
 }

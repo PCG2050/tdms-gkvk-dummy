@@ -482,4 +482,48 @@ namespace Application.Models.DataTables.STU
         public string? SuccessStories { get; set; }
         public string? ImpactOutcome { get; set; }
     }
+
+    // ==================== HISTORY & APPROVALS ====================
+
+    /// <summary>
+    /// DTO for trainer/unit head submission history
+    /// </summary>
+    public class TrainerHistoryItemDto
+    {
+        public int Id { get; set; }
+        public string? Title { get; set; }
+        public DateOnly StartDate { get; set; }
+        public DateOnly EndDate { get; set; }
+        public int UnitLocationId { get; set; }
+        public string? UnitLocationName { get; set; }
+        public string? UnitName { get; set; }
+        public string? DistrictName { get; set; }
+        public string FormStatus { get; set; }
+        public string? FormStatusRemarks { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset? UpdatedAt { get; set; }
+        public DateTimeOffset? ApprovedAt { get; set; }
+        public string? ApprovedByName { get; set; }
+        public string? ProgramTypeName { get; set; }
+    }
+
+    /// <summary>
+    /// DTO for pending approvals shown to unit heads
+    /// </summary>
+    public class PendingApprovalItemDto
+    {
+        public int Id { get; set; }
+        public string? Title { get; set; }
+        public DateOnly StartDate { get; set; }
+        public DateOnly EndDate { get; set; }
+        public int UnitLocationId { get; set; }
+        public string? UnitLocationName { get; set; }
+        public string? UnitName { get; set; }
+        public string? DistrictName { get; set; }
+        public string FormStatus { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
+        public string? CreatedByName { get; set; }
+        public int CreatedById { get; set; }
+        public string? ProgramTypeName { get; set; }
+    }
 }

@@ -119,5 +119,14 @@ namespace Application.Interface.Services.DataTables.STU
         Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
             int pageNumber = 1,
             int pageSize = 10);
+
+        /// <summary>
+        /// Get programs by trainer ID and optionally filter by unit location
+        /// </summary>
+        Task<PaginatedResult<StuProgramDetailsDto>> GetByTrainerAsync(
+            int trainerId,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10);
     }
 }

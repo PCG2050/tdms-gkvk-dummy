@@ -143,7 +143,14 @@ namespace Infrastructure.Repository
             await _context.SaveChangesAsync();
         }
 
-
+        public async Task<List<int>> GetTrainerIdsByUnitLocationIdAsync(int unitLocationId)
+        {
+            return await _context.UnitTrainers
+                .Where(ta => ta.UnitLocationId == unitLocationId)
+                .Select(ta => ta.TrainerId)
+                .Distinct()
+                .ToListAsync();
+        }
     }
 
 }

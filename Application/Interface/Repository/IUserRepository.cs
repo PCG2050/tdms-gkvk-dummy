@@ -36,8 +36,10 @@ namespace Application.Interface.Repository
         Task ClearPasswordResetOTPAsync(int userId);
         Task<User?> GetUserWithValidOTPAsync(int userId, string otp);
 
-       
-
+        /// <summary>
+        /// Get users by a list of user IDs
+        /// </summary>
+        Task<List<User>> GetUsersByIdsAsync(List<int> userIds);
 
     }
 }

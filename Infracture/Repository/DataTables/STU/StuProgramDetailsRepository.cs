@@ -187,5 +187,106 @@ namespace Infrastructure.Repository.DataTables.STU
                 .Select(g => new { Status = g.Key, Count = g.Count() })
                 .ToDictionaryAsync(x => x.Status, x => x.Count);
         }
+
+        public async Task<PaginatedResult<StuProgramDetails>> GetByCreatorIdAsync(
+            int creatorId,
+            List<int> unitLocationIds,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            var query = _context.StuProgramDetails
+                .Include(p => p.ProgramType)
+                .Include(p => p.Category)
+                .Include(p => p.UnitLocation)
+                    .ThenInclude(ul => ul.Unit)
+                .Include(p => p.UnitLocation)
+                    .ThenInclude(ul => ul.District)
+                .Include(p => p.CreatedBy)
+                .Include(p => p.ApprovedBy)
+                .Where(p => p.CreatedById == creatorId &&
+                           unitLocationIds.Contains(p.UnitLocationId));
+
+            var totalItems = await query.CountAsync();
+            var items = await query
+                .OrderByDescending(p => p.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PaginatedResult<StuProgramDetails>(items, totalItems, pageNumber, pageSize);
+        }
+
+        public async Task<PaginatedResult<StuProgramDetails>> GetPendingApprovalsAsync(
+            List<int> unitLocationIds,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            var query = _context.StuProgramDetails
+                .Include(p => p.ProgramType)
+                .Include(p => p.Category)
+                .Include(p => p.UnitLocation)
+                    .ThenInclude(ul => ul.Unit)
+                .Include(p => p.UnitLocation)
+                    .ThenInclude(ul => ul.District)
+                .Include(p => p.CreatedBy)
+                .Where(p => p.FormStatus == "Pending" &&
+                           unitLocationIds.Contains(p.UnitLocationId));
+
+            // Filter by specific unit location if provided
+            if (unitLocationId.HasValue)
+            {
+                query = query.Where(p => p.UnitLocationId == unitLocationId.Value);
+            }
+
+            var totalItems = await query.CountAsync();
+            var items = await query
+                .OrderByDescending(p => p.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PaginatedResult<StuProgramDetails>(items, totalItems, pageNumber, pageSize);
+        }
+
+        public async Task<PaginatedResult<StuProgramDetails>> GetByTrainerAndUnitLocationAsync(
+            int trainerId,
+            int? unitLocationId = null,
+            List<int>? accessibleUnitLocationIds = null,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            var query = _context.StuProgramDetails
+                .Include(p => p.ProgramType)
+                .Include(p => p.Category)
+                .Include(p => p.UnitLocation)
+                    .ThenInclude(ul => ul.Unit)
+                .Include(p => p.UnitLocation)
+                    .ThenInclude(ul => ul.District)
+                .Include(p => p.CreatedBy)
+                .Include(p => p.ApprovedBy)
+                .Where(p => p.CreatedById == trainerId);
+
+            // Filter by accessible unit locations if provided
+            if (accessibleUnitLocationIds != null && accessibleUnitLocationIds.Any())
+            {
+                query = query.Where(p => accessibleUnitLocationIds.Contains(p.UnitLocationId));
+            }
+
+            // Filter by specific unit location if provided
+            if (unitLocationId.HasValue)
+            {
+                query = query.Where(p => p.UnitLocationId == unitLocationId.Value);
+            }
+
+            var totalItems = await query.CountAsync();
+            var items = await query
+                .OrderByDescending(p => p.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PaginatedResult<StuProgramDetails>(items, totalItems, pageNumber, pageSize);
+        }
     }
 }

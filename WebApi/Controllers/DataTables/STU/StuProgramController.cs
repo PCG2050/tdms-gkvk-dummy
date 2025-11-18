@@ -360,10 +360,10 @@ namespace WebApi.Controllers.DataTables.STU
             return Ok(result);
         }
         [HttpGet("my-history")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
         public async Task<IActionResult> GetMyHistory(
-      [FromQuery] int pageNumber = 1,
-      [FromQuery] int pageSize = 20)
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 20)
         {
             var result = await _service.GetTrainerHistoryAsync(pageNumber, pageSize);
             return Ok(result);
@@ -378,6 +378,19 @@ namespace WebApi.Controllers.DataTables.STU
             var result = await _service.GetPendingApprovalsAsync(pageNumber, pageSize);
             return Ok(result);
         }
+
+        [HttpGet("trainer/{trainerId}")]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
+        public async Task<IActionResult> GetByTrainer(
+            int trainerId,
+            [FromQuery] int? unitLocationId = null,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 20)
+        {
+            var result = await _service.GetByTrainerAsync(trainerId, unitLocationId, pageNumber, pageSize);
+            return Ok(result);
+        }
+
         // ============================
         // HELPER METHOD
         // ============================

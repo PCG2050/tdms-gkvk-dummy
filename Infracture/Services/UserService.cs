@@ -501,7 +501,29 @@ namespace Infrastructure.Services
             return otp.ToString();
         }
 
+        public async Task<List<TrainerDetailsDto>> GetTrainersByUnitLocationAsync(int unitLocationId)
+        {
+            // Get trainer IDs from TrainerAssignment
+            var trainerIds = await _trainerAssignmentRepository.GetTrainerIdsByUnitLocationIdAsync(unitLocationId);
 
+            if (!trainerIds.Any())
+                return new List<TrainerDetailsDto>();
+
+            // Get trainer details from User repository
+            var trainers = await _userRepository.GetUsersByIdsAsync(trainerIds);
+
+            // Convert to TrainerDetailsDto
+            return trainers.Where(t => t.Role == Role.TRAINER)
+                .Select(trainer => new TrainerDetailsDto
+                {
+                    UserId = trainer.Id,
+                    FirstName = trainer.FirstName,
+                    LastName = trainer.LastName,
+                    Email = trainer.Email,
+                    Phone = trainer.Phone,
+                    Units = new List<TrainerUnitWithLocationsDto>() // Can be populated if needed
+                }).ToList();
+        }
 
     }
 }
