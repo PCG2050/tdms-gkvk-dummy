@@ -36,6 +36,13 @@ namespace Domain.Entities.GenericTables
         [MaxLength(500)]
         public string Title { get; set; } = string.Empty;
 
+        [MaxLength(500)]
+        public string? TitleOfThesis { get; set; }
+
+        public int? ExtensionWorkId { get; set; }
+        [ForeignKey(nameof(ExtensionWorkId))]
+        public ExtensionWork? ExtensionWork { get; set; }
+
         public int? ModeId { get; set; }
        
         public Mode? Mode { get; set; }

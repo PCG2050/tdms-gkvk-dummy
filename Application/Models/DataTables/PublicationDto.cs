@@ -11,6 +11,9 @@ namespace Application.Models.DataTables
     {
         public int Id { get; set; }
         public string? Title { get; set; }
+        public string? TitleOfThesis { get; set; }
+        public int? ExtensionWorkId { get; set; }
+        public string? ExtensionWorkName { get; set; }
         public DateOnly? PublicationDate { get; set; }
         public DateOnly? StartDate { get; set; }
         public DateOnly? EndDate { get; set; }
@@ -101,6 +104,11 @@ namespace Application.Models.DataTables
         [MaxLength(500, ErrorMessage = "Title cannot exceed 500 characters")]
         public string Title { get; set; } = string.Empty;
 
+        [MaxLength(500, ErrorMessage = "Title of Thesis cannot exceed 500 characters")]
+        public string? TitleOfThesis { get; set; }
+
+        public int? ExtensionWorkId { get; set; }
+
         public DateOnly? PublicationDate { get; set; }    
 
         public string? Attachments { get; set; }
@@ -190,6 +198,11 @@ namespace Application.Models.DataTables
     {
         [MaxLength(500)]
         public string? Title { get; set; }
+
+        [MaxLength(500)]
+        public string? TitleOfThesis { get; set; }
+
+        public int? ExtensionWorkId { get; set; }
 
         public DateOnly? PublicationDate { get; set; }
         public DateOnly? StartDate { get; set; }

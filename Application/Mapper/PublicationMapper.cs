@@ -51,6 +51,7 @@
         [MapProperty(nameof(Publication.Mode.Name), nameof(PublicationDto.ModeName))]
         [MapProperty(nameof(Publication.Region.Name), nameof(PublicationDto.RegionName))]
         [MapProperty(nameof(Publication.Source.Name), nameof(PublicationDto.SourceName))]
+        [MapProperty(nameof(Publication.ExtensionWork.Name), nameof(PublicationDto.ExtensionWorkName))]
         [MapProperty(nameof(Publication.PublicationKannadaNewsPapers), nameof(PublicationDto.KannadaNewsPaperIds), Use = nameof(GetKannadaNewsPaperIds))]
         [MapProperty(nameof(Publication.PublicationEnglishNewsPapers), nameof(PublicationDto.EnglishNewsPaperIds), Use = nameof(GetEnglishNewsPaperIds))]
         [MapProperty(nameof(Publication.PublicationKannadaMagazines), nameof(PublicationDto.KannadaMagazineIds), Use = nameof(GetKannadaMagazineIds))]
@@ -63,6 +64,8 @@
         public static void MapUpdateDtoToEntity(PublicationUpdateDto dto, Publication entity)
         {
             if (dto.Title != null) entity.Title = dto.Title;
+            if (dto.TitleOfThesis != null) entity.TitleOfThesis = dto.TitleOfThesis;
+            if (dto.ExtensionWorkId.HasValue) entity.ExtensionWorkId = dto.ExtensionWorkId;
             if (dto.PublicationDate.HasValue) entity.PublicationDate = dto.PublicationDate;
             if (dto.StartDate.HasValue) entity.StartDate = dto.StartDate.Value;
             if (dto.EndDate.HasValue) entity.EndDate = dto.EndDate.Value;
