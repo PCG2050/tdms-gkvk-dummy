@@ -371,12 +371,75 @@ namespace Infrastructure.DbContext
                 .HasForeignKey(u => u.UpdatedById)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Configure many-to-many junction tables for Publication
+            // CASCADE from Publication side - deleting a publication removes its associations
+            // RESTRICT from Newspaper/Magazine side - prevent deletion if referenced
+            modelBuilder.Entity<Domain.Entities.Junction.PublicationKannadaNewsPaper>()
+                .HasOne(p => p.Publication)
+                .WithMany(pub => pub.PublicationKannadaNewsPapers)
+                .HasForeignKey(p => p.PublicationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Domain.Entities.Junction.PublicationKannadaNewsPaper>()
+                .HasOne(p => p.KannadaNewsPaper)
+                .WithMany()
+                .HasForeignKey(p => p.KannadaNewsPaperId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Domain.Entities.Junction.PublicationEnglishNewsPaper>()
+                .HasOne(p => p.Publication)
+                .WithMany(pub => pub.PublicationEnglishNewsPapers)
+                .HasForeignKey(p => p.PublicationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Domain.Entities.Junction.PublicationEnglishNewsPaper>()
+                .HasOne(p => p.EnglishNewsPaper)
+                .WithMany()
+                .HasForeignKey(p => p.EnglishNewsPaperId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Domain.Entities.Junction.PublicationKannadaMagazine>()
+                .HasOne(p => p.Publication)
+                .WithMany(pub => pub.PublicationKannadaMagazines)
+                .HasForeignKey(p => p.PublicationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Domain.Entities.Junction.PublicationKannadaMagazine>()
+                .HasOne(p => p.KannadaMagazine)
+                .WithMany()
+                .HasForeignKey(p => p.KannadaMagazineId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Domain.Entities.Junction.PublicationEnglishMagazine>()
+                .HasOne(p => p.Publication)
+                .WithMany(pub => pub.PublicationEnglishMagazines)
+                .HasForeignKey(p => p.PublicationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Domain.Entities.Junction.PublicationEnglishMagazine>()
+                .HasOne(p => p.EnglishMagazine)
+                .WithMany()
+                .HasForeignKey(p => p.EnglishMagazineId)
+                .OnDelete(DeleteBehavior.Restrict);
 
 
 
+            // Set NoAction for all relationships except junction tables
             foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
             {
-                relationship.DeleteBehavior = DeleteBehavior.NoAction;
+                // Exclude junction tables from NoAction - they have explicit cascade configuration above
+                var junctionTableTypes = new[]
+                {
+                    typeof(Domain.Entities.Junction.PublicationKannadaNewsPaper),
+                    typeof(Domain.Entities.Junction.PublicationEnglishNewsPaper),
+                    typeof(Domain.Entities.Junction.PublicationKannadaMagazine),
+                    typeof(Domain.Entities.Junction.PublicationEnglishMagazine)
+                };
+
+                if (!junctionTableTypes.Contains(relationship.DeclaringEntityType.ClrType))
+                {
+                    relationship.DeleteBehavior = DeleteBehavior.NoAction;
+                }
             }
             new OrganizationTypeConfiguration().Configure(modelBuilder.Entity<Organization>());
             new UserTypeConfiguration().Configure(modelBuilder.Entity<User>());
