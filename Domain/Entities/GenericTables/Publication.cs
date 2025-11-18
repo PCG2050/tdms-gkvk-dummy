@@ -122,6 +122,12 @@ namespace Domain.Entities.GenericTables
         // Navigation Properties - Related Entities
         public ICollection<ExtensionLiterature> ExtensionLiteratures { get; set; } = new List<ExtensionLiterature>();
         public PublisherDetails? PublisherDetails { get; set; }
+
+        // Many-to-many relationships for Newspapers and Magazines
+        public ICollection<PublicationKannadaNewsPaper> PublicationKannadaNewsPapers { get; set; } = new List<PublicationKannadaNewsPaper>();
+        public ICollection<PublicationEnglishNewsPaper> PublicationEnglishNewsPapers { get; set; } = new List<PublicationEnglishNewsPaper>();
+        public ICollection<PublicationKannadaMagazine> PublicationKannadaMagazines { get; set; } = new List<PublicationKannadaMagazine>();
+        public ICollection<PublicationEnglishMagazine> PublicationEnglishMagazines { get; set; } = new List<PublicationEnglishMagazine>();
     }
 
     public class PublisherDetails : AuditableBaseEntity

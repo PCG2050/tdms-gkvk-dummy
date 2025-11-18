@@ -67,6 +67,15 @@ namespace Infrastructure.Services.DataTables
             publication.FormStatus = "Draft";
 
             var savedPublication = await _publicationRepository.CreateAsync(publication);
+
+            // Handle many-to-many relationships for newspapers and magazines
+            await _publicationRepository.UpdatePublicationNewspapersAndMagazinesAsync(
+                savedPublication.Id,
+                createDto.KannadaNewsPaperIds,
+                createDto.EnglishNewsPaperIds,
+                createDto.KannadaMagazineIds,
+                createDto.EnglishMagazineIds);
+
             var publicationWithDetails = await _publicationRepository.GetWithDetailsAsync(savedPublication.Id);
             var dto = _mapper.MapToDtoWithDetails(publicationWithDetails!);
 
@@ -146,6 +155,14 @@ namespace Infrastructure.Services.DataTables
             }
 
             await _publicationRepository.UpdateAsync(publication);
+
+            // Handle many-to-many relationships for newspapers and magazines
+            await _publicationRepository.UpdatePublicationNewspapersAndMagazinesAsync(
+                id,
+                updateDto.KannadaNewsPaperIds,
+                updateDto.EnglishNewsPaperIds,
+                updateDto.KannadaMagazineIds,
+                updateDto.EnglishMagazineIds);
 
             var updatedPublication = await _publicationRepository.GetWithDetailsAsync(id);
             var dto = _mapper.MapToDtoWithDetails(updatedPublication!);

@@ -75,6 +75,12 @@ namespace Application.Models.DataTables
         public string? SponsorDetails { get; set; }
         public DateOnly? PermissionLetterDate { get; set; }
         public string? PermissionLetterUrl { get; set; }
+
+        // Newspapers and Magazines (many-to-many)
+        public List<int>? KannadaNewsPaperIds { get; set; }
+        public List<int>? EnglishNewsPaperIds { get; set; }
+        public List<int>? KannadaMagazineIds { get; set; }
+        public List<int>? EnglishMagazineIds { get; set; }
     }
 
     /// <summary>
@@ -168,6 +174,12 @@ namespace Application.Models.DataTables
 
         [MaxLength(1000)]
         public string? PermissionLetterUrl { get; set; }
+
+        // Newspapers and Magazines (many-to-many)
+        public List<int>? KannadaNewsPaperIds { get; set; }
+        public List<int>? EnglishNewsPaperIds { get; set; }
+        public List<int>? KannadaMagazineIds { get; set; }
+        public List<int>? EnglishMagazineIds { get; set; }
     }
 
     /// <summary>
@@ -248,6 +260,12 @@ namespace Application.Models.DataTables
 
         [MaxLength(1000)]
         public string? PermissionLetterUrl { get; set; }
+
+        // Newspapers and Magazines (many-to-many)
+        public List<int>? KannadaNewsPaperIds { get; set; }
+        public List<int>? EnglishNewsPaperIds { get; set; }
+        public List<int>? KannadaMagazineIds { get; set; }
+        public List<int>? EnglishMagazineIds { get; set; }
     }
 
     // ==================== PUBLISHER DETAILS DTOs ====================

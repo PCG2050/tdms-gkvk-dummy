@@ -27,6 +27,19 @@
         private string? GetStateName(OrganizationUnitLocation? location)
             => location?.District?.State?.Name;
 
+        // Helper methods for newspaper and magazine ID lists
+        private List<int>? GetKannadaNewsPaperIds(ICollection<PublicationKannadaNewsPaper>? newspapers)
+            => newspapers?.Select(x => x.KannadaNewsPaperId).ToList();
+
+        private List<int>? GetEnglishNewsPaperIds(ICollection<PublicationEnglishNewsPaper>? newspapers)
+            => newspapers?.Select(x => x.EnglishNewsPaperId).ToList();
+
+        private List<int>? GetKannadaMagazineIds(ICollection<PublicationKannadaMagazine>? magazines)
+            => magazines?.Select(x => x.KannadaMagazineId).ToList();
+
+        private List<int>? GetEnglishMagazineIds(ICollection<PublicationEnglishMagazine>? magazines)
+            => magazines?.Select(x => x.EnglishMagazineId).ToList();
+
         // ----------------------------
         // Mapping with Navigation Details
         // ----------------------------
@@ -38,6 +51,10 @@
         [MapProperty(nameof(Publication.Mode.Name), nameof(PublicationDto.ModeName))]
         [MapProperty(nameof(Publication.Region.Name), nameof(PublicationDto.RegionName))]
         [MapProperty(nameof(Publication.Source.Name), nameof(PublicationDto.SourceName))]
+        [MapProperty(nameof(Publication.PublicationKannadaNewsPapers), nameof(PublicationDto.KannadaNewsPaperIds), Use = nameof(GetKannadaNewsPaperIds))]
+        [MapProperty(nameof(Publication.PublicationEnglishNewsPapers), nameof(PublicationDto.EnglishNewsPaperIds), Use = nameof(GetEnglishNewsPaperIds))]
+        [MapProperty(nameof(Publication.PublicationKannadaMagazines), nameof(PublicationDto.KannadaMagazineIds), Use = nameof(GetKannadaMagazineIds))]
+        [MapProperty(nameof(Publication.PublicationEnglishMagazines), nameof(PublicationDto.EnglishMagazineIds), Use = nameof(GetEnglishMagazineIds))]
         public partial PublicationDto MapToDtoWithDetails(Publication entity);
 
         // ----------------------------
