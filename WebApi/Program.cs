@@ -284,6 +284,9 @@ namespace WebApi
 
             builder.Services.AddScoped<IAdminReportService, AdminReportService>();
 
+            // Success Story Service
+            builder.Services.AddScoped<ISuccessStoryService, SuccessStoryService>();
+
 
 
 
