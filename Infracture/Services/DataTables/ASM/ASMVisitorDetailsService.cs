@@ -539,20 +539,6 @@ namespace Infrastructure.Services.DataTables.ASM
             return ServiceResult<Dictionary<string, int>>.Success(summary);
         }
 
-        //public async Task<ServiceResult<VisitorStatisticsDto>> GetVisitorStatisticsAsync(
-        //    DateOnly? startDate = null,
-        //    DateOnly? endDate = null)
-        //{
-        //    var accessibleUnitLocationIds = await GetAccessibleUnitLocationIdsAsync();
-
-        //    var stats = await _repository.GetVisitorStatisticsAsync(
-        //        accessibleUnitLocationIds,
-        //        startDate,
-        //        endDate);
-
-        //    return ServiceResult<VisitorStatisticsDto>.Success(stats);
-        //}
-
         public async Task<PaginatedResult<ASMVisitorDetailsDto>> GetTrainerHistoryAsync(
             int pageNumber = 1,
             int pageSize = 20)
@@ -612,19 +598,6 @@ namespace Infrastructure.Services.DataTables.ASM
                 PageSize = result.PageSize
             };
         }
-
-        public async Task<IEnumerable<ASMVisitorDetailsDto>> GetAllAsync()
-        {
-            var accessibleUnitLocationIds = await GetAccessibleUnitLocationIdsAsync();
-            var entities = await _repository.GetAllAsync();
-
-            var filtered = entities
-                .Where(e => accessibleUnitLocationIds.Contains(e.UnitLocationId))
-                .ToList();
-
-            return filtered.Select(_mapper.MapToDto).ToList();
-        }
-
 
         // ==========================================
         // HELPER METHODS

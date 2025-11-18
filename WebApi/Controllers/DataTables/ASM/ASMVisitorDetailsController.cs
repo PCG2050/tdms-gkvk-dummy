@@ -465,40 +465,6 @@ namespace WebApi.Controllers.DataTables.ASM
         }
 
         /// <summary>
-        /// Get visitor statistics (total counts by visitor type)
-        /// Returns aggregated visitor counts: farmers, students, public
-        /// Only includes approved entries
-        /// </summary>
-        /// <param name="startDate">Start date for statistics (format: YYYY-MM-DD)</param>
-        /// <param name="endDate">End date for statistics (format: YYYY-MM-DD)</param>
-        /// <remarks>
-        /// Sample response:
-        /// 
-        ///     {
-        ///       "totalFarmers": 1250,
-        ///       "totalStudents": 3400,
-        ///       "totalPublic": 890,
-        ///       "totalVisitors": 5540,
-        ///       "totalEntries": 42
-        ///     }
-        /// 
-        /// </remarks>
-        /// <response code="200">Visitor statistics</response>
-        //[HttpGet("statistics")]
-        //[Authorize]
-        //public async Task<IActionResult> GetVisitorStatistics(
-        //    [FromQuery] DateOnly? startDate = null,
-        //    [FromQuery] DateOnly? endDate = null)
-        //{
-        //    var result = await _service.GetVisitorStatisticsAsync(startDate, endDate);
-
-        //    if (!result.IsSuccess)
-        //        return BadRequest(new { message = result.ErrorMessage });
-
-        //    return Ok(result.Data);
-        //}
-
-        /// <summary>
         /// Get trainer's submission history (Trainer only)
         /// Shows all visitor details created by the logged-in trainer
         /// Sorted by most recent first

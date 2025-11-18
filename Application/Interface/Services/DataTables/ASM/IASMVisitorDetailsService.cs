@@ -8,7 +8,6 @@ namespace Application.Interface.Services.DataTables.ASM
         // CRUD
         Task<ServiceResult<ASMVisitorDetailsDto>> AddAsync(ASMVisitorDetailsCreateDto createDto);
         Task<ServiceResult<ASMVisitorDetailsDto>> GetByIdAsync(int id);
-        Task<IEnumerable<ASMVisitorDetailsDto>> GetAllAsync();
         Task<ServiceResult<ASMVisitorDetailsDto>> UpdateAsync(int id, ASMVisitorDetailsUpdateDto updateDto);
         Task<ServiceResult> DeleteAsync(int id);
 
