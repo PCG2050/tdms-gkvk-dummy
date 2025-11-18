@@ -150,5 +150,14 @@ namespace Application.Interface.Services.DataTables.KVK
         Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
             int pageNumber = 1,
             int pageSize = 10);
+
+        /// <summary>
+        /// Get programs by trainer ID with optional unit location filter
+        /// </summary>
+        Task<PaginatedResult<KvkProgramListItemDto>> GetByTrainerAsync(
+            int trainerId,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10);
     }
 }

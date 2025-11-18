@@ -85,9 +85,21 @@ namespace Infrastructure.Services.DataTables.KVK
         {
             var entity = _mapper.MapToEntity(dto);
             entity.OrganizationId = _currentUserService.OrganizationId;
-            entity.FormStatus = "Draft";
             entity.CreatedById = _currentUserService.UserId;
             entity.CreatedAt = DateTimeOffset.UtcNow;
+
+            // Auto-approve forms created by Unit Heads
+            if (_currentUserService.Role == Role.UNITHEAD)
+            {
+                entity.FormStatus = "Approved";
+                entity.ApprovedById = _currentUserService.UserId;
+                entity.ApprovedAt = DateTimeOffset.UtcNow;
+                entity.FormStatusRemarks = "Auto-approved (Unit Head)";
+            }
+            else
+            {
+                entity.FormStatus = "Draft";
+            }
 
             var created = await _programRepository.CreateAsync(entity);
             var resultDto = _mapper.MapToDto(created);
@@ -145,10 +157,23 @@ namespace Infrastructure.Services.DataTables.KVK
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+            // Allow edit for Draft, Rejected, or Approved (if unit head is the creator)
+            if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
+            {
+                // Trainers can edit Draft and Rejected forms
+            }
+            else if (program.FormStatus == "Approved" &&
+                     _currentUserService.Role == Role.UNITHEAD &&
+                     program.CreatedById == _currentUserService.UserId)
+            {
+                // Unit heads can edit their own approved forms
+            }
+            else
+            {
                 return ServiceResult<KvkProgramDetailsDto>.Failure(
-                    "Cannot modify programs that are not in Draft or Rejected status",
+                    "Cannot edit programs in current status",
                     ServiceErrorStatus.INVALIDOPERATION);
+            }
 
             _mapper.MapUpdateDtoToEntity(dto, program);
             program.UpdatedById = _currentUserService.UserId;
@@ -1400,6 +1425,96 @@ namespace Infrastructure.Services.DataTables.KVK
                 pageSize);
         }
 
+        /// <summary>
+        /// Get programs by trainer ID with optional unit location filter
+        /// </summary>
+        public async Task<PaginatedResult<KvkProgramListItemDto>> GetByTrainerAsync(
+            int trainerId,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            // Get accessible unit locations for the current user
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+
+            var query = _programRepository.GetQueryable()
+                .Include(x => x.Category)
+                .Include(x => x.Type)
+                .Include(x => x.CreatedBy)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.Unit)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.District)
+                .Where(x => x.CreatedById == trainerId)
+                .Where(x => unitLocationIds.Contains(x.UnitLocationId));
+
+            // Apply unit location filter if provided
+            if (unitLocationId.HasValue)
+            {
+                query = query.Where(x => x.UnitLocationId == unitLocationId.Value);
+            }
+
+            var totalCount = await query.CountAsync();
+            var programs = await query
+                .OrderByDescending(x => x.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var items = programs.Select(p => new KvkProgramListItemDto
+            {
+                Id = p.Id,
+                Title = p.Title,
+                StartDate = p.StartDate,
+                EndDate = p.EndDate,
+                Area = p.Area,
+                UnitLocationId = p.UnitLocationId,
+                UnitLocationName = p.UnitLocation != null
+                    ? $"{p.UnitLocation.Unit?.Name} - {p.UnitLocation.District?.Name}"
+                    : null,
+                CategoryId = p.CategoryId,
+                CategoryName = p.Category?.Name,
+                TypeId = p.TypeId,
+                TypeName = p.Type?.Name,
+                FormStatus = p.FormStatus,
+                FormStatusRemarks = p.FormStatusRemarks,
+                CreatedAt = p.CreatedAt,
+                CreatedById = p.CreatedById,
+                CreatedByName = p.CreatedBy != null
+                    ? $"{p.CreatedBy.FirstName} {p.CreatedBy.LastName}"
+                    : null
+            }).ToList();
+
+            return new PaginatedResult<KvkProgramListItemDto>
+            {
+                Items = items,
+                TotalItems = totalCount,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+        }
+
+        // ============================
+        // HELPER METHODS
+        // ============================
+
+        private async Task<List<int>> GetAccessibleUnitLocationIdsAsync()
+        {
+            if (_currentUserService.Role == Role.TRAINER)
+            {
+                return await _trainerAssignmentRepository.GetUnitLocationIdsByTrainerIdAsync(_currentUserService.UserId);
+            }
+            else if (_currentUserService.Role == Role.UNITHEAD)
+            {
+                return await _unitHeadAssignmentRepository.GetUnitLocationIdsByUnitHeadIdAsync(_currentUserService.UserId);
+            }
+            else if (_currentUserService.Role == Role.ADMIN)
+            {
+                return await _organizationUnitRepository.GetUnitLocationIdsByOrganizationIdAsync(_currentUserService.OrganizationId);
+            }
+
+            return new List<int>();
+        }
 
     }
 }

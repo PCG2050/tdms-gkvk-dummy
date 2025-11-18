@@ -398,7 +398,7 @@ namespace WebApi.Controllers.DataTables.KVK
         /// Get trainer's own program history with pagination
         /// </summary>
         [HttpGet("my-history")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
         public async Task<IActionResult> GetMyHistory(
       [FromQuery] int pageNumber = 1,
       [FromQuery] int pageSize = 20)
@@ -417,6 +417,21 @@ namespace WebApi.Controllers.DataTables.KVK
             [FromQuery] int pageSize = 20)
         {
             var result = await _service.GetPendingApprovalsAsync(pageNumber, pageSize);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Get programs by trainer ID with optional unit location filter
+        /// </summary>
+        [HttpGet("trainer/{trainerId}")]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
+        public async Task<IActionResult> GetByTrainer(
+            int trainerId,
+            [FromQuery] int? unitLocationId = null,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 20)
+        {
+            var result = await _service.GetByTrainerAsync(trainerId, unitLocationId, pageNumber, pageSize);
             return Ok(result);
         }
 
