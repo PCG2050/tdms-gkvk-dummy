@@ -157,6 +157,19 @@ namespace Infrastructure.Services.DataTables.DEU
             {
                 // Unit heads can edit their own approved forms
             }
+            else if (program.FormStatus == "Pending" &&
+                     _currentUserService.Role == Role.UNITHEAD)
+            {
+                // Unit heads can edit pending forms from trainers in their unit locations
+                var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+                if (!unitLocationIds.Contains(program.UnitLocationId))
+                {
+                    return ServiceResult<DeuProgramDetailsDto>.Failure(
+                        "Access denied to this unit location",
+                        ServiceErrorStatus.FORBIDDEN);
+                }
+                // Allow edit
+            }
             else
             {
                 return ServiceResult<DeuProgramDetailsDto>.Failure(
@@ -1237,6 +1250,79 @@ namespace Infrastructure.Services.DataTables.DEU
 
             // Apply unit location filter if provided
             if (unitLocationId.HasValue)
+            {
+                query = query.Where(x => x.UnitLocationId == unitLocationId.Value);
+            }
+
+            var totalCount = await query.CountAsync();
+            var programs = await query
+                .OrderByDescending(x => x.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var dtos = programs.Select(p => _mapper.MapToDtoWithDetails(p)).ToList();
+
+            return new PaginatedResult<DeuProgramDetailsDto>(
+                dtos,
+                totalCount,
+                pageNumber,
+                pageSize);
+        }
+
+        /// <summary>
+        /// Get unified history - can show own history or specific trainer's history
+        /// Unit heads can view their own forms or forms from trainers in their unit locations
+        /// </summary>
+        public async Task<PaginatedResult<DeuProgramDetailsDto>> GetUnifiedHistoryAsync(
+            int? trainerId = null,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            var currentUserId = _currentUserService.UserId;
+            var currentRole = _currentUserService.Role;
+
+            // Get accessible unit locations
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+
+            // Build query
+            var query = _programRepository.GetQueryable()
+                .Include(x => x.ProgramType)
+                .Include(x => x.Category)
+                .Include(x => x.Type)
+                .Include(x => x.Theme)
+                .Include(x => x.ThematicArea)
+                .Include(x => x.CreatedBy)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.Unit)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.District);
+
+            // Filter by creator
+            if (trainerId.HasValue && trainerId.Value > 0)
+            {
+                // Viewing specific trainer's history (unit heads only)
+                if (currentRole != Role.UNITHEAD && currentRole != Role.ADMIN)
+                {
+                    return new PaginatedResult<DeuProgramDetailsDto>(
+                        new List<DeuProgramDetailsDto>(),
+                        0,
+                        pageNumber,
+                        pageSize);
+                }
+                query = query.Where(x => x.CreatedById == trainerId.Value);
+            }
+            else
+            {
+                // Viewing own history
+                query = query.Where(x => x.CreatedById == currentUserId);
+            }
+
+            // Filter by unit location
+            query = query.Where(x => unitLocationIds.Contains(x.UnitLocationId));
+
+            if (unitLocationId.HasValue && unitLocationId.Value > 0)
             {
                 query = query.Where(x => x.UnitLocationId == unitLocationId.Value);
             }

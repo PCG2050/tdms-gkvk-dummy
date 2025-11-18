@@ -321,6 +321,23 @@ namespace WebApi.Controllers.DataTables.EEU
             return Ok(result);
         }
 
+        /// <summary>
+        /// Get unified history - own forms or trainer forms (for unit heads)
+        /// </summary>
+        /// <param name="trainerId">Optional: Trainer ID to view (unit heads only). If null, shows own history</param>
+        /// <param name="unitLocationId">Optional: Filter by unit location</param>
+        [HttpGet("unified-history")]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead},{RoleString.Admin}")]
+        public async Task<IActionResult> GetUnifiedHistory(
+            [FromQuery] int? trainerId = null,
+            [FromQuery] int? unitLocationId = null,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 20)
+        {
+            var result = await _service.GetUnifiedHistoryAsync(trainerId, unitLocationId, pageNumber, pageSize);
+            return Ok(result);
+        }
+
         // ============================
         // HELPER METHOD
         // ============================

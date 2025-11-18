@@ -202,12 +202,32 @@ namespace Infrastructure.Services.DataTables.ASM
                         && entity.FormStatus == "Approved"
                         && entity.CreatedById == _currentUserService.UserId;
 
+                    // Unit heads can edit pending forms from trainers in their unit locations
+                    bool isUnitHeadEditingPendingForm = false;
+                    if (entity.FormStatus == "Pending" && _currentUserService.Role == Role.UNITHEAD)
+                    {
+                        var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+                        isUnitHeadEditingPendingForm = unitLocationIds.Contains(entity.UnitLocationId);
+                    }
+
                     if (entity.FormStatus == "Approved" && !isUnitHeadEditingOwnApprovedForm)
                     {
                         result.FailedEntries.Add(new BatchErrorDto
                         {
                             Index = i,
                             ErrorMessage = "Cannot modify approved entries",
+                            OriginalData = updateDto
+                        });
+                        result.FailureCount++;
+                        continue;
+                    }
+
+                    if (entity.FormStatus == "Pending" && !isUnitHeadEditingPendingForm)
+                    {
+                        result.FailedEntries.Add(new BatchErrorDto
+                        {
+                            Index = i,
+                            ErrorMessage = "Access denied to this unit location",
                             OriginalData = updateDto
                         });
                         result.FailureCount++;
@@ -295,7 +315,20 @@ namespace Infrastructure.Services.DataTables.ASM
                 && entity.FormStatus == "Approved"
                 && entity.CreatedById == _currentUserService.UserId;
 
-            if (entity.FormStatus == "Approved" && !isUnitHeadEditingOwnApprovedForm)
+            // Unit heads can edit pending forms from trainers in their unit locations
+            if (entity.FormStatus == "Pending" &&
+                _currentUserService.Role == Role.UNITHEAD)
+            {
+                var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+                if (!unitLocationIds.Contains(entity.UnitLocationId))
+                {
+                    return ServiceResult<ASMVisitorDetailsDto>.Failure(
+                        "Access denied to this unit location",
+                        ServiceErrorStatus.FORBIDDEN);
+                }
+                // Allow edit
+            }
+            else if (entity.FormStatus == "Approved" && !isUnitHeadEditingOwnApprovedForm)
                 return ServiceResult<ASMVisitorDetailsDto>.Failure(
                     "Cannot modify approved entries",
                     ServiceErrorStatus.INVALIDOPERATION);
@@ -622,6 +655,74 @@ namespace Infrastructure.Services.DataTables.ASM
                 .Where(x => unitLocationIds.Contains(x.UnitLocationId));
 
             if (unitLocationId.HasValue)
+            {
+                query = query.Where(x => x.UnitLocationId == unitLocationId.Value);
+            }
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .OrderByDescending(x => x.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var dtos = items.Select(x => _mapper.MapToDto(x)).ToList();
+
+            return new PaginatedResult<ASMVisitorDetailsDto>(
+                dtos,
+                totalCount,
+                pageNumber,
+                pageSize);
+        }
+
+        /// <summary>
+        /// Get unified history - can show own history or specific trainer's history
+        /// Unit heads can view their own forms or forms from trainers in their unit locations
+        /// </summary>
+        public async Task<PaginatedResult<ASMVisitorDetailsDto>> GetUnifiedHistoryAsync(
+            int? trainerId = null,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            var currentUserId = _currentUserService.UserId;
+            var currentRole = _currentUserService.Role;
+
+            // Get accessible unit locations
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+
+            // Build query
+            var query = _repository.GetQueryable()
+                .Include(x => x.CreatedBy)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.Unit)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.District);
+
+            // Filter by creator
+            if (trainerId.HasValue && trainerId.Value > 0)
+            {
+                // Viewing specific trainer's history (unit heads only)
+                if (currentRole != Role.UNITHEAD && currentRole != Role.ADMIN)
+                {
+                    return new PaginatedResult<ASMVisitorDetailsDto>(
+                        new List<ASMVisitorDetailsDto>(),
+                        0,
+                        pageNumber,
+                        pageSize);
+                }
+                query = query.Where(x => x.CreatedById == trainerId.Value);
+            }
+            else
+            {
+                // Viewing own history
+                query = query.Where(x => x.CreatedById == currentUserId);
+            }
+
+            // Filter by unit location
+            query = query.Where(x => unitLocationIds.Contains(x.UnitLocationId));
+
+            if (unitLocationId.HasValue && unitLocationId.Value > 0)
             {
                 query = query.Where(x => x.UnitLocationId == unitLocationId.Value);
             }

@@ -63,5 +63,15 @@ namespace Application.Interface.Services.DataTables.FIU
             int? unitLocationId = null,
             int pageNumber = 1,
             int pageSize = 10);
+
+        /// <summary>
+        /// Get unified history - can show own history or specific trainer's history
+        /// Unit heads can view their own forms or forms from trainers in their unit locations
+        /// </summary>
+        Task<PaginatedResult<FIUProgramActivityResponseDto>> GetUnifiedHistoryAsync(
+            int? trainerId = null,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10);
     }
 }

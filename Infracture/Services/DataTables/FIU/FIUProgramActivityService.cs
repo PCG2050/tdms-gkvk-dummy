@@ -180,12 +180,32 @@ namespace Infrastructure.Services.DataTables.FIU
                         && existing.FormStatus == "Approved"
                         && existing.CreatedById == _currentUserService.UserId;
 
+                    // Unit heads can edit pending forms from trainers in their unit locations
+                    bool isUnitHeadEditingPendingForm = false;
+                    if (existing.FormStatus == "Pending" && _currentUserService.Role == Role.UNITHEAD)
+                    {
+                        var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+                        isUnitHeadEditingPendingForm = unitLocationIds.Contains(existing.UnitLocationId);
+                    }
+
                     if (existing.FormStatus == "Approved" && !isUnitHeadEditingOwnApprovedForm)
                     {
                         result.FailedEntries.Add(new FIUBatchErrorDto
                         {
                             Index = i,
                             ErrorMessage = "Cannot modify approved activities",
+                            OriginalData = updateDto
+                        });
+                        result.FailureCount++;
+                        continue;
+                    }
+
+                    if (existing.FormStatus == "Pending" && !isUnitHeadEditingPendingForm && existing.CreatedById != _currentUserService.UserId)
+                    {
+                        result.FailedEntries.Add(new FIUBatchErrorDto
+                        {
+                            Index = i,
+                            ErrorMessage = "Access denied to this unit location",
                             OriginalData = updateDto
                         });
                         result.FailureCount++;
@@ -491,6 +511,75 @@ namespace Infrastructure.Services.DataTables.FIU
                 .Where(x => unitLocationIds.Contains(x.UnitLocationId));
 
             if (unitLocationId.HasValue)
+            {
+                query = query.Where(x => x.UnitLocationId == unitLocationId.Value);
+            }
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .OrderByDescending(x => x.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var dtos = items.Select(x => _mapper.MapEntityToResponseDto(x)).ToList();
+
+            return new PaginatedResult<FIUProgramActivityResponseDto>(
+                dtos,
+                totalCount,
+                pageNumber,
+                pageSize);
+        }
+
+        /// <summary>
+        /// Get unified history - can show own history or specific trainer's history
+        /// Unit heads can view their own forms or forms from trainers in their unit locations
+        /// </summary>
+        public async Task<PaginatedResult<FIUProgramActivityResponseDto>> GetUnifiedHistoryAsync(
+            int? trainerId = null,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            var currentUserId = _currentUserService.UserId;
+            var currentRole = _currentUserService.Role;
+
+            // Get accessible unit locations
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+
+            // Build query
+            var query = _activityRepository.GetQueryable()
+                .Include(x => x.FIUActivity)
+                .Include(x => x.CreatedBy)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.Unit)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.District);
+
+            // Filter by creator
+            if (trainerId.HasValue && trainerId.Value > 0)
+            {
+                // Viewing specific trainer's history (unit heads only)
+                if (currentRole != Role.UNITHEAD && currentRole != Role.ADMIN)
+                {
+                    return new PaginatedResult<FIUProgramActivityResponseDto>(
+                        new List<FIUProgramActivityResponseDto>(),
+                        0,
+                        pageNumber,
+                        pageSize);
+                }
+                query = query.Where(x => x.CreatedById == trainerId.Value);
+            }
+            else
+            {
+                // Viewing own history
+                query = query.Where(x => x.CreatedById == currentUserId);
+            }
+
+            // Filter by unit location
+            query = query.Where(x => unitLocationIds.Contains(x.UnitLocationId));
+
+            if (unitLocationId.HasValue && unitLocationId.Value > 0)
             {
                 query = query.Where(x => x.UnitLocationId == unitLocationId.Value);
             }

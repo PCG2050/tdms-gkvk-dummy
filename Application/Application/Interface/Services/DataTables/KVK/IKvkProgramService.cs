@@ -85,5 +85,15 @@ namespace Application.Interface.Services.DataTables.KVK
         // ============================
         Task<ServiceResult<KvkRecommendationDto>> AddOrUpdateRecommendationAsync(int programId, KvkRecommendationCreateDto dto);
         Task<ServiceResult<KvkRecommendationDto>> GetRecommendationByProgramIdAsync(int programId);
+
+        /// <summary>
+        /// Get unified history - can show own history or specific trainer's history
+        /// Unit heads can view their own forms or forms from trainers in their unit locations
+        /// </summary>
+        Task<PaginatedResult<KvkProgramDetailsDto>> GetUnifiedHistoryAsync(
+            int? trainerId = null,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10);
     }
 }
