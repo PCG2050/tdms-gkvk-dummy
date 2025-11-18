@@ -40,38 +40,8 @@ namespace Infrastructure.Services.DataTables.ASM
         }
 
         // ==========================================
-        // MAIN CRUD OPERATIONS
+        // BATCH CRUD OPERATIONS
         // ==========================================
-
-        public async Task<ServiceResult<ASMVisitorDetailsDto>> AddAsync(ASMVisitorDetailsCreateDto createDto)
-        {
-            // Verify trainer has access to this unit location
-            if (!await CanUserAccessUnitLocationAsync(createDto.UnitLocationId))
-                return ServiceResult<ASMVisitorDetailsDto>.Failure(
-                    "Access denied to unit location",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            var entity = new ASMVisitorDetails
-            {
-                UnitLocationId = createDto.UnitLocationId,
-                InstituteName = createDto.InstituteName,
-                StartDate = createDto.StartDate,
-                EndDate = createDto.EndDate,
-                FarmersCount = createDto.FarmersCount,
-                StudentsCount = createDto.StudentsCount,
-                PublicCount = createDto.PublicCount,
-                SubmittedDate = DateOnly.FromDateTime(DateTime.UtcNow),
-                CreatedById = _currentUserService.UserId,
-                CreatedAt = DateTimeOffset.UtcNow,
-                OrganizationId = _currentUserService.OrganizationId,
-                FormStatus = "Pending"
-            };
-
-            var savedEntity = await _repository.AddAsync(entity);
-            var dto = _mapper.MapToDto(savedEntity);
-
-            return ServiceResult<ASMVisitorDetailsDto>.Success(dto);
-        }
 
         public async Task<ServiceResult<ASMVisitorDetailsBatchResultDto>> AddBatchAsync(ASMVisitorDetailsBatchCreateDto batchCreateDto)
         {
@@ -262,54 +232,9 @@ namespace Infrastructure.Services.DataTables.ASM
             return ServiceResult<ASMVisitorDetailsDto>.Success(dto);
         }
 
-        public async Task<ServiceResult<ASMVisitorDetailsDto>> UpdateAsync(int id, ASMVisitorDetailsUpdateDto updateDto)
-        {
-            var entity = await _repository.GetByIdAsync(id);
-
-            if (entity == null)
-                return ServiceResult<ASMVisitorDetailsDto>.Failure(
-                    "Visitor detail not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            if (!await _entityPermissionService.CanModifyForm(entity))
-                return ServiceResult<ASMVisitorDetailsDto>.Failure(
-                    "Access denied or entry cannot be modified in current status",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (entity.FormStatus == "Approved")
-                return ServiceResult<ASMVisitorDetailsDto>.Failure(
-                    "Cannot modify approved entries",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            // Update only provided fields
-            if (updateDto.InstituteName != null)
-                entity.InstituteName = updateDto.InstituteName;
-
-            if (updateDto.StartDate.HasValue)
-                entity.StartDate = updateDto.StartDate;
-
-            if (updateDto.EndDate.HasValue)
-                entity.EndDate = updateDto.EndDate;
-
-            if (updateDto.FarmersCount.HasValue)
-                entity.FarmersCount = updateDto.FarmersCount.Value;
-
-            if (updateDto.StudentsCount.HasValue)
-                entity.StudentsCount = updateDto.StudentsCount.Value;
-
-            if (updateDto.PublicCount.HasValue)
-                entity.PublicCount = updateDto.PublicCount.Value;
-
-            entity.SubmittedDate = DateOnly.FromDateTime(DateTime.UtcNow);
-            entity.FormStatus = "Pending";
-            entity.UpdatedById = _currentUserService.UserId;
-            entity.UpdatedAt = DateTimeOffset.UtcNow;
-
-            var updatedEntity = await _repository.UpdateAsync(entity);
-            var dto = _mapper.MapToDto(updatedEntity);
-
-            return ServiceResult<ASMVisitorDetailsDto>.Success(dto);
-        }
+        // ==========================================
+        // SINGLE CRUD OPERATIONS
+        // ==========================================
 
         public async Task<ServiceResult> DeleteAsync(int id)
         {
@@ -331,43 +256,8 @@ namespace Infrastructure.Services.DataTables.ASM
         }
 
         // ==========================================
-        // SUBMISSION & APPROVAL WORKFLOW
+        // APPROVAL WORKFLOW
         // ==========================================
-
-        public async Task<ServiceResult> SubmitForApprovalAsync(int id)
-        {
-            var entity = await _repository.GetByIdAsync(id);
-
-            if (entity == null)
-                return ServiceResult.Failure("Visitor detail not found", ServiceErrorStatus.NOTFOUND);
-
-            if (!await _entityPermissionService.CanModifyForm(entity))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            // Since all creates/updates now automatically set to Pending, this endpoint is mostly redundant
-            // But we'll keep it for backward compatibility and handle Rejected status
-            if (entity.FormStatus == "Approved")
-                return ServiceResult.Failure(
-                    "Cannot submit approved entries",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            // If already Pending, just return success (idempotent)
-            if (entity.FormStatus == "Pending")
-                return ServiceResult.Success();
-
-            // Validate required fields before submission
-            if (entity.FarmersCount == 0 && entity.StudentsCount == 0 && entity.PublicCount == 0)
-                return ServiceResult.Failure(
-                    "At least one visitor type count must be greater than zero",
-                    ServiceErrorStatus.VALIDATIONERROR);
-
-            entity.FormStatus = "Pending";
-            entity.UpdatedById = _currentUserService.UserId;
-            entity.UpdatedAt = DateTimeOffset.UtcNow;
-
-            await _repository.UpdateAsync(entity);
-            return ServiceResult.Success();
-        }
 
         public async Task<ServiceResult> ApproveAsync(int id, string? remarks = null)
         {

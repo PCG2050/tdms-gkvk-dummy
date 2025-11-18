@@ -6,9 +6,7 @@ namespace Application.Interface.Services.DataTables.ASM
     public interface IASMVisitorDetailsService
     {
         // CRUD
-        Task<ServiceResult<ASMVisitorDetailsDto>> AddAsync(ASMVisitorDetailsCreateDto createDto);
         Task<ServiceResult<ASMVisitorDetailsDto>> GetByIdAsync(int id);
-        Task<ServiceResult<ASMVisitorDetailsDto>> UpdateAsync(int id, ASMVisitorDetailsUpdateDto updateDto);
         Task<ServiceResult> DeleteAsync(int id);
 
         // Batch Operations
@@ -16,7 +14,6 @@ namespace Application.Interface.Services.DataTables.ASM
         Task<ServiceResult<ASMVisitorDetailsBatchResultDto>> UpdateBatchAsync(ASMVisitorDetailsBatchUpdateDto batchUpdateDto);
 
         // Workflow
-        Task<ServiceResult> SubmitForApprovalAsync(int id);
         Task<ServiceResult> ApproveAsync(int id, string? remarks = null);
         Task<ServiceResult> RejectAsync(int id, string remarks);
 
