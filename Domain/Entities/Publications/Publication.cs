@@ -18,8 +18,6 @@ using System.Threading.Tasks;
             public int? RegionId { get; set; }
             public int? SourceId { get; set; }
             public int? ExtensionLiteratureId { get; set; }
-            public int? KannadaNewsPaperId { get; set; }
-            public int? EnglishNewsPaperId { get; set; }
 
             // Publication Details
             public string? MJASFormat { get; set; }
@@ -55,8 +53,10 @@ using System.Threading.Tasks;
             public Region? Region { get; set; }
             public Source? Source { get; set; }
             public ExtensionLiterature? ExtensionLiterature { get; set; }
-            public KannadaNewsPaper? KannadaNewsPaper { get; set; }
-            public EnglishNewsPaper? EnglishNewsPaper { get; set; }
+
+            // Many-to-many relationships with newspapers
+            public ICollection<PublicationKannadaNewsPaper> PublicationKannadaNewsPapers { get; set; } = [];
+            public ICollection<PublicationEnglishNewsPaper> PublicationEnglishNewsPapers { get; set; } = [];
         }
     }
 

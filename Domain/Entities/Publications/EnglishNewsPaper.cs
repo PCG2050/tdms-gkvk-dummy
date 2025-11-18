@@ -9,6 +9,6 @@ namespace Domain.Entities.Publications
     public class EnglishNewsPaper : AuditableBaseEntity
     {
         public required string NewsPaperName { get; set; }
-        public ICollection<Publication> Publications { get; set; } = [];
+        public ICollection<PublicationEnglishNewsPaper> PublicationEnglishNewsPapers { get; set; } = [];
     }
 }

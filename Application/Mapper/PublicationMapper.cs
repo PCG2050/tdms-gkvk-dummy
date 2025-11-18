@@ -11,9 +11,38 @@
         public partial PublisherDetailsDto MapToDto(PublisherDetails entity);
         public partial ExtensionLiteratureDto MapToDto(ExtensionLiterature entity);
 
+        [MapperIgnoreSource(nameof(PublicationCreateDto.KannadaNewsPaperIds))]
+        [MapperIgnoreSource(nameof(PublicationCreateDto.EnglishNewsPaperIds))]
         public partial Publication MapToEntity(PublicationCreateDto dto);
+
         public partial PublisherDetails MapToEntity(PublisherDetailsCreateDto dto);
         public partial ExtensionLiterature MapToEntity(ExtensionLiteratureCreateDto dto);
+
+        // Helper method to map newspaper IDs to junction entities after creation
+        public static void MapNewspaperIdsToEntity(PublicationCreateDto dto, Publication entity)
+        {
+            if (dto.KannadaNewsPaperIds != null && dto.KannadaNewsPaperIds.Any())
+            {
+                foreach (var newspaperId in dto.KannadaNewsPaperIds)
+                {
+                    entity.PublicationKannadaNewsPapers.Add(new PublicationKannadaNewsPaper
+                    {
+                        KannadaNewsPaperId = newspaperId
+                    });
+                }
+            }
+
+            if (dto.EnglishNewsPaperIds != null && dto.EnglishNewsPaperIds.Any())
+            {
+                foreach (var newspaperId in dto.EnglishNewsPaperIds)
+                {
+                    entity.PublicationEnglishNewsPapers.Add(new PublicationEnglishNewsPaper
+                    {
+                        EnglishNewsPaperId = newspaperId
+                    });
+                }
+            }
+        }
 
         // ----------------------------
         // Helper methods for nested mappings (avoids compile-time deep path errors)
@@ -27,6 +56,19 @@
         private string? GetStateName(OrganizationUnitLocation? location)
             => location?.District?.State?.Name;
 
+        // Helper methods for newspaper many-to-many mappings
+        private List<int> GetKannadaNewsPaperIds(Publication publication)
+            => publication.PublicationKannadaNewsPapers?.Select(p => p.KannadaNewsPaperId).ToList() ?? new List<int>();
+
+        private List<string> GetKannadaNewsPaperNames(Publication publication)
+            => publication.PublicationKannadaNewsPapers?.Select(p => p.KannadaNewsPaper?.NewsPaperName ?? string.Empty).ToList() ?? new List<string>();
+
+        private List<int> GetEnglishNewsPaperIds(Publication publication)
+            => publication.PublicationEnglishNewsPapers?.Select(p => p.EnglishNewsPaperId).ToList() ?? new List<int>();
+
+        private List<string> GetEnglishNewsPaperNames(Publication publication)
+            => publication.PublicationEnglishNewsPapers?.Select(p => p.EnglishNewsPaper?.NewsPaperName ?? string.Empty).ToList() ?? new List<string>();
+
         // ----------------------------
         // Mapping with Navigation Details
         // ----------------------------
@@ -38,8 +80,10 @@
         [MapProperty(nameof(Publication.Mode.Name), nameof(PublicationDto.ModeName))]
         [MapProperty(nameof(Publication.Region.Name), nameof(PublicationDto.RegionName))]
         [MapProperty(nameof(Publication.Source.Name), nameof(PublicationDto.SourceName))]
-        [MapProperty(nameof(Publication.KannadaNewsPaper.NewsPaperName), nameof(PublicationDto.KannadaNewsPaperName))]
-        [MapProperty(nameof(Publication.EnglishNewsPaper.NewsPaperName), nameof(PublicationDto.EnglishNewsPaperName))]
+        [MapProperty(nameof(Publication), nameof(PublicationDto.KannadaNewsPaperIds), Use = nameof(GetKannadaNewsPaperIds))]
+        [MapProperty(nameof(Publication), nameof(PublicationDto.KannadaNewsPaperNames), Use = nameof(GetKannadaNewsPaperNames))]
+        [MapProperty(nameof(Publication), nameof(PublicationDto.EnglishNewsPaperIds), Use = nameof(GetEnglishNewsPaperIds))]
+        [MapProperty(nameof(Publication), nameof(PublicationDto.EnglishNewsPaperNames), Use = nameof(GetEnglishNewsPaperNames))]
         public partial PublicationDto MapToDtoWithDetails(Publication entity);
 
         // ----------------------------
@@ -57,8 +101,35 @@
             if (dto.ModePublication != null) entity.ModePublication = dto.ModePublication;
             if (dto.RegionId.HasValue) entity.RegionId = dto.RegionId;
             if (dto.SourceId.HasValue) entity.SourceId = dto.SourceId;
-            if (dto.KannadaNewsPaperId.HasValue) entity.KannadaNewsPaperId = dto.KannadaNewsPaperId;
-            if (dto.EnglishNewsPaperId.HasValue) entity.EnglishNewsPaperId = dto.EnglishNewsPaperId;
+
+            // Handle many-to-many newspaper relationships
+            // Note: Null means no change, empty list clears all, populated list replaces all
+            if (dto.KannadaNewsPaperIds != null)
+            {
+                entity.PublicationKannadaNewsPapers.Clear();
+                foreach (var newspaperId in dto.KannadaNewsPaperIds)
+                {
+                    entity.PublicationKannadaNewsPapers.Add(new PublicationKannadaNewsPaper
+                    {
+                        PublicationId = entity.Id,
+                        KannadaNewsPaperId = newspaperId
+                    });
+                }
+            }
+
+            if (dto.EnglishNewsPaperIds != null)
+            {
+                entity.PublicationEnglishNewsPapers.Clear();
+                foreach (var newspaperId in dto.EnglishNewsPaperIds)
+                {
+                    entity.PublicationEnglishNewsPapers.Add(new PublicationEnglishNewsPaper
+                    {
+                        PublicationId = entity.Id,
+                        EnglishNewsPaperId = newspaperId
+                    });
+                }
+            }
+
             if (dto.MJASFormat != null) entity.MJASFormat = dto.MJASFormat;
             if (dto.PublicationTitle != null) entity.PublicationTitle = dto.PublicationTitle;
             if (dto.PublicationJournalTitle != null) entity.PublicationJournalTitle = dto.PublicationJournalTitle;
