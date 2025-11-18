@@ -1,6 +1,7 @@
 ﻿
 using Application.Interface.Repository.DataTables.TblService;
 using Application.Services.Common;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace Infrastructure.Services.DataTables
@@ -59,7 +60,19 @@ namespace Infrastructure.Services.DataTables
             entity.CreatedById = _currentUserService.UserId;
             entity.CreatedAt = DateTimeOffset.UtcNow;
             entity.OrganizationId = _currentUserService.OrganizationId;
-            entity.FormStatus = "Draft";
+
+            // Auto-approve forms created by Unit Heads
+            if (_currentUserService.Role == Role.UNITHEAD)
+            {
+                entity.FormStatus = "Approved";
+                entity.ApprovedById = _currentUserService.UserId;
+                entity.ApprovedAt = DateTimeOffset.UtcNow;
+                entity.FormStatusRemarks = "Auto-approved (Unit Head)";
+            }
+            else
+            {
+                entity.FormStatus = "Draft";
+            }
 
             var created = await _tableServiceRepository.CreateAsync(entity);
             var detailed = await _tableServiceRepository.GetWithDetailsAsync(created.Id);
@@ -104,8 +117,36 @@ namespace Infrastructure.Services.DataTables
             if (!await _entityPermissionService.CanModifyForm(entity))
                 return ServiceResult<TblServicesDto>.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (entity.FormStatus != "Draft")
-                return ServiceResult<TblServicesDto>.Failure("Cannot edit submitted services", ServiceErrorStatus.INVALIDOPERATION);
+            // Allow edit for Draft, Rejected, or Approved (if unit head is the creator)
+            if (entity.FormStatus == "Draft" || entity.FormStatus == "Rejected")
+            {
+                // Trainers can edit Draft and Rejected forms
+            }
+            else if (entity.FormStatus == "Approved" &&
+                     _currentUserService.Role == Role.UNITHEAD &&
+                     entity.CreatedById == _currentUserService.UserId)
+            {
+                // Unit heads can edit their own approved forms
+            }
+            else if (entity.FormStatus == "Pending" &&
+                     _currentUserService.Role == Role.UNITHEAD)
+            {
+                // Unit heads can edit pending forms from trainers in their unit locations
+                var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+                if (!unitLocationIds.Contains(entity.UnitLocationId))
+                {
+                    return ServiceResult<TblServicesDto>.Failure(
+                        "Access denied to this unit location",
+                        ServiceErrorStatus.FORBIDDEN);
+                }
+                // Allow edit
+            }
+            else
+            {
+                return ServiceResult<TblServicesDto>.Failure(
+                    "Cannot edit in current status",
+                    ServiceErrorStatus.INVALIDOPERATION);
+            }
 
             _mapper.MapUpdateDtoToEntity(updateDto, entity);
             entity.UpdatedById = _currentUserService.UserId;
@@ -792,6 +833,114 @@ namespace Infrastructure.Services.DataTables
                 getFormStatus: x => x.FormStatus,
                 getCreatedById: x => x.CreatedById ?? 0,
                 _unitHeadAssignmentRepository,
+                pageNumber,
+                pageSize);
+        }
+
+        public async Task<PaginatedResult<TblServicesDto>> GetByTrainerAsync(
+            int trainerId,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+
+            var query = _tableServiceRepository.GetQueryable()
+                .Include(x => x.CreatedBy)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.Unit)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.District)
+                .Include(x => x.Category)
+                .Where(x => x.CreatedById == trainerId)
+                .Where(x => unitLocationIds.Contains(x.UnitLocationId));
+
+            if (unitLocationId.HasValue)
+            {
+                query = query.Where(x => x.UnitLocationId == unitLocationId.Value);
+            }
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .OrderByDescending(x => x.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var dtos = items.Select(x => _mapper.MapToDtoWithDetails(x)).ToList();
+
+            return new PaginatedResult<TblServicesDto>(
+                dtos,
+                totalCount,
+                pageNumber,
+                pageSize);
+        }
+
+        /// <summary>
+        /// Get unified history - can show own history or specific trainer's history
+        /// Unit heads can view their own forms or forms from trainers in their unit locations
+        /// </summary>
+        public async Task<PaginatedResult<TblServicesDto>> GetUnifiedHistoryAsync(
+            int? trainerId = null,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            var currentUserId = _currentUserService.UserId;
+            var currentRole = _currentUserService.Role;
+
+            // Get accessible unit locations
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+
+            // Build query
+            var query = _tableServiceRepository.GetQueryable()
+                .Include(x => x.CreatedBy)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.Unit)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.District)
+                .Include(x => x.Category);
+
+            // Filter by creator
+            if (trainerId.HasValue && trainerId.Value > 0)
+            {
+                // Viewing specific trainer's history (unit heads only)
+                if (currentRole != Role.UNITHEAD && currentRole != Role.ADMIN)
+                {
+                    return new PaginatedResult<TblServicesDto>(
+                        new List<TblServicesDto>(),
+                        0,
+                        pageNumber,
+                        pageSize);
+                }
+                query = query.Where(x => x.CreatedById == trainerId.Value);
+            }
+            else
+            {
+                // Viewing own history
+                query = query.Where(x => x.CreatedById == currentUserId);
+            }
+
+            // Filter by unit location
+            query = query.Where(x => unitLocationIds.Contains(x.UnitLocationId));
+
+            if (unitLocationId.HasValue && unitLocationId.Value > 0)
+            {
+                query = query.Where(x => x.UnitLocationId == unitLocationId.Value);
+            }
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .OrderByDescending(x => x.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var dtos = items.Select(x => _mapper.MapToDtoWithDetails(x)).ToList();
+
+            return new PaginatedResult<TblServicesDto>(
+                dtos,
+                totalCount,
                 pageNumber,
                 pageSize);
         }

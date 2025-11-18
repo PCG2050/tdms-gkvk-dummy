@@ -162,5 +162,23 @@ namespace Application.Interface.Services.DataTables
             int pageNumber = 1,
             int pageSize = 10);
 
+        /// <summary>
+        /// Get publications by trainer ID (Unit Head and Admin only)
+        /// </summary>
+        Task<PaginatedResult<PublicationDto>> GetByTrainerAsync(
+            int trainerId,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10);
+
+        /// <summary>
+        /// Get unified history - own forms or trainer forms (for unit heads)
+        /// </summary>
+        Task<PaginatedResult<PublicationDto>> GetUnifiedHistoryAsync(
+            int? trainerId = null,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10);
+
     }
 }

@@ -1,5 +1,6 @@
 ﻿
 using Application.Services.Common;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Services.DataTables.ConsultSocialMedia
 {
@@ -54,7 +55,19 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
             consultingService.CreatedById = _currentUserService.UserId;
             consultingService.CreatedAt = DateTimeOffset.UtcNow;
             consultingService.OrganizationId = _currentUserService.OrganizationId;
-            consultingService.FormStatus = "Draft";
+
+            // Auto-approve forms created by Unit Heads
+            if (_currentUserService.Role == Role.UNITHEAD)
+            {
+                consultingService.FormStatus = "Approved";
+                consultingService.ApprovedById = _currentUserService.UserId;
+                consultingService.ApprovedAt = DateTimeOffset.UtcNow;
+                consultingService.FormStatusRemarks = "Auto-approved (Unit Head)";
+            }
+            else
+            {
+                consultingService.FormStatus = "Draft";
+            }
 
             var savedService = await _consultingServiceRepository.CreateAsync(consultingService);
             var serviceWithDetails = await _consultingServiceRepository.GetWithDetailsAsync(savedService.Id);
@@ -113,10 +126,36 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (consultingService.FormStatus != "Draft" && consultingService.FormStatus != "Rejected" && consultingService.FormStatus != "Pending")
+            // Allow edit for Draft, Rejected, or Approved (if unit head is the creator)
+            if (consultingService.FormStatus == "Draft" || consultingService.FormStatus == "Rejected")
+            {
+                // Trainers can edit Draft and Rejected forms
+            }
+            else if (consultingService.FormStatus == "Approved" &&
+                     _currentUserService.Role == Role.UNITHEAD &&
+                     consultingService.CreatedById == _currentUserService.UserId)
+            {
+                // Unit heads can edit their own approved forms
+            }
+            else if (consultingService.FormStatus == "Pending" &&
+                     _currentUserService.Role == Role.UNITHEAD)
+            {
+                // Unit heads can edit pending forms from trainers in their unit locations
+                var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+                if (!unitLocationIds.Contains(consultingService.UnitLocationId))
+                {
+                    return ServiceResult<ConsultingServiceDto>.Failure(
+                        "Access denied to this unit location",
+                        ServiceErrorStatus.FORBIDDEN);
+                }
+                // Allow edit
+            }
+            else
+            {
                 return ServiceResult<ConsultingServiceDto>.Failure(
-                    "Cannot edit approved consulting services",
+                    "Cannot edit in current status",
                     ServiceErrorStatus.INVALIDOPERATION);
+            }
 
             _mapper.MapUpdateDtoToEntity(updateDto, consultingService);
             consultingService.UpdatedById = _currentUserService.UserId;
@@ -504,6 +543,114 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
                 getFormStatus: x => x.FormStatus,
                 getCreatedById: x => x.CreatedById ?? 0,
                 _unitHeadAssignmentRepository,
+                pageNumber,
+                pageSize);
+        }
+
+        public async Task<PaginatedResult<ConsultingServiceDto>> GetByTrainerAsync(
+            int trainerId,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+
+            var query = _consultingServiceRepository.GetQueryable()
+                .Include(x => x.CreatedBy)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.Unit)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.District)
+                .Include(x => x.Category)
+                .Where(x => x.CreatedById == trainerId)
+                .Where(x => unitLocationIds.Contains(x.UnitLocationId));
+
+            if (unitLocationId.HasValue)
+            {
+                query = query.Where(x => x.UnitLocationId == unitLocationId.Value);
+            }
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .OrderByDescending(x => x.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var dtos = items.Select(x => _mapper.MapToDtoWithDetails(x)).ToList();
+
+            return new PaginatedResult<ConsultingServiceDto>(
+                dtos,
+                totalCount,
+                pageNumber,
+                pageSize);
+        }
+
+        /// <summary>
+        /// Get unified history - can show own history or specific trainer's history
+        /// Unit heads can view their own forms or forms from trainers in their unit locations
+        /// </summary>
+        public async Task<PaginatedResult<ConsultingServiceDto>> GetUnifiedHistoryAsync(
+            int? trainerId = null,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            var currentUserId = _currentUserService.UserId;
+            var currentRole = _currentUserService.Role;
+
+            // Get accessible unit locations
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+
+            // Build query
+            var query = _consultingServiceRepository.GetQueryable()
+                .Include(x => x.CreatedBy)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.Unit)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.District)
+                .Include(x => x.Category);
+
+            // Filter by creator
+            if (trainerId.HasValue && trainerId.Value > 0)
+            {
+                // Viewing specific trainer's history (unit heads only)
+                if (currentRole != Role.UNITHEAD && currentRole != Role.ADMIN)
+                {
+                    return new PaginatedResult<ConsultingServiceDto>(
+                        new List<ConsultingServiceDto>(),
+                        0,
+                        pageNumber,
+                        pageSize);
+                }
+                query = query.Where(x => x.CreatedById == trainerId.Value);
+            }
+            else
+            {
+                // Viewing own history
+                query = query.Where(x => x.CreatedById == currentUserId);
+            }
+
+            // Filter by unit location
+            query = query.Where(x => unitLocationIds.Contains(x.UnitLocationId));
+
+            if (unitLocationId.HasValue && unitLocationId.Value > 0)
+            {
+                query = query.Where(x => x.UnitLocationId == unitLocationId.Value);
+            }
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .OrderByDescending(x => x.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var dtos = items.Select(x => _mapper.MapToDtoWithDetails(x)).ToList();
+
+            return new PaginatedResult<ConsultingServiceDto>(
+                dtos,
+                totalCount,
                 pageNumber,
                 pageSize);
         }

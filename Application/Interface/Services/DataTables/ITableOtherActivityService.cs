@@ -118,16 +118,34 @@ namespace Application.Interface.Services.DataTables
         /// Shows all entries with status, submission date, approval date
         /// Sorted by most recent first
         /// </summary>
-        Task<PaginatedResult<TableOtherActivityDto>> GetTrainerHistoryAsync(
+        Task<PaginatedResult<TrainerHistoryItemDto>> GetTrainerHistoryAsync(
             int pageNumber = 1,
-            int pageSize = 20);
+            int pageSize = 10);
 
         /// <summary>
         /// Get pending approvals for Unit Head
         /// Shows all entries in Pending status for their unit locations
         /// </summary>
-        Task<PaginatedResult<TableOtherActivityDto>> GetPendingApprovalsAsync(
+        Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
             int pageNumber = 1,
-            int pageSize = 20);
+            int pageSize = 10);
+
+        /// <summary>
+        /// Get table other activities by trainer ID (Unit Head and Admin only)
+        /// </summary>
+        Task<PaginatedResult<TableOtherActivityDto>> GetByTrainerAsync(
+            int trainerId,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10);
+
+        /// <summary>
+        /// Get unified history - own forms or trainer forms (for unit heads)
+        /// </summary>
+        Task<PaginatedResult<TableOtherActivityDto>> GetUnifiedHistoryAsync(
+            int? trainerId = null,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10);
     }
 }

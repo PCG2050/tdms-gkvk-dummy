@@ -59,5 +59,23 @@ namespace Application.Interface.Services.DataTables
         Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
             int pageNumber = 1,
             int pageSize = 10);
+
+        /// <summary>
+        /// Get nomination rewards by trainer ID (Unit Head and Admin only)
+        /// </summary>
+        Task<PaginatedResult<NominationRewardDto>> GetByTrainerAsync(
+            int trainerId,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10);
+
+        /// <summary>
+        /// Get unified history - own forms or trainer forms (for unit heads)
+        /// </summary>
+        Task<PaginatedResult<NominationRewardDto>> GetUnifiedHistoryAsync(
+            int? trainerId = null,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10);
     }
 }

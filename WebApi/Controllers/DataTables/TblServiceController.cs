@@ -589,7 +589,7 @@ namespace WebApi.Controllers.DataTables
         }
 
         [HttpGet("my-history")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
         public async Task<IActionResult> GetMyHistory(
    [FromQuery] int pageNumber = 1,
    [FromQuery] int pageSize = 10)
@@ -613,6 +613,36 @@ namespace WebApi.Controllers.DataTables
             [FromQuery] int pageSize = 10)
         {
             var result = await _service.GetPendingApprovalsAsync(pageNumber, pageSize);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Get tbl services by trainer ID (Unit Head and Admin only)
+        /// </summary>
+        [HttpGet("trainer/{trainerId}")]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
+        public async Task<IActionResult> GetByTrainer(
+            int trainerId,
+            [FromQuery] int? unitLocationId = null,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 20)
+        {
+            var result = await _service.GetByTrainerAsync(trainerId, unitLocationId, pageNumber, pageSize);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Get unified history - own forms or trainer forms (for unit heads)
+        /// </summary>
+        [HttpGet("unified-history")]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead},{RoleString.Admin}")]
+        public async Task<IActionResult> GetUnifiedHistory(
+            [FromQuery] int? trainerId = null,
+            [FromQuery] int? unitLocationId = null,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 20)
+        {
+            var result = await _service.GetUnifiedHistoryAsync(trainerId, unitLocationId, pageNumber, pageSize);
             return Ok(result);
         }
 

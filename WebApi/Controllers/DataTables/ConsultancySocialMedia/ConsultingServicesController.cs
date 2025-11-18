@@ -323,7 +323,60 @@ namespace WebApi.Controllers.DataTables
             var result = await _consultingServiceService.GetByStatusAsync("pending", pageNumber, pageSize);
             return Ok(new { data = result.Items, pagination = result });
         }
-       
+
+        [HttpGet("my-history")]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
+        public async Task<IActionResult> GetMyHistory(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10)
+        {
+            var result = await _consultingServiceService.GetTrainerHistoryAsync(pageNumber, pageSize);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Get pending approvals for Unit Head
+        /// </summary>
+        [HttpGet("pending-approvals")]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
+        public async Task<IActionResult> GetPendingApprovals(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10)
+        {
+            var result = await _consultingServiceService.GetPendingApprovalsAsync(pageNumber, pageSize);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Get consulting services by trainer ID (Unit Head and Admin only)
+        /// </summary>
+        [HttpGet("trainer/{trainerId}")]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
+        public async Task<IActionResult> GetByTrainer(
+            int trainerId,
+            [FromQuery] int? unitLocationId = null,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 20)
+        {
+            var result = await _consultingServiceService.GetByTrainerAsync(trainerId, unitLocationId, pageNumber, pageSize);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Get unified history - own forms or trainer forms (for unit heads)
+        /// </summary>
+        [HttpGet("unified-history")]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead},{RoleString.Admin}")]
+        public async Task<IActionResult> GetUnifiedHistory(
+            [FromQuery] int? trainerId = null,
+            [FromQuery] int? unitLocationId = null,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 20)
+        {
+            var result = await _consultingServiceService.GetUnifiedHistoryAsync(trainerId, unitLocationId, pageNumber, pageSize);
+            return Ok(result);
+        }
+
     }
- 
+
 }

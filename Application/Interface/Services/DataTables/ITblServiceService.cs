@@ -105,5 +105,23 @@ namespace Application.Interface.Services.DataTables
         Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
             int pageNumber = 1,
             int pageSize = 10);
+
+        /// <summary>
+        /// Get tbl services by trainer ID (Unit Head and Admin only)
+        /// </summary>
+        Task<PaginatedResult<TblServicesDto>> GetByTrainerAsync(
+            int trainerId,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10);
+
+        /// <summary>
+        /// Get unified history - own forms or trainer forms (for unit heads)
+        /// </summary>
+        Task<PaginatedResult<TblServicesDto>> GetUnifiedHistoryAsync(
+            int? trainerId = null,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10);
     }
 }

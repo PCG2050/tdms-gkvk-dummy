@@ -6,8 +6,10 @@ using Application.Interface.Services.DataTables;
 using Application.Mapper;
 using Application.Models;
 using Application.Models.DataTables;
+using Application.Services.Common;
 using Domain.Entities.Enum;
 using Domain.Entities.GenericTables;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Services.DataTables
 {
@@ -20,6 +22,8 @@ namespace Infrastructure.Services.DataTables
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
+        // Generic history service
+        private readonly GenericTrainerHistoryService<TableOtherActivity> _historyService;
 
         public TableOtherActivityService(
             ITableOtherActivityRepository repository,
@@ -37,6 +41,8 @@ namespace Infrastructure.Services.DataTables
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
+            //  generic history service
+            _historyService = new GenericTrainerHistoryService<TableOtherActivity>(currentUserService, trainerAssignmentRepository, organizationUnitRepository);
         }
 
         // ==========================================
@@ -55,7 +61,19 @@ namespace Infrastructure.Services.DataTables
             activity.CreatedById = _currentUserService.UserId;
             activity.CreatedAt = DateTimeOffset.UtcNow;
             activity.OrganizationId = _currentUserService.OrganizationId;
-            activity.FormStatus = "Pending";  // AUTO-SUBMIT: Status automatically set to Pending
+
+            // Auto-approve forms created by Unit Heads
+            if (_currentUserService.Role == Role.UNITHEAD)
+            {
+                activity.FormStatus = "Approved";
+                activity.ApprovedById = _currentUserService.UserId;
+                activity.ApprovedAt = DateTimeOffset.UtcNow;
+                activity.FormStatusRemarks = "Auto-approved (Unit Head)";
+            }
+            else
+            {
+                activity.FormStatus = "Pending";  // AUTO-SUBMIT: Status automatically set to Pending
+            }
 
             await _repository.AddAsync(activity);
             await _repository.SaveChangesAsync();
@@ -96,10 +114,36 @@ namespace Infrastructure.Services.DataTables
                     "Access denied or activity cannot be modified in current status",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (activity.FormStatus != "Draft" && activity.FormStatus != "Rejected" && activity.FormStatus != "Pending")
+            // Allow edit for Draft, Rejected, or Approved (if unit head is the creator)
+            if (activity.FormStatus == "Draft" || activity.FormStatus == "Rejected")
+            {
+                // Trainers can edit Draft and Rejected forms
+            }
+            else if (activity.FormStatus == "Approved" &&
+                     _currentUserService.Role == Role.UNITHEAD &&
+                     activity.CreatedById == _currentUserService.UserId)
+            {
+                // Unit heads can edit their own approved forms
+            }
+            else if (activity.FormStatus == "Pending" &&
+                     _currentUserService.Role == Role.UNITHEAD)
+            {
+                // Unit heads can edit pending forms from trainers in their unit locations
+                var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+                if (!unitLocationIds.Contains(activity.UnitLocationId))
+                {
+                    return ServiceResult<TableOtherActivityDto>.Failure(
+                        "Access denied to this unit location",
+                        ServiceErrorStatus.FORBIDDEN);
+                }
+                // Allow edit
+            }
+            else
+            {
                 return ServiceResult<TableOtherActivityDto>.Failure(
-                    "Cannot modify activities in Approved status",
+                    "Cannot edit in current status",
                     ServiceErrorStatus.INVALIDOPERATION);
+            }
 
             _mapper.MapToExistingEntity(updateDto, activity);
             activity.UpdatedById = _currentUserService.UserId;
@@ -363,6 +407,154 @@ namespace Infrastructure.Services.DataTables
                 PageNumber = result.PageNumber,
                 PageSize = result.PageSize
             };
+        }
+
+        /// <summary>
+        /// Get trainer's submission history with pagination
+        /// </summary>
+        public async Task<PaginatedResult<TrainerHistoryItemDto>> GetTrainerHistoryAsync(
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            var query = _repository.GetQueryable()
+                .Include(x => x.ActivityType);
+
+            return await _historyService.GetTrainerHistoryAsync(
+                query,
+                getUnitLocationId: x => x.UnitLocationId,
+                getTitleOrName: x => x.ActivityType?.Name,
+                getFormStatus: x => x.FormStatus,
+                pageNumber,
+                pageSize);
+        }
+
+        /// <summary>
+        /// Get pending approvals for Unit Head with pagination
+        /// </summary>
+        public async Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            var query = _repository.GetQueryable()
+                .Include(x => x.ActivityType);
+
+            return await _historyService.GetPendingApprovalsAsync(
+                query,
+                getUnitLocationId: x => x.UnitLocationId,
+                getTitleOrName: x => x.ActivityType?.Name,
+                getFormStatus: x => x.FormStatus,
+                getCreatedById: x => x.CreatedById ?? 0,
+                _unitHeadAssignmentRepository,
+                pageNumber,
+                pageSize);
+        }
+
+        public async Task<PaginatedResult<TableOtherActivityDto>> GetByTrainerAsync(
+            int trainerId,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+
+            var query = _repository.GetQueryable()
+                .Include(x => x.CreatedBy)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.Unit)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.District)
+                .Include(x => x.ActivityType)
+                .Where(x => x.CreatedById == trainerId)
+                .Where(x => unitLocationIds.Contains(x.UnitLocationId));
+
+            if (unitLocationId.HasValue)
+            {
+                query = query.Where(x => x.UnitLocationId == unitLocationId.Value);
+            }
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .OrderByDescending(x => x.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var dtos = items.Select(x => _mapper.MapToDto(x)).ToList();
+
+            return new PaginatedResult<TableOtherActivityDto>(
+                dtos,
+                totalCount,
+                pageNumber,
+                pageSize);
+        }
+
+        /// <summary>
+        /// Get unified history - can show own history or specific trainer's history
+        /// Unit heads can view their own forms or forms from trainers in their unit locations
+        /// </summary>
+        public async Task<PaginatedResult<TableOtherActivityDto>> GetUnifiedHistoryAsync(
+            int? trainerId = null,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            var currentUserId = _currentUserService.UserId;
+            var currentRole = _currentUserService.Role;
+
+            // Get accessible unit locations
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+
+            // Build query
+            var query = _repository.GetQueryable()
+                .Include(x => x.CreatedBy)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.Unit)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.District)
+                .Include(x => x.ActivityType);
+
+            // Filter by creator
+            if (trainerId.HasValue && trainerId.Value > 0)
+            {
+                // Viewing specific trainer's history (unit heads only)
+                if (currentRole != Role.UNITHEAD && currentRole != Role.ADMIN)
+                {
+                    return new PaginatedResult<TableOtherActivityDto>(
+                        new List<TableOtherActivityDto>(),
+                        0,
+                        pageNumber,
+                        pageSize);
+                }
+                query = query.Where(x => x.CreatedById == trainerId.Value);
+            }
+            else
+            {
+                // Viewing own history
+                query = query.Where(x => x.CreatedById == currentUserId);
+            }
+
+            // Filter by unit location
+            query = query.Where(x => unitLocationIds.Contains(x.UnitLocationId));
+
+            if (unitLocationId.HasValue && unitLocationId.Value > 0)
+            {
+                query = query.Where(x => x.UnitLocationId == unitLocationId.Value);
+            }
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .OrderByDescending(x => x.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var dtos = items.Select(x => _mapper.MapToDto(x)).ToList();
+
+            return new PaginatedResult<TableOtherActivityDto>(
+                dtos,
+                totalCount,
+                pageNumber,
+                pageSize);
         }
 
         // ==========================================

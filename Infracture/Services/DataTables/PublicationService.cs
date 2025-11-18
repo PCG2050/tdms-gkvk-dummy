@@ -10,6 +10,7 @@ using Application.Models.DataTables;
 using Application.Services.Common;
 using Domain.Entities.Enum;
 using Domain.Entities.GenericTables;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Services.DataTables
 {
@@ -64,7 +65,19 @@ namespace Infrastructure.Services.DataTables
             publication.CreatedById = _currentUserService.UserId;
             publication.CreatedAt = DateTimeOffset.UtcNow;
             publication.OrganizationId = _currentUserService.OrganizationId;
-            publication.FormStatus = "Draft";
+
+            // Auto-approve forms created by Unit Heads
+            if (_currentUserService.Role == Role.UNITHEAD)
+            {
+                publication.FormStatus = "Approved";
+                publication.ApprovedById = _currentUserService.UserId;
+                publication.ApprovedAt = DateTimeOffset.UtcNow;
+                publication.FormStatusRemarks = "Auto-approved (Unit Head)";
+            }
+            else
+            {
+                publication.FormStatus = "Draft";
+            }
 
             var savedPublication = await _publicationRepository.CreateAsync(publication);
 
@@ -133,11 +146,36 @@ namespace Infrastructure.Services.DataTables
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            // ✅ Only block Approved publications
-            if (publication.FormStatus == "Approved")
+            // Allow edit for Draft, Rejected, or Approved (if unit head is the creator)
+            if (publication.FormStatus == "Draft" || publication.FormStatus == "Rejected")
+            {
+                // Trainers can edit Draft and Rejected forms
+            }
+            else if (publication.FormStatus == "Approved" &&
+                     _currentUserService.Role == Role.UNITHEAD &&
+                     publication.CreatedById == _currentUserService.UserId)
+            {
+                // Unit heads can edit their own approved forms
+            }
+            else if (publication.FormStatus == "Pending" &&
+                     _currentUserService.Role == Role.UNITHEAD)
+            {
+                // Unit heads can edit pending forms from trainers in their unit locations
+                var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+                if (!unitLocationIds.Contains(publication.UnitLocationId))
+                {
+                    return ServiceResult<PublicationDto>.Failure(
+                        "Access denied to this unit location",
+                        ServiceErrorStatus.FORBIDDEN);
+                }
+                // Allow edit
+            }
+            else
+            {
                 return ServiceResult<PublicationDto>.Failure(
-                    "Cannot edit approved publications. Approved publications are final and cannot be modified.",
+                    "Cannot edit in current status",
                     ServiceErrorStatus.INVALIDOPERATION);
+            }
 
             // ✅ Map the update data first
             PublicationMapper.MapUpdateDtoToEntity(updateDto, publication);
@@ -663,6 +701,114 @@ namespace Infrastructure.Services.DataTables
                 getFormStatus: x => x.FormStatus,
                 getCreatedById: x => x.CreatedById ?? 0,
                 _unitHeadAssignmentRepository,
+                pageNumber,
+                pageSize);
+        }
+
+        public async Task<PaginatedResult<PublicationDto>> GetByTrainerAsync(
+            int trainerId,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+
+            var query = _publicationRepository.GetQueryable()
+                .Include(x => x.CreatedBy)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.Unit)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.District)
+                .Include(x => x.Category)
+                .Where(x => x.CreatedById == trainerId)
+                .Where(x => unitLocationIds.Contains(x.UnitLocationId));
+
+            if (unitLocationId.HasValue)
+            {
+                query = query.Where(x => x.UnitLocationId == unitLocationId.Value);
+            }
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .OrderByDescending(x => x.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var dtos = items.Select(x => _mapper.MapToDtoWithDetails(x)).ToList();
+
+            return new PaginatedResult<PublicationDto>(
+                dtos,
+                totalCount,
+                pageNumber,
+                pageSize);
+        }
+
+        /// <summary>
+        /// Get unified history - can show own history or specific trainer's history
+        /// Unit heads can view their own forms or forms from trainers in their unit locations
+        /// </summary>
+        public async Task<PaginatedResult<PublicationDto>> GetUnifiedHistoryAsync(
+            int? trainerId = null,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            var currentUserId = _currentUserService.UserId;
+            var currentRole = _currentUserService.Role;
+
+            // Get accessible unit locations
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+
+            // Build query
+            var query = _publicationRepository.GetQueryable()
+                .Include(x => x.CreatedBy)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.Unit)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.District)
+                .Include(x => x.Category);
+
+            // Filter by creator
+            if (trainerId.HasValue && trainerId.Value > 0)
+            {
+                // Viewing specific trainer's history (unit heads only)
+                if (currentRole != Role.UNITHEAD && currentRole != Role.ADMIN)
+                {
+                    return new PaginatedResult<PublicationDto>(
+                        new List<PublicationDto>(),
+                        0,
+                        pageNumber,
+                        pageSize);
+                }
+                query = query.Where(x => x.CreatedById == trainerId.Value);
+            }
+            else
+            {
+                // Viewing own history
+                query = query.Where(x => x.CreatedById == currentUserId);
+            }
+
+            // Filter by unit location
+            query = query.Where(x => unitLocationIds.Contains(x.UnitLocationId));
+
+            if (unitLocationId.HasValue && unitLocationId.Value > 0)
+            {
+                query = query.Where(x => x.UnitLocationId == unitLocationId.Value);
+            }
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .OrderByDescending(x => x.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var dtos = items.Select(x => _mapper.MapToDtoWithDetails(x)).ToList();
+
+            return new PaginatedResult<PublicationDto>(
+                dtos,
+                totalCount,
                 pageNumber,
                 pageSize);
         }
