@@ -64,10 +64,8 @@ namespace Infrastructure.Services.DataTables.ASM
                 CreatedById = _currentUserService.UserId,
                 CreatedAt = DateTimeOffset.UtcNow,
                 OrganizationId = _currentUserService.OrganizationId,
-                FormStatus = "Draft"
+                FormStatus = "Pending"
             };
-
-
 
             var savedEntity = await _repository.AddAsync(entity);
             var dto = _mapper.MapToDto(savedEntity);
@@ -121,7 +119,7 @@ namespace Infrastructure.Services.DataTables.ASM
                         CreatedById = _currentUserService.UserId,
                         CreatedAt = DateTimeOffset.UtcNow,
                         OrganizationId = _currentUserService.OrganizationId,
-                        FormStatus = batchCreateDto.SubmitOnCreate ? "Pending" : "Draft"
+                        FormStatus = "Pending"
                     };
 
                     var savedEntity = await _repository.AddAsync(entity);
@@ -190,12 +188,12 @@ namespace Infrastructure.Services.DataTables.ASM
                         continue;
                     }
 
-                    if (entity.FormStatus != "Draft" && entity.FormStatus != "Rejected")
+                    if (entity.FormStatus == "Approved")
                     {
                         result.FailedEntries.Add(new BatchErrorDto
                         {
                             Index = i,
-                            ErrorMessage = "Cannot modify entries in Pending or Approved status",
+                            ErrorMessage = "Cannot modify approved entries",
                             OriginalData = updateDto
                         });
                         result.FailureCount++;
@@ -222,27 +220,9 @@ namespace Infrastructure.Services.DataTables.ASM
                         entity.PublicCount = updateDto.PublicCount.Value;
 
                     entity.SubmittedDate = DateOnly.FromDateTime(DateTime.UtcNow);
+                    entity.FormStatus = "Pending";
                     entity.UpdatedById = _currentUserService.UserId;
                     entity.UpdatedAt = DateTimeOffset.UtcNow;
-
-                    // If SubmitOnUpdate is true, change status to Pending
-                    if (batchUpdateDto.SubmitOnUpdate)
-                    {
-                        // Validate required fields before submission
-                        if (entity.FarmersCount == 0 && entity.StudentsCount == 0 && entity.PublicCount == 0)
-                        {
-                            result.FailedEntries.Add(new BatchErrorDto
-                            {
-                                Index = i,
-                                ErrorMessage = "At least one visitor type count must be greater than zero",
-                                OriginalData = updateDto
-                            });
-                            result.FailureCount++;
-                            continue;
-                        }
-
-                        entity.FormStatus = "Pending";
-                    }
 
                     var updatedEntity = await _repository.UpdateAsync(entity);
                     var dto = _mapper.MapToDto(updatedEntity);
@@ -296,9 +276,9 @@ namespace Infrastructure.Services.DataTables.ASM
                     "Access denied or entry cannot be modified in current status",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (entity.FormStatus != "Draft" && entity.FormStatus != "Rejected")
+            if (entity.FormStatus == "Approved")
                 return ServiceResult<ASMVisitorDetailsDto>.Failure(
-                    "Cannot modify entries in Pending or Approved status",
+                    "Cannot modify approved entries",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             // Update only provided fields
@@ -321,7 +301,7 @@ namespace Infrastructure.Services.DataTables.ASM
                 entity.PublicCount = updateDto.PublicCount.Value;
 
             entity.SubmittedDate = DateOnly.FromDateTime(DateTime.UtcNow);
-
+            entity.FormStatus = "Pending";
             entity.UpdatedById = _currentUserService.UserId;
             entity.UpdatedAt = DateTimeOffset.UtcNow;
 
@@ -341,9 +321,9 @@ namespace Infrastructure.Services.DataTables.ASM
             if (!await _entityPermissionService.CanDeleteForm(entity))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (entity.FormStatus != "Draft")
+            if (entity.FormStatus == "Approved")
                 return ServiceResult.Failure(
-                    "Only Draft entries can be deleted",
+                    "Cannot delete approved entries",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             await _repository.DeleteAsync(id);
@@ -364,10 +344,16 @@ namespace Infrastructure.Services.DataTables.ASM
             if (!await _entityPermissionService.CanModifyForm(entity))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (entity.FormStatus != "Draft")
+            // Since all creates/updates now automatically set to Pending, this endpoint is mostly redundant
+            // But we'll keep it for backward compatibility and handle Rejected status
+            if (entity.FormStatus == "Approved")
                 return ServiceResult.Failure(
-                    "Only Draft entries can be submitted",
+                    "Cannot submit approved entries",
                     ServiceErrorStatus.INVALIDOPERATION);
+
+            // If already Pending, just return success (idempotent)
+            if (entity.FormStatus == "Pending")
+                return ServiceResult.Success();
 
             // Validate required fields before submission
             if (entity.FarmersCount == 0 && entity.StudentsCount == 0 && entity.PublicCount == 0)

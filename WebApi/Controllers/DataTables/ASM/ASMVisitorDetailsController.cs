@@ -18,13 +18,12 @@ namespace WebApi.Controllers.DataTables.ASM
     /// - Used for reporting and statistical analysis of museum visitors
     /// 
     /// STATUS WORKFLOW:
-    /// - Draft: Initial state when created, can edit freely
-    /// - Pending: Submitted for Unit Head approval (via Submit endpoint)
-    /// - Approved: Unit Head approved, cannot edit
-    /// - Rejected: Unit Head rejected with remarks, trainer can edit and resubmit
-    /// 
+    /// - Pending: Automatically set when created or updated, awaiting Unit Head approval
+    /// - Approved: Unit Head approved, cannot edit or delete
+    /// - Rejected: Unit Head rejected with remarks, trainer can edit (status returns to Pending)
+    ///
     /// PERMISSIONS:
-    /// - Trainers: Create, edit (Draft/Rejected only), submit, view own
+    /// - Trainers: Create (auto-pending), edit (Pending/Rejected only), delete (Pending/Rejected only), view own
     /// - UnitHeads: Approve/reject, view all in their unit locations
     /// - Admins: Full access across organization
     /// </summary>
@@ -45,12 +44,12 @@ namespace WebApi.Controllers.DataTables.ASM
 
         /// <summary>
         /// Create new visitor detail entry (Trainer only)
-        /// Initial status: Draft
+        /// Initial status: Pending (automatically submitted for approval)
         /// Auto-sets CreatedById, CreatedAt, and OrganizationId
         /// </summary>
         /// <remarks>
         /// Sample request:
-        /// 
+        ///
         ///     POST /api/units/asm/visitor-details
         ///     {
         ///       "unitLocationId": 1,
@@ -59,10 +58,10 @@ namespace WebApi.Controllers.DataTables.ASM
         ///       "endDate": "2025-01-15",
         ///       "farmersCount": 0,
         ///       "studentsCount": 45,
-        ///       "publicCount": 5,
-        ///       "submittedDate": "2025-01-15T10:30:00"
+        ///       "publicCount": 5
         ///     }
-        /// 
+        ///
+        /// Note: Entry is automatically created with status "Pending"
         /// </remarks>
         /// <response code="200">Visitor detail created successfully</response>
         /// <response code="400">Validation error or access denied</response>
@@ -86,14 +85,13 @@ namespace WebApi.Controllers.DataTables.ASM
 
         /// <summary>
         /// Batch create multiple visitor detail entries (Trainer only)
-        /// Can optionally submit all entries for approval immediately
+        /// All entries are automatically submitted for approval with status "Pending"
         /// </summary>
         /// <remarks>
         /// Sample request:
         ///
         ///     POST /api/units/asm/visitor-details/batch
         ///     {
-        ///       "submitOnCreate": true,
         ///       "visitorDetails": [
         ///         {
         ///           "unitLocationId": 1,
@@ -116,8 +114,7 @@ namespace WebApi.Controllers.DataTables.ASM
         ///       ]
         ///     }
         ///
-        /// If submitOnCreate is true, all entries will be created with status "Pending"
-        /// If submitOnCreate is false (default), all entries will be created with status "Draft"
+        /// All entries are automatically created with status "Pending"
         /// </remarks>
         /// <response code="200">Batch creation completed (includes success and failure details)</response>
         /// <response code="400">Validation error</response>
@@ -140,21 +137,20 @@ namespace WebApi.Controllers.DataTables.ASM
                 failureCount = batchResult.FailureCount,
                 successfulEntries = batchResult.SuccessfulEntries,
                 failedEntries = batchResult.FailedEntries,
-                status = batchCreateDto.SubmitOnCreate ? "Pending" : "Draft"
+                status = "Pending"
             });
         }
 
         /// <summary>
         /// Batch update multiple visitor detail entries (Trainer only)
-        /// Can optionally submit all entries for approval after update
-        /// Only entries in Draft or Rejected status can be updated
+        /// All entries are automatically set to status "Pending" after update
+        /// Only non-approved entries can be updated (Pending and Rejected are editable)
         /// </summary>
         /// <remarks>
         /// Sample request:
         ///
         ///     PUT /api/units/asm/visitor-details/batch
         ///     {
-        ///       "submitOnUpdate": true,
         ///       "visitorDetails": [
         ///         {
         ///           "id": 5,
@@ -169,8 +165,7 @@ namespace WebApi.Controllers.DataTables.ASM
         ///       ]
         ///     }
         ///
-        /// If submitOnUpdate is true, successfully updated entries will have status changed to "Pending"
-        /// If submitOnUpdate is false (default), status remains unchanged
+        /// All successfully updated entries will have status set to "Pending"
         /// </remarks>
         /// <response code="200">Batch update completed (includes success and failure details)</response>
         /// <response code="400">Validation error</response>
@@ -193,7 +188,7 @@ namespace WebApi.Controllers.DataTables.ASM
                 failureCount = batchResult.FailureCount,
                 successfulEntries = batchResult.SuccessfulEntries,
                 failedEntries = batchResult.FailedEntries,
-                submitted = batchUpdateDto.SubmitOnUpdate
+                status = "Pending"
             });
         }
 
@@ -223,22 +218,24 @@ namespace WebApi.Controllers.DataTables.ASM
         }
 
         /// <summary>
-        /// Update visitor detail (Trainer only, Draft or Rejected status only)
-        /// Cannot update Pending or Approved entries
+        /// Update visitor detail (Trainer only)
+        /// Can update Pending and Rejected entries, but not Approved entries
+        /// Status is automatically set to "Pending" after update
         /// </summary>
         /// <param name="id">Visitor detail ID</param>
         /// <param name="updateDto">Updated visitor detail data</param>
         /// <remarks>
         /// Sample request:
-        /// 
+        ///
         ///     PUT /api/units/asm/visitor-details/5
         ///     {
         ///       "instituteName": "Updated School Name",
         ///       "studentsCount": 50,
         ///       "publicCount": 10
         ///     }
-        /// 
+        ///
         /// Note: Only fields you want to update need to be included
+        /// Entry status is automatically set to "Pending" after update
         /// </remarks>
         /// <response code="200">Visitor detail updated successfully</response>
         /// <response code="400">Cannot modify (wrong status or access denied)</response>
@@ -265,8 +262,8 @@ namespace WebApi.Controllers.DataTables.ASM
         }
 
         /// <summary>
-        /// Delete visitor detail (Trainer only, Draft status only)
-        /// Cannot delete submitted or approved entries
+        /// Delete visitor detail (Trainer only)
+        /// Can delete Pending and Rejected entries, but not Approved entries
         /// </summary>
         /// <param name="id">Visitor detail ID</param>
         /// <response code="200">Visitor detail deleted successfully</response>
@@ -295,8 +292,8 @@ namespace WebApi.Controllers.DataTables.ASM
 
         /// <summary>
         /// Submit visitor detail for approval (Trainer only)
-        /// Changes status: Draft → Pending
-        /// After submission, entry cannot be edited until approved/rejected
+        /// NOTE: This endpoint is now redundant since all creates/updates automatically set status to "Pending"
+        /// Kept for backward compatibility - changes status to "Pending" if not already
         /// </summary>
         /// <param name="id">Visitor detail ID</param>
         /// <response code="200">Visitor detail submitted successfully</response>

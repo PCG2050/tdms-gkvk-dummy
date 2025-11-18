@@ -97,6 +97,7 @@ namespace Application.Models.DataTables.ASM
 
     /// <summary>
     /// DTO for batch creating ASMVisitorDetails entries
+    /// All entries are automatically created with status "Pending"
     /// </summary>
     public class ASMVisitorDetailsBatchCreateDto
     {
@@ -105,16 +106,11 @@ namespace Application.Models.DataTables.ASM
         /// </summary>
         [Required]
         public List<ASMVisitorDetailsCreateDto> VisitorDetails { get; set; } = new();
-
-        /// <summary>
-        /// If true, automatically submits all entries for approval (status: Pending)
-        /// If false, saves as Draft (default: false)
-        /// </summary>
-        public bool SubmitOnCreate { get; set; } = false;
     }
 
     /// <summary>
     /// DTO for batch updating ASMVisitorDetails entries
+    /// All entries are automatically set to status "Pending" after update
     /// </summary>
     public class ASMVisitorDetailsBatchUpdateDto
     {
@@ -123,12 +119,6 @@ namespace Application.Models.DataTables.ASM
         /// </summary>
         [Required]
         public List<ASMVisitorDetailsUpdateDto> VisitorDetails { get; set; } = new();
-
-        /// <summary>
-        /// If true, automatically submits all entries for approval (status: Pending)
-        /// If false, keeps existing status (default: false)
-        /// </summary>
-        public bool SubmitOnUpdate { get; set; } = false;
     }
 
     /// <summary>
