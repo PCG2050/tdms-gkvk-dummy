@@ -13,7 +13,7 @@ namespace Application.Interface.Repository
         Task DeleteAsync(User user);
         Task<List<User>> GetUsersByOrganizationAndRoleAsync(int organizationId, Role role);
         //Task SetPasswordResetTokenAsync(int userId, string token, DateTimeOffset expiresAt);
-      
+
 
         Task<PaginatedResult<TrainerDetailsDto>> GetPaginatedItemsAsync(
             int organizationId, int pageNumber = 1, QueryFilter? queryFilter = null, int pageSize = 10);

@@ -112,92 +112,36 @@ namespace WebApi.Controllers.DataTables.IBTVA
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
-        // C1: Resource Persons
-        [HttpPost("content/{contentId}/resource-persons")]
-        public async Task<IActionResult> AddResourcePerson(int contentId, [FromBody] IbtvaResourcePersonCreateDto dto)
+        [HttpGet("{programId}/content")]
+        public async Task<IActionResult> GetProgramContentsByProgramId(int programId)
         {
-            var result = await _service.AddResourcePersonAsync(contentId, dto);
+            var result = await _service.GetProgramContentsByProgramIdAsync(programId);
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
-        [HttpPut("resource-persons/{personId}")]
-        public async Task<IActionResult> UpdateResourcePerson(int personId, [FromBody] IbtvaResourcePersonUpdateDto dto)
+        /// <summary>
+        /// Creates program content with all children in one transaction (RECOMMENDED)
+        /// </summary>
+        [HttpPost("{programId}/content-with-children")]
+        public async Task<IActionResult> AddProgramContentWithChildren(int programId, [FromBody] IbtvaProgramContentWithChildrenCreateDto dto)
         {
-            var result = await _service.UpdateResourcePersonAsync(personId, dto);
+            var result = await _service.AddProgramContentWithChildrenAsync(programId, dto);
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
-        [HttpDelete("resource-persons/{personId}")]
-        public async Task<IActionResult> DeleteResourcePerson(int personId)
+        /// <summary>
+        /// Updates program content with all children using hybrid pattern (RECOMMENDED)
+        /// </summary>
+        [HttpPut("content/{contentId}/with-children")]
+        public async Task<IActionResult> UpdateProgramContentWithChildren(int contentId, [FromBody] IbtvaProgramContentWithChildrenUpdateDto dto)
         {
-            var result = await _service.DeleteResourcePersonAsync(personId);
+            var result = await _service.UpdateProgramContentWithChildrenAsync(contentId, dto);
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
-        [HttpGet("content/{contentId}/resource-persons")]
-        public async Task<IActionResult> GetResourcePersons(int contentId)
-        {
-            var result = await _service.GetResourcePersonsByContentIdAsync(contentId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        // C2: Topics Covered
-        [HttpPost("content/{contentId}/topics")]
-        public async Task<IActionResult> AddTopic(int contentId, [FromBody] IbtvaTopicsCoveredCreateDto dto)
-        {
-            var result = await _service.AddTopicAsync(contentId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpPut("topics/{topicId}")]
-        public async Task<IActionResult> UpdateTopic(int topicId, [FromBody] IbtvaTopicsCoveredUpdateDto dto)
-        {
-            var result = await _service.UpdateTopicAsync(topicId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpDelete("topics/{topicId}")]
-        public async Task<IActionResult> DeleteTopic(int topicId)
-        {
-            var result = await _service.DeleteTopicAsync(topicId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpGet("content/{contentId}/topics")]
-        public async Task<IActionResult> GetTopics(int contentId)
-        {
-            var result = await _service.GetTopicsByContentIdAsync(contentId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        // C3: Teaching Aids
-        [HttpPost("content/{contentId}/teaching-aids")]
-        public async Task<IActionResult> AddTeachingAid(int contentId, [FromBody] IbtvaTeachingAidsCreateDto dto)
-        {
-            var result = await _service.AddTeachingAidAsync(contentId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpPut("teaching-aids/{aidId}")]
-        public async Task<IActionResult> UpdateTeachingAid(int aidId, [FromBody] IbtvaTeachingAidsUpdateDto dto)
-        {
-            var result = await _service.UpdateTeachingAidAsync(aidId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpDelete("teaching-aids/{aidId}")]
-        public async Task<IActionResult> DeleteTeachingAid(int aidId)
-        {
-            var result = await _service.DeleteTeachingAidAsync(aidId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpGet("content/{contentId}/teaching-aids")]
-        public async Task<IActionResult> GetTeachingAids(int contentId)
-        {
-            var result = await _service.GetTeachingAidsByContentIdAsync(contentId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
+        // C1: Resource Persons - REMOVED (use hybrid endpoint instead)
+        // C2: Topics Covered - REMOVED (use hybrid endpoint instead)
+        // C3: Teaching Aids - REMOVED (use hybrid endpoint instead)
 
         // ============================
         // SECTION D: ADVISORY SERVICES

@@ -27,6 +27,7 @@ namespace Infrastructure.Repository.DataTables.Publication_Repo
                .Include(p => p.Mode)
                .Include(p => p.Region)
                .Include(p => p.Source)
+               .Include(p => p.ExtensionWork)
                .Include(p => p.UnitLocation)
                    .ThenInclude(ul => ul.Unit)
                .Include(p => p.UnitLocation)
@@ -38,6 +39,10 @@ namespace Infrastructure.Repository.DataTables.Publication_Repo
                .Include(p => p.ApprovedBy)
                 .Include(p => p.PublisherDetails)
                 .Include(p => p.ExtensionLiteratures)
+                .Include(p => p.PublicationKannadaNewsPapers)
+                .Include(p => p.PublicationEnglishNewsPapers)
+                .Include(p => p.PublicationKannadaMagazines)
+                .Include(p => p.PublicationEnglishMagazines)
                 .AsSplitQuery()
                .ToListAsync();
         }
@@ -54,6 +59,7 @@ namespace Infrastructure.Repository.DataTables.Publication_Repo
                 .Include(p => p.Mode)
                 .Include(p => p.Region)
                 .Include(p => p.Source)
+                .Include(p => p.ExtensionWork)
                 .Include(p => p.UnitLocation)
                     .ThenInclude(ul => ul.Unit)
                 .Include(p => p.UnitLocation)
@@ -65,6 +71,10 @@ namespace Infrastructure.Repository.DataTables.Publication_Repo
                 .Include(p => p.ApprovedBy)
                 .Include(p => p.PublisherDetails)
                 .Include(p => p.ExtensionLiteratures)
+                .Include(p => p.PublicationKannadaNewsPapers)
+                .Include(p => p.PublicationEnglishNewsPapers)
+                .Include(p => p.PublicationKannadaMagazines)
+                .Include(p => p.PublicationEnglishMagazines)
                 .AsSplitQuery()
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
@@ -108,6 +118,7 @@ namespace Infrastructure.Repository.DataTables.Publication_Repo
                 .Include(p => p.Mode)
                 .Include(p => p.Region)
                 .Include(p => p.Source)
+                .Include(p => p.ExtensionWork)
                 .Include(p => p.UnitLocation)
                     .ThenInclude(ul => ul.Unit)
                 .Include(p => p.UnitLocation)
@@ -163,6 +174,7 @@ namespace Infrastructure.Repository.DataTables.Publication_Repo
                 .Include(p => p.Mode)
                 .Include(p => p.Region)
                 .Include(p => p.Source)
+                .Include(p => p.ExtensionWork)
                 .Include(p => p.UnitLocation)
                     .ThenInclude(ul => ul.Unit)
                 .Include(p => p.UnitLocation)
@@ -213,6 +225,89 @@ namespace Infrastructure.Repository.DataTables.Publication_Repo
             }
 
             return summary;
+        }
+
+        // Many-to-many relationship management for newspapers and magazines
+        public async Task UpdatePublicationNewspapersAndMagazinesAsync(
+            int publicationId,
+            List<int>? kannadaNewsPaperIds,
+            List<int>? englishNewsPaperIds,
+            List<int>? kannadaMagazineIds,
+            List<int>? englishMagazineIds)
+        {
+            // Remove existing relationships
+            var existingKannadaNewsPapers = _context.Set<Domain.Entities.Junction.PublicationKannadaNewsPaper>()
+                .Where(x => x.PublicationId == publicationId);
+            var existingEnglishNewsPapers = _context.Set<Domain.Entities.Junction.PublicationEnglishNewsPaper>()
+                .Where(x => x.PublicationId == publicationId);
+            var existingKannadaMagazines = _context.Set<Domain.Entities.Junction.PublicationKannadaMagazine>()
+                .Where(x => x.PublicationId == publicationId);
+            var existingEnglishMagazines = _context.Set<Domain.Entities.Junction.PublicationEnglishMagazine>()
+                .Where(x => x.PublicationId == publicationId);
+
+            _context.Set<Domain.Entities.Junction.PublicationKannadaNewsPaper>().RemoveRange(existingKannadaNewsPapers);
+            _context.Set<Domain.Entities.Junction.PublicationEnglishNewsPaper>().RemoveRange(existingEnglishNewsPapers);
+            _context.Set<Domain.Entities.Junction.PublicationKannadaMagazine>().RemoveRange(existingKannadaMagazines);
+            _context.Set<Domain.Entities.Junction.PublicationEnglishMagazine>().RemoveRange(existingEnglishMagazines);
+
+            // Add new relationships
+            if (kannadaNewsPaperIds != null && kannadaNewsPaperIds.Any())
+            {
+                foreach (var id in kannadaNewsPaperIds)
+                {
+                    _context.Set<Domain.Entities.Junction.PublicationKannadaNewsPaper>().Add(
+                        new Domain.Entities.Junction.PublicationKannadaNewsPaper
+                        {
+                            PublicationId = publicationId,
+                            KannadaNewsPaperId = id,
+                            CreatedAt = DateTimeOffset.UtcNow
+                        });
+                }
+            }
+
+            if (englishNewsPaperIds != null && englishNewsPaperIds.Any())
+            {
+                foreach (var id in englishNewsPaperIds)
+                {
+                    _context.Set<Domain.Entities.Junction.PublicationEnglishNewsPaper>().Add(
+                        new Domain.Entities.Junction.PublicationEnglishNewsPaper
+                        {
+                            PublicationId = publicationId,
+                            EnglishNewsPaperId = id,
+                            CreatedAt = DateTimeOffset.UtcNow
+                        });
+                }
+            }
+
+            if (kannadaMagazineIds != null && kannadaMagazineIds.Any())
+            {
+                foreach (var id in kannadaMagazineIds)
+                {
+                    _context.Set<Domain.Entities.Junction.PublicationKannadaMagazine>().Add(
+                        new Domain.Entities.Junction.PublicationKannadaMagazine
+                        {
+                            PublicationId = publicationId,
+                            KannadaMagazineId = id,
+                            CreatedAt = DateTimeOffset.UtcNow
+                        });
+                }
+            }
+
+            if (englishMagazineIds != null && englishMagazineIds.Any())
+            {
+                foreach (var id in englishMagazineIds)
+                {
+                    _context.Set<Domain.Entities.Junction.PublicationEnglishMagazine>().Add(
+                        new Domain.Entities.Junction.PublicationEnglishMagazine
+                        {
+                            PublicationId = publicationId,
+                            EnglishMagazineId = id,
+                            CreatedAt = DateTimeOffset.UtcNow
+                        });
+                }
+            }
+
+            await _context.SaveChangesAsync();
         }
     }
 }

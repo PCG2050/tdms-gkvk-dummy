@@ -9,7 +9,7 @@ namespace WebApi.Controllers.DataTables.ASM
     /// <summary>
     /// Controller for ASMVisitorDetails (Agricultural Science Museum Visitor Tracking)
     /// 
-    /// This controller manages visitor detail entries for the Agricultural Science Museum,
+    /// This controller manages visitor detail entries for the Agricultural ScienceB Museum,
     /// tracking different types of visitors: Farmers, Students, and General Public.
     /// 
     /// USAGE:
@@ -18,13 +18,12 @@ namespace WebApi.Controllers.DataTables.ASM
     /// - Used for reporting and statistical analysis of museum visitors
     /// 
     /// STATUS WORKFLOW:
-    /// - Draft: Initial state when created, can edit freely
-    /// - Pending: Submitted for Unit Head approval (via Submit endpoint)
-    /// - Approved: Unit Head approved, cannot edit
-    /// - Rejected: Unit Head rejected with remarks, trainer can edit and resubmit
-    /// 
+    /// - Pending: Automatically set when created or updated, awaiting Unit Head approval
+    /// - Approved: Unit Head approved, cannot edit or delete
+    /// - Rejected: Unit Head rejected with remarks, trainer can edit (status returns to Pending)
+    ///
     /// PERMISSIONS:
-    /// - Trainers: Create, edit (Draft/Rejected only), submit, view own
+    /// - Trainers: Create (auto-pending), edit (Pending/Rejected only), delete (Pending/Rejected only), view own
     /// - UnitHeads: Approve/reject, view all in their unit locations
     /// - Admins: Full access across organization
     /// </summary>
@@ -44,43 +43,144 @@ namespace WebApi.Controllers.DataTables.ASM
         // ==========================================
 
         /// <summary>
-        /// Create new visitor detail entry (Trainer only)
-        /// Initial status: Draft
-        /// Auto-sets CreatedById, CreatedAt, and OrganizationId
+        /// Batch create multiple visitor detail entries (Trainer only)
+        /// All entries are automatically submitted for approval with status "Pending"
+        /// Can be used for single or multiple entries
         /// </summary>
         /// <remarks>
-        /// Sample request:
-        /// 
-        ///     POST /api/units/asm/visitor-details
+        /// Sample request for single entry:
+        ///
+        ///     POST /api/units/asm/visitor-details/batch
         ///     {
-        ///       "unitLocationId": 1,
-        ///       "instituteName": "Government High School",
-        ///       "startDate": "2025-01-15",
-        ///       "endDate": "2025-01-15",
-        ///       "farmersCount": 0,
-        ///       "studentsCount": 45,
-        ///       "publicCount": 5,
-        ///       "submittedDate": "2025-01-15T10:30:00"
+        ///       "visitorDetails": [
+        ///         {
+        ///           "unitLocationId": 1,
+        ///           "instituteName": "Government High School",
+        ///           "startDate": "2025-01-15",
+        ///           "endDate": "2025-01-15",
+        ///           "farmersCount": 0,
+        ///           "studentsCount": 45,
+        ///           "publicCount": 5
+        ///         }
+        ///       ]
         ///     }
-        /// 
+        ///
+        /// Sample request for multiple entries:
+        ///
+        ///     POST /api/units/asm/visitor-details/batch
+        ///     {
+        ///       "visitorDetails": [
+        ///         {
+        ///           "unitLocationId": 1,
+        ///           "instituteName": "School A",
+        ///           "startDate": "2025-01-15",
+        ///           "endDate": "2025-01-15",
+        ///           "farmersCount": 0,
+        ///           "studentsCount": 50,
+        ///           "publicCount": 5
+        ///         },
+        ///         {
+        ///           "unitLocationId": 1,
+        ///           "instituteName": "School B",
+        ///           "startDate": "2025-01-16",
+        ///           "endDate": "2025-01-16",
+        ///           "farmersCount": 0,
+        ///           "studentsCount": 30,
+        ///           "publicCount": 2
+        ///         }
+        ///       ]
+        ///     }
+        ///
+        /// All entries are automatically created with status "Pending"
         /// </remarks>
-        /// <response code="200">Visitor detail created successfully</response>
-        /// <response code="400">Validation error or access denied</response>
-        /// <response code="401">Unauthorized - authentication required</response>
-        [HttpPost]
+        /// <response code="200">Batch creation completed (includes success and failure details)</response>
+        /// <response code="400">Validation error</response>
+        [HttpPost("batch")]
         [Authorize(Roles = RoleString.Trainer)]
-        public async Task<IActionResult> AddAsync([FromBody] ASMVisitorDetailsCreateDto createDto)
+        public async Task<IActionResult> AddBatchAsync([FromBody] ASMVisitorDetailsBatchCreateDto batchCreateDto)
         {
-            var result = await _service.AddAsync(createDto);
+            var result = await _service.AddBatchAsync(batchCreateDto);
 
             if (!result.IsSuccess)
                 return BadRequest(new { message = result.ErrorMessage });
 
+            var batchResult = result.Data;
+
             return Ok(new
             {
-                message = "Visitor detail created successfully",
-                data = result.Data,
-                status = result.Data.FormStatus
+                message = $"Batch creation completed: {batchResult.SuccessCount} succeeded, {batchResult.FailureCount} failed",
+                totalProcessed = batchResult.TotalProcessed,
+                successCount = batchResult.SuccessCount,
+                failureCount = batchResult.FailureCount,
+                successfulEntries = batchResult.SuccessfulEntries,
+                failedEntries = batchResult.FailedEntries,
+                status = "Pending"
+            });
+        }
+
+        /// <summary>
+        /// Batch update multiple visitor detail entries (Trainer only)
+        /// All entries are automatically set to status "Pending" after update
+        /// Only non-approved entries can be updated (Pending and Rejected are editable)
+        /// Can be used for single or multiple entries
+        /// </summary>
+        /// <remarks>
+        /// Sample request for single entry:
+        ///
+        ///     PUT /api/units/asm/visitor-details/batch
+        ///     {
+        ///       "visitorDetails": [
+        ///         {
+        ///           "id": 5,
+        ///           "instituteName": "Updated School Name",
+        ///           "studentsCount": 55,
+        ///           "publicCount": 7
+        ///         }
+        ///       ]
+        ///     }
+        ///
+        /// Sample request for multiple entries:
+        ///
+        ///     PUT /api/units/asm/visitor-details/batch
+        ///     {
+        ///       "visitorDetails": [
+        ///         {
+        ///           "id": 5,
+        ///           "studentsCount": 55,
+        ///           "publicCount": 7
+        ///         },
+        ///         {
+        ///           "id": 6,
+        ///           "instituteName": "Updated School Name",
+        ///           "studentsCount": 35
+        ///         }
+        ///       ]
+        ///     }
+        ///
+        /// All successfully updated entries will have status set to "Pending"
+        /// </remarks>
+        /// <response code="200">Batch update completed (includes success and failure details)</response>
+        /// <response code="400">Validation error</response>
+        [HttpPut("batch")]
+        [Authorize(Roles = RoleString.Trainer)]
+        public async Task<IActionResult> UpdateBatchAsync([FromBody] ASMVisitorDetailsBatchUpdateDto batchUpdateDto)
+        {
+            var result = await _service.UpdateBatchAsync(batchUpdateDto);
+
+            if (!result.IsSuccess)
+                return BadRequest(new { message = result.ErrorMessage });
+
+            var batchResult = result.Data;
+
+            return Ok(new
+            {
+                message = $"Batch update completed: {batchResult.SuccessCount} succeeded, {batchResult.FailureCount} failed",
+                totalProcessed = batchResult.TotalProcessed,
+                successCount = batchResult.SuccessCount,
+                failureCount = batchResult.FailureCount,
+                successfulEntries = batchResult.SuccessfulEntries,
+                failedEntries = batchResult.FailedEntries,
+                status = "Pending"
             });
         }
 
@@ -110,50 +210,8 @@ namespace WebApi.Controllers.DataTables.ASM
         }
 
         /// <summary>
-        /// Update visitor detail (Trainer only, Draft or Rejected status only)
-        /// Cannot update Pending or Approved entries
-        /// </summary>
-        /// <param name="id">Visitor detail ID</param>
-        /// <param name="updateDto">Updated visitor detail data</param>
-        /// <remarks>
-        /// Sample request:
-        /// 
-        ///     PUT /api/units/asm/visitor-details/5
-        ///     {
-        ///       "instituteName": "Updated School Name",
-        ///       "studentsCount": 50,
-        ///       "publicCount": 10
-        ///     }
-        /// 
-        /// Note: Only fields you want to update need to be included
-        /// </remarks>
-        /// <response code="200">Visitor detail updated successfully</response>
-        /// <response code="400">Cannot modify (wrong status or access denied)</response>
-        /// <response code="404">Visitor detail not found</response>
-        [HttpPut("{id}")]
-        [Authorize(Roles = RoleString.Trainer)]
-        public async Task<IActionResult> Update(int id, [FromBody] ASMVisitorDetailsUpdateDto updateDto)
-        {
-            var result = await _service.UpdateAsync(id, updateDto);
-
-            if (!result.IsSuccess)
-            {
-                if (result.ErrorStatus == ServiceErrorStatus.NOTFOUND)
-                    return NotFound(new { message = result.ErrorMessage });
-
-                return BadRequest(new { message = result.ErrorMessage });
-            }
-
-            return Ok(new
-            {
-                message = "Visitor detail updated successfully",
-                data = result.Data
-            });
-        }
-
-        /// <summary>
-        /// Delete visitor detail (Trainer only, Draft status only)
-        /// Cannot delete submitted or approved entries
+        /// Delete visitor detail (Trainer only)
+        /// Can delete Pending and Rejected entries, but not Approved entries
         /// </summary>
         /// <param name="id">Visitor detail ID</param>
         /// <response code="200">Visitor detail deleted successfully</response>
@@ -177,28 +235,8 @@ namespace WebApi.Controllers.DataTables.ASM
         }
 
         // ==========================================
-        // SUBMISSION & APPROVAL WORKFLOW
+        // APPROVAL WORKFLOW
         // ==========================================
-
-        /// <summary>
-        /// Submit visitor detail for approval (Trainer only)
-        /// Changes status: Draft → Pending
-        /// After submission, entry cannot be edited until approved/rejected
-        /// </summary>
-        /// <param name="id">Visitor detail ID</param>
-        /// <response code="200">Visitor detail submitted successfully</response>
-        /// <response code="400">Cannot submit (validation error or wrong status)</response>
-        [HttpPost("{id}/submit")]
-        [Authorize(Roles = RoleString.Trainer)]
-        public async Task<IActionResult> Submit(int id)
-        {
-            var result = await _service.SubmitForApprovalAsync(id);
-
-            if (!result.IsSuccess)
-                return BadRequest(new { message = result.ErrorMessage });
-
-            return Ok(new { message = "Visitor detail submitted for approval successfully" });
-        }
 
         /// <summary>
         /// Approve visitor detail (Unit Head/Admin only)
@@ -350,40 +388,6 @@ namespace WebApi.Controllers.DataTables.ASM
 
             return Ok(result.Data);
         }
-
-        /// <summary>
-        /// Get visitor statistics (total counts by visitor type)
-        /// Returns aggregated visitor counts: farmers, students, public
-        /// Only includes approved entries
-        /// </summary>
-        /// <param name="startDate">Start date for statistics (format: YYYY-MM-DD)</param>
-        /// <param name="endDate">End date for statistics (format: YYYY-MM-DD)</param>
-        /// <remarks>
-        /// Sample response:
-        /// 
-        ///     {
-        ///       "totalFarmers": 1250,
-        ///       "totalStudents": 3400,
-        ///       "totalPublic": 890,
-        ///       "totalVisitors": 5540,
-        ///       "totalEntries": 42
-        ///     }
-        /// 
-        /// </remarks>
-        /// <response code="200">Visitor statistics</response>
-        //[HttpGet("statistics")]
-        //[Authorize]
-        //public async Task<IActionResult> GetVisitorStatistics(
-        //    [FromQuery] DateOnly? startDate = null,
-        //    [FromQuery] DateOnly? endDate = null)
-        //{
-        //    var result = await _service.GetVisitorStatisticsAsync(startDate, endDate);
-
-        //    if (!result.IsSuccess)
-        //        return BadRequest(new { message = result.ErrorMessage });
-
-        //    return Ok(result.Data);
-        //}
 
         /// <summary>
         /// Get trainer's submission history (Trainer only)

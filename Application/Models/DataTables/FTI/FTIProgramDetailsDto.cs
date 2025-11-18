@@ -12,7 +12,28 @@ namespace Application.Models.DataTables.FTI
     public class FtiProgramDetailsDto
     {
         public int Id { get; set; }
+
+        // --- Base Fields (same as CreateDto) ---
+
         public string? Title { get; set; }
+        public DateOnly StartDate { get; set; }
+        public DateOnly EndDate { get; set; }
+        public int? ProgramTypeId { get; set; }
+        public int? CategoryId { get; set; }
+        public string? CategoryOther { get; set; }
+        public int? TypeId { get; set; }
+        public string? TypeOther { get; set; }
+        public int? ThemeId { get; set; }
+        public string? ThemeOther { get; set; }
+        public int? ThematicAreaId { get; set; }
+        public string? ThematicAreaOther { get; set; }
+        public int? SponsoredOrganization { get; set; }
+        public string? SponsoredOrganizationName { get; set; }
+        public int? ModeId { get; set; }
+        public string? Duration { get; set; }
+        public int? RegionId { get; set; }
+        public string? RegionOther { get; set; }
+        public int? TPNo { get; set; }
         public string? Location { get; set; }
         public int? SourceOfFundId { get; set; }
         public int? Funds { get; set; }
@@ -100,13 +121,42 @@ namespace Application.Models.DataTables.FTI
         public int Id { get; set; }
         public DateOnly? StartDate { get; set; }
         public DateOnly? EndDate { get; set; }
+        public int? ProgramTypeId { get; set; }
+        public int? CategoryId { get; set; }
+        public string? CategoryOther { get; set; }
+        public int? TypeId { get; set; }
+        public string? TypeOther { get; set; }
+        public int? ThemeId { get; set; }
+        public string? ThemeOther { get; set; }
+        public int? ThematicAreaId { get; set; }
+        public string? ThematicAreaOther { get; set; }
+        public int? SponsoredOrganization { get; set; }
+        public string? SponsoredOrganizationName { get; set; }
+        public string? Title { get; set; }
+        public int? Mode { get; set; }
         public string? Duration { get; set; }
+        public int? RegionId { get; set; }
+        public string? RegionOther { get; set; }
+        public int? TPNo { get; set; }
+        public string? Location { get; set; }
+        public int? SourceOfFundId { get; set; }
+        public int? NoOfCourses { get; set; }
+        public string? Attachments { get; set; }
+        public int? StatusId { get; set; }
+        public decimal? TotalOutlayRs { get; set; }
+        public string? Copi { get; set; }
+        public int? BatchNo { get; set; }
+        public string? OrganizerBroucherFile { get; set; }
+        public string? OrganizerInstitutionName { get; set; }
+        public string? OrganizerInstitutionAddress { get; set; }
+        public int? SourceId { get; set; }
+        public DateTime? ProposalDate { get; set; }
+        public string? ProposalUploadFile { get; set; }
+        public DateTime? UniversitySanctionLetterDate { get; set; }
+        public string? UniversitySanctionLetterUploadFile { get; set; }
+        public DateTime? FundsSanctionLetterDate { get; set; }
+        public string? FundsSanctionLetterUploadFile { get; set; }
 
-        public List<FTIParticipantDemographicsDto>? ParticipantDemographics { get; set; }
-        public List<FTIProgramContentAndResourcesDto>? ProgramContentAndResources { get; set; }
-        public List<FTIAdvisoryServicesDto>? AdvisoryServices { get; set; }
-        public List<FTIReportDto>? Reports { get; set; }
-        public List<FTIRecommendationDto>? Recommendations { get; set; }
     }
 
 
@@ -126,16 +176,23 @@ namespace Application.Models.DataTables.FTI
     public class FtiParticipantDemographicsDto
     {
         public int Id { get; set; }
-        public int FTIProgramDetailsID { get; set; }
-        public int? Participant { get; set; }
+        public int? ParticipantId { get; set; }
         public int? Male_SC { get; set; }
         public int? Male_ST { get; set; }
         public int? Male_OBC { get; set; }
         public int? Male_GEN { get; set; }
+        public int? SC_Male_StayedInHostel { get; set; }
+        public int? ST_Male_StayedInHostel { get; set; }
+        public int? OBC_Male_StayedInHostel { get; set; }
+        public int? GEN_Male_StayedInHostel { get; set; }
         public int? Female_SC { get; set; }
         public int? Female_ST { get; set; }
         public int? Female_OBC { get; set; }
         public int? Female_GEN { get; set; }
+        public int? SC_Female_StayedInHostel { get; set; }
+        public int? ST_Female_StayedInHostel { get; set; }
+        public int? OBC_Female_StayedInHostel { get; set; }
+        public int? GEN_Female_StayedInHostel { get; set; }
         public int? Total { get; set; }
     }
 
@@ -176,13 +233,24 @@ namespace Application.Models.DataTables.FTI
     public class FtiParticipantDemographicsUpdateDto : IUpdateDto
     {
         public int Id { get; set; }
-        public int FTIProgramDetailsID { get; set; }
-        public string? Title { get; set; }
-        public string? Description { get; set; }
-
-        public List<FTIResourcePersonDto>? ResourcePersons { get; set; }
-        public List<FTITopicsCoveredInClassDto>? TopicsCovered { get; set; }
-        public List<FTITeachingAidsDevelopedDto>? TeachingAids { get; set; }
+        public int? ParticipantId { get; set; }
+        public int? Male_SC { get; set; }
+        public int? Male_ST { get; set; }
+        public int? Male_OBC { get; set; }
+        public int? Male_GEN { get; set; }
+        public int? SC_Male_StayedInHostel { get; set; }
+        public int? ST_Male_StayedInHostel { get; set; }
+        public int? OBC_Male_StayedInHostel { get; set; }
+        public int? GEN_Male_StayedInHostel { get; set; }
+        public int? Female_SC { get; set; }
+        public int? Female_ST { get; set; }
+        public int? Female_OBC { get; set; }
+        public int? Female_GEN { get; set; }
+        public int? SC_Female_StayedInHostel { get; set; }
+        public int? ST_Female_StayedInHostel { get; set; }
+        public int? OBC_Female_StayedInHostel { get; set; }
+        public int? GEN_Female_StayedInHostel { get; set; }
+        public int? Total { get; set; }
     }
 
 
@@ -333,6 +401,7 @@ namespace Application.Models.DataTables.FTI
         public string? Name { get; set; }
         public string? Designation { get; set; }
         public int? ResourceType { get; set; }
+        public int? Responsibility { get; set; }
         public string? InstitutionOrDepartment { get; set; }
     }
 
@@ -341,8 +410,7 @@ namespace Application.Models.DataTables.FTI
     /// </summary>
     public class FtiTopicsCoveredHybridDto
     {
-        public int Id { get; set; }
-        public int FTIProgramContentAndResourcesID { get; set; }
+        public int? Id { get; set; }  // null = create new, has value = update existing
         public DateTime? Date { get; set; }
         public string? Title { get; set; }
         public string? PhotoUpload { get; set; }
@@ -353,10 +421,9 @@ namespace Application.Models.DataTables.FTI
     /// </summary>
     public class FtiTeachingAidsHybridDto
     {
-        public int Id { get; set; }
-        public int FTIProgramContentAndResourcesID { get; set; }
-        public string? TypeOfAidDeveloped { get; set; }
-        public string? Other { get; set; }
+        public int? Id { get; set; }  // null = create new, has value = update existing
+        public int? TypeOfAidId { get; set; }
+        public string? OtherTypeOfAid { get; set; }
         public string? Purpose { get; set; }
         public int? Number { get; set; }
     }
@@ -421,11 +488,17 @@ namespace Application.Models.DataTables.FTI
     public class FtiAdvisoryServicesDto
     {
         public int Id { get; set; }
-        public int FTIProgramDetailsID { get; set; }
-        public int? NoOfWhatsappGroups { get; set; }
-        public int? NoOfWhatsappSMS { get; set; }
-        public int? NoOfEmailsSent { get; set; }
-        public int? NoOfBeneficiaries { get; set; }
+        public int NoOfFacebookSMS { get; set; }
+        public int NoOfSMSSentToRegisteredFarmers { get; set; }
+        public int NoOfWhatsappGroups { get; set; }
+        public int NoOfWhatsappSMS { get; set; }
+        public int NoOfAnsweredWhatsappQueries { get; set; }
+        public int NoOfPhoneCalls { get; set; }
+        public int NoOfFaceToFaceDiscussions { get; set; }
+        public int NoOfGroupDiscussions { get; set; }
+        public int NoOfEmailsSent { get; set; }
+        public int NoOfNewspaperCoverage { get; set; }
+        public int NoOfBeneficiaries { get; set; }
     }
 
     // ==================== REPORTS (Section E) ====================
@@ -457,10 +530,12 @@ namespace Application.Models.DataTables.FTI
     public class FtiReportDto
     {
         public int Id { get; set; }
-        public int FTIProgramDetailsID { get; set; }
-        public string? ReportingYear { get; set; }
+        public string? ProgressReportReportingYear { get; set; }
+        public DateTime? Date { get; set; }
         public string? UploadPhoto { get; set; }
+        public string? PhotosGeotaggedPhotoOrUploadPhoto { get; set; }
         public string? UploadVideo { get; set; }
+        public string? SignificantOutcome { get; set; }
     }
 
     // ==================== RECOMMENDATIONS (Section F) ====================
@@ -492,7 +567,6 @@ namespace Application.Models.DataTables.FTI
     public class FtiRecommendationDto
     {
         public int Id { get; set; }
-        public int FTIProgramDetailsID { get; set; }
         public string? ProblemsIdentified { get; set; }
         public string? Recommendation { get; set; }
         public string? ActionTaken { get; set; }

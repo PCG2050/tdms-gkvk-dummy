@@ -4,6 +4,7 @@ using Application.Interface.Repository;
 using Application.Models;
 using Domain.Entities;
 using Domain.Entities.Enum;
+using Infrastructure.Repository;
 using Infrastructure.Settings;
 using Microsoft.Extensions.Options;
 
@@ -58,7 +59,7 @@ namespace Infrastructure.Services
                 OrganizationId = registerDto.OrganizationId,
                 DateOfBirth = registerDto.Role == Role.TRAINER
                               ? registerDto.DateOfBirth ?? throw new InvalidOperationException("Date of Birth required for trainers")
-                              :registerDto.DateOfBirth ?? default,
+                              : registerDto.DateOfBirth ?? default,
                 DateOfJoining = registerDto.Role == Role.TRAINER
                     ? registerDto.DateOfJoining ?? throw new InvalidOperationException("Date of Joining required for trainers")
                     : registerDto.DateOfJoining ?? default,
@@ -67,7 +68,7 @@ namespace Infrastructure.Services
                     : registerDto.Gender ?? Gender.OTHER,
                 EmployementType = registerDto.Role == Role.TRAINER
                     ? registerDto.EmploymentType ?? throw new InvalidOperationException("Employment Type required for trainers")
-                    : registerDto.EmploymentType ?? EmployementType.TEMPORARY, 
+                    : registerDto.EmploymentType ?? EmployementType.TEMPORARY,
                 Qualification = registerDto.Role == Role.TRAINER
                     ? registerDto.Qualification ?? throw new InvalidOperationException("Qualification required for trainers")
                     : registerDto.Qualification
@@ -129,10 +130,10 @@ namespace Infrastructure.Services
                 if (updateDto.Gender is not null) user.Gender = updateDto.Gender.Value;
                 if (updateDto.EmploymentType is not null) user.EmployementType = updateDto.EmploymentType.Value;
                 if (updateDto.Qualification is not null) user.Qualification = updateDto.Qualification;
-                if (updateDto.ProfileImageUrl is not null) user.ProfileImageUrl = updateDto.ProfileImageUrl; 
+                if (updateDto.ProfileImageUrl is not null) user.ProfileImageUrl = updateDto.ProfileImageUrl;
 
-                 user.UpdatedById = _currentUser.UserId;
-                 user.UpdatedAt = DateTimeOffset.Now;
+                user.UpdatedById = _currentUser.UserId;
+                user.UpdatedAt = DateTimeOffset.Now;
                 await _userRepository.SaveAsync(user);
                 return ServiceResult.Success();
             }

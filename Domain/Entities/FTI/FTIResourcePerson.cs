@@ -12,17 +12,10 @@ namespace Domain.Entities.FTI
     public class FtiResourcePerson : AuditableBaseEntity
     {
         [Required]
-<<<<<<< Updated upstream
-        public int? FTIProgramContentAndResourcesID { get; set; }
-
-        [ForeignKey(nameof(FTIProgramContentAndResourcesID))]
-        public FTIProgramContentAndResources ProgramContentAndResources { get; set; }
-=======
         public int? FtiProgramContentAndResourcesId { get; set; }
         [JsonIgnore]
         [ForeignKey(nameof(FtiProgramContentAndResourcesId))]
         public FtiProgramContentAndResources? ProgramContentAndResources { get; set; }
->>>>>>> Stashed changes
 
         [MaxLength(200)]
         public string? Name { get; set; }
@@ -38,7 +31,8 @@ namespace Domain.Entities.FTI
 
         [MaxLength(250)]
         public string? InstitutionOrDepartment { get; set; }
+        public int? UnitLocationId { get; set; }
 
-
+        public int? OrganizationId { get; set; }
     }
 }

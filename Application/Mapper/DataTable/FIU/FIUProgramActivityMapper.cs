@@ -22,8 +22,8 @@ namespace Application.Mapper.Datatable.FIU
 
         public void MapUpdateDtoToEntity(FIUProgramActivityUpdateDto dto, FIUProgramActivity entity)
         {
-            entity.FIUActivitiesId = dto.FIUActivitiesId;
-            entity.Number = dto.Number;
+            entity.FIUActivitiesId = dto.FIUActivitiesId;  // ✅ Direct assignment
+            entity.Number = dto.Number;                     // ✅ Direct assignment
             entity.UploadMediaUrl = dto.UploadMediaUrl;
             entity.Remarks = dto.Remarks;
         }

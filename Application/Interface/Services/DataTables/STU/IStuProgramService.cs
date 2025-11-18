@@ -32,29 +32,9 @@ namespace Application.Interface.Services.DataTables.STU
         Task<ServiceResult> DeleteProgramContentAsync(int contentId);
         Task<ServiceResult<List<StuProgramContentDto>>> GetProgramContentsByProgramIdAsync(int programId);
 
-        // ============================
-        // SECTION C1: RESOURCE PERSONS
-        // ============================
-        Task<ServiceResult<StuResourcePersonDto>> AddResourcePersonAsync(int contentId, StuResourcePersonCreateDto dto);
-        Task<ServiceResult<StuResourcePersonDto>> UpdateResourcePersonAsync(int personId, StuResourcePersonUpdateDto dto);
-        Task<ServiceResult> DeleteResourcePersonAsync(int personId);
-        Task<ServiceResult<List<StuResourcePersonDto>>> GetResourcePersonsByContentIdAsync(int contentId);
-
-        // ============================
-        // SECTION C2: TOPICS COVERED
-        // ============================
-        Task<ServiceResult<StuTopicsCoveredDto>> AddTopicAsync(int contentId, StuTopicsCoveredCreateDto dto);
-        Task<ServiceResult<StuTopicsCoveredDto>> UpdateTopicAsync(int topicId, StuTopicsCoveredUpdateDto dto);
-        Task<ServiceResult> DeleteTopicAsync(int topicId);
-        Task<ServiceResult<List<StuTopicsCoveredDto>>> GetTopicsByContentIdAsync(int contentId);
-
-        // ============================
-        // SECTION C3: TEACHING AIDS
-        // ============================
-        Task<ServiceResult<StuTeachingAidsDto>> AddTeachingAidAsync(int contentId, StuTeachingAidsCreateDto dto);
-        Task<ServiceResult<StuTeachingAidsDto>> UpdateTeachingAidAsync(int aidId, StuTeachingAidsUpdateDto dto);
-        Task<ServiceResult> DeleteTeachingAidAsync(int aidId);
-        Task<ServiceResult<List<StuTeachingAidsDto>>> GetTeachingAidsByContentIdAsync(int contentId);
+        // Hybrid pattern methods for bulk create/update operations
+        Task<ServiceResult<StuProgramContentDto>> AddProgramContentWithChildrenAsync(int programId, StuProgramContentWithChildrenCreateDto dto);
+        Task<ServiceResult<StuProgramContentDto>> UpdateProgramContentWithChildrenAsync(int contentId, StuProgramContentWithChildrenUpdateDto dto);
 
         // ============================
         // SECTION D: ADVISORY SERVICES
@@ -117,15 +97,6 @@ namespace Application.Interface.Services.DataTables.STU
         /// Get pending approvals for Unit Head and Admin with pagination
         /// </summary>
         Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
-            int pageNumber = 1,
-            int pageSize = 10);
-
-        /// <summary>
-        /// Get programs by trainer ID and optionally filter by unit location
-        /// </summary>
-        Task<PaginatedResult<StuProgramDetailsDto>> GetByTrainerAsync(
-            int trainerId,
-            int? unitLocationId = null,
             int pageNumber = 1,
             int pageSize = 10);
     }

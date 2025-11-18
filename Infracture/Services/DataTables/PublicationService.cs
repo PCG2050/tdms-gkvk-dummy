@@ -67,6 +67,15 @@ namespace Infrastructure.Services.DataTables
             publication.FormStatus = "Draft";
 
             var savedPublication = await _publicationRepository.CreateAsync(publication);
+
+            // Handle many-to-many relationships for newspapers and magazines
+            await _publicationRepository.UpdatePublicationNewspapersAndMagazinesAsync(
+                savedPublication.Id,
+                createDto.KannadaNewsPaperIds,
+                createDto.EnglishNewsPaperIds,
+                createDto.KannadaMagazineIds,
+                createDto.EnglishMagazineIds);
+
             var publicationWithDetails = await _publicationRepository.GetWithDetailsAsync(savedPublication.Id);
             var dto = _mapper.MapToDtoWithDetails(publicationWithDetails!);
 
@@ -146,6 +155,14 @@ namespace Infrastructure.Services.DataTables
             }
 
             await _publicationRepository.UpdateAsync(publication);
+
+            // Handle many-to-many relationships for newspapers and magazines
+            await _publicationRepository.UpdatePublicationNewspapersAndMagazinesAsync(
+                id,
+                updateDto.KannadaNewsPaperIds,
+                updateDto.EnglishNewsPaperIds,
+                updateDto.KannadaMagazineIds,
+                updateDto.EnglishMagazineIds);
 
             var updatedPublication = await _publicationRepository.GetWithDetailsAsync(id);
             var dto = _mapper.MapToDtoWithDetails(updatedPublication!);
@@ -279,7 +296,7 @@ namespace Infrastructure.Services.DataTables
                     "Publication not found",
                     ServiceErrorStatus.NOTFOUND);
 
-            if (!await _entityPermissionService.    
+            if (!await _entityPermissionService.
                 CanModifyForm(publication))
                 return ServiceResult<ExtensionLiteratureDto>.Failure(
                     "Access denied",
@@ -454,7 +471,7 @@ namespace Infrastructure.Services.DataTables
             {
                 unitLocationIds = new List<int> { unitLocationId.Value };
             }
-          
+
             int? createdByIdFilter = null;
             if (_currentUserService.Role == Role.TRAINER)
             {
@@ -507,7 +524,7 @@ namespace Infrastructure.Services.DataTables
         {
             var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
 
-         
+
             int? createdByIdFilter = null;
             if (_currentUserService.Role == Role.TRAINER)
             {
@@ -516,7 +533,7 @@ namespace Infrastructure.Services.DataTables
 
             return await _publicationRepository.GetStatusSummaryAsync(
                 unitLocationIds,
-                createdByIdFilter);  
+                createdByIdFilter);
         }
 
         // APPROVAL/REJECTION (Unit Head)
@@ -603,7 +620,7 @@ namespace Infrastructure.Services.DataTables
                 }
             };
         }
-    
+
 
         // -------------------------------------------------------
         // HISTORY: Using Generic Service
@@ -654,7 +671,6 @@ namespace Infrastructure.Services.DataTables
 
 
 
-
         // PRIVATE HELPER METHODS
         //private async Task<bool> CanUserAccessUnitLocationAsync(int unitLocationId)
         //{
@@ -677,9 +693,9 @@ namespace Infrastructure.Services.DataTables
 
         private async Task<List<int>> GetAccessibleUnitLocationIdsAsync()
         {
-           
 
-         
+
+
             if (_currentUserService.Role == Role.TRAINER)
             {
                 return await _trainerAssignmentRepository.GetUnitLocationIdsByTrainerIdAsync(_currentUserService.UserId);

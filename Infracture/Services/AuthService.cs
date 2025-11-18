@@ -42,10 +42,7 @@ namespace Infrastructure.Services
                 throw new InvalidOperationException("Account is deactivated");
             }
 
-<<<<<<< Updated upstream
-=======
             var refreshTokenExpiryDays = request.RememberMe ? _refreshTokenExpiryDays : 1;
->>>>>>> Stashed changes
             // Create new session
             var session = new UserSession
             {
@@ -57,7 +54,7 @@ namespace Infrastructure.Services
                 DeviceId = deviceInfo.DeviceId,
                 Location = deviceInfo.Location,
                 CreatedAt = DateTime.UtcNow,
-                ExpiresAt = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays),
+                ExpiresAt = DateTime.UtcNow.AddDays(refreshTokenExpiryDays),
                 LastUsedAt = DateTime.UtcNow,
                 IsActive = true
             };

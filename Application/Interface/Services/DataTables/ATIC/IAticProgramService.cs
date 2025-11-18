@@ -32,29 +32,9 @@ namespace Application.Interface.Services.DataTables.ATIC
         Task<ServiceResult> DeleteProgramContentAsync(int contentId);
         Task<ServiceResult<List<AticProgramContentDto>>> GetProgramContentsByProgramIdAsync(int programId);
 
-        // ============================
-        // SECTION C1: RESOURCE PERSONS
-        // ============================
-        Task<ServiceResult<AticResourcePersonDto>> AddResourcePersonAsync(int contentId, AticResourcePersonCreateDto dto);
-        Task<ServiceResult<AticResourcePersonDto>> UpdateResourcePersonAsync(int personId, AticResourcePersonUpdateDto dto);
-        Task<ServiceResult> DeleteResourcePersonAsync(int personId);
-        Task<ServiceResult<List<AticResourcePersonDto>>> GetResourcePersonsByContentIdAsync(int contentId);
-
-        // ============================
-        // SECTION C2: TOPICS COVERED
-        // ============================
-        Task<ServiceResult<AticTopicsCoveredDto>> AddTopicAsync(int contentId, AticTopicsCoveredCreateDto dto);
-        Task<ServiceResult<AticTopicsCoveredDto>> UpdateTopicAsync(int topicId, AticTopicsCoveredUpdateDto dto);
-        Task<ServiceResult> DeleteTopicAsync(int topicId);
-        Task<ServiceResult<List<AticTopicsCoveredDto>>> GetTopicsByContentIdAsync(int contentId);
-
-        // ============================
-        // SECTION C3: TEACHING AIDS
-        // ============================
-        Task<ServiceResult<AticTeachingAidsDto>> AddTeachingAidAsync(int contentId, AticTeachingAidsCreateDto dto);
-        Task<ServiceResult<AticTeachingAidsDto>> UpdateTeachingAidAsync(int aidId, AticTeachingAidsUpdateDto dto);
-        Task<ServiceResult> DeleteTeachingAidAsync(int aidId);
-        Task<ServiceResult<List<AticTeachingAidsDto>>> GetTeachingAidsByContentIdAsync(int contentId);
+        // Hybrid pattern methods for bulk create/update operations
+        Task<ServiceResult<AticProgramContentDto>> AddProgramContentWithChildrenAsync(int programId, AticProgramContentWithChildrenCreateDto dto);
+        Task<ServiceResult<AticProgramContentDto>> UpdateProgramContentWithChildrenAsync(int contentId, AticProgramContentWithChildrenUpdateDto dto);
 
         // ============================
         // SECTION D: ADVISORY SERVICES

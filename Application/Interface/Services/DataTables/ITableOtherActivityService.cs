@@ -10,14 +10,13 @@ namespace Application.Interface.Services.DataTables
     /// that don't fit into specific unit tables.
     /// 
     /// STATUS WORKFLOW:
-    /// - Draft: Initial state, can edit (auto-set on creation)
-    /// - Saved: Auto-saved state (not used for OtherActivity - goes from Draft → Pending)
-    /// - Pending: Submitted for Unit Head approval (trainer submits)
+    /// - Pending: Auto-submitted when created or updated, awaits Unit Head approval
     /// - Approved: Unit Head approved, cannot edit
     /// - Rejected: Unit Head rejected with remarks, can edit and resubmit
-    /// 
+    /// - On create/update: Status automatically changes to Pending
+    ///
     /// PERMISSIONS:
-    /// - Trainers: Create, Edit (Draft/Rejected only), Submit, View own entries
+    /// - Trainers: Create, Edit (Pending/Rejected), View own entries
     /// - UnitHeads: Approve/Reject entries for their unit locations, View all in their units
     /// - Admins: Full access to all entries across all organizations
     /// </summary>
@@ -29,7 +28,7 @@ namespace Application.Interface.Services.DataTables
 
         /// <summary>
         /// Create a new OtherActivity entry (Trainer only)
-        /// Initial status: Draft
+        /// Status: Automatically set to Pending (auto-submit)
         /// Auto-sets CreatedById, CreatedAt, and OrganizationId from current user
         /// </summary>
         Task<ServiceResult<TableOtherActivityDto>> CreateAsync(TableOtherActivityCreateDto createDto);
@@ -41,29 +40,23 @@ namespace Application.Interface.Services.DataTables
         Task<ServiceResult<TableOtherActivityDto>> GetByIdAsync(int id);
 
         /// <summary>
-        /// Update OtherActivity (Only for Draft or Rejected status)
+        /// Update OtherActivity (Pending/Rejected status)
         /// Trainers can only update their own entries
-        /// Cannot update entries in Pending or Approved status
+        /// Status auto-changes to Pending on update
+        /// Cannot update Approved entries
         /// </summary>
         Task<ServiceResult<TableOtherActivityDto>> UpdateAsync(int id, TableOtherActivityUpdateDto updateDto);
 
         /// <summary>
-        /// Delete OtherActivity (Only Draft status)
-        /// Trainers can only delete their own Draft entries
-        /// Once submitted, entries cannot be deleted
+        /// Delete OtherActivity (Pending/Rejected status)
+        /// Trainers can only delete their own entries
+        /// Cannot delete Approved entries
         /// </summary>
         Task<ServiceResult> DeleteAsync(int id);
 
         // ============================
-        // SUBMISSION & APPROVAL WORKFLOW
+        // APPROVAL WORKFLOW
         // ============================
-
-        /// <summary>
-        /// Submit OtherActivity for approval (Trainer only)
-        /// Changes status: Draft → Pending
-        /// Only the creator can submit
-        /// </summary>
-        Task<ServiceResult> SubmitForApprovalAsync(int id);
 
         /// <summary>
         /// Approve OtherActivity (Unit Head only)

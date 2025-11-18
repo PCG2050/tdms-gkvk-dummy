@@ -121,16 +121,6 @@ namespace WebApi.Controllers.DataTables.KVK
         // ============================
 
         /// <summary>
-        /// Add program content entry
-        /// </summary>
-        [HttpPost("{programId}/content")]
-        public async Task<IActionResult> AddProgramContent(int programId, [FromBody] KvkProgramContentCreateDto dto)
-        {
-            var result = await _service.AddProgramContentAsync(programId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        /// <summary>
         /// Add program content entry with all child entities (ResourcePersons, Topics, TeachingAids) in one request
         /// This endpoint solves the problem of needing parent ID before creating children by handling everything in a single transaction
         /// </summary>
@@ -186,102 +176,6 @@ namespace WebApi.Controllers.DataTables.KVK
         }
 
         // ============================
-        // C1: RESOURCE PERSONS
-        // ============================
-
-        [HttpPost("content/{contentId}/resource-persons")]
-        public async Task<IActionResult> AddResourcePerson(int contentId, [FromBody] KvkResourcePersonCreateDto dto)
-        {
-            var result = await _service.AddResourcePersonAsync(contentId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpPut("resource-persons/{personId}")]
-        public async Task<IActionResult> UpdateResourcePerson(int personId, [FromBody] KvkResourcePersonUpdateDto dto)
-        {
-            var result = await _service.UpdateResourcePersonAsync(personId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpDelete("resource-persons/{personId}")]
-        public async Task<IActionResult> DeleteResourcePerson(int personId)
-        {
-            var result = await _service.DeleteResourcePersonAsync(personId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpGet("content/{contentId}/resource-persons")]
-        public async Task<IActionResult> GetResourcePersons(int contentId)
-        {
-            var result = await _service.GetResourcePersonsByContentIdAsync(contentId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        // ============================
-        // C2: TOPICS COVERED
-        // ============================
-
-        [HttpPost("content/{contentId}/topics")]
-        public async Task<IActionResult> AddTopic(int contentId, [FromBody] KvkTopicsCoveredCreateDto dto)
-        {
-            var result = await _service.AddTopicAsync(contentId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpPut("topics/{topicId}")]
-        public async Task<IActionResult> UpdateTopic(int topicId, [FromBody] KvkTopicsCoveredUpdateDto dto)
-        {
-            var result = await _service.UpdateTopicAsync(topicId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpDelete("topics/{topicId}")]
-        public async Task<IActionResult> DeleteTopic(int topicId)
-        {
-            var result = await _service.DeleteTopicAsync(topicId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpGet("content/{contentId}/topics")]
-        public async Task<IActionResult> GetTopics(int contentId)
-        {
-            var result = await _service.GetTopicsByContentIdAsync(contentId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        // ============================
-        // C3: TEACHING AIDS
-        // ============================
-
-        [HttpPost("content/{contentId}/teaching-aids")]
-        public async Task<IActionResult> AddTeachingAid(int contentId, [FromBody] KvkTeachingAidsCreateDto dto)
-        {
-            var result = await _service.AddTeachingAidAsync(contentId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpPut("teaching-aids/{aidId}")]
-        public async Task<IActionResult> UpdateTeachingAid(int aidId, [FromBody] KvkTeachingAidsUpdateDto dto)
-        {
-            var result = await _service.UpdateTeachingAidAsync(aidId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpDelete("teaching-aids/{aidId}")]
-        public async Task<IActionResult> DeleteTeachingAid(int aidId)
-        {
-            var result = await _service.DeleteTeachingAidAsync(aidId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpGet("content/{contentId}/teaching-aids")]
-        public async Task<IActionResult> GetTeachingAids(int contentId)
-        {
-            var result = await _service.GetTeachingAidsByContentIdAsync(contentId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        // ============================
         // SECTION D: ADVISORY SERVICES
         // ============================
 
@@ -310,16 +204,6 @@ namespace WebApi.Controllers.DataTables.KVK
         // ============================
 
         /// <summary>
-        /// Get or create Result record (only for CategoryId 18 or 24)
-        /// </summary>
-        [HttpGet("{programId}/results")]
-        public async Task<IActionResult> GetOrCreateResult(int programId)
-        {
-            var result = await _service.GetOrCreateResultAsync(programId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        /// <summary>
         /// Get result by ID
         /// </summary>
         [HttpGet("results/{resultId}")]
@@ -336,94 +220,6 @@ namespace WebApi.Controllers.DataTables.KVK
         public async Task<IActionResult> UpdateResultExcel(int resultId, [FromBody] string excelUrl)
         {
             var result = await _service.UpdateResultExcelAsync(resultId, excelUrl);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        // ============================
-        // E1: FLD RESULTS
-        // ============================
-
-        /// <summary>
-        /// Add FLD result entry
-        /// </summary>
-        [HttpPost("results/{resultId}/fld")]
-        public async Task<IActionResult> AddFldResult(int resultId, [FromBody] KvkFldResultCreateDto dto)
-        {
-            var result = await _service.AddFldResultAsync(resultId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        /// <summary>
-        /// Update FLD result
-        /// </summary>
-        [HttpPut("fld-results/{fldId}")]
-        public async Task<IActionResult> UpdateFldResult(int fldId, [FromBody] KvkFldResultUpdateDto dto)
-        {
-            var result = await _service.UpdateFldResultAsync(fldId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        /// <summary>
-        /// Delete FLD result
-        /// </summary>
-        [HttpDelete("fld-results/{fldId}")]
-        public async Task<IActionResult> DeleteFldResult(int fldId)
-        {
-            var result = await _service.DeleteFldResultAsync(fldId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        /// <summary>
-        /// Get all FLD results for a result record
-        /// </summary>
-        [HttpGet("results/{resultId}/fld")]
-        public async Task<IActionResult> GetFldResults(int resultId)
-        {
-            var result = await _service.GetFldResultsByResultIdAsync(resultId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        // ============================
-        // E2: OFT RESULTS
-        // ============================
-
-        /// <summary>
-        /// Add OFT result entry
-        /// </summary>
-        [HttpPost("results/{resultId}/oft")]
-        public async Task<IActionResult> AddOftResult(int resultId, [FromBody] KvkOftResultCreateDto dto)
-        {
-            var result = await _service.AddOftResultAsync(resultId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        /// <summary>
-        /// Update OFT result
-        /// </summary>
-        [HttpPut("oft-results/{oftId}")]
-        public async Task<IActionResult> UpdateOftResult(int oftId, [FromBody] KvkOftResultUpdateDto dto)
-        {
-            var result = await _service.UpdateOftResultAsync(oftId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        /// <summary>
-        /// Delete OFT result
-        /// </summary>
-        [HttpDelete("oft-results/{oftId}")]
-        public async Task<IActionResult> DeleteOftResult(int oftId)
-        {
-            var result = await _service.DeleteOftResultAsync(oftId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        /// <summary>
-        /// Get all OFT results for a result record
-        /// </summary>
-        [HttpGet("results/{resultId}/oft")]
-        public async Task<IActionResult> GetOftResults(int resultId)
-        {
-            var result = await _service.GetOftResultsByResultIdAsync(resultId);
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
@@ -599,20 +395,20 @@ namespace WebApi.Controllers.DataTables.KVK
         }
 
         /// <summary>
-        /// Get trainer's/unit head's own program history with pagination
+        /// Get trainer's own program history with pagination
         /// </summary>
         [HttpGet("my-history")]
-        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
+        [Authorize(Roles = RoleString.Trainer)]
         public async Task<IActionResult> GetMyHistory(
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 20)
+      [FromQuery] int pageNumber = 1,
+      [FromQuery] int pageSize = 20)
         {
             var result = await _service.GetTrainerHistoryAsync(pageNumber, pageSize);
             return Ok(result);
         }
 
         /// <summary>
-        /// Get pending approvals with pagination
+        /// Get pending approvals for Unit Head and Admin with pagination
         /// </summary>
         [HttpGet("pending-approvals")]
         [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
@@ -621,21 +417,6 @@ namespace WebApi.Controllers.DataTables.KVK
             [FromQuery] int pageSize = 20)
         {
             var result = await _service.GetPendingApprovalsAsync(pageNumber, pageSize);
-            return Ok(result);
-        }
-
-        /// <summary>
-        /// Get programs by trainer ID and optionally filter by unit location
-        /// </summary>
-        [HttpGet("trainer/{trainerId}")]
-        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
-        public async Task<IActionResult> GetByTrainer(
-            int trainerId,
-            [FromQuery] int? unitLocationId = null,
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 20)
-        {
-            var result = await _service.GetByTrainerAsync(trainerId, unitLocationId, pageNumber, pageSize);
             return Ok(result);
         }
 
@@ -653,5 +434,19 @@ namespace WebApi.Controllers.DataTables.KVK
                 _ => 500
             };
         }
+    }
+
+    // ============================
+    // DTOs FOR STATUS MANAGEMENT
+    // ============================
+
+    public class ApprovalDto
+    {
+        public string? Remarks { get; set; }
+    }
+
+    public class RejectionDto
+    {
+        public string Remarks { get; set; } = string.Empty;
     }
 }

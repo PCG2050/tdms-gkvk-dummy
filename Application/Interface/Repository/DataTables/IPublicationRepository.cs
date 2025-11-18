@@ -29,5 +29,12 @@ namespace Application.Interface.Repository.DataTables
             int pageSize = 10, int? createdById = null);
 
         Task<Dictionary<string, int>> GetStatusSummaryAsync(List<int> unitLocationIds, int? createdById = null);
+
+        Task UpdatePublicationNewspapersAndMagazinesAsync(
+            int publicationId,
+            List<int>? kannadaNewsPaperIds,
+            List<int>? englishNewsPaperIds,
+            List<int>? kannadaMagazineIds,
+            List<int>? englishMagazineIds);
     }
 }

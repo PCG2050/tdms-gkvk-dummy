@@ -16,15 +16,5 @@ namespace Application.Interface.Repository.DataTables.KVK
         Task DeleteAsync(int id);
         Task<List<KvkProgramDetails>> GetByCreatedByIdAsync(int createdById);
         Task<List<KvkProgramDetails>> GetByUnitLocationIdsAsync(List<int> unitLocationIds);
-
-        /// <summary>
-        /// Get programs by trainer and optionally filter by unit location
-        /// </summary>
-        Task<PaginatedResult<KvkProgramDetails>> GetByTrainerAndUnitLocationAsync(
-            int trainerId,
-            int? unitLocationId = null,
-            List<int>? accessibleUnitLocationIds = null,
-            int pageNumber = 1,
-            int pageSize = 10);
     }
 }

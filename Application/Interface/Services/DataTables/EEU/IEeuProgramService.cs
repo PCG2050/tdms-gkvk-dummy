@@ -36,30 +36,6 @@ namespace Application.Interface.Services.DataTables.EEU
         Task<ServiceResult<List<EeuProgramContentDto>>> GetProgramContentsByProgramIdAsync(int programId);
 
         // ============================
-        // SECTION C1: RESOURCE PERSONS
-        // ============================
-        Task<ServiceResult<EeuResourcePersonDto>> AddResourcePersonAsync(int contentId, EeuResourcePersonCreateDto dto);
-        Task<ServiceResult<EeuResourcePersonDto>> UpdateResourcePersonAsync(int personId, EeuResourcePersonUpdateDto dto);
-        Task<ServiceResult> DeleteResourcePersonAsync(int personId);
-        Task<ServiceResult<List<EeuResourcePersonDto>>> GetResourcePersonsByContentIdAsync(int contentId);
-
-        // ============================
-        // SECTION C2: TOPICS COVERED
-        // ============================
-        Task<ServiceResult<EeuTopicsCoveredDto>> AddTopicAsync(int contentId, EeuTopicsCoveredCreateDto dto);
-        Task<ServiceResult<EeuTopicsCoveredDto>> UpdateTopicAsync(int topicId, EeuTopicsCoveredUpdateDto dto);
-        Task<ServiceResult> DeleteTopicAsync(int topicId);
-        Task<ServiceResult<List<EeuTopicsCoveredDto>>> GetTopicsByContentIdAsync(int contentId);
-
-        // ============================
-        // SECTION C3: TEACHING AIDS
-        // ============================
-        Task<ServiceResult<EeuTeachingAidsDto>> AddTeachingAidAsync(int contentId, EeuTeachingAidsCreateDto dto);
-        Task<ServiceResult<EeuTeachingAidsDto>> UpdateTeachingAidAsync(int aidId, EeuTeachingAidsUpdateDto dto);
-        Task<ServiceResult> DeleteTeachingAidAsync(int aidId);
-        Task<ServiceResult<List<EeuTeachingAidsDto>>> GetTeachingAidsByContentIdAsync(int contentId);
-
-        // ============================
         // SECTION D: ADVISORY SERVICES
         // ============================
         Task<ServiceResult<EeuAdvisoryServicesDto>> AddAdvisoryServicesAsync(int programId, EeuAdvisoryServicesCreateDto dto);

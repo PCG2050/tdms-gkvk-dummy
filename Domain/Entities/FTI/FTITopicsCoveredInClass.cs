@@ -12,17 +12,11 @@ namespace Domain.Entities.FTI
     public class FtiTopicsCoveredInClass : AuditableBaseEntity
     {
         [Required]
-<<<<<<< Updated upstream
-        public int FTIProgramContentAndResourcesID { get; set; }
-=======
         public int? FtiProgramContentAndResourcesId { get; set; }
         [JsonIgnore]
         [ForeignKey(nameof(FtiProgramContentAndResourcesId))]
         public FtiProgramContentAndResources? ProgramContentAndResources { get; set; }
->>>>>>> Stashed changes
 
-        [ForeignKey(nameof(FTIProgramContentAndResourcesID))]
-        public FTIProgramContentAndResources ProgramContentAndResources { get; set; }
 
         public DateTime? Date { get; set; }
 
@@ -31,5 +25,9 @@ namespace Domain.Entities.FTI
 
         [MaxLength(500)]
         public string? PhotoUpload { get; set; }
+
+        public int? UnitLocationId { get; set; }
+
+        public int? OrganizationId { get; set; }
     }
 }

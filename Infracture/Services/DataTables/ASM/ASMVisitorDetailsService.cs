@@ -64,15 +64,184 @@ namespace Infrastructure.Services.DataTables.ASM
                 CreatedById = _currentUserService.UserId,
                 CreatedAt = DateTimeOffset.UtcNow,
                 OrganizationId = _currentUserService.OrganizationId,
-                FormStatus = "Draft"
+                FormStatus = "Pending"
             };
-
-         
 
             var savedEntity = await _repository.AddAsync(entity);
             var dto = _mapper.MapToDto(savedEntity);
 
             return ServiceResult<ASMVisitorDetailsDto>.Success(dto);
+        }
+
+        public async Task<ServiceResult<ASMVisitorDetailsBatchResultDto>> AddBatchAsync(ASMVisitorDetailsBatchCreateDto batchCreateDto)
+        {
+            var result = new ASMVisitorDetailsBatchResultDto
+            {
+                TotalProcessed = batchCreateDto.VisitorDetails.Count
+            };
+
+            if (batchCreateDto.VisitorDetails == null || !batchCreateDto.VisitorDetails.Any())
+            {
+                return ServiceResult<ASMVisitorDetailsBatchResultDto>.Failure(
+                    "No visitor details provided for batch creation",
+                    ServiceErrorStatus.VALIDATIONERROR);
+            }
+
+            for (int i = 0; i < batchCreateDto.VisitorDetails.Count; i++)
+            {
+                var createDto = batchCreateDto.VisitorDetails[i];
+
+                try
+                {
+                    // Verify trainer has access to this unit location
+                    if (!await CanUserAccessUnitLocationAsync(createDto.UnitLocationId))
+                    {
+                        result.FailedEntries.Add(new BatchErrorDto
+                        {
+                            Index = i,
+                            ErrorMessage = "Access denied to unit location",
+                            OriginalData = createDto
+                        });
+                        result.FailureCount++;
+                        continue;
+                    }
+
+                    var entity = new ASMVisitorDetails
+                    {
+                        UnitLocationId = createDto.UnitLocationId,
+                        InstituteName = createDto.InstituteName,
+                        StartDate = createDto.StartDate,
+                        EndDate = createDto.EndDate,
+                        FarmersCount = createDto.FarmersCount,
+                        StudentsCount = createDto.StudentsCount,
+                        PublicCount = createDto.PublicCount,
+                        SubmittedDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                        CreatedById = _currentUserService.UserId,
+                        CreatedAt = DateTimeOffset.UtcNow,
+                        OrganizationId = _currentUserService.OrganizationId,
+                        FormStatus = "Pending"
+                    };
+
+                    var savedEntity = await _repository.AddAsync(entity);
+                    var dto = _mapper.MapToDto(savedEntity);
+                    result.SuccessfulEntries.Add(dto);
+                    result.SuccessCount++;
+                }
+                catch (Exception ex)
+                {
+                    result.FailedEntries.Add(new BatchErrorDto
+                    {
+                        Index = i,
+                        ErrorMessage = ex.Message,
+                        OriginalData = createDto
+                    });
+                    result.FailureCount++;
+                }
+            }
+
+            return ServiceResult<ASMVisitorDetailsBatchResultDto>.Success(result);
+        }
+
+        public async Task<ServiceResult<ASMVisitorDetailsBatchResultDto>> UpdateBatchAsync(ASMVisitorDetailsBatchUpdateDto batchUpdateDto)
+        {
+            var result = new ASMVisitorDetailsBatchResultDto
+            {
+                TotalProcessed = batchUpdateDto.VisitorDetails.Count
+            };
+
+            if (batchUpdateDto.VisitorDetails == null || !batchUpdateDto.VisitorDetails.Any())
+            {
+                return ServiceResult<ASMVisitorDetailsBatchResultDto>.Failure(
+                    "No visitor details provided for batch update",
+                    ServiceErrorStatus.VALIDATIONERROR);
+            }
+
+            for (int i = 0; i < batchUpdateDto.VisitorDetails.Count; i++)
+            {
+                var updateDto = batchUpdateDto.VisitorDetails[i];
+
+                try
+                {
+                    var entity = await _repository.GetByIdAsync(updateDto.Id);
+
+                    if (entity == null)
+                    {
+                        result.FailedEntries.Add(new BatchErrorDto
+                        {
+                            Index = i,
+                            ErrorMessage = $"Visitor detail with ID {updateDto.Id} not found",
+                            OriginalData = updateDto
+                        });
+                        result.FailureCount++;
+                        continue;
+                    }
+
+                    if (!await _entityPermissionService.CanModifyForm(entity))
+                    {
+                        result.FailedEntries.Add(new BatchErrorDto
+                        {
+                            Index = i,
+                            ErrorMessage = "Access denied or entry cannot be modified in current status",
+                            OriginalData = updateDto
+                        });
+                        result.FailureCount++;
+                        continue;
+                    }
+
+                    if (entity.FormStatus == "Approved")
+                    {
+                        result.FailedEntries.Add(new BatchErrorDto
+                        {
+                            Index = i,
+                            ErrorMessage = "Cannot modify approved entries",
+                            OriginalData = updateDto
+                        });
+                        result.FailureCount++;
+                        continue;
+                    }
+
+                    // Update only provided fields
+                    if (updateDto.InstituteName != null)
+                        entity.InstituteName = updateDto.InstituteName;
+
+                    if (updateDto.StartDate.HasValue)
+                        entity.StartDate = updateDto.StartDate;
+
+                    if (updateDto.EndDate.HasValue)
+                        entity.EndDate = updateDto.EndDate;
+
+                    if (updateDto.FarmersCount.HasValue)
+                        entity.FarmersCount = updateDto.FarmersCount.Value;
+
+                    if (updateDto.StudentsCount.HasValue)
+                        entity.StudentsCount = updateDto.StudentsCount.Value;
+
+                    if (updateDto.PublicCount.HasValue)
+                        entity.PublicCount = updateDto.PublicCount.Value;
+
+                    entity.SubmittedDate = DateOnly.FromDateTime(DateTime.UtcNow);
+                    entity.FormStatus = "Pending";
+                    entity.UpdatedById = _currentUserService.UserId;
+                    entity.UpdatedAt = DateTimeOffset.UtcNow;
+
+                    var updatedEntity = await _repository.UpdateAsync(entity);
+                    var dto = _mapper.MapToDto(updatedEntity);
+                    result.SuccessfulEntries.Add(dto);
+                    result.SuccessCount++;
+                }
+                catch (Exception ex)
+                {
+                    result.FailedEntries.Add(new BatchErrorDto
+                    {
+                        Index = i,
+                        ErrorMessage = ex.Message,
+                        OriginalData = updateDto
+                    });
+                    result.FailureCount++;
+                }
+            }
+
+            return ServiceResult<ASMVisitorDetailsBatchResultDto>.Success(result);
         }
 
         public async Task<ServiceResult<ASMVisitorDetailsDto>> GetByIdAsync(int id)
@@ -107,9 +276,9 @@ namespace Infrastructure.Services.DataTables.ASM
                     "Access denied or entry cannot be modified in current status",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (entity.FormStatus != "Draft" && entity.FormStatus != "Rejected")
+            if (entity.FormStatus == "Approved")
                 return ServiceResult<ASMVisitorDetailsDto>.Failure(
-                    "Cannot modify entries in Pending or Approved status",
+                    "Cannot modify approved entries",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             // Update only provided fields
@@ -132,7 +301,7 @@ namespace Infrastructure.Services.DataTables.ASM
                 entity.PublicCount = updateDto.PublicCount.Value;
 
             entity.SubmittedDate = DateOnly.FromDateTime(DateTime.UtcNow);
-
+            entity.FormStatus = "Pending";
             entity.UpdatedById = _currentUserService.UserId;
             entity.UpdatedAt = DateTimeOffset.UtcNow;
 
@@ -152,9 +321,9 @@ namespace Infrastructure.Services.DataTables.ASM
             if (!await _entityPermissionService.CanDeleteForm(entity))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (entity.FormStatus != "Draft")
+            if (entity.FormStatus == "Approved")
                 return ServiceResult.Failure(
-                    "Only Draft entries can be deleted",
+                    "Cannot delete approved entries",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             await _repository.DeleteAsync(id);
@@ -165,34 +334,40 @@ namespace Infrastructure.Services.DataTables.ASM
         // SUBMISSION & APPROVAL WORKFLOW
         // ==========================================
 
-        public async Task<ServiceResult> SubmitForApprovalAsync(int id)
-        {
-            var entity = await _repository.GetByIdAsync(id);
+        //public async Task<ServiceResult> SubmitForApprovalAsync(int id)
+        //{
+        //    var entity = await _repository.GetByIdAsync(id);
 
-            if (entity == null)
-                return ServiceResult.Failure("Visitor detail not found", ServiceErrorStatus.NOTFOUND);
+        //    if (entity == null)
+        //        return ServiceResult.Failure("Visitor detail not found", ServiceErrorStatus.NOTFOUND);
 
-            if (!await _entityPermissionService.CanModifyForm(entity))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
+        //    if (!await _entityPermissionService.CanModifyForm(entity))
+        //        return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (entity.FormStatus != "Draft")
-                return ServiceResult.Failure(
-                    "Only Draft entries can be submitted",
-                    ServiceErrorStatus.INVALIDOPERATION);
+        //    // Since all creates/updates now automatically set to Pending, this endpoint is mostly redundant
+        //    // But we'll keep it for backward compatibility and handle Rejected status
+        //    if (entity.FormStatus == "Approved")
+        //        return ServiceResult.Failure(
+        //            "Cannot submit approved entries",
+        //            ServiceErrorStatus.INVALIDOPERATION);
 
-            // Validate required fields before submission
-            if (entity.FarmersCount == 0 && entity.StudentsCount == 0 && entity.PublicCount == 0)
-                return ServiceResult.Failure(
-                    "At least one visitor type count must be greater than zero",
-                    ServiceErrorStatus.VALIDATIONERROR);
+        //    // If already Pending, just return success (idempotent)
+        //    if (entity.FormStatus == "Pending")
+        //        return ServiceResult.Success();
 
-            entity.FormStatus = "Pending";
-            entity.UpdatedById = _currentUserService.UserId;
-            entity.UpdatedAt = DateTimeOffset.UtcNow;
+        //    // Validate required fields before submission
+        //    if (entity.FarmersCount == 0 && entity.StudentsCount == 0 && entity.PublicCount == 0)
+        //        return ServiceResult.Failure(
+        //            "At least one visitor type count must be greater than zero",
+        //            ServiceErrorStatus.VALIDATIONERROR);
 
-            await _repository.UpdateAsync(entity);
-            return ServiceResult.Success();
-        }
+        //    entity.FormStatus = "Pending";
+        //    entity.UpdatedById = _currentUserService.UserId;
+        //    entity.UpdatedAt = DateTimeOffset.UtcNow;
+
+        //    await _repository.UpdateAsync(entity);
+        //    return ServiceResult.Success();
+        //}
 
         public async Task<ServiceResult> ApproveAsync(int id, string? remarks = null)
         {
@@ -350,20 +525,6 @@ namespace Infrastructure.Services.DataTables.ASM
             return ServiceResult<Dictionary<string, int>>.Success(summary);
         }
 
-        //public async Task<ServiceResult<VisitorStatisticsDto>> GetVisitorStatisticsAsync(
-        //    DateOnly? startDate = null,
-        //    DateOnly? endDate = null)
-        //{
-        //    var accessibleUnitLocationIds = await GetAccessibleUnitLocationIdsAsync();
-
-        //    var stats = await _repository.GetVisitorStatisticsAsync(
-        //        accessibleUnitLocationIds,
-        //        startDate,
-        //        endDate);
-
-        //    return ServiceResult<VisitorStatisticsDto>.Success(stats);
-        //}
-
         public async Task<PaginatedResult<ASMVisitorDetailsDto>> GetTrainerHistoryAsync(
             int pageNumber = 1,
             int pageSize = 20)
@@ -423,19 +584,6 @@ namespace Infrastructure.Services.DataTables.ASM
                 PageSize = result.PageSize
             };
         }
-
-        public async Task<IEnumerable<ASMVisitorDetailsDto>> GetAllAsync()
-        {
-            var accessibleUnitLocationIds = await GetAccessibleUnitLocationIdsAsync();
-            var entities = await _repository.GetAllAsync();
-
-            var filtered = entities
-                .Where(e => accessibleUnitLocationIds.Contains(e.UnitLocationId))
-                .ToList();
-
-            return filtered.Select(_mapper.MapToDto).ToList();
-        }
-
 
         // ==========================================
         // HELPER METHODS

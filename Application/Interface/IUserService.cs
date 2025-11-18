@@ -32,7 +32,7 @@ namespace Application.Interface
 
         Task<ServiceResult> ForgotPasswordAsync(ForgotPasswordDto dto);
 
-      
+
         Task<ServiceResult<OTPVerificationResult>> VerifyPasswordResetOTPAsync(VerifyOTPDto dto);
 
         Task<ServiceResult> ResetPasswordWithOTPAsync(ResetPasswordWithOTPDto dto);
