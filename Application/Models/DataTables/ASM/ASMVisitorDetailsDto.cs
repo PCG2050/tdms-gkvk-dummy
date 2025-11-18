@@ -73,7 +73,8 @@ namespace Application.Models.DataTables.ASM
     }
 
     /// <summary>
- 
+    /// DTO for updating existing ASMVisitorDetails entries
+    /// </summary>
     public class ASMVisitorDetailsUpdateDto :IUpdateDto
     {
         public int Id { get; set; }
@@ -92,5 +93,63 @@ namespace Application.Models.DataTables.ASM
 
         [Range(0, int.MaxValue, ErrorMessage = "Public count must be a positive number")]
         public int? PublicCount { get; set; }
+    }
+
+    /// <summary>
+    /// DTO for batch creating ASMVisitorDetails entries
+    /// </summary>
+    public class ASMVisitorDetailsBatchCreateDto
+    {
+        /// <summary>
+        /// List of visitor details to create
+        /// </summary>
+        [Required]
+        public List<ASMVisitorDetailsCreateDto> VisitorDetails { get; set; } = new();
+
+        /// <summary>
+        /// If true, automatically submits all entries for approval (status: Pending)
+        /// If false, saves as Draft (default: false)
+        /// </summary>
+        public bool SubmitOnCreate { get; set; } = false;
+    }
+
+    /// <summary>
+    /// DTO for batch updating ASMVisitorDetails entries
+    /// </summary>
+    public class ASMVisitorDetailsBatchUpdateDto
+    {
+        /// <summary>
+        /// List of visitor details to update
+        /// </summary>
+        [Required]
+        public List<ASMVisitorDetailsUpdateDto> VisitorDetails { get; set; } = new();
+
+        /// <summary>
+        /// If true, automatically submits all entries for approval (status: Pending)
+        /// If false, keeps existing status (default: false)
+        /// </summary>
+        public bool SubmitOnUpdate { get; set; } = false;
+    }
+
+    /// <summary>
+    /// DTO for batch operation results
+    /// </summary>
+    public class ASMVisitorDetailsBatchResultDto
+    {
+        public List<ASMVisitorDetailsDto> SuccessfulEntries { get; set; } = new();
+        public List<BatchErrorDto> FailedEntries { get; set; } = new();
+        public int TotalProcessed { get; set; }
+        public int SuccessCount { get; set; }
+        public int FailureCount { get; set; }
+    }
+
+    /// <summary>
+    /// DTO for individual batch operation errors
+    /// </summary>
+    public class BatchErrorDto
+    {
+        public int Index { get; set; }
+        public string ErrorMessage { get; set; } = string.Empty;
+        public object? OriginalData { get; set; }
     }
 }

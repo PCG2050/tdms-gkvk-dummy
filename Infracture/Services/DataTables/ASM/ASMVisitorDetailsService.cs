@@ -67,12 +67,201 @@ namespace Infrastructure.Services.DataTables.ASM
                 FormStatus = "Draft"
             };
 
-         
+
 
             var savedEntity = await _repository.AddAsync(entity);
             var dto = _mapper.MapToDto(savedEntity);
 
             return ServiceResult<ASMVisitorDetailsDto>.Success(dto);
+        }
+
+        public async Task<ServiceResult<ASMVisitorDetailsBatchResultDto>> AddBatchAsync(ASMVisitorDetailsBatchCreateDto batchCreateDto)
+        {
+            var result = new ASMVisitorDetailsBatchResultDto
+            {
+                TotalProcessed = batchCreateDto.VisitorDetails.Count
+            };
+
+            if (batchCreateDto.VisitorDetails == null || !batchCreateDto.VisitorDetails.Any())
+            {
+                return ServiceResult<ASMVisitorDetailsBatchResultDto>.Failure(
+                    "No visitor details provided for batch creation",
+                    ServiceErrorStatus.VALIDATIONERROR);
+            }
+
+            for (int i = 0; i < batchCreateDto.VisitorDetails.Count; i++)
+            {
+                var createDto = batchCreateDto.VisitorDetails[i];
+
+                try
+                {
+                    // Verify trainer has access to this unit location
+                    if (!await CanUserAccessUnitLocationAsync(createDto.UnitLocationId))
+                    {
+                        result.FailedEntries.Add(new BatchErrorDto
+                        {
+                            Index = i,
+                            ErrorMessage = "Access denied to unit location",
+                            OriginalData = createDto
+                        });
+                        result.FailureCount++;
+                        continue;
+                    }
+
+                    var entity = new ASMVisitorDetails
+                    {
+                        UnitLocationId = createDto.UnitLocationId,
+                        InstituteName = createDto.InstituteName,
+                        StartDate = createDto.StartDate,
+                        EndDate = createDto.EndDate,
+                        FarmersCount = createDto.FarmersCount,
+                        StudentsCount = createDto.StudentsCount,
+                        PublicCount = createDto.PublicCount,
+                        SubmittedDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                        CreatedById = _currentUserService.UserId,
+                        CreatedAt = DateTimeOffset.UtcNow,
+                        OrganizationId = _currentUserService.OrganizationId,
+                        FormStatus = batchCreateDto.SubmitOnCreate ? "Pending" : "Draft"
+                    };
+
+                    var savedEntity = await _repository.AddAsync(entity);
+                    var dto = _mapper.MapToDto(savedEntity);
+                    result.SuccessfulEntries.Add(dto);
+                    result.SuccessCount++;
+                }
+                catch (Exception ex)
+                {
+                    result.FailedEntries.Add(new BatchErrorDto
+                    {
+                        Index = i,
+                        ErrorMessage = ex.Message,
+                        OriginalData = createDto
+                    });
+                    result.FailureCount++;
+                }
+            }
+
+            return ServiceResult<ASMVisitorDetailsBatchResultDto>.Success(result);
+        }
+
+        public async Task<ServiceResult<ASMVisitorDetailsBatchResultDto>> UpdateBatchAsync(ASMVisitorDetailsBatchUpdateDto batchUpdateDto)
+        {
+            var result = new ASMVisitorDetailsBatchResultDto
+            {
+                TotalProcessed = batchUpdateDto.VisitorDetails.Count
+            };
+
+            if (batchUpdateDto.VisitorDetails == null || !batchUpdateDto.VisitorDetails.Any())
+            {
+                return ServiceResult<ASMVisitorDetailsBatchResultDto>.Failure(
+                    "No visitor details provided for batch update",
+                    ServiceErrorStatus.VALIDATIONERROR);
+            }
+
+            for (int i = 0; i < batchUpdateDto.VisitorDetails.Count; i++)
+            {
+                var updateDto = batchUpdateDto.VisitorDetails[i];
+
+                try
+                {
+                    var entity = await _repository.GetByIdAsync(updateDto.Id);
+
+                    if (entity == null)
+                    {
+                        result.FailedEntries.Add(new BatchErrorDto
+                        {
+                            Index = i,
+                            ErrorMessage = $"Visitor detail with ID {updateDto.Id} not found",
+                            OriginalData = updateDto
+                        });
+                        result.FailureCount++;
+                        continue;
+                    }
+
+                    if (!await _entityPermissionService.CanModifyForm(entity))
+                    {
+                        result.FailedEntries.Add(new BatchErrorDto
+                        {
+                            Index = i,
+                            ErrorMessage = "Access denied or entry cannot be modified in current status",
+                            OriginalData = updateDto
+                        });
+                        result.FailureCount++;
+                        continue;
+                    }
+
+                    if (entity.FormStatus != "Draft" && entity.FormStatus != "Rejected")
+                    {
+                        result.FailedEntries.Add(new BatchErrorDto
+                        {
+                            Index = i,
+                            ErrorMessage = "Cannot modify entries in Pending or Approved status",
+                            OriginalData = updateDto
+                        });
+                        result.FailureCount++;
+                        continue;
+                    }
+
+                    // Update only provided fields
+                    if (updateDto.InstituteName != null)
+                        entity.InstituteName = updateDto.InstituteName;
+
+                    if (updateDto.StartDate.HasValue)
+                        entity.StartDate = updateDto.StartDate;
+
+                    if (updateDto.EndDate.HasValue)
+                        entity.EndDate = updateDto.EndDate;
+
+                    if (updateDto.FarmersCount.HasValue)
+                        entity.FarmersCount = updateDto.FarmersCount.Value;
+
+                    if (updateDto.StudentsCount.HasValue)
+                        entity.StudentsCount = updateDto.StudentsCount.Value;
+
+                    if (updateDto.PublicCount.HasValue)
+                        entity.PublicCount = updateDto.PublicCount.Value;
+
+                    entity.SubmittedDate = DateOnly.FromDateTime(DateTime.UtcNow);
+                    entity.UpdatedById = _currentUserService.UserId;
+                    entity.UpdatedAt = DateTimeOffset.UtcNow;
+
+                    // If SubmitOnUpdate is true, change status to Pending
+                    if (batchUpdateDto.SubmitOnUpdate)
+                    {
+                        // Validate required fields before submission
+                        if (entity.FarmersCount == 0 && entity.StudentsCount == 0 && entity.PublicCount == 0)
+                        {
+                            result.FailedEntries.Add(new BatchErrorDto
+                            {
+                                Index = i,
+                                ErrorMessage = "At least one visitor type count must be greater than zero",
+                                OriginalData = updateDto
+                            });
+                            result.FailureCount++;
+                            continue;
+                        }
+
+                        entity.FormStatus = "Pending";
+                    }
+
+                    var updatedEntity = await _repository.UpdateAsync(entity);
+                    var dto = _mapper.MapToDto(updatedEntity);
+                    result.SuccessfulEntries.Add(dto);
+                    result.SuccessCount++;
+                }
+                catch (Exception ex)
+                {
+                    result.FailedEntries.Add(new BatchErrorDto
+                    {
+                        Index = i,
+                        ErrorMessage = ex.Message,
+                        OriginalData = updateDto
+                    });
+                    result.FailureCount++;
+                }
+            }
+
+            return ServiceResult<ASMVisitorDetailsBatchResultDto>.Success(result);
         }
 
         public async Task<ServiceResult<ASMVisitorDetailsDto>> GetByIdAsync(int id)

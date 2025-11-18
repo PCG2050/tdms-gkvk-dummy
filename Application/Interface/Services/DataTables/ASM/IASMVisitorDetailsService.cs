@@ -12,6 +12,10 @@ namespace Application.Interface.Services.DataTables.ASM
         Task<ServiceResult<ASMVisitorDetailsDto>> UpdateAsync(int id, ASMVisitorDetailsUpdateDto updateDto);
         Task<ServiceResult> DeleteAsync(int id);
 
+        // Batch Operations
+        Task<ServiceResult<ASMVisitorDetailsBatchResultDto>> AddBatchAsync(ASMVisitorDetailsBatchCreateDto batchCreateDto);
+        Task<ServiceResult<ASMVisitorDetailsBatchResultDto>> UpdateBatchAsync(ASMVisitorDetailsBatchUpdateDto batchUpdateDto);
+
         // Workflow
         Task<ServiceResult> SubmitForApprovalAsync(int id);
         Task<ServiceResult> ApproveAsync(int id, string? remarks = null);

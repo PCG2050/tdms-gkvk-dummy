@@ -85,6 +85,119 @@ namespace WebApi.Controllers.DataTables.ASM
         }
 
         /// <summary>
+        /// Batch create multiple visitor detail entries (Trainer only)
+        /// Can optionally submit all entries for approval immediately
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     POST /api/units/asm/visitor-details/batch
+        ///     {
+        ///       "submitOnCreate": true,
+        ///       "visitorDetails": [
+        ///         {
+        ///           "unitLocationId": 1,
+        ///           "instituteName": "School A",
+        ///           "startDate": "2025-01-15",
+        ///           "endDate": "2025-01-15",
+        ///           "farmersCount": 0,
+        ///           "studentsCount": 50,
+        ///           "publicCount": 5
+        ///         },
+        ///         {
+        ///           "unitLocationId": 1,
+        ///           "instituteName": "School B",
+        ///           "startDate": "2025-01-16",
+        ///           "endDate": "2025-01-16",
+        ///           "farmersCount": 0,
+        ///           "studentsCount": 30,
+        ///           "publicCount": 2
+        ///         }
+        ///       ]
+        ///     }
+        ///
+        /// If submitOnCreate is true, all entries will be created with status "Pending"
+        /// If submitOnCreate is false (default), all entries will be created with status "Draft"
+        /// </remarks>
+        /// <response code="200">Batch creation completed (includes success and failure details)</response>
+        /// <response code="400">Validation error</response>
+        [HttpPost("batch")]
+        [Authorize(Roles = RoleString.Trainer)]
+        public async Task<IActionResult> AddBatchAsync([FromBody] ASMVisitorDetailsBatchCreateDto batchCreateDto)
+        {
+            var result = await _service.AddBatchAsync(batchCreateDto);
+
+            if (!result.IsSuccess)
+                return BadRequest(new { message = result.ErrorMessage });
+
+            var batchResult = result.Data;
+
+            return Ok(new
+            {
+                message = $"Batch creation completed: {batchResult.SuccessCount} succeeded, {batchResult.FailureCount} failed",
+                totalProcessed = batchResult.TotalProcessed,
+                successCount = batchResult.SuccessCount,
+                failureCount = batchResult.FailureCount,
+                successfulEntries = batchResult.SuccessfulEntries,
+                failedEntries = batchResult.FailedEntries,
+                status = batchCreateDto.SubmitOnCreate ? "Pending" : "Draft"
+            });
+        }
+
+        /// <summary>
+        /// Batch update multiple visitor detail entries (Trainer only)
+        /// Can optionally submit all entries for approval after update
+        /// Only entries in Draft or Rejected status can be updated
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     PUT /api/units/asm/visitor-details/batch
+        ///     {
+        ///       "submitOnUpdate": true,
+        ///       "visitorDetails": [
+        ///         {
+        ///           "id": 5,
+        ///           "studentsCount": 55,
+        ///           "publicCount": 7
+        ///         },
+        ///         {
+        ///           "id": 6,
+        ///           "instituteName": "Updated School Name",
+        ///           "studentsCount": 35
+        ///         }
+        ///       ]
+        ///     }
+        ///
+        /// If submitOnUpdate is true, successfully updated entries will have status changed to "Pending"
+        /// If submitOnUpdate is false (default), status remains unchanged
+        /// </remarks>
+        /// <response code="200">Batch update completed (includes success and failure details)</response>
+        /// <response code="400">Validation error</response>
+        [HttpPut("batch")]
+        [Authorize(Roles = RoleString.Trainer)]
+        public async Task<IActionResult> UpdateBatchAsync([FromBody] ASMVisitorDetailsBatchUpdateDto batchUpdateDto)
+        {
+            var result = await _service.UpdateBatchAsync(batchUpdateDto);
+
+            if (!result.IsSuccess)
+                return BadRequest(new { message = result.ErrorMessage });
+
+            var batchResult = result.Data;
+
+            return Ok(new
+            {
+                message = $"Batch update completed: {batchResult.SuccessCount} succeeded, {batchResult.FailureCount} failed",
+                totalProcessed = batchResult.TotalProcessed,
+                successCount = batchResult.SuccessCount,
+                failureCount = batchResult.FailureCount,
+                successfulEntries = batchResult.SuccessfulEntries,
+                failedEntries = batchResult.FailedEntries,
+                submitted = batchUpdateDto.SubmitOnUpdate
+            });
+        }
+
+        /// <summary>
         /// Get visitor detail by ID
         /// Returns full details including creator and approver information
         /// </summary>
