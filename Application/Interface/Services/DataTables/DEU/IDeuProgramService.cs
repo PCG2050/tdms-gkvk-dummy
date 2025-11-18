@@ -36,30 +36,6 @@ namespace Application.Interface.Services.DataTables.DEU
         Task<ServiceResult<List<DeuProgramContentDto>>> GetProgramContentsByProgramIdAsync(int programId);
 
         // ============================
-        // SECTION C1: RESOURCE PERSONS
-        // ============================
-        Task<ServiceResult<DeuResourcePersonDto>> AddResourcePersonAsync(int contentId, DeuResourcePersonCreateDto dto);
-        Task<ServiceResult<DeuResourcePersonDto>> UpdateResourcePersonAsync(int personId, DeuResourcePersonUpdateDto dto);
-        Task<ServiceResult> DeleteResourcePersonAsync(int personId);
-        Task<ServiceResult<List<DeuResourcePersonDto>>> GetResourcePersonsByContentIdAsync(int contentId);
-
-        // ============================
-        // SECTION C2: TOPICS COVERED
-        // ============================
-        Task<ServiceResult<DeuTopicsCoveredDto>> AddTopicAsync(int contentId, DeuTopicsCoveredCreateDto dto);
-        Task<ServiceResult<DeuTopicsCoveredDto>> UpdateTopicAsync(int topicId, DeuTopicsCoveredUpdateDto dto);
-        Task<ServiceResult> DeleteTopicAsync(int topicId);
-        Task<ServiceResult<List<DeuTopicsCoveredDto>>> GetTopicsByContentIdAsync(int contentId);
-
-        // ============================
-        // SECTION C3: TEACHING AIDS
-        // ============================
-        Task<ServiceResult<DeuTeachingAidsDto>> AddTeachingAidAsync(int contentId, DeuTeachingAidsCreateDto dto);
-        Task<ServiceResult<DeuTeachingAidsDto>> UpdateTeachingAidAsync(int aidId, DeuTeachingAidsUpdateDto dto);
-        Task<ServiceResult> DeleteTeachingAidAsync(int aidId);
-        Task<ServiceResult<List<DeuTeachingAidsDto>>> GetTeachingAidsByContentIdAsync(int contentId);
-
-        // ============================
         // SECTION D: ADVISORY SERVICES
         // ============================
         Task<ServiceResult<DeuAdvisoryServicesDto>> AddAdvisoryServicesAsync(int programId, DeuAdvisoryServicesCreateDto dto);

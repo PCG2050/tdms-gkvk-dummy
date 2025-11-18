@@ -1,14 +1,5 @@
 ﻿namespace Domain.Entities.FTI
 {
-<<<<<<< Updated upstream
-    public  class FTIReport : AuditableBaseEntity
-    {
-        [Required]
-        public int FTIProgramDetailsID { get; set; }
-
-        [ForeignKey(nameof(FTIProgramDetailsID))]
-        public FTIProgramDetails ProgramDetails { get; set; }
-=======
     public class FtiReport : AuditableBaseEntity
     {
         [Required]
@@ -16,7 +7,6 @@
         [JsonIgnore]
         [ForeignKey(nameof(FtiProgramDetailsId))]
         public FtiProgramDetails? ProgramDetails { get; set; }
->>>>>>> Stashed changes
 
         // Report details
         [MaxLength(150)]
@@ -36,5 +26,8 @@
 
         [MaxLength(1000)]
         public string? SignificantOutcome { get; set; }
+        public int? UnitLocationId { get; set; }
+
+        public int? OrganizationId { get; set; }
     }
 }

@@ -135,7 +135,7 @@ namespace Infrastructure.Services.DataTables.IBTVA
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<IbtvaProgramDetailsDto>.Failure(
                     "Cannot edit programs that have been submitted",
                     ServiceErrorStatus.INVALIDOPERATION);
@@ -162,7 +162,7 @@ namespace Infrastructure.Services.DataTables.IBTVA
             if (!await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
                     "Only draft programs can be deleted",
                     ServiceErrorStatus.INVALIDOPERATION);
@@ -191,9 +191,9 @@ namespace Infrastructure.Services.DataTables.IBTVA
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<IbtvaParticipantDemographicsDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             var demographics = _mapper.MapToEntity(dto);
@@ -226,9 +226,9 @@ namespace Infrastructure.Services.DataTables.IBTVA
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<IbtvaParticipantDemographicsDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             IbtvaProgramMapper.MapUpdateDtoToEntity(dto, demographics);
@@ -252,9 +252,9 @@ namespace Infrastructure.Services.DataTables.IBTVA
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             await _demographicsRepository.DeleteAsync(demographicsId);
@@ -296,9 +296,9 @@ namespace Infrastructure.Services.DataTables.IBTVA
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<IbtvaProgramContentDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             var content = _mapper.MapToEntity(dto);
@@ -340,9 +340,9 @@ namespace Infrastructure.Services.DataTables.IBTVA
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             await _contentRepository.DeleteAsync(contentId);
@@ -364,348 +364,241 @@ namespace Infrastructure.Services.DataTables.IBTVA
             return ServiceResult<List<IbtvaProgramContentDto>>.Success(dtos);
         }
 
-        // ============================
-        // SECTION C1: RESOURCE PERSONS
-        // ============================
+        /// <summary>
+        /// Create IbtvaProgramContentAndResources with all child entities in a single transaction
+        /// </summary>
+        public async Task<ServiceResult<IbtvaProgramContentDto>> AddProgramContentWithChildrenAsync(
+            int programId,
+            IbtvaProgramContentWithChildrenCreateDto dto)
+        {
+            // Validate program exists
+            var program = await _programRepository.GetByIdAsync(programId);
+            if (program == null)
+                return ServiceResult<IbtvaProgramContentDto>.Failure(
+                    "Program not found",
+                    ServiceErrorStatus.NOTFOUND);
 
-        public async Task<ServiceResult<IbtvaResourcePersonDto>> AddResourcePersonAsync(
+            // Check permissions
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult<IbtvaProgramContentDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            // Validate form status
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+                return ServiceResult<IbtvaProgramContentDto>.Failure(
+                    "Cannot add content to submitted or approved programs",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            try
+            {
+                // Prepare parent entity
+                var parentEntity = new IbtvaProgramContentAndResources
+                {
+                    IbtvaProgramDetailsId = programId,
+                    UnitLocationId = program.UnitLocationId,
+                    OrganizationId = program.OrganizationId,
+                    CreatedById = _currentUserService.UserId,
+                    CreatedAt = DateTimeOffset.UtcNow
+                };
+
+                // Prepare child entities
+                var resourcePersons = dto.ResourcePersons?.Select(rp =>
+                {
+                    var entity = _mapper.MapToEntity(rp);
+                    entity.UnitLocationId = program.UnitLocationId;
+                    entity.OrganizationId = program.OrganizationId;
+                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedAt = DateTimeOffset.UtcNow;
+                    return entity;
+                }).ToList();
+
+                var topicsCovered = dto.TopicsCovered?.Select(tc =>
+                {
+                    var entity = _mapper.MapToEntity(tc);
+                    entity.UnitLocationId = program.UnitLocationId;
+                    entity.OrganizationId = program.OrganizationId;
+                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedAt = DateTimeOffset.UtcNow;
+                    return entity;
+                }).ToList();
+
+                var teachingAids = dto.TeachingAids?.Select(ta =>
+                {
+                    var entity = _mapper.MapToEntity(ta);
+                    entity.UnitLocationId = program.UnitLocationId;
+                    entity.OrganizationId = program.OrganizationId;
+                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedAt = DateTimeOffset.UtcNow;
+                    return entity;
+                }).ToList();
+
+                // Repository handles transaction internally
+                var createdContent = await _contentRepository.CreateWithChildrenAsync(
+                    parentEntity,
+                    resourcePersons,
+                    topicsCovered,
+                    teachingAids);
+
+                var resultDto = _mapper.MapToDto(createdContent);
+                return ServiceResult<IbtvaProgramContentDto>.Success(resultDto);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<IbtvaProgramContentDto>.Failure(
+                    $"Failed to create program content with children: {ex.Message}",
+                    ServiceErrorStatus.INVALIDOPERATION);
+            }
+        }
+
+        /// <summary>
+        /// Update IbtvaProgramContentAndResources with all child entities using Hybrid Pattern
+        /// - Items WITH Id: UPDATE existing
+        /// - Items WITHOUT Id: CREATE new
+        /// - Items in DB but NOT in arrays: DELETE
+        /// </summary>
+        public async Task<ServiceResult<IbtvaProgramContentDto>> UpdateProgramContentWithChildrenAsync(
             int contentId,
-            IbtvaResourcePersonCreateDto dto)
+            IbtvaProgramContentWithChildrenUpdateDto dto)
         {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
+            // Validate content exists
+            var content = await _contentRepository.GetWithDetailsAsync(contentId);
             if (content == null)
-                return ServiceResult<IbtvaResourcePersonDto>.Failure(
-                    "Program content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var program = await _programRepository.GetByIdAsync(content.IbtvaProgramDetailsId ?? 0);
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<IbtvaResourcePersonDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult<IbtvaResourcePersonDto>.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            var person = _mapper.MapToEntity(dto);
-            person.IbtvaProgramContentAndResourcesId = contentId;
-            person.OrganizationId = _currentUserService.OrganizationId;
-            person.UnitLocationId = program.UnitLocationId;
-            person.CreatedById = _currentUserService.UserId;
-            person.CreatedAt = DateTimeOffset.UtcNow;
-
-            await _resourcePersonRepository.CreateAsync(person);
-
-            var resultDto = _mapper.MapToDto(person);
-            return ServiceResult<IbtvaResourcePersonDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult<IbtvaResourcePersonDto>> UpdateResourcePersonAsync(
-            int personId,
-            IbtvaResourcePersonUpdateDto dto)
-        {
-            var person = await _resourcePersonRepository.GetByIdAsync(personId);
-
-            if (person == null)
-                return ServiceResult<IbtvaResourcePersonDto>.Failure(
-                    "Resource person not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(person.IbtvaProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.IbtvaProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<IbtvaResourcePersonDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult<IbtvaResourcePersonDto>.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            // Apply updates from DTO
-            if (dto.Name != null) person.Name = dto.Name;
-            if (dto.Designation != null) person.Designation = dto.Designation;
-            if (dto.ResourceType.HasValue) person.ResourceType = dto.ResourceType;
-            if (dto.Responsibility.HasValue) person.Responsibility = dto.Responsibility;
-            if (dto.InstitutionOrDepartment != null) person.InstitutionOrDepartment = dto.InstitutionOrDepartment;
-
-            person.UpdatedById = _currentUserService.UserId;
-            person.UpdatedAt = DateTimeOffset.UtcNow;
-
-            await _resourcePersonRepository.UpdateAsync(person);
-
-            var resultDto = _mapper.MapToDto(person);
-            return ServiceResult<IbtvaResourcePersonDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult> DeleteResourcePersonAsync(int personId)
-        {
-            var person = await _resourcePersonRepository.GetByIdAsync(personId);
-
-            if (person == null)
-                return ServiceResult.Failure("Resource person not found", ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(person.IbtvaProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.IbtvaProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            await _resourcePersonRepository.DeleteAsync(personId);
-            return ServiceResult.Success();
-        }
-
-        public async Task<ServiceResult<List<IbtvaResourcePersonDto>>> GetResourcePersonsByContentIdAsync(int contentId)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<List<IbtvaResourcePersonDto>>.Failure(
+                return ServiceResult<IbtvaProgramContentDto>.Failure(
                     "Content not found",
                     ServiceErrorStatus.NOTFOUND);
 
-            var persons = await _resourcePersonRepository.GetByContentIdAsync(contentId);
-            var dtos = persons.Select(p => _mapper.MapToDto(p)).ToList();
-
-            return ServiceResult<List<IbtvaResourcePersonDto>>.Success(dtos);
-        }
-
-        // ============================
-        // SECTION C2: TOPICS COVERED
-        // ============================
-
-        public async Task<ServiceResult<IbtvaTopicsCoveredDto>> AddTopicAsync(
-            int contentId,
-            IbtvaTopicsCoveredCreateDto dto)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<IbtvaTopicsCoveredDto>.Failure(
-                    "Program content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
+            // Validate program and permissions
             var program = await _programRepository.GetByIdAsync(content.IbtvaProgramDetailsId ?? 0);
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<IbtvaTopicsCoveredDto>.Failure(
+            if (program == null)
+                return ServiceResult<IbtvaProgramContentDto>.Failure(
+                    "Program not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult<IbtvaProgramContentDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
-                return ServiceResult<IbtvaTopicsCoveredDto>.Failure(
-                    "Cannot modify submitted programs",
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+                return ServiceResult<IbtvaProgramContentDto>.Failure(
+                    "Cannot update content in submitted or approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
-            var topic = _mapper.MapToEntity(dto);
-            topic.IbtvaProgramContentAndResourcesId = contentId;
-            topic.OrganizationId = _currentUserService.OrganizationId;
-            topic.UnitLocationId = program.UnitLocationId;
-            topic.CreatedById = _currentUserService.UserId;
-            topic.CreatedAt = DateTimeOffset.UtcNow;
+            try
+            {
+                // Prepare parent entity for update
+                var parentEntity = new IbtvaProgramContentAndResources
+                {
+                    Id = contentId,
+                    UpdatedById = _currentUserService.UserId,
+                    UpdatedAt = DateTimeOffset.UtcNow
+                };
 
-            await _topicsRepository.CreateAsync(topic);
+                // Prepare child entities (hybrid: mix of new and existing)
+                var resourcePersons = dto.ResourcePersons?.Select(rp =>
+                {
+                    var entity = new IbtvaResourcePerson
+                    {
+                        Id = rp.Id ?? 0, // 0 means new
+                        Name = rp.Name,
+                        Designation = rp.Designation,
+                        ResourceType = rp.ResourceType,
+                        Responsibility = rp.Responsibility,
+                        InstitutionOrDepartment = rp.InstitutionOrDepartment,
+                        UnitLocationId = program.UnitLocationId,
+                        OrganizationId = program.OrganizationId
+                    };
 
-            var resultDto = _mapper.MapToDto(topic);
-            return ServiceResult<IbtvaTopicsCoveredDto>.Success(resultDto);
-        }
+                    if (entity.Id == 0)
+                    {
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
 
-        public async Task<ServiceResult<IbtvaTopicsCoveredDto>> UpdateTopicAsync(
-            int topicId,
-            IbtvaTopicsCoveredUpdateDto dto)
-        {
-            var topic = await _topicsRepository.GetByIdAsync(topicId);
+                    return entity;
+                }).ToList();
 
-            if (topic == null)
-                return ServiceResult<IbtvaTopicsCoveredDto>.Failure(
-                    "Topic not found",
-                    ServiceErrorStatus.NOTFOUND);
+                var topicsCovered = dto.TopicsCovered?.Select(tc =>
+                {
+                    var entity = new IbtvaTopicsCoveredInClass
+                    {
+                        Id = tc.Id ?? 0,
+                        Date = tc.Date,
+                        Title = tc.Title,
+                        PhotoUpload = tc.PhotoUpload,
+                        UnitLocationId = program.UnitLocationId,
+                        OrganizationId = program.OrganizationId
+                    };
 
-            var content = await _contentRepository.GetByIdAsync(topic.IbtvaProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.IbtvaProgramDetailsId ?? 0);
+                    if (entity.Id == 0)
+                    {
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
 
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<IbtvaTopicsCoveredDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
+                    return entity;
+                }).ToList();
 
-            if (program.FormStatus != "Draft")
-                return ServiceResult<IbtvaTopicsCoveredDto>.Failure(
-                    "Cannot modify submitted programs",
+                var teachingAids = dto.TeachingAids?.Select(ta =>
+                {
+                    var entity = new IbtvaTeachingAidsDeveloped
+                    {
+                        Id = ta.Id ?? 0,
+                        TypeOfAidId = ta.TypeOfAidId,
+                        OtherTypeOfAid = ta.OtherTypeOfAid,
+                        Purpose = ta.Purpose,
+                        Number = ta.Number,
+                        UnitLocationId = program.UnitLocationId,
+                        OrganizationId = program.OrganizationId
+                    };
+
+                    if (entity.Id == 0)
+                    {
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
+
+                    return entity;
+                }).ToList();
+
+                // Repository handles transaction internally
+                var updatedContent = await _contentRepository.UpdateWithChildrenAsync(
+                    parentEntity,
+                    resourcePersons,
+                    topicsCovered,
+                    teachingAids);
+
+                var resultDto = _mapper.MapToDto(updatedContent);
+                return ServiceResult<IbtvaProgramContentDto>.Success(resultDto);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<IbtvaProgramContentDto>.Failure(
+                    $"Failed to update program content with children: {ex.Message}",
                     ServiceErrorStatus.INVALIDOPERATION);
-
-            if (dto.Date.HasValue) topic.Date = dto.Date;
-            if (dto.Title != null) topic.Title = dto.Title;
-            if (dto.PhotoUpload != null) topic.PhotoUpload = dto.PhotoUpload;
-
-            topic.UpdatedById = _currentUserService.UserId;
-            topic.UpdatedAt = DateTimeOffset.UtcNow;
-
-            await _topicsRepository.UpdateAsync(topic);
-
-            var resultDto = _mapper.MapToDto(topic);
-            return ServiceResult<IbtvaTopicsCoveredDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult> DeleteTopicAsync(int topicId)
-        {
-            var topic = await _topicsRepository.GetByIdAsync(topicId);
-
-            if (topic == null)
-                return ServiceResult.Failure("Topic not found", ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(topic.IbtvaProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.IbtvaProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            await _topicsRepository.DeleteAsync(topicId);
-            return ServiceResult.Success();
-        }
-
-        public async Task<ServiceResult<List<IbtvaTopicsCoveredDto>>> GetTopicsByContentIdAsync(int contentId)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<List<IbtvaTopicsCoveredDto>>.Failure(
-                    "Content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var topics = await _topicsRepository.GetByContentIdAsync(contentId);
-            var dtos = topics.Select(t => _mapper.MapToDto(t)).ToList();
-
-            return ServiceResult<List<IbtvaTopicsCoveredDto>>.Success(dtos);
+            }
         }
 
         // ============================
-        // SECTION C3: TEACHING AIDS
+        // SECTION C1-C3: RESOURCE PERSONS, TOPICS, TEACHING AIDS
+        // Individual CRUD methods REMOVED - Use hybrid endpoints instead
         // ============================
-
-        public async Task<ServiceResult<IbtvaTeachingAidsDto>> AddTeachingAidAsync(
-            int contentId,
-            IbtvaTeachingAidsCreateDto dto)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<IbtvaTeachingAidsDto>.Failure(
-                    "Program content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var program = await _programRepository.GetByIdAsync(content.IbtvaProgramDetailsId ?? 0);
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<IbtvaTeachingAidsDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult<IbtvaTeachingAidsDto>.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            var aid = _mapper.MapToEntity(dto);
-            aid.IbtvaProgramContentAndResourcesId = contentId;
-            aid.OrganizationId = _currentUserService.OrganizationId;
-            aid.UnitLocationId = program.UnitLocationId;
-            aid.CreatedById = _currentUserService.UserId;
-            aid.CreatedAt = DateTimeOffset.UtcNow;
-
-            await _teachingAidsRepository.CreateAsync(aid);
-
-            var resultDto = _mapper.MapToDto(aid);
-            return ServiceResult<IbtvaTeachingAidsDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult<IbtvaTeachingAidsDto>> UpdateTeachingAidAsync(
-            int aidId,
-            IbtvaTeachingAidsUpdateDto dto)
-        {
-            var aid = await _teachingAidsRepository.GetByIdAsync(aidId);
-
-            if (aid == null)
-                return ServiceResult<IbtvaTeachingAidsDto>.Failure(
-                    "Teaching aid not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(aid.IbtvaProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.IbtvaProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<IbtvaTeachingAidsDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult<IbtvaTeachingAidsDto>.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            if (dto.TypeOfAidId.HasValue) aid.TypeOfAidId = dto.TypeOfAidId;
-            if (dto.OtherTypeOfAid != null) aid.OtherTypeOfAid = dto.OtherTypeOfAid;
-            if (dto.Purpose != null) aid.Purpose = dto.Purpose;
-            if (dto.Number.HasValue) aid.Number = dto.Number.Value;
-
-            aid.UpdatedById = _currentUserService.UserId;
-            aid.UpdatedAt = DateTimeOffset.UtcNow;
-
-            await _teachingAidsRepository.UpdateAsync(aid);
-
-            var resultDto = _mapper.MapToDto(aid);
-            return ServiceResult<IbtvaTeachingAidsDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult> DeleteTeachingAidAsync(int aidId)
-        {
-            var aid = await _teachingAidsRepository.GetByIdAsync(aidId);
-
-            if (aid == null)
-                return ServiceResult.Failure("Teaching aid not found", ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(aid.IbtvaProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.IbtvaProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            await _teachingAidsRepository.DeleteAsync(aidId);
-            return ServiceResult.Success();
-        }
-
-        public async Task<ServiceResult<List<IbtvaTeachingAidsDto>>> GetTeachingAidsByContentIdAsync(int contentId)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<List<IbtvaTeachingAidsDto>>.Failure(
-                    "Content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var aids = await _teachingAidsRepository.GetByContentIdAsync(contentId);
-            var dtos = aids.Select(a => _mapper.MapToDto(a)).ToList();
-
-            return ServiceResult<List<IbtvaTeachingAidsDto>>.Success(dtos);
-        }
 
         // ============================
         // SECTION D: ADVISORY SERVICES
@@ -727,9 +620,9 @@ namespace Infrastructure.Services.DataTables.IBTVA
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<IbtvaAdvisoryServicesDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             // Check if advisory services already exist
@@ -769,9 +662,9 @@ namespace Infrastructure.Services.DataTables.IBTVA
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<IbtvaAdvisoryServicesDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             if (dto.NoOfFacebookSMS.HasValue) advisory.NoOfFacebookSMS = dto.NoOfFacebookSMS.Value;
@@ -806,9 +699,9 @@ namespace Infrastructure.Services.DataTables.IBTVA
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             await _advisoryRepository.DeleteAsync(advisoryId);
@@ -854,9 +747,9 @@ namespace Infrastructure.Services.DataTables.IBTVA
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<IbtvaReportDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             // Check if report already exists
@@ -896,9 +789,9 @@ namespace Infrastructure.Services.DataTables.IBTVA
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<IbtvaReportDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             if (dto.ProgressReportReportingYear != null) report.ProgressReportReportingYear = dto.ProgressReportReportingYear;
@@ -928,9 +821,9 @@ namespace Infrastructure.Services.DataTables.IBTVA
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.CONFLICT);
 
             await _reportRepository.DeleteAsync(reportId);
@@ -976,9 +869,9 @@ namespace Infrastructure.Services.DataTables.IBTVA
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<IbtvaRecommendationDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             // Check if recommendation already exists
@@ -996,6 +889,15 @@ namespace Infrastructure.Services.DataTables.IBTVA
             recommendation.CreatedAt = DateTimeOffset.UtcNow;
 
             await _recommendationRepository.CreateAsync(recommendation);
+
+            // AUTO-SUBMIT: Since Recommendation is the last section, automatically change status to Pending
+            if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
+            {
+                program.FormStatus = "Pending";
+                program.UpdatedById = _currentUserService.UserId;
+                program.UpdatedAt = DateTimeOffset.UtcNow;
+                await _programRepository.UpdateAsync(program);
+            }
 
             var resultDto = _mapper.MapToDto(recommendation);
             return ServiceResult<IbtvaRecommendationDto>.Success(resultDto);
@@ -1018,9 +920,9 @@ namespace Infrastructure.Services.DataTables.IBTVA
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<IbtvaRecommendationDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.CONFLICT);
 
             if (dto.ProblemsIdentified != null) recommendation.ProblemsIdentified = dto.ProblemsIdentified;
@@ -1034,6 +936,15 @@ namespace Infrastructure.Services.DataTables.IBTVA
             recommendation.UpdatedAt = DateTimeOffset.UtcNow;
 
             await _recommendationRepository.UpdateAsync(recommendation);
+
+            // AUTO-SUBMIT: Since Recommendation is the last section, automatically change status to Pending
+            if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
+            {
+                program.FormStatus = "Pending";
+                program.UpdatedById = _currentUserService.UserId;
+                program.UpdatedAt = DateTimeOffset.UtcNow;
+                await _programRepository.UpdateAsync(program);
+            }
 
             var resultDto = _mapper.MapToDto(recommendation);
             return ServiceResult<IbtvaRecommendationDto>.Success(resultDto);
@@ -1050,9 +961,9 @@ namespace Infrastructure.Services.DataTables.IBTVA
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             await _recommendationRepository.DeleteAsync(recommendationId);
@@ -1092,7 +1003,7 @@ namespace Infrastructure.Services.DataTables.IBTVA
             if (!await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
                     "Only draft programs can be submitted",
                     ServiceErrorStatus.INVALIDOPERATION);

@@ -27,12 +27,7 @@ namespace Infrastructure.DbContext
         public DbSet<User> Users { get; set; }
         public DbSet<UserSession> UserSessions { get; set; }
         public DbSet<Unit> Units { get; set; }
-<<<<<<< Updated upstream
-        public DbSet<FtiTrainingProgram> FtiTrainingPrograms { get; set; }
-        public DbSet<FtiOtherActivity> FtiOtherActivities { get; set; }
-=======
      
->>>>>>> Stashed changes
         #region STU
        
       
@@ -263,7 +258,7 @@ namespace Infrastructure.DbContext
 
         #endregion
 
-        
+
 
 
 
@@ -344,7 +339,7 @@ namespace Infrastructure.DbContext
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-          
+
 
 
             modelBuilder.Entity<TrainerAssignment>()
@@ -371,18 +366,32 @@ namespace Infrastructure.DbContext
                 .HasForeignKey(u => u.UpdatedById)
                 .OnDelete(DeleteBehavior.Restrict);
 
+          
 
 
 
+            // Set NoAction for all relationships except junction tables
             foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
             {
-                relationship.DeleteBehavior = DeleteBehavior.NoAction;
+                // Exclude junction tables from NoAction - they have explicit cascade configuration above
+                var junctionTableTypes = new[]
+                {
+                    typeof(Domain.Entities.Junction.PublicationKannadaNewsPaper),
+                    typeof(Domain.Entities.Junction.PublicationEnglishNewsPaper),
+                    typeof(Domain.Entities.Junction.PublicationKannadaMagazine),
+                    typeof(Domain.Entities.Junction.PublicationEnglishMagazine)
+                };
+
+                if (!junctionTableTypes.Contains(relationship.DeclaringEntityType.ClrType))
+                {
+                    relationship.DeleteBehavior = DeleteBehavior.NoAction;
+                }
             }
             new OrganizationTypeConfiguration().Configure(modelBuilder.Entity<Organization>());
             new UserTypeConfiguration().Configure(modelBuilder.Entity<User>());
             new AticSalesTypeConfiguration().Configure(modelBuilder.Entity<AticSales>());
             //new DeuCourseTypeConfiguration().Configure(modelBuilder.Entity<DeuCourse>());
-            
+
 
             //Configuring Defaults for createdAt only (UpdatedAt will be handled by savechanges override) 
             foreach (var entityType in modelBuilder.Model.GetEntityTypes()
@@ -393,7 +402,7 @@ namespace Infrastructure.DbContext
                     .Property(nameof(ReportEntryBaseEntity.CreatedAt))
                     .ValueGeneratedOnAdd()
                     .HasDefaultValueSql("SYSUTCDATETIME()"); // for SQL Server/SQLite
-            
+
                 //Dont Set for UpdateAt - it should only be set on updates
                 //if(typeof(AuditableBaseEntity).IsAssignableFrom(entityType.ClrType) ||
                 //        typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
@@ -402,7 +411,7 @@ namespace Infrastructure.DbContext
                 //        .Property("UpdatedAt")
                 //        .ValueGeneratedOnUpdate();
                 //}
-                
+
             }
         }
     }

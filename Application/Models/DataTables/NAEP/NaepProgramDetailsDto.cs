@@ -137,8 +137,20 @@ namespace Application.Models.DataTables.NAEP
         public int? SourceOfFundId { get; set; }
         public int? NoOfCourses { get; set; }
         public string? Attachments { get; set; }
-
-       
+        public int? StatusId { get; set; }
+        public decimal? TotalOutlayRs { get; set; }
+        public string? Copi { get; set; }
+        public int? BatchNo { get; set; }
+        public string? OrganizerBroucherFile { get; set; }
+        public string? OrganizerInstitutionName { get; set; }
+        public string? OrganizerInstitutionAddress { get; set; }
+        public int? SourceId { get; set; }
+        public DateTime? ProposalDate { get; set; }
+        public string? ProposalUploadFile { get; set; }
+        public DateTime? UniversitySanctionLetterDate { get; set; }
+        public string? UniversitySanctionLetterUploadFile { get; set; }
+        public DateTime? FundsSanctionLetterDate { get; set; }
+        public string? FundsSanctionLetterUploadFile { get; set; }
 
     }
 

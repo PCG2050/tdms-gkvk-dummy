@@ -37,30 +37,6 @@ namespace Application.Interface.Services.DataTables.NAEP
         Task<ServiceResult<List<NaepProgramContentDto>>> GetProgramContentsByProgramIdAsync(int programId);
 
         // ============================
-        // SECTION C1: RESOURCE PERSONS
-        // ============================
-        Task<ServiceResult<NaepResourcePersonDto>> AddResourcePersonAsync(int contentId, NaepResourcePersonCreateDto dto);
-        Task<ServiceResult<NaepResourcePersonDto>> UpdateResourcePersonAsync(int personId, NaepResourcePersonUpdateDto dto);
-        Task<ServiceResult> DeleteResourcePersonAsync(int personId);
-        Task<ServiceResult<List<NaepResourcePersonDto>>> GetResourcePersonsByContentIdAsync(int contentId);
-
-        // ============================
-        // SECTION C2: TOPICS COVERED
-        // ============================
-        Task<ServiceResult<NaepTopicsCoveredDto>> AddTopicAsync(int contentId, NaepTopicsCoveredCreateDto dto);
-        Task<ServiceResult<NaepTopicsCoveredDto>> UpdateTopicAsync(int topicId, NaepTopicsCoveredUpdateDto dto);
-        Task<ServiceResult> DeleteTopicAsync(int topicId);
-        Task<ServiceResult<List<NaepTopicsCoveredDto>>> GetTopicsByContentIdAsync(int contentId);
-
-        // ============================
-        // SECTION C3: TEACHING AIDS
-        // ============================
-        Task<ServiceResult<NaepTeachingAidsDto>> AddTeachingAidAsync(int contentId, NaepTeachingAidsCreateDto dto);
-        Task<ServiceResult<NaepTeachingAidsDto>> UpdateTeachingAidAsync(int aidId, NaepTeachingAidsUpdateDto dto);
-        Task<ServiceResult> DeleteTeachingAidAsync(int aidId);
-        Task<ServiceResult<List<NaepTeachingAidsDto>>> GetTeachingAidsByContentIdAsync(int contentId);
-
-        // ============================
         // SECTION D: ADVISORY SERVICES
         // ============================
         Task<ServiceResult<NaepAdvisoryServicesDto>> AddAdvisoryServicesAsync(int programId, NaepAdvisoryServicesCreateDto dto);

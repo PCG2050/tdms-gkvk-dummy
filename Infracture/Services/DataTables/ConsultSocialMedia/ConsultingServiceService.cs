@@ -113,9 +113,9 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (consultingService.FormStatus != "Draft")
+            if (consultingService.FormStatus != "Draft" && consultingService.FormStatus != "Rejected" && consultingService.FormStatus != "Pending")
                 return ServiceResult<ConsultingServiceDto>.Failure(
-                    "Cannot edit consulting services that have been submitted",
+                    "Cannot edit approved consulting services",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             _mapper.MapUpdateDtoToEntity(updateDto, consultingService);
@@ -140,116 +140,13 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
             if (!await _entityPermissionService.CanModifyForm(consultingService))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (consultingService.FormStatus != "Draft")
+            if (consultingService.FormStatus != "Draft" && consultingService.FormStatus != "Rejected" && consultingService.FormStatus != "Pending")
                 return ServiceResult.Failure(
                     "Only draft consulting services can be deleted",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             await _consultingServiceRepository.DeleteAsync(id);
             return ServiceResult.Success();
-        }
-
-        // ==========================================
-        // ModeAndOutreach Management
-        // ==========================================
-
-        public async Task<ServiceResult<ModeAndOutreachDto>> AddModeAndOutreachAsync(
-            int consultingServiceId,
-            ModeAndOutreachCreateDto dto)
-        {
-            var consultingService = await _consultingServiceRepository.GetByIdAsync(consultingServiceId);
-
-            if (consultingService == null)
-                return ServiceResult<ModeAndOutreachDto>.Failure(
-                    "Consulting service not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            if (!await _entityPermissionService.CanModifyForm(consultingService))
-                return ServiceResult<ModeAndOutreachDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (consultingService.FormStatus != "Draft")
-                return ServiceResult<ModeAndOutreachDto>.Failure(
-                    "Cannot add mode and outreach to submitted consulting services",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            var modeAndOutreach = _mapper.MapToEntity(dto);
-            modeAndOutreach.ConsultingServiceId = consultingServiceId;
-            modeAndOutreach.CreatedById = _currentUserService.UserId;
-            modeAndOutreach.CreatedAt = DateTimeOffset.UtcNow;
-
-            await _modeAndOutreachRepository.CreateAsync(modeAndOutreach);
-
-            var resultDto = _mapper.MapToDto(modeAndOutreach);
-            return ServiceResult<ModeAndOutreachDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult<ModeAndOutreachDto>> UpdateModeAndOutreachAsync(int modeAndOutreachId, ModeAndOutreachCreateDto dto)
-        {
-            var modeAndOutreach = await _modeAndOutreachRepository.GetByIdAsync(modeAndOutreachId);
-
-            if (modeAndOutreach == null)
-                return ServiceResult<ModeAndOutreachDto>.Failure(
-                    "Mode and outreach not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var consultingService = await _consultingServiceRepository.GetByIdAsync(modeAndOutreach.ConsultingServiceId);
-            if (consultingService == null || !await _entityPermissionService.CanModifyForm(consultingService))
-                return ServiceResult<ModeAndOutreachDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (consultingService.FormStatus != "Draft")
-                return ServiceResult<ModeAndOutreachDto>.Failure(
-                    "Cannot edit mode and outreach for submitted consulting services",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            modeAndOutreach.Name = dto.Name;
-            modeAndOutreach.MobileNo = dto.MobileNo;
-            modeAndOutreach.Gender = dto.Gender;
-            modeAndOutreach.UpdatedById = _currentUserService.UserId;
-            modeAndOutreach.UpdatedAt = DateTimeOffset.UtcNow;
-
-            await _modeAndOutreachRepository.UpdateAsync(modeAndOutreach);
-
-            var resultDto = _mapper.MapToDto(modeAndOutreach);
-            return ServiceResult<ModeAndOutreachDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult> DeleteModeAndOutreachAsync(int modeAndOutreachId)
-        {
-            var modeAndOutreach = await _modeAndOutreachRepository.GetByIdAsync(modeAndOutreachId);
-
-            if (modeAndOutreach == null)
-                return ServiceResult.Failure("Mode and outreach not found", ServiceErrorStatus.NOTFOUND);
-
-            var consultingService = await _consultingServiceRepository.GetByIdAsync(modeAndOutreach.ConsultingServiceId);
-            if (consultingService == null || !await _entityPermissionService.CanModifyForm(consultingService))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (consultingService.FormStatus != "Draft")
-                return ServiceResult.Failure(
-                    "Cannot delete mode and outreach for submitted consulting services",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            await _modeAndOutreachRepository.DeleteAsync(modeAndOutreachId);
-            return ServiceResult.Success();
-        }
-
-        public async Task<ServiceResult<List<ModeAndOutreachDto>>> GetModeAndOutreachesAsync(int consultingServiceId)
-        {
-            var consultingService = await _consultingServiceRepository.GetByIdAsync(consultingServiceId);
-
-            if (consultingService == null)
-                return ServiceResult<List<ModeAndOutreachDto>>.Failure(
-                    "Consulting service not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var modeAndOutreaches = await _modeAndOutreachRepository.GetByConsultingServiceIdAsync(consultingServiceId);
-            var dtos = modeAndOutreaches.Select(m => _mapper.MapToDto(m)).ToList();
-
-            return ServiceResult<List<ModeAndOutreachDto>>.Success(dtos);
         }
 
         // ==========================================
@@ -287,6 +184,15 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
                         modeEntity.CreatedAt = DateTimeOffset.UtcNow;
                         await _modeAndOutreachRepository.CreateAsync(modeEntity);
                     }
+
+                    // AUTO-SUBMIT: Since ModeAndOutreach is saved, automatically change status to Pending
+                    if (createdService.FormStatus == "Draft" || createdService.FormStatus == "Rejected")
+                    {
+                        createdService.FormStatus = "Pending";
+                        createdService.UpdatedById = _currentUserService.UserId;
+                        createdService.UpdatedAt = DateTimeOffset.UtcNow;
+                        await _consultingServiceRepository.UpdateAsync(createdService);
+                    }
                 }
 
                 // Step 4: Get complete entity with all children and return
@@ -317,9 +223,9 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
                     ServiceErrorStatus.FORBIDDEN);
 
             // Step 3: Validate form status
-            if (existingService.FormStatus != "Draft")
+            if (existingService.FormStatus != "Draft" && existingService.FormStatus != "Rejected" && existingService.FormStatus != "Pending")
                 return ServiceResult<ConsultingServiceDto>.Failure(
-                    "Cannot modify submitted or approved consulting services",
+                    "Cannot modify approved consulting services",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             try
@@ -382,6 +288,17 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
                     }
                 }
 
+                // AUTO-SUBMIT: If ModeAndOutreach children exist, automatically change status to Pending
+                var updatedModeAndOutreaches = await _modeAndOutreachRepository.GetByConsultingServiceIdAsync(consultingServiceId);
+                if (updatedModeAndOutreaches.Any() &&
+                    (existingService.FormStatus == "Draft" || existingService.FormStatus == "Rejected"))
+                {
+                    existingService.FormStatus = "Pending";
+                    existingService.UpdatedById = _currentUserService.UserId;
+                    existingService.UpdatedAt = DateTimeOffset.UtcNow;
+                    await _consultingServiceRepository.UpdateAsync(existingService);
+                }
+
                 // Step 6: Get complete entity with all children and return
                 var completeEntity = await _consultingServiceRepository.GetWithDetailsAsync(consultingServiceId);
                 return ServiceResult<ConsultingServiceDto>.Success(_mapper.MapToDto(completeEntity));
@@ -408,7 +325,7 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
             if (!await _entityPermissionService.CanModifyForm(consultingService))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (consultingService.FormStatus != "Draft")
+            if (consultingService.FormStatus != "Draft" && consultingService.FormStatus != "Rejected" && consultingService.FormStatus != "Pending")
                 return ServiceResult.Failure(
                     "Only draft consulting services can be submitted",
                     ServiceErrorStatus.INVALIDOPERATION);

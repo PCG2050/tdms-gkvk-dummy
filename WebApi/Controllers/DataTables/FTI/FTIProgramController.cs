@@ -6,6 +6,8 @@ using Application.Models.DataTables.KVK;
 
 namespace WebApi.Controllers.DataTables.FTI
 {
+    [Authorize]
+    [Route("api/[controller]")]
     [ApiController]
     public class FtiProgramController : ControllerBase
     {
@@ -23,39 +25,36 @@ namespace WebApi.Controllers.DataTables.FTI
         [HttpPost]
         public async Task<IActionResult> CreateProgram([FromBody] FtiProgramCreateDto dto)
         {
-            var programs = await _service.GetAllProgramsAsync();
-            return Ok(programs);
+            var result = await _service.CreateProgramAsync(dto);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetProgram(int id)
         {
-            var program = await _service.GetProgramByIdAsync(id);
-            if (program == null) return NotFound();
-            return Ok(program);
+            var result = await _service.GetProgramByIdAsync(id);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] FTIProgramDetailsDto dto)
+        [HttpGet("{id}/complete")]
+        public async Task<IActionResult> GetCompleteProgram(int id)
         {
-            var created = await _service.AddProgramAsync(dto);
-            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+            var result = await _service.GetCompleteProgramAsync(id);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] FTIProgramDetailsDto dto)
+        public async Task<IActionResult> UpdateProgram(int id, [FromBody] FtiProgramUpdateDto dto)
         {
-            if (id != dto.Id) return BadRequest();
-            var updated = await _service.UpdateProgramAsync(dto);
-            return Ok(updated);
+            var result = await _service.UpdateProgramAsync(id, dto);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> DeleteProgram(int id)
         {
-            var deleted = await _service.DeleteProgramAsync(id);
-            if (!deleted) return NotFound();
-            return NoContent();
+            var result = await _service.DeleteProgramAsync(id);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
         // ============================

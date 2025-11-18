@@ -135,6 +135,14 @@ namespace Application.Mapper.DataTable.KVK
 
         public partial KvkAdvisoryServices MapToEntity(KvkAdvisoryServicesCreateDto dto);
 
+        [MapperIgnoreTarget(nameof(KvkAdvisoryServices.Id))]
+        [MapperIgnoreTarget(nameof(KvkAdvisoryServices.KvkProgramDetailsId))]
+        [MapperIgnoreTarget(nameof(KvkAdvisoryServices.CreatedAt))]
+        [MapperIgnoreTarget(nameof(KvkAdvisoryServices.CreatedById))]
+        [MapperIgnoreTarget(nameof(KvkAdvisoryServices.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(KvkAdvisoryServices.UpdatedById))]
+        public partial void MapUpdateDtoToEntity(KvkAdvisoryServicesUpdateDto dto, KvkAdvisoryServices entity);
+
         // ============================
         // RESULT MAPPINGS (FLD/OFT)
         // ============================
@@ -185,6 +193,14 @@ namespace Application.Mapper.DataTable.KVK
 
         public partial KvkReport MapToEntity(KvkReportCreateDto dto);
 
+        [MapperIgnoreTarget(nameof(KvkReport.Id))]
+        [MapperIgnoreTarget(nameof(KvkReport.KvkProgramDetailsId))]
+        [MapperIgnoreTarget(nameof(KvkReport.CreatedAt))]
+        [MapperIgnoreTarget(nameof(KvkReport.CreatedById))]
+        [MapperIgnoreTarget(nameof(KvkReport.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(KvkReport.UpdatedById))]
+        public partial void MapUpdateDtoToEntity(KvkReportUpdateDto dto, KvkReport entity);
+
         // ============================
         // RECOMMENDATION MAPPINGS
         // ============================
@@ -192,5 +208,13 @@ namespace Application.Mapper.DataTable.KVK
         public partial KvkRecommendationDto MapToDto(KvkRecommendation entity);
 
         public partial KvkRecommendation MapToEntity(KvkRecommendationCreateDto dto);
+
+        [MapperIgnoreTarget(nameof(KvkRecommendation.Id))]
+        [MapperIgnoreTarget(nameof(KvkRecommendation.KvkProgramDetailsId))]
+        [MapperIgnoreTarget(nameof(KvkRecommendation.CreatedAt))]
+        [MapperIgnoreTarget(nameof(KvkRecommendation.CreatedById))]
+        [MapperIgnoreTarget(nameof(KvkRecommendation.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(KvkRecommendation.UpdatedById))]
+        public partial void MapUpdateDtoToEntity(KvkRecommendationUpdateDto dto, KvkRecommendation entity);
     }
 }

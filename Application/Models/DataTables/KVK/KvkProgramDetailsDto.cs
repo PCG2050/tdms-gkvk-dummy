@@ -177,6 +177,24 @@ namespace Application.Models.DataTables.KVK
         public KvkRecommendationDto? Recommendation { get; set; }
     }
 
+    /// <summary>
+    /// Lightweight DTO for list/search results
+    /// </summary>
+    public class KvkProgramListItemDto
+    {
+        public int Id { get; set; }
+        public string? Title { get; set; }
+        public DateOnly StartDate { get; set; }
+        public DateOnly EndDate { get; set; }
+        public string? CategoryName { get; set; }
+        public string? TypeName { get; set; }
+        public string? Location { get; set; }
+        public string FormStatus { get; set; } = "Draft";
+        public string? CreatedByName { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
+        public string? UnitName { get; set; }
+    }
+
     // ============================
     // DEMOGRAPHICS DTOs
     // ============================
@@ -460,6 +478,22 @@ namespace Application.Models.DataTables.KVK
         public int? NoOfBeneficiaries { get; set; }
     }
 
+    public class KvkAdvisoryServicesUpdateDto : IUpdateDto
+    {
+        public int Id { get; set; }
+        public int? NoOfFacebookSMS { get; set; }
+        public int? NoOfSMSSentToRegisteredFarmers { get; set; }
+        public int? NoOfWhatsappGroups { get; set; }
+        public int? NoOfWhatsappSMS { get; set; }
+        public int? NoOfAnsweredWhatsappQueries { get; set; }
+        public int? NoOfPhoneCalls { get; set; }
+        public int? NoOfFaceToFaceDiscussions { get; set; }
+        public int? NoOfGroupDiscussions { get; set; }
+        public int? NoOfEmailsSent { get; set; }
+        public int? NoOfNewspaperCoverage { get; set; }
+        public int? NoOfBeneficiaries { get; set; }
+    }
+
     // ============================
     // RESULT DTOs (FLD/OFT)
     // ============================
@@ -710,6 +744,17 @@ namespace Application.Models.DataTables.KVK
         public string? SignificantOutcome { get; set; }
     }
 
+    public class KvkReportUpdateDto : IUpdateDto
+    {
+        public int Id { get; set; }
+        public string? ProgressReportReportingYear { get; set; }
+        public DateTime? Date { get; set; }
+        public string? UploadPhoto { get; set; }
+        public string? PhotosGeotaggedPhotoOrUploadPhoto { get; set; }
+        public string? UploadVideo { get; set; }
+        public string? SignificantOutcome { get; set; }
+    }
+
     // ============================
     // RECOMMENDATION DTOs
     // ============================
@@ -726,6 +771,17 @@ namespace Application.Models.DataTables.KVK
 
     public class KvkRecommendationCreateDto
     {
+        public string? ProblemsIdentified { get; set; }
+        public string? Recommendation { get; set; }
+        public string? ActionTaken { get; set; }
+        public string? SignificantAchievement { get; set; }
+        public string? SuccessStories { get; set; }
+        public string? ImpactOutcome { get; set; }
+    }
+
+    public class KvkRecommendationUpdateDto : IUpdateDto
+    {
+        public int Id { get; set; }
         public string? ProblemsIdentified { get; set; }
         public string? Recommendation { get; set; }
         public string? ActionTaken { get; set; }

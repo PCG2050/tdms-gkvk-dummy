@@ -11,7 +11,7 @@ namespace Domain.Entities.GenericTables
         //Unitlocaiton and Organization References
         [Required]
         public int UnitLocationId { get; set; }
-       
+
         public int OrganizationId { get; set; }
         [JsonIgnore]
         [ForeignKey(nameof(UnitLocationId))]
@@ -26,7 +26,7 @@ namespace Domain.Entities.GenericTables
 
         // Master Data References
         public int? CategoryId { get; set; }
-       
+
         public PublicationCategory? Category { get; set; }
 
         [MaxLength(200)]
@@ -36,8 +36,15 @@ namespace Domain.Entities.GenericTables
         [MaxLength(500)]
         public string Title { get; set; } = string.Empty;
 
+        [MaxLength(500)]
+        public string? TitleOfThesis { get; set; }
+
+        public int? ExtensionWorkId { get; set; }
+        [ForeignKey(nameof(ExtensionWorkId))]
+        public ExtensionWork? ExtensionWork { get; set; }
+
         public int? ModeId { get; set; }
-       
+
         public Mode? Mode { get; set; }
 
         [MaxLength(200)]
@@ -122,6 +129,12 @@ namespace Domain.Entities.GenericTables
         // Navigation Properties - Related Entities
         public ICollection<ExtensionLiterature> ExtensionLiteratures { get; set; } = new List<ExtensionLiterature>();
         public PublisherDetails? PublisherDetails { get; set; }
+
+        // Many-to-many relationships for Newspapers and Magazines
+        public ICollection<PublicationKannadaNewsPaper> PublicationKannadaNewsPapers { get; set; } = new List<PublicationKannadaNewsPaper>();
+        public ICollection<PublicationEnglishNewsPaper> PublicationEnglishNewsPapers { get; set; } = new List<PublicationEnglishNewsPaper>();
+        public ICollection<PublicationKannadaMagazine> PublicationKannadaMagazines { get; set; } = new List<PublicationKannadaMagazine>();
+        public ICollection<PublicationEnglishMagazine> PublicationEnglishMagazines { get; set; } = new List<PublicationEnglishMagazine>();
     }
 
     public class PublisherDetails : AuditableBaseEntity

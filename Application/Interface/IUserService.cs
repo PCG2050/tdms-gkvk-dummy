@@ -32,7 +32,7 @@ namespace Application.Interface
 
         Task<ServiceResult> ForgotPasswordAsync(ForgotPasswordDto dto);
 
-      
+
         Task<ServiceResult<OTPVerificationResult>> VerifyPasswordResetOTPAsync(VerifyOTPDto dto);
 
         Task<ServiceResult> ResetPasswordWithOTPAsync(ResetPasswordWithOTPDto dto);
@@ -40,6 +40,11 @@ namespace Application.Interface
 
         //New method for unitheads to get trainers they created
         Task<List<TrainerDetailsDto>> GetAllTrainersCreatedByUnitHead(int unitHeadId);
+
+        /// <summary>
+        /// Get all trainers assigned to a specific unit location
+        /// </summary>
+        Task<List<TrainerDetailsDto>> GetTrainersByUnitLocationAsync(int unitLocationId);
 
     }
 }

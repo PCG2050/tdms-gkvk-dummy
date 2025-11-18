@@ -208,12 +208,47 @@ namespace Application.Mapper
 
         public void MapUpdateDtoToEntity(NominationRewardDto dto, NominationReward entity)
         {
+            // Update all parent fields
             entity.TypeId = dto.TypeId;
             entity.RegionId = dto.RegionId;
+            entity.ContributionId = dto.ContributionId;
+            entity.ModeId = dto.ModeId;
+            entity.NominationCategoryId = dto.NominationCategoryId;
+            entity.PositionId = dto.PositionId;
+            entity.StartDate = dto.StartDate;
+            entity.EndDate = dto.EndDate;
+            entity.OtherRegion = dto.OtherRegion;
             entity.AwardName = dto.AwardName;
+            entity.OtherContribution = dto.OtherContribution;
+            entity.AwardingAgency = dto.AwardingAgency;
             entity.SpecificContributionTitle = dto.SpecificContributionTitle;
+            entity.OrganizerInstitutionName = dto.OrganizerInstitutionName;
+            entity.OrganizerInstituteAddress = dto.OrganizerInstituteAddress;
+            entity.AwardApplicationDate = dto.AwardApplicationDate;
+            entity.AwardFilePath = dto.AwardFilePath;
+            entity.AwardEventTitle = dto.AwardEventTitle;
+            entity.AwardEventDate = dto.AwardEventDate;
+            entity.SanctionLetterDate = dto.SanctionLetterDate;
+            entity.SanctionLetterFilePath = dto.SanctionLetterFilePath;
+            entity.PaperDate = dto.PaperDate;
+            entity.PaperFilePath = dto.PaperFilePath;
+            entity.AwardReceivingPhoto = dto.AwardReceivingPhoto;
+            entity.AwardReceivingCertificate = dto.AwardReceivingCertificate;
+            entity.InstitutionBoardName = dto.InstitutionBoardName;
+            entity.InstitutionName = dto.InstitutionName;
+            entity.InstitutionDesignation = dto.InstitutionDesignation;
+            entity.InstitutionAddress = dto.InstitutionAddress;
+            entity.PositionFrom = dto.PositionFrom;
+            entity.PositionTo = dto.PositionTo;
+            entity.DurationDays = dto.DurationDays;
+            entity.NominationDate = dto.NominationDate;
+            entity.NominationLetterPath = dto.NominationLetterPath;
             entity.FormStatus = dto.FormStatus;
+            entity.FormStatusRemarks = dto.FormStatusRemarks;
+            entity.ApprovedAt = dto.ApprovedAt;
+            entity.ApprovedById = dto.ApprovedById;
 
+            // Update child collections
             entity.NominationRewardIFSFarmers.Clear();
             if (dto.IFSFarmers != null)
                 foreach (var c in dto.IFSFarmers)

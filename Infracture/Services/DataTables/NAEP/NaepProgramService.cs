@@ -136,7 +136,7 @@ namespace Infrastructure.Services.DataTables.NAEP
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<NaepProgramDetailsDto>.Failure(
                     "Cannot edit programs that have been submitted",
                     ServiceErrorStatus.INVALIDOPERATION);
@@ -163,7 +163,7 @@ namespace Infrastructure.Services.DataTables.NAEP
             if (!await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
                     "Only draft programs can be deleted",
                     ServiceErrorStatus.INVALIDOPERATION);
@@ -192,9 +192,9 @@ namespace Infrastructure.Services.DataTables.NAEP
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<NaepParticipantDemographicsDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             var demographics = _mapper.MapToEntity(dto);
@@ -227,9 +227,9 @@ namespace Infrastructure.Services.DataTables.NAEP
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<NaepParticipantDemographicsDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             NaepProgramMapper.MapUpdateDtoToEntity(dto, demographics);
@@ -253,9 +253,9 @@ namespace Infrastructure.Services.DataTables.NAEP
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             await _demographicsRepository.DeleteAsync(demographicsId);
@@ -297,9 +297,9 @@ namespace Infrastructure.Services.DataTables.NAEP
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<NaepProgramContentDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             var content = _mapper.MapToEntity(dto);
@@ -339,9 +339,9 @@ namespace Infrastructure.Services.DataTables.NAEP
                     ServiceErrorStatus.FORBIDDEN);
 
             // Validate form status
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending" && program.FormStatus != "Rejected")
                 return ServiceResult<NaepProgramContentDto>.Failure(
-                    "Cannot add content to submitted or approved programs",
+                    "Cannot add content to approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             try
@@ -436,9 +436,9 @@ namespace Infrastructure.Services.DataTables.NAEP
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending" && program.FormStatus != "Rejected")
                 return ServiceResult<NaepProgramContentDto>.Failure(
-                    "Cannot update content in submitted or approved programs",
+                    "Cannot update content in approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             try
@@ -576,9 +576,9 @@ namespace Infrastructure.Services.DataTables.NAEP
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             await _contentRepository.DeleteAsync(contentId);
@@ -601,349 +601,6 @@ namespace Infrastructure.Services.DataTables.NAEP
         }
 
         // ============================
-        // SECTION C1: RESOURCE PERSONS
-        // ============================
-
-        public async Task<ServiceResult<NaepResourcePersonDto>> AddResourcePersonAsync(
-            int contentId,
-            NaepResourcePersonCreateDto dto)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<NaepResourcePersonDto>.Failure(
-                    "Program content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var program = await _programRepository.GetByIdAsync(content.NaepProgramDetailsId ?? 0);
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<NaepResourcePersonDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult<NaepResourcePersonDto>.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            var person = _mapper.MapToEntity(dto);
-            person.NaepProgramContentAndResourcesId = contentId;
-            person.OrganizationId = _currentUserService.OrganizationId;
-            person.UnitLocationId = program.UnitLocationId;
-            person.CreatedById = _currentUserService.UserId;
-            person.CreatedAt = DateTimeOffset.UtcNow;
-
-            await _resourcePersonRepository.CreateAsync(person);
-
-            var resultDto = _mapper.MapToDto(person);
-            return ServiceResult<NaepResourcePersonDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult<NaepResourcePersonDto>> UpdateResourcePersonAsync(
-            int personId,
-            NaepResourcePersonUpdateDto dto)
-        {
-            var person = await _resourcePersonRepository.GetByIdAsync(personId);
-
-            if (person == null)
-                return ServiceResult<NaepResourcePersonDto>.Failure(
-                    "Resource person not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(person.NaepProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.NaepProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<NaepResourcePersonDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult<NaepResourcePersonDto>.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            // Apply updates from DTO
-            if (dto.Name != null) person.Name = dto.Name;
-            if (dto.Designation != null) person.Designation = dto.Designation;
-            if (dto.ResourceType.HasValue) person.ResourceType = dto.ResourceType;
-            if (dto.Responsibility.HasValue) person.Responsibility = dto.Responsibility;
-            if (dto.InstitutionOrDepartment != null) person.InstitutionOrDepartment = dto.InstitutionOrDepartment;
-
-            person.UpdatedById = _currentUserService.UserId;
-            person.UpdatedAt = DateTimeOffset.UtcNow;
-
-            await _resourcePersonRepository.UpdateAsync(person);
-
-            var resultDto = _mapper.MapToDto(person);
-            return ServiceResult<NaepResourcePersonDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult> DeleteResourcePersonAsync(int personId)
-        {
-            var person = await _resourcePersonRepository.GetByIdAsync(personId);
-
-            if (person == null)
-                return ServiceResult.Failure("Resource person not found", ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(person.NaepProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.NaepProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            await _resourcePersonRepository.DeleteAsync(personId);
-            return ServiceResult.Success();
-        }
-
-        public async Task<ServiceResult<List<NaepResourcePersonDto>>> GetResourcePersonsByContentIdAsync(int contentId)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<List<NaepResourcePersonDto>>.Failure(
-                    "Content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var persons = await _resourcePersonRepository.GetByContentIdAsync(contentId);
-            var dtos = persons.Select(p => _mapper.MapToDto(p)).ToList();
-
-            return ServiceResult<List<NaepResourcePersonDto>>.Success(dtos);
-        }
-
-        // ============================
-        // SECTION C2: TOPICS COVERED
-        // ============================
-
-        public async Task<ServiceResult<NaepTopicsCoveredDto>> AddTopicAsync(
-            int contentId,
-            NaepTopicsCoveredCreateDto dto)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<NaepTopicsCoveredDto>.Failure(
-                    "Program content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var program = await _programRepository.GetByIdAsync(content.NaepProgramDetailsId ?? 0);
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<NaepTopicsCoveredDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult<NaepTopicsCoveredDto>.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            var topic = _mapper.MapToEntity(dto);
-            topic.NaepProgramContentAndResourcesId = contentId;
-            topic.OrganizationId = _currentUserService.OrganizationId;
-            topic.UnitLocationId = program.UnitLocationId;
-            topic.CreatedById = _currentUserService.UserId;
-            topic.CreatedAt = DateTimeOffset.UtcNow;
-
-            await _topicsRepository.CreateAsync(topic);
-
-            var resultDto = _mapper.MapToDto(topic);
-            return ServiceResult<NaepTopicsCoveredDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult<NaepTopicsCoveredDto>> UpdateTopicAsync(
-            int topicId,
-            NaepTopicsCoveredUpdateDto dto)
-        {
-            var topic = await _topicsRepository.GetByIdAsync(topicId);
-
-            if (topic == null)
-                return ServiceResult<NaepTopicsCoveredDto>.Failure(
-                    "Topic not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(topic.NaepProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.NaepProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<NaepTopicsCoveredDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult<NaepTopicsCoveredDto>.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            if (dto.Date.HasValue) topic.Date = dto.Date;
-            if (dto.Title != null) topic.Title = dto.Title;
-            if (dto.PhotoUpload != null) topic.PhotoUpload = dto.PhotoUpload;
-
-            topic.UpdatedById = _currentUserService.UserId;
-            topic.UpdatedAt = DateTimeOffset.UtcNow;
-
-            await _topicsRepository.UpdateAsync(topic);
-
-            var resultDto = _mapper.MapToDto(topic);
-            return ServiceResult<NaepTopicsCoveredDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult> DeleteTopicAsync(int topicId)
-        {
-            var topic = await _topicsRepository.GetByIdAsync(topicId);
-
-            if (topic == null)
-                return ServiceResult.Failure("Topic not found", ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(topic.NaepProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.NaepProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            await _topicsRepository.DeleteAsync(topicId);
-            return ServiceResult.Success();
-        }
-
-        public async Task<ServiceResult<List<NaepTopicsCoveredDto>>> GetTopicsByContentIdAsync(int contentId)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<List<NaepTopicsCoveredDto>>.Failure(
-                    "Content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var topics = await _topicsRepository.GetByContentIdAsync(contentId);
-            var dtos = topics.Select(t => _mapper.MapToDto(t)).ToList();
-
-            return ServiceResult<List<NaepTopicsCoveredDto>>.Success(dtos);
-        }
-
-        // ============================
-        // SECTION C3: TEACHING AIDS
-        // ============================
-
-        public async Task<ServiceResult<NaepTeachingAidsDto>> AddTeachingAidAsync(
-            int contentId,
-            NaepTeachingAidsCreateDto dto)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<NaepTeachingAidsDto>.Failure(
-                    "Program content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var program = await _programRepository.GetByIdAsync(content.NaepProgramDetailsId ?? 0);
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<NaepTeachingAidsDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult<NaepTeachingAidsDto>.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            var aid = _mapper.MapToEntity(dto);
-            aid.NaepProgramContentAndResourcesId = contentId;
-            aid.OrganizationId = _currentUserService.OrganizationId;
-            aid.UnitLocationId = program.UnitLocationId;
-            aid.CreatedById = _currentUserService.UserId;
-            aid.CreatedAt = DateTimeOffset.UtcNow;
-
-            await _teachingAidsRepository.CreateAsync(aid);
-
-            var resultDto = _mapper.MapToDto(aid);
-            return ServiceResult<NaepTeachingAidsDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult<NaepTeachingAidsDto>> UpdateTeachingAidAsync(
-            int aidId,
-            NaepTeachingAidsUpdateDto dto)
-        {
-            var aid = await _teachingAidsRepository.GetByIdAsync(aidId);
-
-            if (aid == null)
-                return ServiceResult<NaepTeachingAidsDto>.Failure(
-                    "Teaching aid not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(aid.NaepProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.NaepProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<NaepTeachingAidsDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult<NaepTeachingAidsDto>.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            if (dto.TypeOfAidId.HasValue) aid.TypeOfAidId = dto.TypeOfAidId;
-            if (dto.OtherTypeOfAid != null) aid.OtherTypeOfAid = dto.OtherTypeOfAid;
-            if (dto.Purpose != null) aid.Purpose = dto.Purpose;
-            if (dto.Number.HasValue) aid.Number = dto.Number.Value;
-
-            aid.UpdatedById = _currentUserService.UserId;
-            aid.UpdatedAt = DateTimeOffset.UtcNow;
-
-            await _teachingAidsRepository.UpdateAsync(aid);
-
-            var resultDto = _mapper.MapToDto(aid);
-            return ServiceResult<NaepTeachingAidsDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult> DeleteTeachingAidAsync(int aidId)
-        {
-            var aid = await _teachingAidsRepository.GetByIdAsync(aidId);
-
-            if (aid == null)
-                return ServiceResult.Failure("Teaching aid not found", ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(aid.NaepProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.NaepProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            await _teachingAidsRepository.DeleteAsync(aidId);
-            return ServiceResult.Success();
-        }
-
-        public async Task<ServiceResult<List<NaepTeachingAidsDto>>> GetTeachingAidsByContentIdAsync(int contentId)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<List<NaepTeachingAidsDto>>.Failure(
-                    "Content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var aids = await _teachingAidsRepository.GetByContentIdAsync(contentId);
-            var dtos = aids.Select(a => _mapper.MapToDto(a)).ToList();
-
-            return ServiceResult<List<NaepTeachingAidsDto>>.Success(dtos);
-        }
-
-        // ============================
         // SECTION D: ADVISORY SERVICES
         // ============================
 
@@ -963,9 +620,9 @@ namespace Infrastructure.Services.DataTables.NAEP
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<NaepAdvisoryServicesDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             // Check if advisory services already exist
@@ -1005,9 +662,9 @@ namespace Infrastructure.Services.DataTables.NAEP
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<NaepAdvisoryServicesDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             if (dto.NoOfFacebookSMS.HasValue) advisory.NoOfFacebookSMS = dto.NoOfFacebookSMS.Value;
@@ -1042,9 +699,9 @@ namespace Infrastructure.Services.DataTables.NAEP
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             await _advisoryRepository.DeleteAsync(advisoryId);
@@ -1090,9 +747,9 @@ namespace Infrastructure.Services.DataTables.NAEP
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<NaepReportDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             // Check if report already exists
@@ -1132,9 +789,9 @@ namespace Infrastructure.Services.DataTables.NAEP
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<NaepReportDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             if (dto.ProgressReportReportingYear != null) report.ProgressReportReportingYear = dto.ProgressReportReportingYear;
@@ -1164,9 +821,9 @@ namespace Infrastructure.Services.DataTables.NAEP
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.CONFLICT);
 
             await _reportRepository.DeleteAsync(reportId);
@@ -1212,9 +869,9 @@ namespace Infrastructure.Services.DataTables.NAEP
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<NaepRecommendationDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             // Check if recommendation already exists
@@ -1232,6 +889,15 @@ namespace Infrastructure.Services.DataTables.NAEP
             recommendation.CreatedAt = DateTimeOffset.UtcNow;
 
             await _recommendationRepository.CreateAsync(recommendation);
+
+            // AUTO-SUBMIT: Since Recommendation is the last section, automatically change status to Pending
+            if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
+            {
+                program.FormStatus = "Pending";
+                program.UpdatedById = _currentUserService.UserId;
+                program.UpdatedAt = DateTimeOffset.UtcNow;
+                await _programRepository.UpdateAsync(program);
+            }
 
             var resultDto = _mapper.MapToDto(recommendation);
             return ServiceResult<NaepRecommendationDto>.Success(resultDto);
@@ -1254,9 +920,9 @@ namespace Infrastructure.Services.DataTables.NAEP
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<NaepRecommendationDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.CONFLICT);
 
             if (dto.ProblemsIdentified != null) recommendation.ProblemsIdentified = dto.ProblemsIdentified;
@@ -1270,6 +936,15 @@ namespace Infrastructure.Services.DataTables.NAEP
             recommendation.UpdatedAt = DateTimeOffset.UtcNow;
 
             await _recommendationRepository.UpdateAsync(recommendation);
+
+            // AUTO-SUBMIT: Since Recommendation is the last section, automatically change status to Pending
+            if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
+            {
+                program.FormStatus = "Pending";
+                program.UpdatedById = _currentUserService.UserId;
+                program.UpdatedAt = DateTimeOffset.UtcNow;
+                await _programRepository.UpdateAsync(program);
+            }
 
             var resultDto = _mapper.MapToDto(recommendation);
             return ServiceResult<NaepRecommendationDto>.Success(resultDto);
@@ -1286,9 +961,9 @@ namespace Infrastructure.Services.DataTables.NAEP
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             await _recommendationRepository.DeleteAsync(recommendationId);
@@ -1328,7 +1003,7 @@ namespace Infrastructure.Services.DataTables.NAEP
             if (!await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
                     "Only draft programs can be submitted",
                     ServiceErrorStatus.INVALIDOPERATION);

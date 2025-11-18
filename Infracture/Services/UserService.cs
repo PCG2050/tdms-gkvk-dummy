@@ -4,6 +4,7 @@ using Application.Interface.Repository;
 using Application.Models;
 using Domain.Entities;
 using Domain.Entities.Enum;
+using Infrastructure.Repository;
 using Infrastructure.Settings;
 using Microsoft.Extensions.Options;
 
@@ -58,7 +59,7 @@ namespace Infrastructure.Services
                 OrganizationId = registerDto.OrganizationId,
                 DateOfBirth = registerDto.Role == Role.TRAINER
                               ? registerDto.DateOfBirth ?? throw new InvalidOperationException("Date of Birth required for trainers")
-                              :registerDto.DateOfBirth ?? default,
+                              : registerDto.DateOfBirth ?? default,
                 DateOfJoining = registerDto.Role == Role.TRAINER
                     ? registerDto.DateOfJoining ?? throw new InvalidOperationException("Date of Joining required for trainers")
                     : registerDto.DateOfJoining ?? default,
@@ -67,7 +68,7 @@ namespace Infrastructure.Services
                     : registerDto.Gender ?? Gender.OTHER,
                 EmployementType = registerDto.Role == Role.TRAINER
                     ? registerDto.EmploymentType ?? throw new InvalidOperationException("Employment Type required for trainers")
-                    : registerDto.EmploymentType ?? EmployementType.TEMPORARY, 
+                    : registerDto.EmploymentType ?? EmployementType.TEMPORARY,
                 Qualification = registerDto.Role == Role.TRAINER
                     ? registerDto.Qualification ?? throw new InvalidOperationException("Qualification required for trainers")
                     : registerDto.Qualification
@@ -129,10 +130,10 @@ namespace Infrastructure.Services
                 if (updateDto.Gender is not null) user.Gender = updateDto.Gender.Value;
                 if (updateDto.EmploymentType is not null) user.EmployementType = updateDto.EmploymentType.Value;
                 if (updateDto.Qualification is not null) user.Qualification = updateDto.Qualification;
-                if (updateDto.ProfileImageUrl is not null) user.ProfileImageUrl = updateDto.ProfileImageUrl; 
+                if (updateDto.ProfileImageUrl is not null) user.ProfileImageUrl = updateDto.ProfileImageUrl;
 
-                 user.UpdatedById = _currentUser.UserId;
-                 user.UpdatedAt = DateTimeOffset.Now;
+                user.UpdatedById = _currentUser.UserId;
+                user.UpdatedAt = DateTimeOffset.Now;
                 await _userRepository.SaveAsync(user);
                 return ServiceResult.Success();
             }
@@ -501,7 +502,29 @@ namespace Infrastructure.Services
             return otp.ToString();
         }
 
+        public async Task<List<TrainerDetailsDto>> GetTrainersByUnitLocationAsync(int unitLocationId)
+        {
+            // Get trainer IDs from TrainerAssignment
+            var trainerIds = await _trainerAssignmentRepository.GetTrainerIdsByUnitLocationIdAsync(unitLocationId);
 
+            if (!trainerIds.Any())
+                return new List<TrainerDetailsDto>();
+
+            // Get trainer details from User repository
+            var trainers = await _userRepository.GetUsersByIdsAsync(trainerIds);
+
+            // Convert to TrainerDetailsDto
+            return trainers.Where(t => t.Role == Role.TRAINER)
+                .Select(trainer => new TrainerDetailsDto
+                {
+                    UserId = trainer.Id,
+                    FirstName = trainer.FirstName,
+                    LastName = trainer.LastName,
+                    Email = trainer.Email,
+                    Phone = trainer.Phone,
+                    Units = new List<TrainerUnitWithLocationsDto>() // Can be populated if needed
+                }).ToList();
+        }
 
     }
 }

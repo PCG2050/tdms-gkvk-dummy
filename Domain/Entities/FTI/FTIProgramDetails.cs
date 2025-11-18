@@ -1,16 +1,16 @@
 ﻿
 namespace Domain.Entities.FTI
 {
-<<<<<<< Updated upstream
-    public class FTIProgramDetails : AuditableBaseEntity
-=======
     public class FtiProgramDetails : ReportEntryBaseEntity
->>>>>>> Stashed changes
     {
         public int? ProgramTypeId { get; set; }
-        // Foreign keys & “Other” text fields
+        [JsonIgnore]
+        public ProgramType? ProgramType { get; set; }
+        // Foreign keys & "Other" text fields
+
         public int? CategoryId { get; set; }
 
+        [JsonIgnore]
         public ProgramCategory? Category { get; set; }
 
         [MaxLength(200)]
@@ -18,54 +18,52 @@ namespace Domain.Entities.FTI
 
         [MaxLength(100)]
         public int? TypeId { get; set; }
-
+        [JsonIgnore]
         public InfoType? Type { get; set; }
 
-        
+
         [MaxLength(200)]
         public string? TypeOther { get; set; }
 
-        public int? CollaboratorId { get; set; }
-
-        public Collaborator? Collaborator { get; set; }
-
-        public string? CollaboratorOther { get; set; }
-
         [MaxLength(150)]
-        public int? Theme { get; set; }
+        public int? ThemeId { get; set; }
+        [JsonIgnore]
+        public Theme? Theme { get; set; }
+
         [MaxLength(200)]
         public string? ThemeOther { get; set; }
 
         [MaxLength(150)]
         public int? ThematicAreaId { get; set; }
-
+        [JsonIgnore]
         public ThematicArea? ThematicArea { get; set; }
         [MaxLength(200)]
         public string? ThematicAreaOther { get; set; }
 
         [MaxLength(200)]
-        public int SponsoredOrganization { get; set; }
+        public int? SponsoredOrganization { get; set; }
 
         [MaxLength(200)]
         public string? SponsoredOrganizationName { get; set; }
 
-        [Required]
+
         [MaxLength(250)]
         public string? Title { get; set; }
 
         [MaxLength(100)]
-        public int? Mode { get; set; }
-
-        // Dates
-        public DateOnly? StartDate { get; set; }
-        [Required]
-        public DateOnly? EndDate { get; set; }
+        public int? ModeId { get; set; }
+        [JsonIgnore]
+        public Mode? Mode { get; set; }
 
         [MaxLength(100)]
         public string? Duration { get; set; }
 
         [MaxLength(150)]
-        public int? Region { get; set; }
+        public int? RegionId { get; set; }
+
+        [JsonIgnore]
+        public Region? Region { get; set; }
+
         [MaxLength(200)]
         public string? RegionOther { get; set; }
 
@@ -75,14 +73,37 @@ namespace Domain.Entities.FTI
         [MaxLength(250)]
         public string? Location { get; set; }
 
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal? TotalOutlayRs { get; set; }
+
+        public int? SourceOfFundId { get; set; }
+
+        [JsonIgnore]
+        public SourceOfFund? SourceOfFund { get; set; }
+
+        public int? Funds { get; set; }
 
         [MaxLength(100)]
-        public int? Status { get; set; }
+        public int? StatusId { get; set; }
+        [JsonIgnore]
+        public Status? Status { get; set; }
+
+        public decimal? TotalOutlayRs { get; set; }
+        //this is for project dropdown it has to be linked to masterdata table
+        public string? Copi { get; set; }
+
+
 
         [MaxLength(100)]
         public int? BatchNo { get; set; }
+
+
+        public string? OrganizerBroucherFile { get; set; }
+
+        public string? OrganizerInstitutionName { get; set; }
+        public string? OrganizerInstitutionAddress { get; set; }
+
+        public int? SourceId { get; set; }
+        [JsonIgnore]
+        public ParticipatedSource? Source { get; set; }
 
         // Proposal details
         public DateTime? ProposalDate { get; set; }
@@ -97,65 +118,13 @@ namespace Domain.Entities.FTI
         [MaxLength(500)]
         public string? FundsSanctionLetterUploadFile { get; set; }
 
-<<<<<<< Updated upstream
-        [MaxLength(500)]
-        public string? UploadVideo { get; set; }
-
-        [MaxLength(100)]
-        public int? SD { get; set; }
-
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal? AreaHa { get; set; }
-
-        [MaxLength(500)]
-        public string? OrganizerFileUpload { get; set; }
-
-        [MaxLength(250)]
-        public string? OrganizerInstitutionName { get; set; }
-
-        [MaxLength(500)]
-        public string? OrganizerAddress { get; set; }
-
-        // Participation details
-        [MaxLength(250)]
-        public string? Participation { get; set; }
-
-        [MaxLength(250)]
-        public string? ParticipatedAs { get; set; }
-
-        [MaxLength(500)]
-        public string? ParticipationFileLink { get; set; }
-
-        // Source of Information
-        [MaxLength(250)]
-        public string? SourceOfInformation { get; set; }
-
-        // Thesis / Project / Paper / Others
-        [MaxLength(500)]
-        public string? TitleOfThesisOrProjectOrPaperOrOthers { get; set; }
-
-        // Paper / Poster / Abstract details
-        [MaxLength(100)]
-        public string? PaperPosterAbstract { get; set; }
-
-        public DateTime? PaperPosterAbstractDate { get; set; }
-
-        [MaxLength(500)]
-        public string? PaperPosterAbstractLink { get; set; }
-=======
         public ICollection<FtiParticipantDemographics>? ParticipantDemographics { get; set; }
 
         public ICollection<FtiProgramContentAndResources>? ProgramContent { get; set; }
         public FtiAdvisoryServices? AdvisoryServices { get; set; }
         public FtiRecommendation? Recommendations { get; set; }
         public FtiReport? Reports { get; set; }
->>>>>>> Stashed changes
 
 
-        public ICollection<FTIRecommendation> Recommendations { get; set; } = new List<FTIRecommendation>();
-        public ICollection<FTIReport> Reports { get; set; } = new List<FTIReport>();
-        public ICollection<FTIAdvisoryServices> AdvisoryServices { get; set; } = new List<FTIAdvisoryServices>();
-        public ICollection<FTIParticipantDemographics> ParticipantDemographics { get; set; } = new List<FTIParticipantDemographics>();
-        public ICollection<FTIProgramContentAndResources> ProgramContentAndResources { get; set; } = new List<FTIProgramContentAndResources>();
     }
 }
