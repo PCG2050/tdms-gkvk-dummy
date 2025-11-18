@@ -6,6 +6,7 @@ using Application.Models.DataTables.FIU.Application.Models.FIU;
 using Application.Services.Common;
 using Domain.Entities.FIU;
 using System.Globalization;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Services.DataTables.FIU
 {
@@ -96,8 +97,20 @@ namespace Infrastructure.Services.DataTables.FIU
                     var activity = _mapper.MapCreateDtoToEntity(createDto);
                     activity.OrganizationId = _currentUserService.OrganizationId;
                     activity.CreatedById = _currentUserService.UserId;
-                    activity.FormStatus = "Pending";
                     activity.SubmittedAt = DateTimeOffset.UtcNow;
+
+                    // Auto-approve forms created by Unit Heads
+                    if (_currentUserService.Role == Role.UNITHEAD)
+                    {
+                        activity.FormStatus = "Approved";
+                        activity.ApprovedById = _currentUserService.UserId;
+                        activity.ApprovedAt = DateTimeOffset.UtcNow;
+                        activity.FormStatusRemarks = "Auto-approved (Unit Head)";
+                    }
+                    else
+                    {
+                        activity.FormStatus = "Pending";
+                    }
 
                     var created = await _activityRepository.CreateAsync(activity);
                     var response = _mapper.MapEntityToResponseDto(created);
@@ -162,7 +175,12 @@ namespace Infrastructure.Services.DataTables.FIU
                         continue;
                     }
 
-                    if (existing.FormStatus == "Approved")
+                    // Unit Heads can edit their own approved forms
+                    bool isUnitHeadEditingOwnApprovedForm = _currentUserService.Role == Role.UNITHEAD
+                        && existing.FormStatus == "Approved"
+                        && existing.CreatedById == _currentUserService.UserId;
+
+                    if (existing.FormStatus == "Approved" && !isUnitHeadEditingOwnApprovedForm)
                     {
                         result.FailedEntries.Add(new FIUBatchErrorDto
                         {
@@ -450,6 +468,45 @@ namespace Infrastructure.Services.DataTables.FIU
                 getFormStatus: x => x.FormStatus,
                 getCreatedById: x => x.CreatedById ?? 0,
                 _unitHeadAssignmentRepository,
+                pageNumber,
+                pageSize);
+        }
+
+        public async Task<PaginatedResult<FIUProgramActivityResponseDto>> GetByTrainerAsync(
+            int trainerId,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+
+            var query = _activityRepository.GetQueryable()
+                .Include(x => x.FIUActivity)
+                .Include(x => x.CreatedBy)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.Unit)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.District)
+                .Where(x => x.CreatedById == trainerId)
+                .Where(x => unitLocationIds.Contains(x.UnitLocationId));
+
+            if (unitLocationId.HasValue)
+            {
+                query = query.Where(x => x.UnitLocationId == unitLocationId.Value);
+            }
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .OrderByDescending(x => x.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var dtos = items.Select(x => _mapper.MapEntityToResponseDto(x)).ToList();
+
+            return new PaginatedResult<FIUProgramActivityResponseDto>(
+                dtos,
+                totalCount,
                 pageNumber,
                 pageSize);
         }

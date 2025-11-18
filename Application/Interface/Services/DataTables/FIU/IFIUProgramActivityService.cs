@@ -57,5 +57,11 @@ namespace Application.Interface.Services.DataTables.FIU
         Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
             int pageNumber = 1,
             int pageSize = 10);
+
+        Task<PaginatedResult<FIUProgramActivityResponseDto>> GetByTrainerAsync(
+            int trainerId,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10);
     }
 }

@@ -8,6 +8,7 @@ using Application.Models;
 using Application.Models.DataTables.ASM;
 using Domain.Entities.ASM;
 using Domain.Entities.Enum;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Services.DataTables.ASM
 {
@@ -64,7 +65,11 @@ namespace Infrastructure.Services.DataTables.ASM
                 CreatedById = _currentUserService.UserId,
                 CreatedAt = DateTimeOffset.UtcNow,
                 OrganizationId = _currentUserService.OrganizationId,
-                FormStatus = "Pending"
+                // Auto-approve forms created by Unit Heads
+                FormStatus = _currentUserService.Role == Role.UNITHEAD ? "Approved" : "Pending",
+                ApprovedById = _currentUserService.Role == Role.UNITHEAD ? _currentUserService.UserId : null,
+                ApprovedAt = _currentUserService.Role == Role.UNITHEAD ? DateTimeOffset.UtcNow : null,
+                FormStatusRemarks = _currentUserService.Role == Role.UNITHEAD ? "Auto-approved (Unit Head)" : null
             };
 
             var savedEntity = await _repository.AddAsync(entity);
@@ -119,7 +124,11 @@ namespace Infrastructure.Services.DataTables.ASM
                         CreatedById = _currentUserService.UserId,
                         CreatedAt = DateTimeOffset.UtcNow,
                         OrganizationId = _currentUserService.OrganizationId,
-                        FormStatus = "Pending"
+                        // Auto-approve forms created by Unit Heads
+                        FormStatus = _currentUserService.Role == Role.UNITHEAD ? "Approved" : "Pending",
+                        ApprovedById = _currentUserService.Role == Role.UNITHEAD ? _currentUserService.UserId : null,
+                        ApprovedAt = _currentUserService.Role == Role.UNITHEAD ? DateTimeOffset.UtcNow : null,
+                        FormStatusRemarks = _currentUserService.Role == Role.UNITHEAD ? "Auto-approved (Unit Head)" : null
                     };
 
                     var savedEntity = await _repository.AddAsync(entity);
@@ -188,7 +197,12 @@ namespace Infrastructure.Services.DataTables.ASM
                         continue;
                     }
 
-                    if (entity.FormStatus == "Approved")
+                    // Unit Heads can edit their own approved forms
+                    bool isUnitHeadEditingOwnApprovedForm = _currentUserService.Role == Role.UNITHEAD
+                        && entity.FormStatus == "Approved"
+                        && entity.CreatedById == _currentUserService.UserId;
+
+                    if (entity.FormStatus == "Approved" && !isUnitHeadEditingOwnApprovedForm)
                     {
                         result.FailedEntries.Add(new BatchErrorDto
                         {
@@ -276,7 +290,12 @@ namespace Infrastructure.Services.DataTables.ASM
                     "Access denied or entry cannot be modified in current status",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (entity.FormStatus == "Approved")
+            // Unit Heads can edit their own approved forms
+            bool isUnitHeadEditingOwnApprovedForm = _currentUserService.Role == Role.UNITHEAD
+                && entity.FormStatus == "Approved"
+                && entity.CreatedById == _currentUserService.UserId;
+
+            if (entity.FormStatus == "Approved" && !isUnitHeadEditingOwnApprovedForm)
                 return ServiceResult<ASMVisitorDetailsDto>.Failure(
                     "Cannot modify approved entries",
                     ServiceErrorStatus.INVALIDOPERATION);
@@ -583,6 +602,44 @@ namespace Infrastructure.Services.DataTables.ASM
                 PageNumber = result.PageNumber,
                 PageSize = result.PageSize
             };
+        }
+
+        public async Task<PaginatedResult<ASMVisitorDetailsDto>> GetByTrainerAsync(
+            int trainerId,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+
+            var query = _repository.GetQueryable()
+                .Include(x => x.CreatedBy)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.Unit)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.District)
+                .Where(x => x.CreatedById == trainerId)
+                .Where(x => unitLocationIds.Contains(x.UnitLocationId));
+
+            if (unitLocationId.HasValue)
+            {
+                query = query.Where(x => x.UnitLocationId == unitLocationId.Value);
+            }
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .OrderByDescending(x => x.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var dtos = items.Select(x => _mapper.MapToDto(x)).ToList();
+
+            return new PaginatedResult<ASMVisitorDetailsDto>(
+                dtos,
+                totalCount,
+                pageNumber,
+                pageSize);
         }
 
         // ==========================================

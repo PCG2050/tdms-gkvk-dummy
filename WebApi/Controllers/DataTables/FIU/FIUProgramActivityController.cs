@@ -534,7 +534,7 @@ namespace WebApi.Controllers.DataTables.FIU
         }
 
         [HttpGet("my-history")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
         public async Task<IActionResult> GetMyHistory(
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 20)
@@ -553,7 +553,27 @@ namespace WebApi.Controllers.DataTables.FIU
             return Ok(result);
         }
 
-
+        /// <summary>
+        /// Get FIU activities by trainer ID (Unit Head and Admin only)
+        /// Shows all activities created by the specified trainer
+        /// Filtered by accessible unit locations
+        /// </summary>
+        /// <param name="trainerId">Trainer ID</param>
+        /// <param name="unitLocationId">Optional unit location filter</param>
+        /// <param name="pageNumber">Page number (default: 1)</param>
+        /// <param name="pageSize">Items per page (default: 20)</param>
+        /// <response code="200">Paginated list of trainer's activities</response>
+        [HttpGet("trainer/{trainerId}")]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
+        public async Task<IActionResult> GetByTrainer(
+            int trainerId,
+            [FromQuery] int? unitLocationId = null,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 20)
+        {
+            var result = await _service.GetByTrainerAsync(trainerId, unitLocationId, pageNumber, pageSize);
+            return Ok(result);
+        }
 
     }
 

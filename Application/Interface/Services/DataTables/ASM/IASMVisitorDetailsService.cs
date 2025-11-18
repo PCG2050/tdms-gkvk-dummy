@@ -45,5 +45,11 @@ namespace Application.Interface.Services.DataTables.ASM
         Task<PaginatedResult<ASMVisitorDetailsDto>> GetPendingApprovalsAsync(
             int pageNumber = 1,
             int pageSize = 20);
+
+        Task<PaginatedResult<ASMVisitorDetailsDto>> GetByTrainerAsync(
+            int trainerId,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10);
     }
 }

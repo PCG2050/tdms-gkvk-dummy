@@ -390,15 +390,15 @@ namespace WebApi.Controllers.DataTables.ASM
         }
 
         /// <summary>
-        /// Get trainer's submission history (Trainer only)
-        /// Shows all visitor details created by the logged-in trainer
+        /// Get trainer's submission history (Trainer and Unit Head)
+        /// Shows all visitor details created by the logged-in trainer/unit head
         /// Sorted by most recent first
         /// </summary>
         /// <param name="pageNumber">Page number (default: 1)</param>
         /// <param name="pageSize">Items per page (default: 20)</param>
         /// <response code="200">Paginated history of trainer's submissions</response>
         [HttpGet("my-history")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
         public async Task<IActionResult> GetMyHistory(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 20)
@@ -422,6 +422,28 @@ namespace WebApi.Controllers.DataTables.ASM
             [FromQuery] int pageSize = 20)
         {
             var result = await _service.GetPendingApprovalsAsync(pageNumber, pageSize);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Get visitor details by trainer ID (Unit Head and Admin only)
+        /// Shows all visitor details created by the specified trainer
+        /// Filtered by accessible unit locations
+        /// </summary>
+        /// <param name="trainerId">Trainer ID</param>
+        /// <param name="unitLocationId">Optional unit location filter</param>
+        /// <param name="pageNumber">Page number (default: 1)</param>
+        /// <param name="pageSize">Items per page (default: 20)</param>
+        /// <response code="200">Paginated list of trainer's visitor details</response>
+        [HttpGet("trainer/{trainerId}")]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
+        public async Task<IActionResult> GetByTrainer(
+            int trainerId,
+            [FromQuery] int? unitLocationId = null,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 20)
+        {
+            var result = await _service.GetByTrainerAsync(trainerId, unitLocationId, pageNumber, pageSize);
             return Ok(result);
         }
     }

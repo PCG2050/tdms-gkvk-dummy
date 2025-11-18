@@ -1,6 +1,15 @@
 ﻿
-
+using Application.Interface.Repository;
+using Application.Interface.Repository.DataTables.ATIC;
+using Application.Interface.Services.Common;
+using Application.Interface.Services.DataTables.ATIC;
+using Application.Mapper.DataTable.ATIC;
+using Application.Models;
+using Application.Models.DataTables.ATIC;
 using Application.Services.Common;
+using Domain.Entities.ATIC;
+using Domain.Entities.Enum;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Services.DataTables.ATIC
 {
@@ -74,7 +83,19 @@ namespace Infrastructure.Services.DataTables.ATIC
             program.OrganizationId = _currentUserService.OrganizationId;
             program.CreatedById = _currentUserService.UserId;
             program.CreatedAt = DateTimeOffset.UtcNow;
-            program.FormStatus = "Draft";
+
+            // Auto-approve forms created by Unit Heads
+            if (_currentUserService.Role == Role.UNITHEAD)
+            {
+                program.FormStatus = "Approved";
+                program.ApprovedById = _currentUserService.UserId;
+                program.ApprovedAt = DateTimeOffset.UtcNow;
+                program.FormStatusRemarks = "Auto-approved (Unit Head)";
+            }
+            else
+            {
+                program.FormStatus = "Draft";
+            }
 
             await _programRepository.CreateAsync(program);
 
@@ -134,7 +155,12 @@ namespace Infrastructure.Services.DataTables.ATIC
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+            // Unit Heads can edit their own approved forms
+            bool isUnitHeadEditingOwnApprovedForm = _currentUserService.Role == Role.UNITHEAD
+                && program.FormStatus == "Approved"
+                && program.CreatedById == _currentUserService.UserId;
+
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending" && !isUnitHeadEditingOwnApprovedForm)
                 return ServiceResult<AticProgramDetailsDto>.Failure(
                     "Cannot edit programs that have been submitted",
                     ServiceErrorStatus.INVALIDOPERATION);
@@ -1181,6 +1207,45 @@ namespace Infrastructure.Services.DataTables.ATIC
                 getFormStatus: x => x.FormStatus,
                 getCreatedById: x => x.CreatedById ?? 0,
                 _unitHeadAssignmentRepository,
+                pageNumber,
+                pageSize);
+        }
+
+        public async Task<PaginatedResult<AticProgramDetailsDto>> GetByTrainerAsync(
+            int trainerId,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+
+            var query = _programRepository.GetQueryable()
+                .Include(x => x.Type)
+                .Include(x => x.CreatedBy)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.Unit)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.District)
+                .Where(x => x.CreatedById == trainerId)
+                .Where(x => unitLocationIds.Contains(x.UnitLocationId));
+
+            if (unitLocationId.HasValue)
+            {
+                query = query.Where(x => x.UnitLocationId == unitLocationId.Value);
+            }
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .OrderByDescending(x => x.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var dtos = items.Select(x => _mapper.MapToDtoWithDetails(x)).ToList();
+
+            return new PaginatedResult<AticProgramDetailsDto>(
+                dtos,
+                totalCount,
                 pageNumber,
                 pageSize);
         }
