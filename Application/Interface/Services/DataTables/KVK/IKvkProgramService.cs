@@ -159,5 +159,14 @@ namespace Application.Interface.Services.DataTables.KVK
             int? unitLocationId = null,
             int pageNumber = 1,
             int pageSize = 10);
+
+        /// <summary>
+        /// Get unified history - own forms or trainer forms (for unit heads)
+        /// </summary>
+        Task<PaginatedResult<KvkProgramListItemDto>> GetUnifiedHistoryAsync(
+            int? trainerId = null,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10);
     }
 }
