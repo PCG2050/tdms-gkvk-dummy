@@ -79,7 +79,19 @@ namespace Infrastructure.Services.DataTables.FTI
             program.OrganizationId = _currentUserService.OrganizationId;
             program.CreatedById = _currentUserService.UserId;
             program.CreatedAt = DateTimeOffset.UtcNow;
-            program.FormStatus = "Draft";
+
+            // Auto-approve forms created by Unit Heads
+            if (_currentUserService.Role == Role.UNITHEAD)
+            {
+                program.FormStatus = "Approved";
+                program.ApprovedById = _currentUserService.UserId;
+                program.ApprovedAt = DateTimeOffset.UtcNow;
+                program.FormStatusRemarks = "Auto-approved (Unit Head)";
+            }
+            else
+            {
+                program.FormStatus = "Draft";
+            }
 
             await _programRepository.CreateAsync(program);
 
@@ -139,10 +151,23 @@ namespace Infrastructure.Services.DataTables.FTI
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+            // Allow edit for Draft, Rejected, or Approved (if unit head is the creator)
+            if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
+            {
+                // Trainers can edit Draft and Rejected forms
+            }
+            else if (program.FormStatus == "Approved" &&
+                     _currentUserService.Role == Role.UNITHEAD &&
+                     program.CreatedById == _currentUserService.UserId)
+            {
+                // Unit heads can edit their own approved forms
+            }
+            else
+            {
                 return ServiceResult<FtiProgramDetailsDto>.Failure(
-                    "Cannot edit programs that have been submitted",
+                    "Cannot edit programs in current status",
                     ServiceErrorStatus.INVALIDOPERATION);
+            }
 
             FtiProgramMapper.MapUpdateDtoToEntity(dto, program);
             program.UpdatedById = _currentUserService.UserId;
@@ -1186,6 +1211,54 @@ namespace Infrastructure.Services.DataTables.FTI
                 getFormStatus: x => x.FormStatus,
                 getCreatedById: x => x.CreatedById ?? 0,
                 _unitHeadAssignmentRepository,
+                pageNumber,
+                pageSize);
+        }
+
+        /// <summary>
+        /// Get programs by trainer ID with optional unit location filter
+        /// </summary>
+        public async Task<PaginatedResult<FtiProgramDetailsDto>> GetByTrainerAsync(
+            int trainerId,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            // Get accessible unit locations for the current user
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+
+            var query = _programRepository.GetQueryable()
+                .Include(x => x.ProgramType)
+                .Include(x => x.Category)
+                .Include(x => x.Type)
+                .Include(x => x.Theme)
+                .Include(x => x.ThematicArea)
+                .Include(x => x.CreatedBy)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.Unit)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.District)
+                .Where(x => x.CreatedById == trainerId)
+                .Where(x => unitLocationIds.Contains(x.UnitLocationId));
+
+            // Apply unit location filter if provided
+            if (unitLocationId.HasValue)
+            {
+                query = query.Where(x => x.UnitLocationId == unitLocationId.Value);
+            }
+
+            var totalCount = await query.CountAsync();
+            var programs = await query
+                .OrderByDescending(x => x.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var dtos = programs.Select(p => _mapper.MapToDtoWithDetails(p)).ToList();
+
+            return new PaginatedResult<FtiProgramDetailsDto>(
+                dtos,
+                totalCount,
                 pageNumber,
                 pageSize);
         }
