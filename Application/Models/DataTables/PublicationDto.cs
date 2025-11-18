@@ -53,6 +53,12 @@ namespace Application.Models.DataTables
         public int? SourceId { get; set; }
         public string? SourceName { get; set; }
 
+        public int? KannadaNewsPaperId { get; set; }
+        public string? KannadaNewsPaperName { get; set; }
+
+        public int? EnglishNewsPaperId { get; set; }
+        public string? EnglishNewsPaperName { get; set; }
+
         // Publication Details
         public string? MJASFormat { get; set; }
         public string? PublicationTitle { get; set; }
@@ -115,6 +121,8 @@ namespace Application.Models.DataTables
 
         public int? RegionId { get; set; }
         public int? SourceId { get; set; }
+        public int? KannadaNewsPaperId { get; set; }
+        public int? EnglishNewsPaperId { get; set; }
 
         // Publication fields
         [MaxLength(200)]
@@ -197,6 +205,8 @@ namespace Application.Models.DataTables
 
         public int? RegionId { get; set; }
         public int? SourceId { get; set; }
+        public int? KannadaNewsPaperId { get; set; }
+        public int? EnglishNewsPaperId { get; set; }
 
         [MaxLength(200)]
         public string? MJASFormat { get; set; }

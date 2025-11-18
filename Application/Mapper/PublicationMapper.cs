@@ -38,6 +38,8 @@
         [MapProperty(nameof(Publication.Mode.Name), nameof(PublicationDto.ModeName))]
         [MapProperty(nameof(Publication.Region.Name), nameof(PublicationDto.RegionName))]
         [MapProperty(nameof(Publication.Source.Name), nameof(PublicationDto.SourceName))]
+        [MapProperty(nameof(Publication.KannadaNewsPaper.NewsPaperName), nameof(PublicationDto.KannadaNewsPaperName))]
+        [MapProperty(nameof(Publication.EnglishNewsPaper.NewsPaperName), nameof(PublicationDto.EnglishNewsPaperName))]
         public partial PublicationDto MapToDtoWithDetails(Publication entity);
 
         // ----------------------------
@@ -55,6 +57,8 @@
             if (dto.ModePublication != null) entity.ModePublication = dto.ModePublication;
             if (dto.RegionId.HasValue) entity.RegionId = dto.RegionId;
             if (dto.SourceId.HasValue) entity.SourceId = dto.SourceId;
+            if (dto.KannadaNewsPaperId.HasValue) entity.KannadaNewsPaperId = dto.KannadaNewsPaperId;
+            if (dto.EnglishNewsPaperId.HasValue) entity.EnglishNewsPaperId = dto.EnglishNewsPaperId;
             if (dto.MJASFormat != null) entity.MJASFormat = dto.MJASFormat;
             if (dto.PublicationTitle != null) entity.PublicationTitle = dto.PublicationTitle;
             if (dto.PublicationJournalTitle != null) entity.PublicationJournalTitle = dto.PublicationJournalTitle;
