@@ -3,7 +3,7 @@
 using Application.Services.Common;
 using Application.Interface.Services.DataTables.STU;
 
-namespace Infrastructure.Services.DataTables.EEU
+namespace Infrastructure.Services.DataTables.STU
 {
     public class StuProgramService : IStuProgramService
     {
