@@ -22,6 +22,7 @@ namespace Infrastructure.Services.DataTables.EEU
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
         private readonly GenericTrainerHistoryService<StuProgramDetails> _historyService;
+        private readonly IUserRepository _userRepository;
 
         public StuProgramService(
             IStuProgramDetailsRepository programRepository,
@@ -39,7 +40,8 @@ namespace Infrastructure.Services.DataTables.EEU
             IOrganizationUnitRepository organizationUnitRepository,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
             ITrainerAssignmentRepository trainerAssignmentRepository,
-            GenericTrainerHistoryService<StuProgramDetails> historyService)
+            GenericTrainerHistoryService<StuProgramDetails> historyService,
+            IUserRepository userRepository)
         {
             _programRepository = programRepository;
             _demographicsRepository = demographicsRepository;
@@ -57,6 +59,7 @@ namespace Infrastructure.Services.DataTables.EEU
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
             _historyService = historyService;
+            _userRepository = userRepository;
         }
 
         // ============================
@@ -1470,7 +1473,9 @@ namespace Infrastructure.Services.DataTables.EEU
 
         public async Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
             int pageNumber = 1,
-            int pageSize = 10)
+            int pageSize = 10,
+            int? unitLocationId = null,
+            int? trainerId = null)
         {
             var query = _programRepository.GetQueryable()
                 .Include(x => x.Type);
@@ -1483,11 +1488,47 @@ namespace Infrastructure.Services.DataTables.EEU
                 getCreatedById: x => x.CreatedById ?? 0,
                 _unitHeadAssignmentRepository,
                 pageNumber,
-                pageSize);
+                pageSize,
+                unitLocationId,
+                trainerId);
         }
 
         // REMOVED: GetByTrainerAsync - Repository method doesn't exist
         // Use GetPaginatedAsync with appropriate filters instead
+
+        /// <summary>
+        /// Get trainers assigned to a specific unit location (for filtering purposes)
+        /// </summary>
+        public async Task<ServiceResult<List<TrainerBasicInfoDto>>> GetTrainersByUnitLocationAsync(int unitLocationId)
+        {
+            // Check if user has access to this unit location
+            if (!await CanUserAccessUnitLocationAsync(unitLocationId))
+                return ServiceResult<List<TrainerBasicInfoDto>>.Failure(
+                    "Access denied to this unit location",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            // Get trainer IDs for this unit location
+            var trainerIds = await _trainerAssignmentRepository.GetTrainerIdsByUnitLocationIdAsync(unitLocationId);
+
+            // Get trainer details
+            var trainers = new List<TrainerBasicInfoDto>();
+            foreach (var trainerId in trainerIds)
+            {
+                var user = await _userRepository.GetByIdAsync(trainerId);
+                if (user != null && user.Role == Role.TRAINER)
+                {
+                    trainers.Add(new TrainerBasicInfoDto
+                    {
+                        TrainerId = user.Id,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Email = user.Email
+                    });
+                }
+            }
+
+            return ServiceResult<List<TrainerBasicInfoDto>>.Success(trainers);
+        }
 
         // ============================
         // HELPER METHODS

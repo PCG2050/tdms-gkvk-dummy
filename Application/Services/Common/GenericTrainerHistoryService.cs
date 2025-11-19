@@ -83,7 +83,7 @@ namespace Application.Services.Common
         }
 
         /// <summary>
-        /// Get pending approvals for Unit Head with pagination
+        /// Get pending approvals for Unit Head with pagination and optional filters
         /// Shows all entries in Pending status for unit locations assigned to Unit Head
         /// </summary>
         public async Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
@@ -94,7 +94,9 @@ namespace Application.Services.Common
             Func<TEntity, int> getCreatedById,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
             int pageNumber = 1,
-            int pageSize = 10)
+            int pageSize = 10,
+            int? filterUnitLocationId = null,
+            int? filterTrainerId = null)
         {
             // Only Unit Heads and Admins can access this
             if (_currentUserService.Role != Role.UNITHEAD &&
@@ -130,6 +132,21 @@ namespace Application.Services.Common
                 .Where(x => getFormStatus(x) == "Pending" &&
                            unitLocationIds.Contains(getUnitLocationId(x)))
                 .ToList();
+
+            // Apply optional filters
+            if (filterUnitLocationId.HasValue)
+            {
+                filteredData = filteredData
+                    .Where(x => getUnitLocationId(x) == filterUnitLocationId.Value)
+                    .ToList();
+            }
+
+            if (filterTrainerId.HasValue)
+            {
+                filteredData = filteredData
+                    .Where(x => getCreatedById(x) == filterTrainerId.Value)
+                    .ToList();
+            }
 
             var totalCount = filteredData.Count;
 

@@ -95,10 +95,27 @@ namespace Application.Interface.Services.DataTables.STU
             int pageSize = 10);
 
         /// <summary>
-        /// Get pending approvals for Unit Head and Admin with pagination
+        /// Get pending approvals for Unit Head and Admin with pagination and optional filters
         /// </summary>
         Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
             int pageNumber = 1,
-            int pageSize = 10);
+            int pageSize = 10,
+            int? unitLocationId = null,
+            int? trainerId = null);
+
+        /// <summary>
+        /// Get trainers assigned to a specific unit location (for filtering purposes)
+        /// </summary>
+        Task<ServiceResult<List<TrainerBasicInfoDto>>> GetTrainersByUnitLocationAsync(int unitLocationId);
+    }
+
+    // DTO for basic trainer information
+    public class TrainerBasicInfoDto
+    {
+        public int TrainerId { get; set; }
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string FullName => $"{FirstName} {LastName}";
+        public string Email { get; set; } = string.Empty;
     }
 }

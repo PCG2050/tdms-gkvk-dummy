@@ -379,10 +379,20 @@ namespace WebApi.Controllers.DataTables.STU
         [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
         public async Task<IActionResult> GetPendingApprovals(
             [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 20)
+            [FromQuery] int pageSize = 20,
+            [FromQuery] int? unitLocationId = null,
+            [FromQuery] int? trainerId = null)
         {
-            var result = await _service.GetPendingApprovalsAsync(pageNumber, pageSize);
+            var result = await _service.GetPendingApprovalsAsync(pageNumber, pageSize, unitLocationId, trainerId);
             return Ok(result);
+        }
+
+        [HttpGet("trainers-by-location/{unitLocationId}")]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
+        public async Task<IActionResult> GetTrainersByUnitLocation(int unitLocationId)
+        {
+            var result = await _service.GetTrainersByUnitLocationAsync(unitLocationId);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
         // ============================
         // HELPER METHOD
