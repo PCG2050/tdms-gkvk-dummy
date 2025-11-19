@@ -1406,6 +1406,61 @@ namespace Infrastructure.Services.DataTables.EEU
                 pageSize);
         }
 
+        /// <summary>
+        /// Get unified history - can show own history or specific trainer's history
+        /// Unit heads can view their own forms or forms from trainers in their unit locations
+        /// </summary>
+        public async Task<PaginatedResult<StuProgramDetailsDto>> GetUnifiedHistoryAsync(
+            int? trainerId = null,
+            int? unitLocationId = null,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            // If trainerId is provided, get that trainer's forms (for unit heads viewing trainer's history)
+            if (trainerId.HasValue)
+            {
+                return await GetByTrainerAsync(trainerId.Value, unitLocationId, pageNumber, pageSize);
+            }
+
+            // Otherwise, get own history (works for both trainers and unit heads)
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+
+            var query = _programRepository.GetQueryable()
+                .Include(x => x.ProgramType)
+                .Include(x => x.Category)
+                .Include(x => x.Type)
+                .Include(x => x.Theme)
+                .Include(x => x.ThematicArea)
+                .Include(x => x.CreatedBy)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.Unit)
+                .Include(x => x.UnitLocation)
+                .ThenInclude(ul => ul.District)
+                .Where(x => x.CreatedById == _currentUserService.UserId)
+                .Where(x => unitLocationIds.Contains(x.UnitLocationId));
+
+            // Apply unit location filter if provided
+            if (unitLocationId.HasValue)
+            {
+                query = query.Where(x => x.UnitLocationId == unitLocationId.Value);
+            }
+
+            var totalCount = await query.CountAsync();
+            var programs = await query
+                .OrderByDescending(x => x.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var dtos = programs.Select(p => _mapper.MapToDtoWithDetails(p)).ToList();
+
+            return new PaginatedResult<StuProgramDetailsDto>(
+                dtos,
+                totalCount,
+                pageNumber,
+                pageSize);
+        }
+
         // ============================
         // HELPER METHODS
         // ============================
