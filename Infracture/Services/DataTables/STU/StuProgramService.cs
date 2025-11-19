@@ -41,7 +41,6 @@ namespace Infrastructure.Services.DataTables.STU
             IOrganizationUnitRepository organizationUnitRepository,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
             ITrainerAssignmentRepository trainerAssignmentRepository,
-            GenericTrainerHistoryService<StuProgramDetails> historyService,
             IUserService userService)
         {
             _programRepository = programRepository;
@@ -59,7 +58,7 @@ namespace Infrastructure.Services.DataTables.STU
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
-            _historyService = historyService;
+            _historyService = new GenericTrainerHistoryService<StuProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository);
             _userService = userService;
         }
 
