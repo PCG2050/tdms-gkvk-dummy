@@ -3,6 +3,7 @@ using Application.Interface.Services.DataTables.ConsultSocialMedia;
 using Application.Models;
 using Application.Models.DataTables;
 using Domain.Entities.Enum;
+using Infrastructure.Services.DataTables;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -217,6 +218,19 @@ namespace WebApi.Controllers.DataTables
                 }
             });
         }
+
+
+        [HttpGet("my-history")]
+        [Authorize(Roles = RoleString.Trainer)]
+        public async Task<IActionResult> GetMyHistory(
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10)
+        {
+            var result = await _consultingServiceService.GetTrainerHistoryAsync(pageNumber, pageSize);
+            return Ok(result);
+        }
+
+
 
         [HttpGet("status-summary")]
         [Authorize(Roles = RoleString.Trainer)]

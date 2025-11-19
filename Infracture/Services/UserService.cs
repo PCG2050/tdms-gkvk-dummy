@@ -505,7 +505,7 @@ namespace Infrastructure.Services
         public async Task<List<TrainerDetailsDto>> GetTrainersByUnitLocationAsync(int unitLocationId)
         {
             // Get trainer IDs from TrainerAssignment
-            var trainerIds = await _trainerAssignmentRepository.GetTrainerIdsByUnitLocationIdAsync(unitLocationId);
+            var trainerIds = await _trainerAssignment.GetTrainerIdsByUnitLocationIdAsync(unitLocationId);
 
             if (!trainerIds.Any())
                 return new List<TrainerDetailsDto>();
@@ -520,9 +520,8 @@ namespace Infrastructure.Services
                     UserId = trainer.Id,
                     FirstName = trainer.FirstName,
                     LastName = trainer.LastName,
-                    Email = trainer.Email,
-                    Phone = trainer.Phone,
-                    Units = new List<TrainerUnitWithLocationsDto>() // Can be populated if needed
+                    Email = trainer.Email,                   
+                    Units = new List<TrainerUnitDto>() 
                 }).ToList();
         }
 
