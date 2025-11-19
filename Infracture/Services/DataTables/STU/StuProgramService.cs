@@ -22,7 +22,7 @@ namespace Infrastructure.Services.DataTables.EEU
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
         private readonly GenericTrainerHistoryService<StuProgramDetails> _historyService;
-        private readonly IUserRepository _userRepository;
+        private readonly IUserService _userService;
 
         public StuProgramService(
             IStuProgramDetailsRepository programRepository,
@@ -41,7 +41,7 @@ namespace Infrastructure.Services.DataTables.EEU
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
             ITrainerAssignmentRepository trainerAssignmentRepository,
             GenericTrainerHistoryService<StuProgramDetails> historyService,
-            IUserRepository userRepository)
+            IUserService userService)
         {
             _programRepository = programRepository;
             _demographicsRepository = demographicsRepository;
@@ -59,7 +59,7 @@ namespace Infrastructure.Services.DataTables.EEU
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
             _historyService = historyService;
-            _userRepository = userRepository;
+            _userService = userService;
         }
 
         // ============================
@@ -1498,6 +1498,7 @@ namespace Infrastructure.Services.DataTables.EEU
 
         /// <summary>
         /// Get trainers assigned to a specific unit location (for filtering purposes)
+        /// Uses centralized UserService.GetTrainersByUnitLocationAsync
         /// </summary>
         public async Task<ServiceResult<List<TrainerBasicInfoDto>>> GetTrainersByUnitLocationAsync(int unitLocationId)
         {
@@ -1507,25 +1508,17 @@ namespace Infrastructure.Services.DataTables.EEU
                     "Access denied to this unit location",
                     ServiceErrorStatus.FORBIDDEN);
 
-            // Get trainer IDs for this unit location
-            var trainerIds = await _trainerAssignmentRepository.GetTrainerIdsByUnitLocationIdAsync(unitLocationId);
+            // Use centralized UserService method
+            var trainerDetails = await _userService.GetTrainersByUnitLocationAsync(unitLocationId);
 
-            // Get trainer details
-            var trainers = new List<TrainerBasicInfoDto>();
-            foreach (var trainerId in trainerIds)
+            // Map TrainerDetailsDto to TrainerBasicInfoDto
+            var trainers = trainerDetails.Select(t => new TrainerBasicInfoDto
             {
-                var user = await _userRepository.GetByIdAsync(trainerId);
-                if (user != null && user.Role == Role.TRAINER)
-                {
-                    trainers.Add(new TrainerBasicInfoDto
-                    {
-                        TrainerId = user.Id,
-                        FirstName = user.FirstName,
-                        LastName = user.LastName,
-                        Email = user.Email
-                    });
-                }
-            }
+                TrainerId = t.UserId,
+                FirstName = t.FirstName,
+                LastName = t.LastName,
+                Email = t.Email
+            }).ToList();
 
             return ServiceResult<List<TrainerBasicInfoDto>>.Success(trainers);
         }
