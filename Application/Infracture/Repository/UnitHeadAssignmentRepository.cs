@@ -173,7 +173,13 @@ namespace Infrastructure.Repository
 
         public async Task<List<UnitHeadAssignment>> GetByUnitHeadIdAsync(int unitHeadId)
         {
-            return await _context.UnitHeadAssignments.Where(x => x.UnitHeadId == unitHeadId)
+            return await _context.UnitHeadAssignments
+                .Include(x => x.UnitLocation)
+                    .ThenInclude(l => l.Unit)
+                .Include(x => x.UnitLocation)
+                    .ThenInclude(l => l.District)
+                    .ThenInclude(d => d.State)
+                .Where(x => x.UnitHeadId == unitHeadId)
                 .ToListAsync();
         }
 

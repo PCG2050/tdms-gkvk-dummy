@@ -61,4 +61,35 @@ namespace Application.Models
         public int DistrictId { get; set; }
         public string DistrictName { get; set; }
     }
+
+    // DTO for unithead with their current assignments
+    public class UnitHeadWithAssignmentsDto
+    {
+        public int UnitHeadId { get; set; }
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
+        public Gender Gender { get; set; }
+        public EmployementType EmployementType { get; set; }
+        public DateOnly DateOfBirth { get; set; }
+        public DateOnly DateOfJoining { get; set; }
+        public bool IsDeactivated { get; set; }
+        public string? Qualification { get; set; }
+
+        // List of currently assigned location IDs
+        public List<int> AssignedLocationIds { get; set; } = new List<int>();
+
+        // Detailed location information
+        public List<UnitLocationDetailsDto> UnitLocationDetails { get; set; } = new List<UnitLocationDetailsDto>();
+    }
+
+    public class UnitHeadLoginResponseDto
+    {
+        public string AccessToken { get; set; } = default!;
+        public string RefreshToken { get; set; } = default!;
+
+        // Reuse the DTO with all unithead details & assigned locations
+        public UnitHeadWithAssignmentsDto UnitHeadDetails { get; set; } = default!;
+    }
 }

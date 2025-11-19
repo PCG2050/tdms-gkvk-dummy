@@ -10,14 +10,16 @@ namespace WebApi.Controllers
         private readonly ICurrentUserService _currentUserService;
         private readonly IUserRepository _userRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
-        
+        private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
 
-        public AuthController(IAuthService authService, ICurrentUserService currentUserService,IUserRepository userRepository, ITrainerAssignmentRepository trainerAssignmentRepository)
+
+        public AuthController(IAuthService authService, ICurrentUserService currentUserService,IUserRepository userRepository, ITrainerAssignmentRepository trainerAssignmentRepository, IUnitHeadAssignmentRepository unitHeadAssignmentRepository)
         {
             _authService = authService;
             _currentUserService = currentUserService;
             _userRepository = userRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
+            _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
         }
         /// <summary>
         /// Authenticate user and create session with device tracking
@@ -111,6 +113,81 @@ namespace WebApi.Controllers
                     AccessToken = tokenResponse.AccessToken,
                     RefreshToken = tokenResponse.RefreshToken,                   
                     TrainerDetails = trainerDetails
+                };
+
+                return Ok(response);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// UnitHead-specific login that returns unit assignments along with tokens
+        /// </summary>
+        [HttpPost("unithead-login")]
+        public async Task<IActionResult> UnitHeadLogin(LoginRequestDto request)
+        {
+            try
+            {
+                var deviceInfo = GetDeviceInfo();
+
+                // First, perform regular authentication
+                var tokenResponse = await _authService.LoginAsync(request, deviceInfo);
+
+                // Verify unithead
+                var user = await _userRepository.GetByEmailAsync(request.Email);
+                if (user == null)
+                    return Unauthorized(new { message = "Invalid credentials" });
+
+                if (user.Role != Role.UNITHEAD)
+                    return Unauthorized(new { message = "This endpoint is only for unitheads" });
+
+                // Get unithead assignments with full details
+                var assignments = await _unitHeadAssignmentRepository.GetByUnitHeadIdAsync(user.Id);
+
+                // Flatten into UnitLocationDetailsDto
+                var unitLocationDetails = assignments.Select(a => new UnitLocationDetailsDto
+                {
+                    UnitLocationId = a.UnitLocationId,
+                    UnitId = a.UnitLocation.Unit.Id,
+                    UnitName = a.UnitLocation.Unit.Name,
+                    OrganizationId = a.UnitLocation.OrganizationId,
+                    StateId = a.UnitLocation.District.State.Id,
+                    StateName = a.UnitLocation.District.State.Name,
+                    DistrictId = a.UnitLocation.District.Id,
+                    DistrictName = a.UnitLocation.District.Name
+                }).ToList();
+
+                // Build UnitHeadWithAssignmentsDto
+                var unitHeadDetails = new UnitHeadWithAssignmentsDto
+                {
+                    UnitHeadId = user.Id,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                    Phone = user.Phone ?? string.Empty,
+                    Gender = user.Gender,
+                    EmployementType = user.EmployementType,
+                    DateOfBirth = user.DateOfBirth,
+                    DateOfJoining = user.DateOfJoining,
+                    IsDeactivated = user.IsDeactivated,
+                    Qualification = user.Qualification,
+                    AssignedLocationIds = assignments.Select(a => a.UnitLocationId).ToList(),
+                    UnitLocationDetails = unitLocationDetails
+                };
+
+                // Wrap with tokens
+                var response = new UnitHeadLoginResponseDto
+                {
+                    AccessToken = tokenResponse.AccessToken,
+                    RefreshToken = tokenResponse.RefreshToken,
+                    UnitHeadDetails = unitHeadDetails
                 };
 
                 return Ok(response);
