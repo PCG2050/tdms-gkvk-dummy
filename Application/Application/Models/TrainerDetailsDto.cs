@@ -6,6 +6,7 @@ namespace Application.Models
     {
         public string AccessToken { get; set; } = default!;
         public string RefreshToken { get; set; } = default!;
+        public string UserRole { get; set; } = default!;
         //public DateTime ExpiresAt { get; set; }
 
         // Reuse your existing DTO with all trainer details & assigned locations
