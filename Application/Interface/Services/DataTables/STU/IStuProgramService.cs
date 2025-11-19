@@ -63,7 +63,8 @@ namespace Application.Interface.Services.DataTables.STU
         // ============================
         // STATUS MANAGEMENT & SUBMISSION
         // ============================
-        Task<ServiceResult> SubmitForApprovalAsync(int programId);
+        // REMOVED: SubmitForApprovalAsync - Form submission now happens automatically via recommendations
+        // Task<ServiceResult> SubmitForApprovalAsync(int programId);
         Task<ServiceResult> ApproveAsync(int programId, string? remarks = null);
         Task<ServiceResult> RejectAsync(int programId, string remarks);
 

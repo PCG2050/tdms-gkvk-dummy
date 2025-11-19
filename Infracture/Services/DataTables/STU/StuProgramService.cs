@@ -390,6 +390,146 @@ namespace Infrastructure.Services.DataTables.EEU
         }
 
         // ============================
+        // HYBRID PATTERN METHODS
+        // ============================
+
+        public async Task<ServiceResult<StuProgramContentDto>> AddProgramContentWithChildrenAsync(
+            int programId,
+            StuProgramContentWithChildrenCreateDto dto)
+        {
+            // Validate program exists
+            var program = await _programRepository.GetByIdAsync(programId);
+            if (program == null)
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    "Program not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            // Check permissions
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            // Validate form status
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    "Cannot add content to submitted or approved programs",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            try
+            {
+                // Prepare parent entity
+                var parentEntity = new StuProgramContentAndResources
+                {
+                    StuProgramDetailsId = programId,
+                    UnitLocationId = program.UnitLocationId,
+                    OrganizationId = program.OrganizationId,
+                    CreatedById = _currentUserService.UserId,
+                    CreatedAt = DateTimeOffset.UtcNow
+                };
+
+                // Prepare child entities
+                var resourcePersons = dto.ResourcePersons?.Select(rp =>
+                {
+                    var entity = _mapper.MapToEntity(rp);
+                    entity.UnitLocationId = program.UnitLocationId;
+                    entity.OrganizationId = program.OrganizationId;
+                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedAt = DateTimeOffset.UtcNow;
+                    return entity;
+                }).ToList();
+
+                var topicsCovered = dto.TopicsCovered?.Select(tc =>
+                {
+                    var entity = _mapper.MapToEntity(tc);
+                    entity.UnitLocationId = program.UnitLocationId;
+                    entity.OrganizationId = program.OrganizationId;
+                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedAt = DateTimeOffset.UtcNow;
+                    return entity;
+                }).ToList();
+
+                var teachingAids = dto.TeachingAids?.Select(ta =>
+                {
+                    var entity = _mapper.MapToEntity(ta);
+                    entity.UnitLocationId = program.UnitLocationId;
+                    entity.OrganizationId = program.OrganizationId;
+                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedAt = DateTimeOffset.UtcNow;
+                    return entity;
+                }).ToList();
+
+                // Repository handles transaction internally
+                var createdContent = await _contentRepository.CreateWithChildrenAsync(
+                    parentEntity,
+                    resourcePersons,
+                    topicsCovered,
+                    teachingAids);
+
+                var resultDto = _mapper.MapToDto(createdContent);
+                return ServiceResult<StuProgramContentDto>.Success(resultDto);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    $"Failed to create program content with children: {ex.Message}",
+                    ServiceErrorStatus.INVALIDOPERATION);
+            }
+        }
+
+        public async Task<ServiceResult<StuProgramContentDto>> UpdateProgramContentWithChildrenAsync(
+            int contentId,
+            StuProgramContentWithChildrenUpdateDto dto)
+        {
+            // Validate content exists
+            var content = await _contentRepository.GetWithDetailsAsync(contentId);
+            if (content == null)
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    "Content not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            // Validate program and permissions
+            var program = await _programRepository.GetByIdAsync(content.StuProgramDetailsId ?? 0);
+            if (program == null)
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    "Program not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    "Cannot update content in submitted or approved programs",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            try
+            {
+                // Update parent entity
+                content.UpdatedById = _currentUserService.UserId;
+                content.UpdatedAt = DateTimeOffset.UtcNow;
+
+                await _contentRepository.UpdateWithChildrenAsync(
+                    content,
+                    dto.ResourcePersons,
+                    dto.TopicsCovered,
+                    dto.TeachingAids,
+                    _currentUserService.UserId);
+
+                var resultDto = _mapper.MapToDto(content);
+                return ServiceResult<StuProgramContentDto>.Success(resultDto);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    $"Failed to update program content with children: {ex.Message}",
+                    ServiceErrorStatus.INVALIDOPERATION);
+            }
+        }
+
+        // ============================
         // SECTION C1: RESOURCE PERSONS
         // ============================
 
@@ -1022,6 +1162,28 @@ namespace Infrastructure.Services.DataTables.EEU
 
             await _recommendationRepository.CreateAsync(recommendation);
 
+            // Update program FormStatus based on user role
+            if (_currentUserService.Role == Role.UNITHEAD)
+            {
+                // Unit Head creates/edits → Auto-approved
+                program.FormStatus = "Approved";
+                program.ApprovedById = _currentUserService.UserId;
+                program.ApprovedAt = DateTimeOffset.UtcNow;
+                program.FormStatusRemarks = "Auto-approved (Unit Head)";
+            }
+            else
+            {
+                // Trainer creates/edits → Pending approval
+                program.FormStatus = "Pending";
+                program.ApprovedById = null;
+                program.ApprovedAt = null;
+                program.FormStatusRemarks = null;
+            }
+
+            program.UpdatedById = _currentUserService.UserId;
+            program.UpdatedAt = DateTimeOffset.UtcNow;
+            await _programRepository.UpdateAsync(program);
+
             var resultDto = _mapper.MapToDto(recommendation);
             return ServiceResult<StuRecommendationDto>.Success(resultDto);
         }
@@ -1059,6 +1221,28 @@ namespace Infrastructure.Services.DataTables.EEU
             recommendation.UpdatedAt = DateTimeOffset.UtcNow;
 
             await _recommendationRepository.UpdateAsync(recommendation);
+
+            // Update program FormStatus based on user role
+            if (_currentUserService.Role == Role.UNITHEAD)
+            {
+                // Unit Head edits → Auto-approved
+                program.FormStatus = "Approved";
+                program.ApprovedById = _currentUserService.UserId;
+                program.ApprovedAt = DateTimeOffset.UtcNow;
+                program.FormStatusRemarks = "Auto-approved (Unit Head)";
+            }
+            else
+            {
+                // Trainer edits → Pending approval
+                program.FormStatus = "Pending";
+                program.ApprovedById = null;
+                program.ApprovedAt = null;
+                program.FormStatusRemarks = null;
+            }
+
+            program.UpdatedById = _currentUserService.UserId;
+            program.UpdatedAt = DateTimeOffset.UtcNow;
+            await _programRepository.UpdateAsync(program);
 
             var resultDto = _mapper.MapToDto(recommendation);
             return ServiceResult<StuRecommendationDto>.Success(resultDto);
@@ -1107,6 +1291,12 @@ namespace Infrastructure.Services.DataTables.EEU
         // STATUS MANAGEMENT & SUBMISSION
         // ============================
 
+        // REMOVED: SubmitForApprovalAsync
+        // Form submission now happens automatically when recommendations are added/updated
+        // - Trainer adds/updates recommendation → FormStatus = "Pending"
+        // - Unit Head adds/updates recommendation → FormStatus = "Approved" (auto-approved)
+
+        /* COMMENTED OUT - No longer needed as recommendations handle submission
         public async Task<ServiceResult> SubmitForApprovalAsync(int programId)
         {
             var program = await _programRepository.GetByIdAsync(programId);
@@ -1129,6 +1319,7 @@ namespace Infrastructure.Services.DataTables.EEU
             await _programRepository.UpdateAsync(program);
             return ServiceResult.Success();
         }
+        */
 
         public async Task<ServiceResult> ApproveAsync(int programId, string? remarks = null)
         {
@@ -1295,28 +1486,8 @@ namespace Infrastructure.Services.DataTables.EEU
                 pageSize);
         }
 
-        public async Task<PaginatedResult<StuProgramDetailsDto>> GetByTrainerAsync(
-            int trainerId,
-            int? unitLocationId = null,
-            int pageNumber = 1,
-            int pageSize = 10)
-        {
-            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
-            var result = await _programRepository.GetByTrainerAndUnitLocationAsync(
-                trainerId,
-                unitLocationId,
-                unitLocationIds,
-                pageNumber,
-                pageSize);
-
-            var dtos = result.Items.Select(p => _mapper.MapToDtoWithDetails(p)).ToList();
-
-            return new PaginatedResult<StuProgramDetailsDto>(
-                dtos,
-                result.TotalItems,
-                result.PageNumber,
-                result.PageSize);
-        }
+        // REMOVED: GetByTrainerAsync - Repository method doesn't exist
+        // Use GetPaginatedAsync with appropriate filters instead
 
         // ============================
         // HELPER METHODS

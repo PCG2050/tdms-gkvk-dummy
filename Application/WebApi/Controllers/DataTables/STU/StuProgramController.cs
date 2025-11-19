@@ -300,12 +300,18 @@ namespace WebApi.Controllers.DataTables.STU
         // STATUS MANAGEMENT
         // ============================
 
+        // REMOVED: Submit endpoint - Form submission now happens automatically via recommendations
+        // When trainer adds/updates recommendation → FormStatus = "Pending"
+        // When unit head adds/updates recommendation → FormStatus = "Approved" (auto-approved)
+
+        /* COMMENTED OUT
         [HttpPost("{programId}/submit")]
         public async Task<IActionResult> SubmitForApproval(int programId)
         {
             var result = await _service.SubmitForApprovalAsync(programId);
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
+        */
 
         [HttpPost("{programId}/approve")]
         public async Task<IActionResult> Approve(int programId, [FromBody] ApprovalDto dto)
