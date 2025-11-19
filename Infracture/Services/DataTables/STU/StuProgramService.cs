@@ -1,6 +1,7 @@
 ﻿
 
 using Application.Services.Common;
+using Application.Interface.Services.DataTables.STU;
 
 namespace Infrastructure.Services.DataTables.EEU
 {
@@ -518,8 +519,7 @@ namespace Infrastructure.Services.DataTables.EEU
                     content,
                     dto.ResourcePersons,
                     dto.TopicsCovered,
-                    dto.TeachingAids,
-                    _currentUserService.UserId);
+                    dto.TeachingAids);
 
                 var resultDto = _mapper.MapToDto(content);
                 return ServiceResult<StuProgramContentDto>.Success(resultDto);
