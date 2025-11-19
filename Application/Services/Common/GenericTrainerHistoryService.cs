@@ -173,7 +173,10 @@ namespace Application.Services.Common
                 PageSize = pageSize
             };
         }
-    }
+    
+
+
+}
 
     public class TrainerHistoryItemDto
     {
@@ -193,4 +196,5 @@ namespace Application.Services.Common
         public string FormStatus { get; set; } = string.Empty;
         public int CreatedById { get; set; }
     }
+
 }

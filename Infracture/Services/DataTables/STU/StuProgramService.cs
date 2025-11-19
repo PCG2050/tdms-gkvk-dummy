@@ -1,7 +1,6 @@
 ﻿
 
 using Application.Services.Common;
-using Application.Interface.Services.DataTables.STU;
 
 namespace Infrastructure.Services.DataTables.STU
 {
@@ -41,6 +40,7 @@ namespace Infrastructure.Services.DataTables.STU
             IOrganizationUnitRepository organizationUnitRepository,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
             ITrainerAssignmentRepository trainerAssignmentRepository,
+            GenericTrainerHistoryService<StuProgramDetails> historyService,
             IUserService userService)
         {
             _programRepository = programRepository;
@@ -58,7 +58,7 @@ namespace Infrastructure.Services.DataTables.STU
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
-            _historyService = new GenericTrainerHistoryService<StuProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository);
+            _historyService = new GenericTrainerHistoryService<StuProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository); 
             _userService = userService;
         }
 
@@ -395,7 +395,9 @@ namespace Infrastructure.Services.DataTables.STU
         // ============================
         // HYBRID PATTERN METHODS
         // ============================
-
+        /// <summary>
+        /// Create StuProgramContentAndResources with all child entities in a single transaction
+        /// </summary>
         public async Task<ServiceResult<StuProgramContentDto>> AddProgramContentWithChildrenAsync(
             int programId,
             StuProgramContentWithChildrenCreateDto dto)
@@ -414,9 +416,9 @@ namespace Infrastructure.Services.DataTables.STU
                     ServiceErrorStatus.FORBIDDEN);
 
             // Validate form status
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<StuProgramContentDto>.Failure(
-                    "Cannot add content to submitted or approved programs",
+                    "Cannot add content to approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             try
@@ -425,6 +427,7 @@ namespace Infrastructure.Services.DataTables.STU
                 var parentEntity = new StuProgramContentAndResources
                 {
                     StuProgramDetailsId = programId,
+
                     UnitLocationId = program.UnitLocationId,
                     OrganizationId = program.OrganizationId,
                     CreatedById = _currentUserService.UserId,
@@ -480,6 +483,12 @@ namespace Infrastructure.Services.DataTables.STU
             }
         }
 
+        /// <summary>
+        /// Update StuProgramContentAndResources with all child entities using Hybrid Pattern
+        /// - Items WITH Id: UPDATE existing
+        /// - Items WITHOUT Id: CREATE new
+        /// - Items in DB but NOT in arrays: DELETE
+        /// </summary>
         public async Task<ServiceResult<StuProgramContentDto>> UpdateProgramContentWithChildrenAsync(
             int contentId,
             StuProgramContentWithChildrenUpdateDto dto)
@@ -503,24 +512,112 @@ namespace Infrastructure.Services.DataTables.STU
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<StuProgramContentDto>.Failure(
-                    "Cannot update content in submitted or approved programs",
+                    "Cannot update content in approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             try
             {
-                // Update parent entity
-                content.UpdatedById = _currentUserService.UserId;
-                content.UpdatedAt = DateTimeOffset.UtcNow;
+                // Prepare parent entity for update
+                var parentEntity = new StuProgramContentAndResources
+                {
+                    Id = contentId,
 
-                await _contentRepository.UpdateWithChildrenAsync(
-                    content,
-                    dto.ResourcePersons,
-                    dto.TopicsCovered,
-                    dto.TeachingAids);
+                    UpdatedById = _currentUserService.UserId,
+                    UpdatedAt = DateTimeOffset.UtcNow
+                };
 
-                var resultDto = _mapper.MapToDto(content);
+                // Prepare child entities (hybrid: mix of new and existing)
+                var resourcePersons = dto.ResourcePersons?.Select(rp =>
+                {
+                    var entity = new StuResourcePerson
+                    {
+                        Id = rp.Id ?? 0, // 0 means new
+                        Name = rp.Name,
+                        Designation = rp.Designation,
+                        ResourceType = rp.ResourceType,
+                        Responsibility = rp.Responsibility,
+                        InstitutionOrDepartment = rp.InstitutionOrDepartment,
+                        UnitLocationId = program.UnitLocationId,
+                        OrganizationId = program.OrganizationId
+                    };
+
+                    if (entity.Id == 0)
+                    {
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
+
+                    return entity;
+                }).ToList();
+
+                var topicsCovered = dto.TopicsCovered?.Select(tc =>
+                {
+                    var entity = new StuTopicsCoveredInClass
+                    {
+                        Id = tc.Id ?? 0,
+                        Date = tc.Date,
+                        Title = tc.Title,
+                        PhotoUpload = tc.PhotoUpload,
+                        UnitLocationId = program.UnitLocationId,
+                        OrganizationId = program.OrganizationId
+                    };
+
+                    if (entity.Id == 0)
+                    {
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
+
+                    return entity;
+                }).ToList();
+
+                var teachingAids = dto.TeachingAids?.Select(ta =>
+                {
+                    var entity = new StuTeachingAidsDeveloped
+                    {
+                        Id = ta.Id ?? 0,
+                        TypeOfAidId = ta.TypeOfAidId,
+                        OtherTypeOfAid = ta.OtherTypeOfAid,
+                        Purpose = ta.Purpose,
+                        Number = ta.Number,
+                        UnitLocationId = program.UnitLocationId,
+                        OrganizationId = program.OrganizationId
+                    };
+
+                    if (entity.Id == 0)
+                    {
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
+
+                    return entity;
+                }).ToList();
+
+                // Repository handles transaction internally
+                var updatedContent = await _contentRepository.UpdateWithChildrenAsync(
+                    parentEntity,
+                    resourcePersons,
+                    topicsCovered,
+                    teachingAids);
+
+                var resultDto = _mapper.MapToDto(updatedContent);
                 return ServiceResult<StuProgramContentDto>.Success(resultDto);
             }
             catch (Exception ex)
