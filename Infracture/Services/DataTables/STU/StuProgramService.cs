@@ -21,6 +21,7 @@ namespace Infrastructure.Services.DataTables.EEU
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
+        private readonly GenericTrainerHistoryService<StuProgramDetails> _historyService;
 
         public StuProgramService(
             IStuProgramDetailsRepository programRepository,
@@ -37,7 +38,8 @@ namespace Infrastructure.Services.DataTables.EEU
             StuProgramMapper mapper,
             IOrganizationUnitRepository organizationUnitRepository,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
-            ITrainerAssignmentRepository trainerAssignmentRepository)
+            ITrainerAssignmentRepository trainerAssignmentRepository,
+            GenericTrainerHistoryService<StuProgramDetails> historyService)
         {
             _programRepository = programRepository;
             _demographicsRepository = demographicsRepository;
@@ -54,6 +56,7 @@ namespace Infrastructure.Services.DataTables.EEU
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
+            _historyService = historyService;
         }
 
         // ============================
@@ -1262,80 +1265,34 @@ namespace Infrastructure.Services.DataTables.EEU
             int pageNumber = 1,
             int pageSize = 10)
         {
-            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
-            var result = await _programRepository.GetByCreatorIdAsync(
-                _currentUserService.UserId,
-                unitLocationIds,
+            var query = _programRepository.GetQueryable()
+                .Include(x => x.Type);
+
+            return await _historyService.GetTrainerHistoryAsync(
+                query,
+                getUnitLocationId: x => x.UnitLocationId,
+                getTitleOrName: x => x.Title ?? x.ProgramType?.Name,
+                getFormStatus: x => x.FormStatus,
                 pageNumber,
                 pageSize);
-
-            var dtos = result.Items.Select(p => new TrainerHistoryItemDto
-            {
-                Id = p.Id,
-                Title = p.Title,
-                StartDate = p.StartDate,
-                EndDate = p.EndDate,
-                UnitLocationId = p.UnitLocationId,
-                UnitLocationName = p.UnitLocation != null
-                    ? $"{p.UnitLocation.Unit?.Name} - {p.UnitLocation.District?.Name}"
-                    : null,
-                UnitName = p.UnitLocation?.Unit?.Name,
-                DistrictName = p.UnitLocation?.District?.Name,
-                FormStatus = p.FormStatus,
-                FormStatusRemarks = p.FormStatusRemarks,
-                CreatedAt = p.CreatedAt,
-                UpdatedAt = p.UpdatedAt,
-                ApprovedAt = p.ApprovedAt,
-                ApprovedByName = p.ApprovedBy != null
-                    ? $"{p.ApprovedBy.FirstName} {p.ApprovedBy.LastName}"
-                    : null,
-                ProgramTypeName = p.ProgramType?.Name
-            }).ToList();
-
-            return new PaginatedResult<TrainerHistoryItemDto>(
-                dtos,
-                result.TotalItems,
-                result.PageNumber,
-                result.PageSize);
         }
 
         public async Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
             int pageNumber = 1,
             int pageSize = 10)
         {
-            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
-            var result = await _programRepository.GetPendingApprovalsAsync(
-                unitLocationIds,
-                null,
+            var query = _programRepository.GetQueryable()
+                .Include(x => x.Type);
+
+            return await _historyService.GetPendingApprovalsAsync(
+                query,
+                getUnitLocationId: x => x.UnitLocationId,
+                getTitleOrName: x => x.Title ?? x.ProgramType?.Name,
+                getFormStatus: x => x.FormStatus,
+                getCreatedById: x => x.CreatedById ?? 0,
+                _unitHeadAssignmentRepository,
                 pageNumber,
                 pageSize);
-
-            var dtos = result.Items.Select(p => new PendingApprovalItemDto
-            {
-                Id = p.Id,
-                Title = p.Title,
-                StartDate = p.StartDate,
-                EndDate = p.EndDate,
-                UnitLocationId = p.UnitLocationId,
-                UnitLocationName = p.UnitLocation != null
-                    ? $"{p.UnitLocation.Unit?.Name} - {p.UnitLocation.District?.Name}"
-                    : null,
-                UnitName = p.UnitLocation?.Unit?.Name,
-                DistrictName = p.UnitLocation?.District?.Name,
-                FormStatus = p.FormStatus,
-                CreatedAt = p.CreatedAt,
-                CreatedByName = p.CreatedBy != null
-                    ? $"{p.CreatedBy.FirstName} {p.CreatedBy.LastName}"
-                    : null,
-                CreatedById = p.CreatedById,
-                ProgramTypeName = p.ProgramType?.Name
-            }).ToList();
-
-            return new PaginatedResult<PendingApprovalItemDto>(
-                dtos,
-                result.TotalItems,
-                result.PageNumber,
-                result.PageSize);
         }
 
         public async Task<PaginatedResult<StuProgramDetailsDto>> GetByTrainerAsync(
