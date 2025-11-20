@@ -29,5 +29,10 @@ namespace Application.Interface.Repository
 
         // Additional methods for PATCH operations
         Task<OrganizationUnitLocation?> GetByIdAsync(int id);
+
+        /// <summary>
+        /// Get multiple organization unit locations by their IDs
+        /// </summary>
+        Task<List<OrganizationUnitLocation>> GetByIdsAsync(List<int> ids);
     }
 }

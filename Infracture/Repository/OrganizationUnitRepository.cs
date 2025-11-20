@@ -177,5 +177,23 @@ namespace Infrastructure.Repository
                 .ThenBy(x => x.District.Name)
                 .ToListAsync();
         }
+
+        /// <summary>
+        /// Get multiple organization unit locations by their IDs
+        /// </summary>
+        public async Task<List<OrganizationUnitLocation>> GetByIdsAsync(List<int> ids)
+        {
+            if (ids == null || !ids.Any())
+                return new List<OrganizationUnitLocation>();
+
+            return await _dbContext.OrganizationUnitLocations
+                .Include(x => x.Unit)
+                .Include(x => x.District)
+                    .ThenInclude(d => d.State)
+                .Where(x => ids.Contains(x.Id))
+                .OrderBy(x => x.Unit.Name)
+                .ThenBy(x => x.District.Name)
+                .ToListAsync();
+        }
     }
 }

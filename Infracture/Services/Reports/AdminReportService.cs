@@ -81,24 +81,35 @@ namespace Infrastructure.Services.Reports
 
         public async Task<ServiceResult<ReportFilterOptionsDto>> GetFilterOptionsAsync()
         {
-            if (_currentUserService.Role != Role.ADMIN)
-                return ServiceResult<ReportFilterOptionsDto>.Failure("Only admins can access reports");
+            // Allow both Admin and UnitHead
+            if (_currentUserService.Role != Role.ADMIN && _currentUserService.Role != Role.UNITHEAD)
+                return ServiceResult<ReportFilterOptionsDto>.Failure("Access denied");
 
             var orgId = _currentUserService.OrganizationId;
+            List<int> allowedLocationIds;
 
-            // Get assigned unit locations
-            var unitHeadAssignments = await _unitHeadAssignmentRepository.GetAllAsync();
-            var trainerAssignments = await _trainerAssignmentRepository.GetAllAsync();
+            if (_currentUserService.Role == Role.ADMIN)
+            {
+                // Admin: Get ALL assigned locations in organization
+                var unitHeadAssignments = await _unitHeadAssignmentRepository.GetAllAsync();
+                var trainerAssignments = await _trainerAssignmentRepository.GetAllAsync();
 
-            var assignedLocationIds = unitHeadAssignments.Select(x => x.UnitLocationId)
-                .Union(trainerAssignments.Select(x => x.UnitLocationId))
-                .Distinct().ToList();
+                allowedLocationIds = unitHeadAssignments.Select(x => x.UnitLocationId)
+                    .Union(trainerAssignments.Select(x => x.UnitLocationId))
+                    .Distinct().ToList();
+            }
+            else // UNITHEAD
+            {
+                // Unit Head: Get ONLY their assigned locations
+                allowedLocationIds = await _unitHeadAssignmentRepository
+                    .GetUnitLocationIdsByUnitHeadIdAsync(_currentUserService.UserId);
+            }
 
-            var allLocations = await _organizationUnitRepository.GetOrganizationUnitsAsync(orgId);
-            var activeLocations = allLocations.Where(ul => assignedLocationIds.Contains(ul.Id)).ToList();
+            // Get location details
+            var locations = await _organizationUnitRepository.GetByIdsAsync(allowedLocationIds);
 
             // Group by unit
-            var units = activeLocations
+            var units = locations
                 .GroupBy(ul => new { ul.Unit.Id, ul.Unit.Name })
                 .Select(g => new UnitWithLocationsDto
                 {
@@ -125,8 +136,23 @@ namespace Infrastructure.Services.Reports
 
         public async Task<ServiceResult<AdminReportResponseDto>> GenerateReportAsync(AdminReportFilterDto filter)
         {
-            if (_currentUserService.Role != Role.ADMIN)
-                return ServiceResult<AdminReportResponseDto>.Failure("Only admins can access reports");
+            // Allow both Admin and UnitHead
+            if (_currentUserService.Role != Role.ADMIN && _currentUserService.Role != Role.UNITHEAD)
+                return ServiceResult<AdminReportResponseDto>.Failure("Access denied");
+
+            // Validate Unit Head has access to this location
+            if (_currentUserService.Role == Role.UNITHEAD)
+            {
+                var allowedLocationIds = await _unitHeadAssignmentRepository
+                    .GetUnitLocationIdsByUnitHeadIdAsync(_currentUserService.UserId);
+
+                if (!allowedLocationIds.Contains(filter.UnitLocationId))
+                {
+                    return ServiceResult<AdminReportResponseDto>.Failure(
+                        "You don't have access to this unit location",
+                        ServiceErrorStatus.FORBIDDEN);
+                }
+            }
 
             if (filter.Month < 1 || filter.Month > 12)
                 return ServiceResult<AdminReportResponseDto>.Failure("Month must be 1-12");
