@@ -47,7 +47,7 @@ namespace Application.Models.DataTables.KVK
         public decimal? TotalOutlayRs { get; set; }
         public string? Copi { get; set; }
         public int? BatchNo { get; set; }
-        public decimal Area { get; set; }
+        public decimal? Area { get; set; }
         public string? OrganizerBroucherFile { get; set; }
         public string? OrganizerInstitutionName { get; set; }
         public string? OrganizerInstitutionAddress { get; set; }
@@ -109,7 +109,7 @@ namespace Application.Models.DataTables.KVK
         public decimal? TotalOutlayRs { get; set; }
         public string? Copi { get; set; }
         public int? BatchNo { get; set; }
-        public decimal Area { get; set; }
+        public decimal? Area { get; set; }
         public string? OrganizerBroucherFile { get; set; }
         public string? OrganizerInstitutionName { get; set; }
         public string? OrganizerInstitutionAddress { get; set; }
