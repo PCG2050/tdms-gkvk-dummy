@@ -100,11 +100,9 @@ namespace Application.Models
         [Required]
         public int UnitLocationId { get; set; }
 
-        [Required]
-        public DateOnly StartDate { get; set; }
+        public DateOnly? StartDate { get; set; }
 
-        [Required]
-        public DateOnly EndDate { get; set; }
+        public DateOnly? EndDate { get; set; }
 
         public int? CategoryId { get; set; }
         public string? OtherCategory { get; set; }
