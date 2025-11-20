@@ -50,7 +50,6 @@ namespace Domain.Entities.KVK
         [MaxLength(200)]
         public string? SponsoredOrganizationName { get; set; }
 
-        [Required]
         [MaxLength(250)]
         public string? Title { get; set; }
 
@@ -94,7 +93,8 @@ namespace Domain.Entities.KVK
         //this is for project dropdown it has to be linked to masterdata table
         public string? Copi { get; set; }
 
-
+        [MaxLength(500)]
+        public string? PiAddress { get; set; }
 
         [MaxLength(100)]
         public int? BatchNo { get; set; }
@@ -109,6 +109,12 @@ namespace Domain.Entities.KVK
         [JsonIgnore]
         public ParticipatedSource? Source { get; set; }
 
+        [MaxLength(500)]
+        public string? OtherSourceOfInformation { get; set; }
+
+        [MaxLength(500)]
+        public string? SourceOfTitle { get; set; }
+
         // Proposal details
         public DateTime? ProposalDate { get; set; }
         [MaxLength(500)]
@@ -118,9 +124,29 @@ namespace Domain.Entities.KVK
         [MaxLength(500)]
         public string? UniversitySanctionLetterUploadFile { get; set; }
 
+        public DateTime? ProjectSanctionDate { get; set; }
+        [MaxLength(500)]
+        public string? ProjectSanctionFile { get; set; }
+
+        public DateTime? UniImplDate { get; set; }
+        [MaxLength(500)]
+        public string? UniImplLetterFile { get; set; }
+
+        [MaxLength(100)]
+        public string? FundReleaseYear { get; set; }
+
+        public decimal? FundAmount { get; set; }
+
+        public DateTime? FundReleaseDate { get; set; }
+        [MaxLength(500)]
+        public string? FundReleaseFile { get; set; }
+
         public DateTime? FundsSanctionLetterDate { get; set; }
         [MaxLength(500)]
         public string? FundsSanctionLetterUploadFile { get; set; }
+
+        [MaxLength(500)]
+        public string? ReportingVideo { get; set; }
 
         public ICollection<KvkParticipantDemographics>? ParticipantDemographics { get; set; }
 
