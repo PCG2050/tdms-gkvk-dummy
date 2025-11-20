@@ -98,7 +98,7 @@ namespace WebApi.Controllers
                 // Map to simple DTO for dropdown
                 var dropdownItems = trainers.Select(t => new
                 {
-                    userId = t.Id,
+                    userId = t.UserId,
                     name = $"{t.FirstName} {t.LastName}".Trim(),
                     firstName = t.FirstName,
                     lastName = t.LastName
