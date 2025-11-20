@@ -355,7 +355,7 @@ namespace WebApi.Controllers.DataTables
         /// Solves the parent-child ID dependency - perfect for "Save & Next" button
         /// </summary>
         [HttpPost("with-children")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
         public async Task<IActionResult> CreateWithChildren([FromBody] TblServiceCreateDto dto)
         {
             var result = await _service.CreateWithChildrenAsync(dto);
@@ -386,7 +386,7 @@ namespace WebApi.Controllers.DataTables
         /// Perfect for "Save & Next" button with inline editing
         /// </summary>
         [HttpPut("{id}/with-children")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
         public async Task<IActionResult> UpdateWithChildren(int id, [FromBody] TblServiceWithChildrenUpdateDto dto)
         {
             var result = await _service.UpdateWithChildrenAsync(id, dto);
@@ -605,14 +605,16 @@ namespace WebApi.Controllers.DataTables
         /// </summary>
         /// <param name="pageNumber">Page number (default: 1)</param>
         /// <param name="pageSize">Items per page (default: 20)</param>
-        /// <response code="200">Paginated list of pending approvals</response>
+        /// <param name="createdByIdFilter">Optional: Filter by user who created the form (trainer/unit head)</param>
+        /// <response code="200">Paginated list of pending approvals with creator names</response>
         [HttpGet("pending-approvals")]
         [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
         public async Task<IActionResult> GetPendingApprovals(
             [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 10)
+            [FromQuery] int pageSize = 10,
+            [FromQuery] int? createdByIdFilter = null)
         {
-            var result = await _service.GetPendingApprovalsAsync(pageNumber, pageSize);
+            var result = await _service.GetPendingApprovalsAsync(pageNumber, pageSize, createdByIdFilter);
             return Ok(result);
         }
 

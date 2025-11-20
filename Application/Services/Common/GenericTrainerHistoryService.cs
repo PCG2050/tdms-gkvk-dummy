@@ -94,7 +94,8 @@ namespace Application.Services.Common
             Func<TEntity, int> getCreatedById,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
             int pageNumber = 1,
-            int pageSize = 10)
+            int pageSize = 10,
+            int? createdByIdFilter = null)
         {
             // Only Unit Heads and Admins can access this
             if (_currentUserService.Role != Role.UNITHEAD &&
@@ -122,13 +123,17 @@ namespace Application.Services.Common
                     .GetUnitLocationIdsByUnitHeadIdAsync(_currentUserService.UserId);
             }
 
+            // Include CreatedBy to get user names
+            var queryWithCreator = query.Include(x => x.CreatedBy);
+
             // Materialize data first
-            var allPendingData = await query.ToListAsync();
+            var allPendingData = await queryWithCreator.ToListAsync();
 
             // Filter in memory
             var filteredData = allPendingData
                 .Where(x => getFormStatus(x) == "Pending" &&
-                           unitLocationIds.Contains(getUnitLocationId(x)))
+                           unitLocationIds.Contains(getUnitLocationId(x)) &&
+                           (!createdByIdFilter.HasValue || getCreatedById(x) == createdByIdFilter.Value))
                 .ToList();
 
             var totalCount = filteredData.Count;
@@ -144,7 +149,10 @@ namespace Application.Services.Common
                     CreatedAt = x.CreatedAt,
                     UpdatedAt = x.UpdatedAt,
                     FormStatus = getFormStatus(x),
-                    CreatedById = getCreatedById(x)
+                    CreatedById = getCreatedById(x),
+                    CreatedByName = x.CreatedBy != null
+                        ? $"{x.CreatedBy.FirstName} {x.CreatedBy.LastName}".Trim()
+                        : "Unknown"
                 })
                 .ToList();
 
@@ -175,5 +183,6 @@ namespace Application.Services.Common
         public DateTimeOffset? UpdatedAt { get; set; }
         public string FormStatus { get; set; } = string.Empty;
         public int CreatedById { get; set; }
+        public string CreatedByName { get; set; } = string.Empty;
     }
 }
