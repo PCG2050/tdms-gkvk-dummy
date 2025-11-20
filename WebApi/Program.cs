@@ -3,6 +3,7 @@ using Application.Interface.Services.DataTables.FTI;
 using Application.Mapper.DataTable.FTI;
 using Infrastructure.Repository.DataTables.FTI;
 using Infrastructure.Services.DataTables.FTI;
+using Infrastructure.Services.DataTables.STU;
 
 namespace WebApi
 {

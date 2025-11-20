@@ -521,7 +521,7 @@ namespace Infrastructure.Services
                     FirstName = trainer.FirstName,
                     LastName = trainer.LastName,
                     Email = trainer.Email,                   
-                    Units = new List<TrainerUnitDto>() 
+                    Units = new List<TrainerUnitDto>() // Can be populated if needed
                 }).ToList();
         }
 

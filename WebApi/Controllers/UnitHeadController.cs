@@ -73,26 +73,6 @@ namespace WebApi.Controllers
             }
         }
 
-        //Get all trainers assigned to a specific unit location
-        [HttpGet("trainers/by-unit-location/{unitLocationId}")]
-        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
-        public async Task<IActionResult> GetTrainersByUnitLocation(int unitLocationId)
-        {
-            try
-            {
-                var trainers = await _userService.GetTrainersByUnitLocationAsync(unitLocationId);
-                return Ok(trainers);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return Forbid(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return Problem(detail: ex.Message, title: "An error occurred while retrieving trainers");
-            }
-        }
-
         [HttpPost]
         [Authorize(Roles = $"{RoleString.Admin},{RoleString.UnitHead}")]
         public async Task<IActionResult> RegisterUnitHead(UserRegisterDto registerDto)

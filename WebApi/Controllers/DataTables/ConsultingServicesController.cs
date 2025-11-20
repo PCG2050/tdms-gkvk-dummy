@@ -223,14 +223,12 @@ namespace WebApi.Controllers.DataTables
         [HttpGet("my-history")]
         [Authorize(Roles = RoleString.Trainer)]
         public async Task<IActionResult> GetMyHistory(
-        [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 10)
+     [FromQuery] int pageNumber = 1,
+     [FromQuery] int pageSize = 10)
         {
             var result = await _consultingServiceService.GetTrainerHistoryAsync(pageNumber, pageSize);
             return Ok(result);
         }
-
-
 
         [HttpGet("status-summary")]
         [Authorize(Roles = RoleString.Trainer)]
