@@ -1,5 +1,8 @@
 ﻿using Application.Interface;
 using Application.Interface.Repository;
+using Application.Interface.Repository.DataTables;
+using Application.Interface.Repository.DataTables.ConsultSocialMedia;
+using Application.Interface.Repository.DataTables.TblService;
 using Application.Models;
 
 using Domain.Entities.Enum;
@@ -11,11 +14,30 @@ namespace Infrastructure.Services
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignment;
         private readonly ICurrentUserService _currentUser;
         private readonly IUserRepository _userRepository;
-        public UnitHeadAssignmentService(IUnitHeadAssignmentRepository unitHeadAssignment, ICurrentUserService currentUser,IUserRepository userRepository)
+        private readonly ITableServiceRepository _tableServiceRepository;
+        private readonly IConsultingServiceRepository _consultingServiceRepository;
+        private readonly IPublicationRepository _publicationRepository;
+        private readonly INominationRewardRepository _nominationRewardRepository;
+        private readonly ITableOtherActivityRepository _tableOtherActivityRepository;
+
+        public UnitHeadAssignmentService(
+            IUnitHeadAssignmentRepository unitHeadAssignment,
+            ICurrentUserService currentUser,
+            IUserRepository userRepository,
+            ITableServiceRepository tableServiceRepository,
+            IConsultingServiceRepository consultingServiceRepository,
+            IPublicationRepository publicationRepository,
+            INominationRewardRepository nominationRewardRepository,
+            ITableOtherActivityRepository tableOtherActivityRepository)
         {
             _unitHeadAssignment = unitHeadAssignment;
             _userRepository = userRepository;
             _currentUser = currentUser;
+            _tableServiceRepository = tableServiceRepository;
+            _consultingServiceRepository = consultingServiceRepository;
+            _publicationRepository = publicationRepository;
+            _nominationRewardRepository = nominationRewardRepository;
+            _tableOtherActivityRepository = tableOtherActivityRepository;
         }
 
         //public async Task<ServiceResult<List<UnitHeadFlatDto>> GetAllUnitHeadsDetails()
@@ -49,10 +71,39 @@ namespace Infrastructure.Services
             var trainers = await _userRepository.GetTrainersCreatedByAsync(unitHeadId);
             var trainersCount = trainers.Count;
 
-            // TODO: Implement pending approvals and approved count when repository methods are available
-            // For now, returning 0 for these statistics
+            // Get status summaries from all data tables
             var pendingCount = 0;
-            var approvedThisMonth = 0;
+            var approvedCount = 0;
+
+            // TblService (Services table)
+            var tblServiceSummary = await _tableServiceRepository.GetStatusSummaryAsync(unitLocationIds);
+            pendingCount += tblServiceSummary.GetValueOrDefault("Pending", 0);
+            approvedCount += tblServiceSummary.GetValueOrDefault("Approved", 0);
+
+            // Consulting & Social Media Services
+            var consultingSummary = await _consultingServiceRepository.GetStatusSummaryAsync(unitLocationIds);
+            pendingCount += consultingSummary.GetValueOrDefault("Pending", 0);
+            approvedCount += consultingSummary.GetValueOrDefault("Approved", 0);
+
+            // Publications
+            var publicationSummary = await _publicationRepository.GetStatusSummaryAsync(unitLocationIds);
+            pendingCount += publicationSummary.GetValueOrDefault("Pending", 0);
+            approvedCount += publicationSummary.GetValueOrDefault("Approved", 0);
+
+            // Nominations & Rewards
+            var nominationSummary = await _nominationRewardRepository.GetStatusSummaryAsync(unitLocationIds);
+            pendingCount += nominationSummary.GetValueOrDefault("Pending", 0);
+            approvedCount += nominationSummary.GetValueOrDefault("Approved", 0);
+
+            // Other Activities
+            var otherActivitySummary = await _tableOtherActivityRepository.GetStatusSummaryAsync(unitLocationIds);
+            pendingCount += otherActivitySummary.GetValueOrDefault("Pending", 0);
+            approvedCount += otherActivitySummary.GetValueOrDefault("Approved", 0);
+
+            // NOTE: approvedCount is total approved, not filtered by month
+            // To get approved this month, we would need to query each repository separately
+            // For now, returning total approved count
+            var approvedThisMonth = approvedCount; // TODO: Filter by current month
 
             var statistics = new UnitHeadStatisticsDto
             {
