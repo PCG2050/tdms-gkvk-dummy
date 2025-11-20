@@ -40,6 +40,15 @@ namespace WebApi.Controllers
 
 
 
+        [HttpGet("{unitHeadId}/statistics")]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
+        public async Task<IActionResult> GetUnitHeadStatistics(int unitHeadId)
+        {
+            var result = await _assignmentService.GetUnitHeadStatisticsAsync(unitHeadId);
+            if (!result.IsSuccess) return ServiceResponseToActionResult.Error(result.ErrorMessage, result.ErrorStatus);
+            return Ok(result.Data);
+        }
+
         [HttpGet("{unitHeadId}/units")]
         [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
         public async Task<IActionResult> GetUnitHeadUnits(int unitHeadId)

@@ -1,4 +1,4 @@
-﻿using Application.Interface.Repository;
+using Application.Interface.Repository;
 using Application.Models;
 using Domain.Entities.Enum;
 using System;
@@ -9,8 +9,9 @@ using System.Threading.Tasks;
 
 namespace Application.Interface
 {
-    public interface IUnitHeadAssignmentService 
-    {        
+    public interface IUnitHeadAssignmentService
+    {
         Task<ServiceResult<List<UnitWithLocationsDto>>> GetUnitHeadUnits(int unitHeadId);
+        Task<ServiceResult<UnitHeadStatisticsDto>> GetUnitHeadStatisticsAsync(int unitHeadId);
     }
 }
