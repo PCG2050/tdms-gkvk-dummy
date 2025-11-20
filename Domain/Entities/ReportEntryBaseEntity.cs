@@ -6,8 +6,8 @@ namespace Domain.Entities
 {
     public abstract class ReportEntryBaseEntity:AuditableBaseEntity
     {
-        public DateOnly StartDate { get; set; }
-        public DateOnly EndDate { get; set; }
+        public DateOnly? StartDate { get; set; }
+        public DateOnly? EndDate { get; set; }
         public string? Attachements { get; set; } = null; 
         [Required]
         public int UnitLocationId {  get; set; }

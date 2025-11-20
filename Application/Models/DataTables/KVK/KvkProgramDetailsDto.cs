@@ -12,8 +12,8 @@ namespace Application.Models.DataTables.KVK
         public int Id { get; set; }
         public int UnitLocationId { get; set; }
         public int OrganizationId { get; set; }
-        public DateOnly StartDate { get; set; }
-        public DateOnly EndDate { get; set; }
+        public DateOnly? StartDate { get; set; }
+        public DateOnly? EndDate { get; set; }
         public int? ProgramTypeId { get; set; }
         public string? ProgramTypeName { get; set; }
         public int? CategoryId { get; set; }
@@ -95,8 +95,8 @@ namespace Application.Models.DataTables.KVK
     {
         [Required]
         public int UnitLocationId { get; set; }
-        public DateOnly StartDate { get; set; }
-        public DateOnly EndDate { get; set; }
+        public DateOnly? StartDate { get; set; }
+        public DateOnly? EndDate { get; set; }
         public int? ProgramTypeId { get; set; }
         public int? CategoryId { get; set; }
         public string? CategoryOther { get; set; }
