@@ -120,10 +120,10 @@ namespace Application.Models
 
         public string? Component { get; set; }
         public int? QuantityUnitId { get; set; }
-        public int Number { get; set; } = 0;
+        public int? Number { get; set; }
 
-        public decimal AmountGenerated { get; set; } = 0;
-        public decimal AmountReleased { get; set; } = 0;
+        public decimal? AmountGenerated { get; set; }
+        public decimal? AmountReleased { get; set; }
 
         public DateOnly? Date { get; set; }
         public string? RentedTo { get; set; }
@@ -237,10 +237,10 @@ namespace Application.Models
 
     public class RevolvingFundStatusCreateDto
     {
-        public decimal OpeningBalance { get; set; }
-        public int Receipt { get; set; }
-        public decimal Expenditure { get; set; }
-        public double ClosingBalance { get; set; }
+        public decimal? OpeningBalance { get; set; }
+        public int? Receipt { get; set; }
+        public decimal? Expenditure { get; set; }
+        public double? ClosingBalance { get; set; }
     }
 
 
