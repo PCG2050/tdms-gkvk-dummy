@@ -1,5 +1,6 @@
 ﻿// Application/Interface/Services/DataTables/IStuProgramService.cs
 
+using Application.Models;
 using Application.Models.DataTables.DEU;
 using Application.Services.Common;
 
@@ -82,9 +83,44 @@ namespace Application.Interface.Services.DataTables.STU
         Task<PaginatedResult<StuProgramDetailsDto>> GetByStatusAsync(
             string status,
             int pageNumber = 1,
-            int pageSize = 10);
+            int pageSize = 10,
+            int? unitLocationId = null,
+            int? trainerId = null);
 
         Task<Dictionary<string, int>> GetStatusSummaryAsync();
+
+        /// <summary>
+        /// Update pending program by Unit Head with auto-approval
+        /// </summary>
+        Task<ServiceResult<StuProgramDetailsDto>> UpdatePendingProgramByUnitHeadAsync(int id, StuProgramUpdateDto dto);
+
+        /// <summary>
+        /// Get trainers assigned to a specific unit location
+        /// </summary>
+        Task<ServiceResult<List<UserBasicDto>>> GetTrainersByUnitLocationAsync(int unitLocationId);
+
+        /// <summary>
+        /// Get forms created by a specific trainer
+        /// </summary>
+        Task<PaginatedResult<StuProgramDetailsDto>> GetFormsByTrainerAsync(
+            int trainerId,
+            int pageNumber = 1,
+            int pageSize = 10);
+
+        /// <summary>
+        /// Get history with filters (own or trainer history)
+        /// </summary>
+        Task<PaginatedResult<StuProgramDetailsDto>> GetHistoryAsync(
+            string historyType,
+            int pageNumber = 1,
+            int pageSize = 10,
+            int? userId = null,
+            int? unitLocationId = null);
+
+        /// <summary>
+        /// Get users (trainers and unit heads) for a specific unit location
+        /// </summary>
+        Task<ServiceResult<List<UserBasicDto>>> GetUsersByUnitLocationAsync(int unitLocationId);
 
         /// <summary>
         /// Get trainer's submission history with pagination

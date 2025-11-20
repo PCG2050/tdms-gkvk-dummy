@@ -347,9 +347,11 @@ namespace WebApi.Controllers.DataTables.DEU
         public async Task<IActionResult> GetByStatus(
             string status,
             [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 10)
+            [FromQuery] int pageSize = 10,
+            [FromQuery] int? unitLocationId = null,
+            [FromQuery] int? trainerId = null)
         {
-            var result = await _service.GetByStatusAsync(status, pageNumber, pageSize);
+            var result = await _service.GetByStatusAsync(status, pageNumber, pageSize, unitLocationId, trainerId);
             return Ok(result);
         }
 
@@ -358,6 +360,53 @@ namespace WebApi.Controllers.DataTables.DEU
         {
             var result = await _service.GetStatusSummaryAsync();
             return Ok(result);
+        }
+
+        // ============================
+        // UNIT HEAD OPERATIONS
+        // ============================
+
+        [HttpPut("{id}/unit-head-edit")]
+        public async Task<IActionResult> UpdatePendingProgramByUnitHead(int id, [FromBody] DeuProgramUpdateDto dto)
+        {
+            var result = await _service.UpdatePendingProgramByUnitHeadAsync(id, dto);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
+        [HttpGet("unit-location/{unitLocationId}/trainers")]
+        public async Task<IActionResult> GetTrainersByUnitLocation(int unitLocationId)
+        {
+            var result = await _service.GetTrainersByUnitLocationAsync(unitLocationId);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
+        [HttpGet("trainer/{trainerId}/forms")]
+        public async Task<IActionResult> GetFormsByTrainer(
+            int trainerId,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10)
+        {
+            var result = await _service.GetFormsByTrainerAsync(trainerId, pageNumber, pageSize);
+            return Ok(result);
+        }
+
+        [HttpGet("history")]
+        public async Task<IActionResult> GetHistory(
+            [FromQuery] string historyType,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] int? userId = null,
+            [FromQuery] int? unitLocationId = null)
+        {
+            var result = await _service.GetHistoryAsync(historyType, pageNumber, pageSize, userId, unitLocationId);
+            return Ok(result);
+        }
+
+        [HttpGet("unit-location/{unitLocationId}/users")]
+        public async Task<IActionResult> GetUsersByUnitLocation(int unitLocationId)
+        {
+            var result = await _service.GetUsersByUnitLocationAsync(unitLocationId);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
         // ============================

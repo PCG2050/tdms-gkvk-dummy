@@ -19,6 +19,7 @@ namespace Infrastructure.Services.DataTables.EEU
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
+        private readonly IUserRepository _userRepository;
 
         public StuProgramService(
             IStuProgramDetailsRepository programRepository,
@@ -35,7 +36,8 @@ namespace Infrastructure.Services.DataTables.EEU
             StuProgramMapper mapper,
             IOrganizationUnitRepository organizationUnitRepository,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
-            ITrainerAssignmentRepository trainerAssignmentRepository)
+            ITrainerAssignmentRepository trainerAssignmentRepository,
+            IUserRepository userRepository)
         {
             _programRepository = programRepository;
             _demographicsRepository = demographicsRepository;
@@ -52,6 +54,7 @@ namespace Infrastructure.Services.DataTables.EEU
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
+            _userRepository = userRepository;
         }
 
         // ============================
@@ -70,7 +73,18 @@ namespace Infrastructure.Services.DataTables.EEU
             program.OrganizationId = _currentUserService.OrganizationId;
             program.CreatedById = _currentUserService.UserId;
             program.CreatedAt = DateTimeOffset.UtcNow;
-            program.FormStatus = "Draft";
+
+            // Auto-approve if Unit Head creates the form
+            if (_currentUserService.Role == Role.UNITHEAD)
+            {
+                program.FormStatus = "Approved";
+                program.ApprovedById = _currentUserService.UserId;
+                program.ApprovedAt = DateTimeOffset.UtcNow;
+            }
+            else
+            {
+                program.FormStatus = "Draft";
+            }
 
             await _programRepository.CreateAsync(program);
 
@@ -1167,6 +1181,48 @@ namespace Infrastructure.Services.DataTables.EEU
             return ServiceResult.Success();
         }
 
+        public async Task<ServiceResult<StuProgramDetailsDto>> UpdatePendingProgramByUnitHeadAsync(int id, StuProgramUpdateDto dto)
+        {
+            var program = await _programRepository.GetWithDetailsAsync(id);
+
+            if (program == null)
+                return ServiceResult<StuProgramDetailsDto>.Failure(
+                    "Program not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            // Only UnitHead can edit pending programs
+            if (_currentUserService.Role != Role.UNITHEAD)
+                return ServiceResult<StuProgramDetailsDto>.Failure(
+                    "Only Unit Heads can edit pending programs",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult<StuProgramDetailsDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            if (program.FormStatus != "Pending")
+                return ServiceResult<StuProgramDetailsDto>.Failure(
+                    "Only pending programs can be edited by Unit Head",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            StuProgramMapper.MapUpdateDtoToEntity(dto, program);
+            program.UpdatedById = _currentUserService.UserId;
+            program.UpdatedAt = DateTimeOffset.UtcNow;
+
+            // Auto-approve after Unit Head edits
+            program.FormStatus = "Approved";
+            program.ApprovedById = _currentUserService.UserId;
+            program.ApprovedAt = DateTimeOffset.UtcNow;
+
+            await _programRepository.UpdateAsync(program);
+
+            var updatedProgram = await _programRepository.GetWithDetailsAsync(id);
+            var resultDto = _mapper.MapToDtoWithDetails(updatedProgram!);
+
+            return ServiceResult<StuProgramDetailsDto>.Success(resultDto);
+        }
+
         // ============================
         // PAGINATION & FILTERING
         // ============================
@@ -1225,6 +1281,192 @@ namespace Infrastructure.Services.DataTables.EEU
         {
             var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
             return await _programRepository.GetStatusSummaryAsync(unitLocationIds);
+        }
+
+        public async Task<PaginatedResult<StuProgramDetailsDto>> GetByStatusAsync(
+            string status,
+            int pageNumber = 1,
+            int pageSize = 10,
+            int? unitLocationId = null,
+            int? trainerId = null)
+        {
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+
+            // Filter by specific unit location if provided
+            if (unitLocationId.HasValue && unitLocationIds.Contains(unitLocationId.Value))
+            {
+                unitLocationIds = new List<int> { unitLocationId.Value };
+            }
+
+            // Get the results
+            var result = await _programRepository.GetByStatusAsync(unitLocationIds, status, pageNumber, pageSize);
+
+            // Filter by trainerId if provided
+            if (trainerId.HasValue)
+            {
+                result = new PaginatedResult<StuProgramDetails>(
+                    result.Items.Where(p => p.CreatedById == trainerId.Value).ToList(),
+                    result.Items.Count(p => p.CreatedById == trainerId.Value),
+                    pageNumber,
+                    pageSize);
+            }
+
+            var dtos = result.Items.Select(p => _mapper.MapToDtoWithDetails(p)).ToList();
+
+            return new PaginatedResult<StuProgramDetailsDto>(
+                dtos,
+                result.TotalItems,
+                result.PageNumber,
+                result.PageSize);
+        }
+
+        public async Task<ServiceResult<List<UserBasicDto>>> GetTrainersByUnitLocationAsync(int unitLocationId)
+        {
+            // Verify access to unit location
+            if (!await CanUserAccessUnitLocationAsync(unitLocationId))
+                return ServiceResult<List<UserBasicDto>>.Failure(
+                    "Access denied to this unit location",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            // Get trainer IDs for this unit location
+            var trainerIds = await _trainerAssignmentRepository.GetTrainerIdsByUnitLocationIdAsync(unitLocationId);
+
+            if (trainerIds == null || !trainerIds.Any())
+                return ServiceResult<List<UserBasicDto>>.Success(new List<UserBasicDto>());
+
+            // Get trainer details
+            var trainers = await _userRepository.GetUsersByIdsAsync(trainerIds);
+
+            var trainerDtos = trainers.Select(t => new UserBasicDto
+            {
+                Id = t.Id,
+                Name = t.Name,
+                Email = t.Email
+            }).ToList();
+
+            return ServiceResult<List<UserBasicDto>>.Success(trainerDtos);
+        }
+
+        public async Task<PaginatedResult<StuProgramDetailsDto>> GetFormsByTrainerAsync(
+            int trainerId,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            // Verify the trainer is in one of the accessible unit locations
+            var trainerUnitLocations = await _trainerAssignmentRepository.GetUnitLocationIdsByTrainerIdAsync(trainerId);
+            var accessibleUnitLocations = await GetAccessibleUnitLocationIdsAsync();
+            var commonLocations = trainerUnitLocations.Intersect(accessibleUnitLocations).ToList();
+
+            if (!commonLocations.Any())
+                return new PaginatedResult<StuProgramDetailsDto>(
+                    new List<StuProgramDetailsDto>(),
+                    0,
+                    pageNumber,
+                    pageSize);
+
+            // Get forms created by this trainer
+            var result = await _programRepository.GetPaginatedAsync(
+                commonLocations,
+                pageNumber,
+                pageSize,
+                null,
+                null,
+                null,
+                null);
+
+            // Filter by trainer ID
+            var trainerForms = result.Items.Where(p => p.CreatedById == trainerId).ToList();
+            var dtos = trainerForms.Select(p => _mapper.MapToDtoWithDetails(p)).ToList();
+
+            return new PaginatedResult<StuProgramDetailsDto>(
+                dtos,
+                trainerForms.Count,
+                pageNumber,
+                pageSize);
+        }
+
+        public async Task<PaginatedResult<StuProgramDetailsDto>> GetHistoryAsync(
+            string historyType,
+            int pageNumber = 1,
+            int pageSize = 10,
+            int? userId = null,
+            int? unitLocationId = null)
+        {
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+
+            // Filter by specific unit location if provided
+            if (unitLocationId.HasValue && unitLocationIds.Contains(unitLocationId.Value))
+            {
+                unitLocationIds = new List<int> { unitLocationId.Value };
+            }
+
+            var result = await _programRepository.GetPaginatedAsync(
+                unitLocationIds,
+                pageNumber,
+                pageSize,
+                null,
+                null,
+                null,
+                null);
+
+            List<StuProgramDetails> filteredItems;
+
+            if (historyType.ToLower() == "own")
+            {
+                // Show forms created by the specified user (or current user if not specified)
+                var targetUserId = userId ?? _currentUserService.UserId;
+                filteredItems = result.Items.Where(p => p.CreatedById == targetUserId).ToList();
+            }
+            else if (historyType.ToLower() == "trainer" || historyType.ToLower() == "approved")
+            {
+                // Show forms approved or rejected by the specified user (or current user if not specified)
+                var targetUserId = userId ?? _currentUserService.UserId;
+                filteredItems = result.Items.Where(p =>
+                    p.ApprovedById == targetUserId &&
+                    (p.FormStatus == "Approved" || p.FormStatus == "Rejected"))
+                    .ToList();
+            }
+            else
+            {
+                filteredItems = result.Items.ToList();
+            }
+
+            var dtos = filteredItems.Select(p => _mapper.MapToDtoWithDetails(p)).ToList();
+
+            return new PaginatedResult<StuProgramDetailsDto>(
+                dtos,
+                filteredItems.Count,
+                pageNumber,
+                pageSize);
+        }
+
+        public async Task<ServiceResult<List<UserBasicDto>>> GetUsersByUnitLocationAsync(int unitLocationId)
+        {
+            // Verify access to unit location
+            if (!await CanUserAccessUnitLocationAsync(unitLocationId))
+                return ServiceResult<List<UserBasicDto>>.Failure(
+                    "Access denied to this unit location",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            // Get both trainers and unit heads for this location
+            var trainerIds = await _trainerAssignmentRepository.GetTrainerIdsByUnitLocationIdAsync(unitLocationId);
+            var unitHeadIds = await _unitHeadAssignmentRepository.GetUnitLocationIdsByUnitHeadIdAsync(_currentUserService.UserId);
+
+            var allUserIds = new List<int>();
+            if (trainerIds != null) allUserIds.AddRange(trainerIds);
+
+            // Get unit heads assigned to this location by checking all unit heads
+            var allUsers = await _userRepository.GetUsersByOrganizationAndRoleAsync(_currentUserService.OrganizationId, Role.TRAINER);
+            allUsers.AddRange(await _userRepository.GetUsersByOrganizationAndRoleAsync(_currentUserService.OrganizationId, Role.UNITHEAD));
+
+            var userDtos = allUsers.Where(u => allUserIds.Contains(u.Id)).Select(u => new UserBasicDto
+            {
+                Id = u.Id,
+                Name = u.Name,
+                Email = u.Email
+            }).ToList();
+
+            return ServiceResult<List<UserBasicDto>>.Success(userDtos);
         }
 
         // ============================
