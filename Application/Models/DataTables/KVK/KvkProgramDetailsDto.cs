@@ -48,7 +48,7 @@ namespace Application.Models.DataTables.KVK
         public string? Copi { get; set; }
         public string? PiAddress { get; set; }
         public int? BatchNo { get; set; }
-        public decimal Area { get; set; }
+        public int? Area { get; set; }
         public string? OrganizerBroucherFile { get; set; }
         public string? OrganizerInstitutionName { get; set; }
         public string? OrganizerInstitutionAddress { get; set; }
@@ -56,19 +56,19 @@ namespace Application.Models.DataTables.KVK
         public string? SourceName { get; set; }
         public string? OtherSourceOfInformation { get; set; }
         public string? SourceOfTitle { get; set; }
-        public DateTime? ProposalDate { get; set; }
+        public DateOnly? ProposalDate { get; set; }
         public string? ProposalUploadFile { get; set; }
-        public DateTime? UniversitySanctionLetterDate { get; set; }
+        public DateOnly? UniversitySanctionLetterDate { get; set; }
         public string? UniversitySanctionLetterUploadFile { get; set; }
-        public DateTime? ProjectSanctionDate { get; set; }
+        public DateOnly? ProjectSanctionDate { get; set; }
         public string? ProjectSanctionFile { get; set; }
-        public DateTime? UniImplDate { get; set; }
+        public DateOnly? UniImplDate { get; set; }
         public string? UniImplLetterFile { get; set; }
         public string? FundReleaseYear { get; set; }
-        public decimal? FundAmount { get; set; }
-        public DateTime? FundReleaseDate { get; set; }
+        public double? FundAmount { get; set; }
+        public DateOnly? FundReleaseDate { get; set; }
         public string? FundReleaseFile { get; set; }
-        public DateTime? FundsSanctionLetterDate { get; set; }
+        public DateOnly? FundsSanctionLetterDate { get; set; }
         public string? FundsSanctionLetterUploadFile { get; set; }
         public string? ReportingVideo { get; set; }
         public string? Attachements { get; set; }
@@ -122,26 +122,26 @@ namespace Application.Models.DataTables.KVK
         public string? Copi { get; set; }
         public string? PiAddress { get; set; }
         public int? BatchNo { get; set; }
-        public decimal Area { get; set; }
+        public int? Area { get; set; }
         public string? OrganizerBroucherFile { get; set; }
         public string? OrganizerInstitutionName { get; set; }
         public string? OrganizerInstitutionAddress { get; set; }
         public int? SourceId { get; set; }
         public string? OtherSourceOfInformation { get; set; }
         public string? SourceOfTitle { get; set; }
-        public DateTime? ProposalDate { get; set; }
+        public DateOnly? ProposalDate { get; set; }
         public string? ProposalUploadFile { get; set; }
-        public DateTime? UniversitySanctionLetterDate { get; set; }
+        public DateOnly? UniversitySanctionLetterDate { get; set; }
         public string? UniversitySanctionLetterUploadFile { get; set; }
-        public DateTime? ProjectSanctionDate { get; set; }
+        public DateOnly? ProjectSanctionDate { get; set; }
         public string? ProjectSanctionFile { get; set; }
-        public DateTime? UniImplDate { get; set; }
+        public DateOnly? UniImplDate { get; set; }
         public string? UniImplLetterFile { get; set; }
         public string? FundReleaseYear { get; set; }
-        public decimal? FundAmount { get; set; }
-        public DateTime? FundReleaseDate { get; set; }
+        public double? FundAmount { get; set; }
+        public DateOnly? FundReleaseDate { get; set; }
         public string? FundReleaseFile { get; set; }
-        public DateTime? FundsSanctionLetterDate { get; set; }
+        public DateOnly? FundsSanctionLetterDate { get; set; }
         public string? FundsSanctionLetterUploadFile { get; set; }
         public string? ReportingVideo { get; set; }
         public string? Attachements { get; set; }
@@ -177,26 +177,26 @@ namespace Application.Models.DataTables.KVK
         public string? Copi { get; set; }
         public string? PiAddress { get; set; }
         public int? BatchNo { get; set; }
-        public decimal? Area { get; set; }
+        public int? Area { get; set; }
         public string? OrganizerBroucherFile { get; set; }
         public string? OrganizerInstitutionName { get; set; }
         public string? OrganizerInstitutionAddress { get; set; }
         public int? SourceId { get; set; }
         public string? OtherSourceOfInformation { get; set; }
         public string? SourceOfTitle { get; set; }
-        public DateTime? ProposalDate { get; set; }
+        public DateOnly? ProposalDate { get; set; }
         public string? ProposalUploadFile { get; set; }
-        public DateTime? UniversitySanctionLetterDate { get; set; }
+        public DateOnly? UniversitySanctionLetterDate { get; set; }
         public string? UniversitySanctionLetterUploadFile { get; set; }
-        public DateTime? ProjectSanctionDate { get; set; }
+        public DateOnly? ProjectSanctionDate { get; set; }
         public string? ProjectSanctionFile { get; set; }
-        public DateTime? UniImplDate { get; set; }
+        public DateOnly? UniImplDate { get; set; }
         public string? UniImplLetterFile { get; set; }
         public string? FundReleaseYear { get; set; }
-        public decimal? FundAmount { get; set; }
-        public DateTime? FundReleaseDate { get; set; }
+        public double? FundAmount { get; set; }
+        public DateOnly? FundReleaseDate { get; set; }
         public string? FundReleaseFile { get; set; }
-        public DateTime? FundsSanctionLetterDate { get; set; }
+        public DateOnly? FundsSanctionLetterDate { get; set; }
         public string? FundsSanctionLetterUploadFile { get; set; }
         public string? ReportingVideo { get; set; }
         public string? Attachements { get; set; }
@@ -373,7 +373,7 @@ namespace Application.Models.DataTables.KVK
         public int? TypeOfAidId { get; set; }
         public string? OtherTypeOfAid { get; set; }
         public string? Purpose { get; set; }
-        public int Number { get; set; }
+        public int? Number { get; set; }
     }
 
     /// <summary>
@@ -460,7 +460,7 @@ namespace Application.Models.DataTables.KVK
         public string? TypeOfAidName { get; set; }
         public string? OtherTypeOfAid { get; set; }
         public string? Purpose { get; set; }
-        public int Number { get; set; }
+        public int? Number { get; set; }
     }
 
     public class KvkTeachingAidsCreateDto
@@ -468,7 +468,7 @@ namespace Application.Models.DataTables.KVK
         public int? TypeOfAidId { get; set; }
         public string? OtherTypeOfAid { get; set; }
         public string? Purpose { get; set; }
-        public int Number { get; set; }
+        public int? Number { get; set; }
     }
 
     public class KvkTeachingAidsUpdateDto : IUpdateDto
@@ -477,7 +477,7 @@ namespace Application.Models.DataTables.KVK
         public int? TypeOfAidId { get; set; }
         public string? OtherTypeOfAid { get; set; }
         public string? Purpose { get; set; }
-        public int Number { get; set; }
+        public int? Number { get; set; }
     }
 
     // ============================

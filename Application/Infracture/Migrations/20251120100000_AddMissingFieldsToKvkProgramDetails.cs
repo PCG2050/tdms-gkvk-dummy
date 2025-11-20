@@ -22,6 +22,43 @@ namespace Infrastructure.Migrations
                 oldType: "nvarchar(250)",
                 oldMaxLength: 250);
 
+            // Modify Area from decimal to int
+            migrationBuilder.AlterColumn<int>(
+                name: "Area",
+                table: "KvkProgramDetails",
+                type: "int",
+                nullable: true,
+                oldClrType: typeof(decimal),
+                oldType: "decimal(18,2)");
+
+            // Modify date fields from DateTime to DateOnly
+            migrationBuilder.AlterColumn<DateOnly>(
+                name: "ProposalDate",
+                table: "KvkProgramDetails",
+                type: "date",
+                nullable: true,
+                oldClrType: typeof(DateTime),
+                oldType: "datetime2",
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<DateOnly>(
+                name: "UniversitySanctionLetterDate",
+                table: "KvkProgramDetails",
+                type: "date",
+                nullable: true,
+                oldClrType: typeof(DateTime),
+                oldType: "datetime2",
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<DateOnly>(
+                name: "FundsSanctionLetterDate",
+                table: "KvkProgramDetails",
+                type: "date",
+                nullable: true,
+                oldClrType: typeof(DateTime),
+                oldType: "datetime2",
+                oldNullable: true);
+
             // Add new fields
             migrationBuilder.AddColumn<string>(
                 name: "PiAddress",
@@ -44,10 +81,10 @@ namespace Infrastructure.Migrations
                 maxLength: 500,
                 nullable: true);
 
-            migrationBuilder.AddColumn<DateTime>(
+            migrationBuilder.AddColumn<DateOnly>(
                 name: "ProjectSanctionDate",
                 table: "KvkProgramDetails",
-                type: "datetime2",
+                type: "date",
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
@@ -57,10 +94,10 @@ namespace Infrastructure.Migrations
                 maxLength: 500,
                 nullable: true);
 
-            migrationBuilder.AddColumn<DateTime>(
+            migrationBuilder.AddColumn<DateOnly>(
                 name: "UniImplDate",
                 table: "KvkProgramDetails",
-                type: "datetime2",
+                type: "date",
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
@@ -77,16 +114,16 @@ namespace Infrastructure.Migrations
                 maxLength: 100,
                 nullable: true);
 
-            migrationBuilder.AddColumn<decimal>(
+            migrationBuilder.AddColumn<double>(
                 name: "FundAmount",
                 table: "KvkProgramDetails",
-                type: "decimal(18,2)",
+                type: "float",
                 nullable: true);
 
-            migrationBuilder.AddColumn<DateTime>(
+            migrationBuilder.AddColumn<DateOnly>(
                 name: "FundReleaseDate",
                 table: "KvkProgramDetails",
-                type: "datetime2",
+                type: "date",
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
@@ -155,6 +192,44 @@ namespace Infrastructure.Migrations
             migrationBuilder.DropColumn(
                 name: "ReportingVideo",
                 table: "KvkProgramDetails");
+
+            // Restore date fields to DateTime
+            migrationBuilder.AlterColumn<DateTime>(
+                name: "ProposalDate",
+                table: "KvkProgramDetails",
+                type: "datetime2",
+                nullable: true,
+                oldClrType: typeof(DateOnly),
+                oldType: "date",
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<DateTime>(
+                name: "UniversitySanctionLetterDate",
+                table: "KvkProgramDetails",
+                type: "datetime2",
+                nullable: true,
+                oldClrType: typeof(DateOnly),
+                oldType: "date",
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<DateTime>(
+                name: "FundsSanctionLetterDate",
+                table: "KvkProgramDetails",
+                type: "datetime2",
+                nullable: true,
+                oldClrType: typeof(DateOnly),
+                oldType: "date",
+                oldNullable: true);
+
+            // Restore Area to decimal
+            migrationBuilder.AlterColumn<decimal>(
+                name: "Area",
+                table: "KvkProgramDetails",
+                type: "decimal(18,2)",
+                nullable: false,
+                oldClrType: typeof(int),
+                oldType: "int",
+                oldNullable: true);
 
             // Restore Required constraint on Title
             migrationBuilder.AlterColumn<string>(
