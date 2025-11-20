@@ -416,7 +416,7 @@ namespace Infrastructure.Services.DataTables
 
                 // Step 6: Get complete entity with all children and return
                 var completeEntity = await _tableServiceRepository.GetWithDetailsAsync(serviceId);
-                return ServiceResult<TblServicesDto>.Success(_mapper.MapToDto(completeEntity));
+                return ServiceResult<TblServicesDto>.Success(_mapper.MapToDtoWithDetails(completeEntity!));
             }
             catch (Exception ex)
             {
@@ -612,7 +612,7 @@ namespace Infrastructure.Services.DataTables
 
                 // Step 8: Get complete entity with all children and return
                 var completeEntity = await _tableServiceRepository.GetWithDetailsAsync(serviceId);
-                return ServiceResult<TblServicesDto>.Success(_mapper.MapToDto(completeEntity));
+                return ServiceResult<TblServicesDto>.Success(_mapper.MapToDtoWithDetails(completeEntity!));
             }
             catch (Exception ex)
             {
