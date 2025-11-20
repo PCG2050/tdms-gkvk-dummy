@@ -1,4 +1,4 @@
-﻿
+using Domain.Entities.Enum;
 
 namespace Application.Models
 {
@@ -10,6 +10,42 @@ namespace Application.Models
 
         // Reuse your existing DTO with all trainer details & assigned locations
         public TrainerWithAssignmentsDto TrainerDetails { get; set; } = default!;
+    }
+
+    /// <summary>
+    /// Unified login response for both Trainers and Unit Heads
+    /// Includes user role and assignment details
+    /// </summary>
+    public class UnifiedLoginResponseDto
+    {
+        public string AccessToken { get; set; } = default!;
+        public string RefreshToken { get; set; } = default!;
+        public string UserRole { get; set; } = default!;
+        public UserDetailsDto UserDetails { get; set; } = default!;
+    }
+
+    /// <summary>
+    /// User details with assignments (works for both Trainer and UnitHead)
+    /// </summary>
+    public class UserDetailsDto
+    {
+        public int UserId { get; set; }
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
+        public Gender Gender { get; set; }
+        public EmployementType EmployementType { get; set; }
+        public DateOnly DateOfBirth { get; set; }
+        public DateOnly DateOfJoining { get; set; }
+        public bool IsDeactivated { get; set; }
+        public string? Qualification { get; set; }
+
+        // List of currently assigned location IDs
+        public List<int> AssignedLocationIds { get; set; } = new List<int>();
+
+        // Detailed location information
+        public List<UnitLocationDetailsDto> UnitLocationDetails { get; set; } = new List<UnitLocationDetailsDto>();
     }
 
 

@@ -10,14 +10,21 @@ namespace WebApi.Controllers
         private readonly ICurrentUserService _currentUserService;
         private readonly IUserRepository _userRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
-        
+        private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
 
-        public AuthController(IAuthService authService, ICurrentUserService currentUserService,IUserRepository userRepository, ITrainerAssignmentRepository trainerAssignmentRepository)
+
+        public AuthController(
+            IAuthService authService,
+            ICurrentUserService currentUserService,
+            IUserRepository userRepository,
+            ITrainerAssignmentRepository trainerAssignmentRepository,
+            IUnitHeadAssignmentRepository unitHeadAssignmentRepository)
         {
             _authService = authService;
             _currentUserService = currentUserService;
             _userRepository = userRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
+            _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
         }
         /// <summary>
         /// Authenticate user and create session with device tracking
@@ -52,7 +59,8 @@ namespace WebApi.Controllers
         }
 
         /// <summary>
-        /// Trainer-specific login that returns unit assignments along with tokens
+        /// Unified login for Trainers and Unit Heads that returns unit assignments along with tokens
+        /// Returns user role and assignment details in the response
         /// </summary>
         [HttpPost("trainer-login")]
         public async Task<IActionResult> TrainerLogin(LoginRequestDto request)
@@ -64,34 +72,56 @@ namespace WebApi.Controllers
                 // First, perform regular authentication
                 var tokenResponse = await _authService.LoginAsync(request, deviceInfo);
 
-                // Verify trainer
+                // Verify user
                 var user = await _userRepository.GetByEmailAsync(request.Email);
                 if (user == null)
                     return Unauthorized(new { message = "Invalid credentials" });
 
-                if (user.Role != Role.TRAINER)
-                    return Unauthorized(new { message = "This endpoint is only for trainers" });
+                // Verify user is either Trainer or UnitHead
+                if (user.Role != Role.TRAINER && user.Role != Role.UNITHEAD)
+                    return Unauthorized(new { message = "This endpoint is only for trainers and unit heads" });
 
-              
-                var assignments = await _trainerAssignmentRepository.GetByTrainerIdAsync(user.Id);
+                List<UnitLocationDetailsDto> unitLocationDetails;
+                List<int> assignedLocationIds;
 
-              
-                var unitLocationDetails = assignments.Select(a => new UnitLocationDetailsDto
+                // Get assignments based on role
+                if (user.Role == Role.TRAINER)
                 {
-                    UnitLocationId = a.UnitLocationId,
-                    UnitId = a.UnitLocation.Unit.Id,
-                    UnitName = a.UnitLocation.Unit.Name,
-                    OrganizationId = a.UnitLocation.OrganizationId,
-                    StateId = a.UnitLocation.District.State.Id,
-                    StateName = a.UnitLocation.District.State.Name,
-                    DistrictId = a.UnitLocation.District.Id,
-                    DistrictName = a.UnitLocation.District.Name
-                }).ToList();
-
-               
-                var trainerDetails = new TrainerWithAssignmentsDto
+                    var trainerAssignments = await _trainerAssignmentRepository.GetByTrainerIdAsync(user.Id);
+                    unitLocationDetails = trainerAssignments.Select(a => new UnitLocationDetailsDto
+                    {
+                        UnitLocationId = a.UnitLocationId,
+                        UnitId = a.UnitLocation.Unit.Id,
+                        UnitName = a.UnitLocation.Unit.Name,
+                        OrganizationId = a.UnitLocation.OrganizationId,
+                        StateId = a.UnitLocation.District.State.Id,
+                        StateName = a.UnitLocation.District.State.Name,
+                        DistrictId = a.UnitLocation.District.Id,
+                        DistrictName = a.UnitLocation.District.Name
+                    }).ToList();
+                    assignedLocationIds = trainerAssignments.Select(a => a.UnitLocationId).ToList();
+                }
+                else // UNITHEAD
                 {
-                    TrainerId = user.Id,
+                    var unitHeadAssignments = await _unitHeadAssignmentRepository.GetByUnitHeadIdAsync(user.Id);
+                    unitLocationDetails = unitHeadAssignments.Select(a => new UnitLocationDetailsDto
+                    {
+                        UnitLocationId = a.UnitLocationId,
+                        UnitId = a.UnitLocation.Unit.Id,
+                        UnitName = a.UnitLocation.Unit.Name,
+                        OrganizationId = a.UnitLocation.OrganizationId,
+                        StateId = a.UnitLocation.District.State.Id,
+                        StateName = a.UnitLocation.District.State.Name,
+                        DistrictId = a.UnitLocation.District.Id,
+                        DistrictName = a.UnitLocation.District.Name
+                    }).ToList();
+                    assignedLocationIds = unitHeadAssignments.Select(a => a.UnitLocationId).ToList();
+                }
+
+                // Build unified response with role
+                var userDetails = new UserDetailsDto
+                {
+                    UserId = user.Id,
                     FirstName = user.FirstName,
                     LastName = user.LastName,
                     Email = user.Email,
@@ -102,15 +132,16 @@ namespace WebApi.Controllers
                     DateOfJoining = user.DateOfJoining,
                     IsDeactivated = user.IsDeactivated,
                     Qualification = user.Qualification,
-                    AssignedLocationIds = assignments.Select(a => a.UnitLocationId).ToList(),
+                    AssignedLocationIds = assignedLocationIds,
                     UnitLocationDetails = unitLocationDetails
                 };
 
-                var response = new TrainerLoginResponseDto
+                var response = new UnifiedLoginResponseDto
                 {
                     AccessToken = tokenResponse.AccessToken,
-                    RefreshToken = tokenResponse.RefreshToken,                   
-                    TrainerDetails = trainerDetails
+                    RefreshToken = tokenResponse.RefreshToken,
+                    UserRole = user.Role.ToString(),
+                    UserDetails = userDetails
                 };
 
                 return Ok(response);
