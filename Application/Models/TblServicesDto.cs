@@ -333,10 +333,10 @@ namespace Application.Models
     public class RevolvingFundStatusHybridDto
     {
         public int? Id { get; set; }  // null or 0 = create new, > 0 = update existing
-        public decimal OpeningBalance { get; set; }
-        public int Receipt { get; set; }
-        public decimal Expenditure { get; set; }
-        public double ClosingBalance { get; set; }
+        public decimal? OpeningBalance { get; set; }
+        public int? Receipt { get; set; }
+        public decimal? Expenditure { get; set; }
+        public double? ClosingBalance { get; set; }
     }
 
     /// <summary>
