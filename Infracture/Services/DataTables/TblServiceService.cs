@@ -370,7 +370,7 @@ namespace Infrastructure.Services.DataTables
                 parentEntity.OrganizationId = unitLocation.OrganizationId;
                 parentEntity.CreatedById = _currentUserService.UserId;
                 parentEntity.CreatedAt = DateTimeOffset.UtcNow;
-                parentEntity.FormStatus = "Draft";
+                parentEntity.FormStatus = "Pending";
 
                 var createdService = await _tableServiceRepository.CreateAsync(parentEntity);
                 var serviceId = createdService.Id;
@@ -451,6 +451,7 @@ namespace Infrastructure.Services.DataTables
             {
                 // Step 4: Update parent TblService
                 _mapper.MapUpdateDtoToEntity(dto, existingService);
+                existingService.FormStatus = "Pending";
                 existingService.UpdatedById = _currentUserService.UserId;
                 existingService.UpdatedAt = DateTimeOffset.UtcNow;
                 await _tableServiceRepository.UpdateAsync(existingService);
