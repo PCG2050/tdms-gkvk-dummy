@@ -21,6 +21,7 @@ namespace Infrastructure.Services.DataTables.ATIC
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
+        private readonly IUserRepository _userRepository;
         private readonly GenericTrainerHistoryService<AticProgramDetails> _historyService;
 
         public AticProgramService(
@@ -38,7 +39,8 @@ namespace Infrastructure.Services.DataTables.ATIC
             AticProgramMapper mapper,
             IOrganizationUnitRepository organizationUnitRepository,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
-            ITrainerAssignmentRepository trainerAssignmentRepository)
+            ITrainerAssignmentRepository trainerAssignmentRepository,
+            IUserRepository userRepository)
         {
             _programRepository = programRepository;
             _demographicsRepository = demographicsRepository;
@@ -55,7 +57,13 @@ namespace Infrastructure.Services.DataTables.ATIC
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
-            _historyService = new GenericTrainerHistoryService<AticProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository);
+            _userRepository = userRepository;
+            _historyService = new GenericTrainerHistoryService<AticProgramDetails>(
+                currentUserService,
+                trainerAssignmentRepository,
+                organizationUnitRepository,
+                unitHeadAssignmentRepository,
+                userRepository);
         }
 
         // ============================

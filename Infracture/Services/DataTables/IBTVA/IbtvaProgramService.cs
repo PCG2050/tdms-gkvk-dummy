@@ -21,6 +21,7 @@ namespace Infrastructure.Services.DataTables.IBTVA
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
+        private readonly IUserRepository _userRepository;
         private readonly GenericTrainerHistoryService<IbtvaProgramDetails> _historyService;
 
         public IbtvaProgramService(
@@ -38,7 +39,8 @@ namespace Infrastructure.Services.DataTables.IBTVA
             IbtvaProgramMapper mapper,
             IOrganizationUnitRepository organizationUnitRepository,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
-            ITrainerAssignmentRepository trainerAssignmentRepository)
+            ITrainerAssignmentRepository trainerAssignmentRepository,
+            IUserRepository userRepository)
         {
             _programRepository = programRepository;
             _demographicsRepository = demographicsRepository;
@@ -55,8 +57,14 @@ namespace Infrastructure.Services.DataTables.IBTVA
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
+            _userRepository = userRepository;
             //  generic history service
-            _historyService = new GenericTrainerHistoryService<IbtvaProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository);
+            _historyService = new GenericTrainerHistoryService<IbtvaProgramDetails>(
+                currentUserService,
+                trainerAssignmentRepository,
+                organizationUnitRepository,
+                unitHeadAssignmentRepository,
+                userRepository);
         }
 
         // ============================

@@ -26,6 +26,7 @@ namespace Infrastructure.Services.DataTables.FTI
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
+        private readonly IUserRepository _userRepository;
         private readonly GenericTrainerHistoryService<FtiProgramDetails> _historyService;
 
         public FtiProgramService(
@@ -43,7 +44,8 @@ namespace Infrastructure.Services.DataTables.FTI
             FtiProgramMapper mapper,
             IOrganizationUnitRepository organizationUnitRepository,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
-            ITrainerAssignmentRepository trainerAssignmentRepository)
+            ITrainerAssignmentRepository trainerAssignmentRepository,
+            IUserRepository userRepository)
         {
             _programRepository = programRepository;
             _demographicsRepository = demographicsRepository;
@@ -60,7 +62,13 @@ namespace Infrastructure.Services.DataTables.FTI
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
-            _historyService = new GenericTrainerHistoryService<FtiProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository);
+            _userRepository = userRepository;
+            _historyService = new GenericTrainerHistoryService<FtiProgramDetails>(
+                currentUserService,
+                trainerAssignmentRepository,
+                organizationUnitRepository,
+                unitHeadAssignmentRepository,
+                userRepository);
         }
 
         // ============================

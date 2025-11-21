@@ -24,6 +24,7 @@ namespace Infrastructure.Services.DataTables
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
+        private readonly IUserRepository _userRepository;
         // Generic history service
         private readonly GenericTrainerHistoryService<Publication> _historyService;
 
@@ -36,7 +37,8 @@ namespace Infrastructure.Services.DataTables
             PublicationMapper mapper,
             IOrganizationUnitRepository organizationUnitRepository,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
-            ITrainerAssignmentRepository trainerAssignmentRepository
+            ITrainerAssignmentRepository trainerAssignmentRepository,
+            IUserRepository userRepository
             )
         {
             _publicationRepository = publicationRepository;
@@ -48,8 +50,14 @@ namespace Infrastructure.Services.DataTables
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
+            _userRepository = userRepository;
             //  generic history service
-            _historyService = new GenericTrainerHistoryService<Publication>(currentUserService, trainerAssignmentRepository, organizationUnitRepository);
+            _historyService = new GenericTrainerHistoryService<Publication>(
+                currentUserService,
+                trainerAssignmentRepository,
+                organizationUnitRepository,
+                unitHeadAssignmentRepository,
+                userRepository);
         }
 
         // PHASE 1: Create Publication

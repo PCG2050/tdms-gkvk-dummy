@@ -21,6 +21,7 @@ namespace Infrastructure.Services.DataTables.NAEP
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
+        private readonly IUserRepository _userRepository;
         private readonly GenericTrainerHistoryService<NaepProgramDetails> _historyService;
 
 
@@ -39,7 +40,8 @@ namespace Infrastructure.Services.DataTables.NAEP
             NaepProgramMapper mapper,
             IOrganizationUnitRepository organizationUnitRepository,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
-            ITrainerAssignmentRepository trainerAssignmentRepository)
+            ITrainerAssignmentRepository trainerAssignmentRepository,
+            IUserRepository userRepository)
         {
             _programRepository = programRepository;
             _demographicsRepository = demographicsRepository;
@@ -56,8 +58,14 @@ namespace Infrastructure.Services.DataTables.NAEP
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
+            _userRepository = userRepository;
             //  generic history service
-            _historyService = new GenericTrainerHistoryService<NaepProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository);
+            _historyService = new GenericTrainerHistoryService<NaepProgramDetails>(
+                currentUserService,
+                trainerAssignmentRepository,
+                organizationUnitRepository,
+                unitHeadAssignmentRepository,
+                userRepository);
         }
 
         // ============================

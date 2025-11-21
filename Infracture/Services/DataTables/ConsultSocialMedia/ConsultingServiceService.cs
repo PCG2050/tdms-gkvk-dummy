@@ -13,6 +13,7 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
+        private readonly IUserRepository _userRepository;
         // Generic history service
         private readonly GenericTrainerHistoryService<ConsultingAndSocialMediaService> _historyService;
 
@@ -25,7 +26,8 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
             ConsultingServiceMapper mapper,
             IOrganizationUnitRepository organizationUnitRepository,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
-            ITrainerAssignmentRepository trainerAssignmentRepository)
+            ITrainerAssignmentRepository trainerAssignmentRepository,
+            IUserRepository userRepository)
         {
             _consultingServiceRepository = consultingServiceRepository;
             _modeAndOutreachRepository = modeAndOutreachRepository;
@@ -35,8 +37,14 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
+            _userRepository = userRepository;
             //  generic history service
-            _historyService = new GenericTrainerHistoryService<ConsultingAndSocialMediaService>(currentUserService, trainerAssignmentRepository, organizationUnitRepository);
+            _historyService = new GenericTrainerHistoryService<ConsultingAndSocialMediaService>(
+                currentUserService,
+                trainerAssignmentRepository,
+                organizationUnitRepository,
+                unitHeadAssignmentRepository,
+                userRepository);
         }
 
         // ==========================================

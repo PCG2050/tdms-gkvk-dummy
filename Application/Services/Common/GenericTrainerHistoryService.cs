@@ -18,17 +18,20 @@ namespace Application.Services.Common
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
+        private readonly IUserRepository _userRepository;
 
         public GenericTrainerHistoryService(
             ICurrentUserService currentUserService,
             ITrainerAssignmentRepository trainerAssignmentRepository,
             IOrganizationUnitRepository organizationUnitRepository,
-            IUnitHeadAssignmentRepository unitHeadAssignmentRepository)
+            IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
+            IUserRepository userRepository)
         {
             _currentUserService = currentUserService;
             _trainerAssignmentRepository = trainerAssignmentRepository;
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
+            _userRepository = userRepository;
         }
 
         /// <summary>
@@ -167,10 +170,20 @@ namespace Application.Services.Common
 
             var totalCount = filteredData.Count;
 
-            var items = filteredData
+            // Get paginated data
+            var paginatedData = filteredData
                 .OrderByDescending(x => x.CreatedAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
+                .ToList();
+
+            // Fetch user information for all creators
+            var creatorIds = paginatedData.Select(x => getCreatedById(x)).Distinct().ToList();
+            var users = await _userRepository.GetUsersByIdsAsync(creatorIds);
+            var userDictionary = users.ToDictionary(u => u.Id, u => $"{u.FirstName} {u.LastName}");
+
+            // Build DTOs with user names
+            var items = paginatedData
                 .Select(x => new PendingApprovalItemDto
                 {
                     Id = x.Id,
@@ -178,7 +191,8 @@ namespace Application.Services.Common
                     CreatedAt = x.CreatedAt,
                     UpdatedAt = x.UpdatedAt,
                     FormStatus = getFormStatus(x),
-                    CreatedById = getCreatedById(x)
+                    CreatedById = getCreatedById(x),
+                    CreatedByName = userDictionary.GetValueOrDefault(getCreatedById(x), "Unknown User")
                 })
                 .ToList();
 
@@ -209,5 +223,6 @@ namespace Application.Services.Common
         public DateTimeOffset? UpdatedAt { get; set; }
         public string FormStatus { get; set; } = string.Empty;
         public int CreatedById { get; set; }
+        public string CreatedByName { get; set; } = string.Empty;
     }
 }

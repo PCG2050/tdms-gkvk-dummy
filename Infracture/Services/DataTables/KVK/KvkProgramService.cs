@@ -28,6 +28,7 @@ namespace Infrastructure.Services.DataTables.KVK
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
+        private readonly IUserRepository _userRepository;
         private readonly GenericTrainerHistoryService<KvkProgramDetails> _historyService;
 
         private const int FLD_CATEGORY_ID = 18;
@@ -52,6 +53,7 @@ namespace Infrastructure.Services.DataTables.KVK
             ITrainerAssignmentRepository trainerAssignmentRepository,
             IOrganizationUnitRepository organizationUnitRepository,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
+            IUserRepository userRepository,
             KvkProgramMapper mapper)
         {
             _programRepository = programRepository;
@@ -71,10 +73,16 @@ namespace Infrastructure.Services.DataTables.KVK
             _trainerAssignmentRepository = trainerAssignmentRepository;
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
+            _userRepository = userRepository;
             _mapper = mapper;
 
             //  generic history service
-            _historyService = new GenericTrainerHistoryService<KvkProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository);
+            _historyService = new GenericTrainerHistoryService<KvkProgramDetails>(
+                currentUserService,
+                trainerAssignmentRepository,
+                organizationUnitRepository,
+                unitHeadAssignmentRepository,
+                userRepository);
         }
 
         // ============================
