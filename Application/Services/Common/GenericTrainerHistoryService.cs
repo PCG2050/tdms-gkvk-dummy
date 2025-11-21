@@ -9,7 +9,7 @@ namespace Application.Services.Common
 {
     /// <summary>
     /// Generic service for handling trainer history across all data entry controllers
-    /// Provides common pagination and filtering for trainer submissions
+    /// Provides common pagination and filtering for trainer and unit head submissions
     /// </summary>
     /// <typeparam name="TEntity">The entity type (e.g., Publication, NominationReward)</typeparam>
     public class GenericTrainerHistoryService<TEntity> where TEntity : AuditableBaseEntity
@@ -17,19 +17,22 @@ namespace Application.Services.Common
         private readonly ICurrentUserService _currentUserService;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
+        private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
 
         public GenericTrainerHistoryService(
             ICurrentUserService currentUserService,
             ITrainerAssignmentRepository trainerAssignmentRepository,
-            IOrganizationUnitRepository organizationUnitRepository)
+            IOrganizationUnitRepository organizationUnitRepository,
+            IUnitHeadAssignmentRepository unitHeadAssignmentRepository)
         {
             _currentUserService = currentUserService;
             _trainerAssignmentRepository = trainerAssignmentRepository;
             _organizationUnitRepository = organizationUnitRepository;
+            _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
         }
 
         /// <summary>
-        /// Get trainer's submission history with pagination
+        /// Get trainer or unit head submission history with pagination
         /// Filters by CreatedById and accessible unit locations
         /// </summary>
         public async Task<PaginatedResult<TrainerHistoryItemDto>> GetTrainerHistoryAsync(
@@ -40,10 +43,31 @@ namespace Application.Services.Common
             int pageNumber = 1,
             int pageSize = 10)
         {
-            // Get trainer's accessible unit locations
+            // Get user's accessible unit locations based on their role
             var userId = _currentUserService.UserId;
-            var unitLocationIds = await _trainerAssignmentRepository
-                .GetUnitLocationIdsByTrainerIdAsync(userId);
+            var role = _currentUserService.Role;
+
+            List<int> unitLocationIds;
+            if (role == Role.TRAINER)
+            {
+                unitLocationIds = await _trainerAssignmentRepository
+                    .GetUnitLocationIdsByTrainerIdAsync(userId);
+            }
+            else if (role == Role.UNITHEAD)
+            {
+                unitLocationIds = await _unitHeadAssignmentRepository
+                    .GetUnitLocationIdsByUnitHeadIdAsync(userId);
+            }
+            else if (role == Role.ADMIN)
+            {
+                var orgUnits = await _organizationUnitRepository
+                    .GetUnitLocationIdsByOrganizationIdAsync(_currentUserService.OrganizationId);
+                unitLocationIds = orgUnits;
+            }
+            else
+            {
+                unitLocationIds = new List<int>();
+            }
 
             // Materialize data first to avoid EF Core translation issues
             var allData = await query

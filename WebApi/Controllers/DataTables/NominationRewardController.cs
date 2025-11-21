@@ -165,7 +165,7 @@ namespace WebApi.Controllers.DataTables.IBTVA
             }
 
             [HttpGet("my-history")]
-            [Authorize(Roles = RoleString.Trainer)]
+            [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
             public async Task<IActionResult> GetMyHistory(
    [FromQuery] int pageNumber = 1,
    [FromQuery] int pageSize = 10)
