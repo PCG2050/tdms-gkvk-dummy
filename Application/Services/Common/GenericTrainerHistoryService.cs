@@ -87,17 +87,35 @@ namespace Application.Services.Common
             var totalCount = filteredData.Count;
 
             // Get paginated items
-            var items = filteredData
+            var paginatedData = filteredData
                 .OrderByDescending(x => x.CreatedAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
+                .ToList();
+
+            // Fetch user information for all creators
+            var creatorIds = paginatedData
+                .Where(x => x.CreatedById.HasValue)
+                .Select(x => x.CreatedById!.Value)
+                .Distinct()
+                .ToList();
+
+            var users = await _userRepository.GetUsersByIdsAsync(creatorIds);
+            var userDictionary = users.ToDictionary(u => u.Id, u => $"{u.FirstName} {u.LastName}");
+
+            // Build DTOs with user names
+            var items = paginatedData
                 .Select(x => new TrainerHistoryItemDto
                 {
                     Id = x.Id,
                     Title = getTitleOrName(x) ?? "Untitled",
                     CreatedAt = x.CreatedAt,
                     UpdatedAt = x.UpdatedAt,
-                    FormStatus = getFormStatus(x)
+                    FormStatus = getFormStatus(x),
+                    CreatedById = x.CreatedById ?? 0,
+                    CreatedByName = x.CreatedById.HasValue
+                        ? userDictionary.GetValueOrDefault(x.CreatedById.Value, "Unknown User")
+                        : "Unknown User"
                 })
                 .ToList();
 
@@ -214,6 +232,8 @@ namespace Application.Services.Common
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset? UpdatedAt { get; set; }
         public string FormStatus { get; set; } = string.Empty;
+        public int CreatedById { get; set; }
+        public string CreatedByName { get; set; } = string.Empty;
     }
 
     public class PendingApprovalItemDto
