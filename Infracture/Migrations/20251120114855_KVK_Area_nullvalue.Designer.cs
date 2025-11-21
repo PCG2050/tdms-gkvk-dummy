@@ -4,6 +4,7 @@ using Infrastructure.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(TdmsDbContext))]
-    partial class TdmsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251120114855_KVK_Area_nullvalue")]
+    partial class KVK_Area_nullvalue
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -6542,25 +6545,11 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<double?>("FundAmount")
-                        .HasColumnType("float");
-
-                    b.Property<DateOnly?>("FundReleaseDate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("FundReleaseFile")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("FundReleaseYear")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<int?>("Funds")
                         .HasColumnType("int");
 
-                    b.Property<DateOnly?>("FundsSanctionLetterDate")
-                        .HasColumnType("date");
+                    b.Property<DateTime?>("FundsSanctionLetterDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("FundsSanctionLetterUploadFile")
                         .HasMaxLength(500)
@@ -6586,26 +6575,11 @@ namespace Infrastructure.Migrations
                     b.Property<string>("OrganizerInstitutionName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OtherSourceOfInformation")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("PiAddress")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
                     b.Property<int?>("ProgramTypeId")
                         .HasColumnType("int");
 
-                    b.Property<DateOnly?>("ProjectSanctionDate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("ProjectSanctionFile")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<DateOnly?>("ProposalDate")
-                        .HasColumnType("date");
+                    b.Property<DateTime?>("ProposalDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("ProposalUploadFile")
                         .HasMaxLength(500)
@@ -6619,19 +6593,11 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<string>("ReportingVideo")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
                     b.Property<int?>("SourceId")
                         .HasColumnType("int");
 
                     b.Property<int?>("SourceOfFundId")
                         .HasColumnType("int");
-
-                    b.Property<string>("SourceOfTitle")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
 
                     b.Property<int?>("SponsoredOrganization")
                         .HasMaxLength(200)
@@ -6669,6 +6635,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
@@ -6683,18 +6650,11 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<DateOnly?>("UniImplDate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("UniImplLetterFile")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
                     b.Property<int>("UnitLocationId")
                         .HasColumnType("int");
 
-                    b.Property<DateOnly?>("UniversitySanctionLetterDate")
-                        .HasColumnType("date");
+                    b.Property<DateTime?>("UniversitySanctionLetterDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UniversitySanctionLetterUploadFile")
                         .HasMaxLength(500)

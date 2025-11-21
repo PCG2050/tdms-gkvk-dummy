@@ -40,6 +40,15 @@ namespace WebApi.Controllers
 
 
 
+        [HttpGet("{unitHeadId}/statistics")]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
+        public async Task<IActionResult> GetUnitHeadStatistics(int unitHeadId)
+        {
+            var result = await _assignmentService.GetUnitHeadStatisticsAsync(unitHeadId);
+            if (!result.IsSuccess) return ServiceResponseToActionResult.Error(result.ErrorMessage, result.ErrorStatus);
+            return Ok(result.Data);
+        }
+
         [HttpGet("{unitHeadId}/units")]
         [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
         public async Task<IActionResult> GetUnitHeadUnits(int unitHeadId)
@@ -49,7 +58,7 @@ namespace WebApi.Controllers
             return Ok(result.Data);
         }
 
-        //Get all trainers created bya a specific UnitHead
+        //Get all trainers created by a specific UnitHead
         [HttpGet("{unitHeadId}/trainers/all")]
         [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
         public async Task<IActionResult> GetAllTrainersCreatedByUnitHead(int unitHeadId)
@@ -70,6 +79,44 @@ namespace WebApi.Controllers
             catch (Exception ex)
             {
                 return Problem(detail: ex.Message, title: " An error occured while retreiving trainers");
+            }
+        }
+
+        /// <summary>
+        /// Get all trainers assigned to the unit head's unit locations for dropdown
+        /// Returns simplified list with userId and name
+        /// </summary>
+        [HttpGet("{unitHeadId}/trainers")]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
+        public async Task<IActionResult> GetTrainersForUnitHead(int unitHeadId)
+        {
+            try
+            {
+                // Get all trainers created by the unit head
+                var trainers = await _userService.GetAllTrainersCreatedByUnitHead(unitHeadId);
+
+                // Map to simple DTO for dropdown
+                var dropdownItems = trainers.Select(t => new
+                {
+                    userId = t.UserId,
+                    name = $"{t.FirstName} {t.LastName}".Trim(),
+                    firstName = t.FirstName,
+                    lastName = t.LastName
+                }).ToList();
+
+                return Ok(dropdownItems);               
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return Problem(detail: ex.Message, title: "An error occurred while retrieving trainers");
             }
         }
 

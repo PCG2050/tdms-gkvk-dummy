@@ -55,6 +55,8 @@ namespace Application.Services.Common
                 .Where(x => unitLocationIds.Contains(getUnitLocationId(x)))
                 .ToList();
 
+
+
             // Get total count
             var totalCount = filteredData.Count;
 

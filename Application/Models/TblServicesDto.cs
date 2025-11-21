@@ -100,11 +100,9 @@ namespace Application.Models
         [Required]
         public int UnitLocationId { get; set; }
 
-        [Required]
-        public DateOnly StartDate { get; set; }
+        public DateOnly? StartDate { get; set; }
 
-        [Required]
-        public DateOnly EndDate { get; set; }
+        public DateOnly? EndDate { get; set; }
 
         public int? CategoryId { get; set; }
         public string? OtherCategory { get; set; }
@@ -122,10 +120,10 @@ namespace Application.Models
 
         public string? Component { get; set; }
         public int? QuantityUnitId { get; set; }
-        public int Number { get; set; } = 0;
+        public int? Number { get; set; }
 
-        public decimal AmountGenerated { get; set; } = 0;
-        public decimal AmountReleased { get; set; } = 0;
+        public decimal? AmountGenerated { get; set; }
+        public decimal? AmountReleased { get; set; }
 
         public DateOnly? Date { get; set; }
         public string? RentedTo { get; set; }
@@ -239,10 +237,10 @@ namespace Application.Models
 
     public class RevolvingFundStatusCreateDto
     {
-        public decimal OpeningBalance { get; set; }
-        public int Receipt { get; set; }
-        public decimal Expenditure { get; set; }
-        public double ClosingBalance { get; set; }
+        public decimal? OpeningBalance { get; set; }
+        public int? Receipt { get; set; }
+        public decimal? Expenditure { get; set; }
+        public double? ClosingBalance { get; set; }
     }
 
 
@@ -335,10 +333,10 @@ namespace Application.Models
     public class RevolvingFundStatusHybridDto
     {
         public int? Id { get; set; }  // null or 0 = create new, > 0 = update existing
-        public decimal OpeningBalance { get; set; }
-        public int Receipt { get; set; }
-        public decimal Expenditure { get; set; }
-        public double ClosingBalance { get; set; }
+        public decimal? OpeningBalance { get; set; }
+        public int? Receipt { get; set; }
+        public decimal? Expenditure { get; set; }
+        public double? ClosingBalance { get; set; }
     }
 
     /// <summary>

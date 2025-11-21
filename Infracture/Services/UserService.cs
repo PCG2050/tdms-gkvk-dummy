@@ -56,6 +56,8 @@ namespace Infrastructure.Services
                 PasswordHash = _passwordHasher.HashPassword(registerDto.Password),
                 FirstName = registerDto.FirstName,
                 LastName = registerDto.LastName,
+                Phone = registerDto.Phone,
+                Role = registerDto.Role,
                 OrganizationId = registerDto.OrganizationId,
                 DateOfBirth = registerDto.Role == Role.TRAINER
                               ? registerDto.DateOfBirth ?? throw new InvalidOperationException("Date of Birth required for trainers")
@@ -71,7 +73,8 @@ namespace Infrastructure.Services
                     : registerDto.EmploymentType ?? EmployementType.TEMPORARY,
                 Qualification = registerDto.Role == Role.TRAINER
                     ? registerDto.Qualification ?? throw new InvalidOperationException("Qualification required for trainers")
-                    : registerDto.Qualification
+                    : registerDto.Qualification,
+                ProfileImageUrl = registerDto.ProfileImageUrl
             };
             user.CreatedById = _currentUser.UserId;
             user.CreatedAt = DateTimeOffset.UtcNow;
@@ -520,7 +523,7 @@ namespace Infrastructure.Services
                     UserId = trainer.Id,
                     FirstName = trainer.FirstName,
                     LastName = trainer.LastName,
-                    Email = trainer.Email,                   
+                    Email = trainer.Email,
                     Units = new List<TrainerUnitDto>() // Can be populated if needed
                 }).ToList();
         }

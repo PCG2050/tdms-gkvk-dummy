@@ -99,7 +99,11 @@ namespace Domain.Entities.KVK
         [MaxLength(100)]
         public int? BatchNo { get; set; }
 
+<<<<<<< Updated upstream
         public decimal Area { get; set; }
+=======
+        public decimal? Area { get; set; }
+>>>>>>> Stashed changes
         public string? OrganizerBroucherFile { get; set; }
 
         public string? OrganizerInstitutionName { get; set; }

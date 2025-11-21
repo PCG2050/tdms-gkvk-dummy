@@ -57,7 +57,7 @@ namespace Infrastructure.Services.DataTables.NAEP
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
             //  generic history service
-            _historyService = new GenericTrainerHistoryService<NaepProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository);
+            _historyService = new GenericTrainerHistoryService<NaepProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository);
         }
 
         // ============================

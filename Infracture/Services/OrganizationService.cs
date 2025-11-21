@@ -72,7 +72,12 @@ namespace Application.Interface
                 CreatedAt = DateTimeOffset.UtcNow,
                 Phone = registerDto.Phone,
                 Role = registerDto.Role,
-                Qualification = registerDto.Qualification
+                Gender = registerDto.Gender ?? Gender.OTHER,
+                DateOfBirth = registerDto.DateOfBirth ?? default,
+                DateOfJoining = registerDto.DateOfJoining ?? default,
+                EmployementType = registerDto.EmploymentType ?? EmployementType.TEMPORARY,
+                Qualification = registerDto.Qualification,
+                ProfileImageUrl = registerDto.ProfileImageUrl
 
 
             };

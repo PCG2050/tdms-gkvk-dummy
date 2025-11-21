@@ -43,7 +43,7 @@ namespace Infrastructure.Services.DataTables
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
             //  generic history service
-            _historyService = new GenericTrainerHistoryService<TblService>(currentUserService, trainerAssignmentRepository, organizationUnitRepository);
+            _historyService = new GenericTrainerHistoryService<TblService>(currentUserService, trainerAssignmentRepository, organizationUnitRepository,unitHeadAssignmentRepository);
         }
 
         // ============================
@@ -370,7 +370,7 @@ namespace Infrastructure.Services.DataTables
                 parentEntity.OrganizationId = unitLocation.OrganizationId;
                 parentEntity.CreatedById = _currentUserService.UserId;
                 parentEntity.CreatedAt = DateTimeOffset.UtcNow;
-                parentEntity.FormStatus = "Draft";
+                parentEntity.FormStatus = "Pending";
 
                 var createdService = await _tableServiceRepository.CreateAsync(parentEntity);
                 var serviceId = createdService.Id;
@@ -416,7 +416,7 @@ namespace Infrastructure.Services.DataTables
 
                 // Step 6: Get complete entity with all children and return
                 var completeEntity = await _tableServiceRepository.GetWithDetailsAsync(serviceId);
-                return ServiceResult<TblServicesDto>.Success(_mapper.MapToDto(completeEntity));
+                return ServiceResult<TblServicesDto>.Success(_mapper.MapToDtoWithDetails(completeEntity!));
             }
             catch (Exception ex)
             {
@@ -451,6 +451,7 @@ namespace Infrastructure.Services.DataTables
             {
                 // Step 4: Update parent TblService
                 _mapper.MapUpdateDtoToEntity(dto, existingService);
+                existingService.FormStatus = "Pending";
                 existingService.UpdatedById = _currentUserService.UserId;
                 existingService.UpdatedAt = DateTimeOffset.UtcNow;
                 await _tableServiceRepository.UpdateAsync(existingService);
@@ -611,7 +612,7 @@ namespace Infrastructure.Services.DataTables
 
                 // Step 8: Get complete entity with all children and return
                 var completeEntity = await _tableServiceRepository.GetWithDetailsAsync(serviceId);
-                return ServiceResult<TblServicesDto>.Success(_mapper.MapToDto(completeEntity));
+                return ServiceResult<TblServicesDto>.Success(_mapper.MapToDtoWithDetails(completeEntity!));
             }
             catch (Exception ex)
             {
@@ -780,7 +781,8 @@ namespace Infrastructure.Services.DataTables
         /// </summary>
         public async Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
             int pageNumber = 1,
-            int pageSize = 10)
+            int pageSize = 10,
+            int? createdByIdFilter = null)
         {
             var query = _tableServiceRepository.GetQueryable()
                 .Include(x => x.Category);
@@ -793,7 +795,8 @@ namespace Infrastructure.Services.DataTables
                 getCreatedById: x => x.CreatedById ?? 0,
                 _unitHeadAssignmentRepository,
                 pageNumber,
-                pageSize);
+                pageSize,
+                createdByIdFilter);
         }
 
         // ============================

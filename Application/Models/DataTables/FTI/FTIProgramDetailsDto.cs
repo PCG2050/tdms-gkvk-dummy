@@ -53,9 +53,7 @@ namespace Application.Models.DataTables.FTI
         public string? FundsSanctionLetterUploadFile { get; set; }
 
         // --- Derived / Display Fields ---
-
         public int UnitLocationId { get; set; }
-
         public string? UnitLocationName { get; set; }
         public string? CategoryName { get; set; }
         public string? ProgramTypeName { get; set; }

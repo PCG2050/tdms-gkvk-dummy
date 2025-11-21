@@ -46,7 +46,7 @@ namespace Infrastructure.Services.DataTables
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
             //  generic history service
-            _historyService = new GenericTrainerHistoryService<NominationReward>(currentUserService, trainerAssignmentRepository, organizationUnitRepository);
+            _historyService = new GenericTrainerHistoryService<NominationReward>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository);
 
         }
 
@@ -356,7 +356,9 @@ namespace Infrastructure.Services.DataTables
         /// </summary>
         public async Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
             int pageNumber = 1,
-            int pageSize = 10)
+            int pageSize = 10,
+            int? createdByIdFilter = null)
+           
         {
             var query = _repository.GetQueryable()
                 .Include(x => x.Type);
@@ -369,7 +371,8 @@ namespace Infrastructure.Services.DataTables
                 getCreatedById: x => x.CreatedById ?? 0,
                 _unitHeadAssignmentRepository,
                 pageNumber,
-                pageSize);
+                pageSize,
+                createdByIdFilter);
         }
 
 

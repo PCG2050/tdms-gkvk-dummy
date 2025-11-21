@@ -117,8 +117,8 @@ namespace WebApi
             //Tables
        
                         
-            builder.Services.AddScoped<IAticSalesRepository, AticSalesRepository>();         
-            builder.Services.AddScoped<IAsmVisitRepository, AsmVisitRepository>();
+            //builder.Services.AddScoped<IAticSalesRepository, AticSalesRepository>();         
+            //builder.Services.AddScoped<IAsmVisitRepository, AsmVisitRepository>();
                     
 
             // Mappers

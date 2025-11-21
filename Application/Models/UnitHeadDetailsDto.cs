@@ -61,4 +61,12 @@ namespace Application.Models
         public int DistrictId { get; set; }
         public string DistrictName { get; set; }
     }
+
+    public class UnitHeadStatisticsDto
+    {
+        public int AssignedUnitsCount { get; set; }
+        public int TrainersCount { get; set; }
+        public int PendingApprovalsCount { get; set; }
+        public int ApprovedThisMonthCount { get; set; }
+    }
 }

@@ -37,7 +37,7 @@ namespace Infrastructure.Services.DataTables.FIU
             _currentUserService = currentUserService;
             _mapper = mapper;
             //  generic history service
-            _historyService = new GenericTrainerHistoryService<FIUProgramActivity>(currentUserService, trainerAssignmentRepository, organizationUnitRepository);
+            _historyService = new GenericTrainerHistoryService<FIUProgramActivity>(currentUserService, trainerAssignmentRepository, organizationUnitRepository,unitHeadAssignmentRepository);
         }
 
         // ==========================================

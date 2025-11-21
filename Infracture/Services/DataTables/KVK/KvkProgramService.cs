@@ -74,7 +74,7 @@ namespace Infrastructure.Services.DataTables.KVK
             _mapper = mapper;
 
             //  generic history service
-            _historyService = new GenericTrainerHistoryService<KvkProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository);
+            _historyService = new GenericTrainerHistoryService<KvkProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository);
         }
 
         // ============================

@@ -91,3 +91,4 @@ global using Infrastructure.Repository.DataTables.ASM;
 global using Application.Interface.Services.DataTables.ASM;
 global using Infrastructure.Services.DataTables.ASM;
 global using Application.Mapper.DataTable.ASM;
+global using Application.Interface;

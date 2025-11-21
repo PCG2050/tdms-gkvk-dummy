@@ -19,7 +19,7 @@ namespace WebApi.Controllers.DataTables
         // ==========================================
 
         [HttpPost("phase1")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
         public async Task<IActionResult> CreatePublicationPhase1([FromBody] PublicationCreateDto createDto)
         {
             if (!ModelState.IsValid)
@@ -39,7 +39,7 @@ namespace WebApi.Controllers.DataTables
         }
 
         [HttpPut("phase1/{id}")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
         public async Task<IActionResult> UpdatePublicationPhase1(int id, [FromBody] PublicationUpdateDto updateDto)
         {
             if (!ModelState.IsValid)
@@ -65,7 +65,7 @@ namespace WebApi.Controllers.DataTables
         // ==========================================
 
         [HttpPost("{publicationId}/phase2/publisher-details")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
         public async Task<IActionResult> AddPublisherDetailsPhase2(int publicationId, [FromBody] PublisherDetailsCreateDto dto)
         {
             if (!ModelState.IsValid)
@@ -84,7 +84,7 @@ namespace WebApi.Controllers.DataTables
         }
 
         [HttpPut("{publicationId}/phase2/publisher-details/{id}")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
         public async Task<IActionResult> UpdatePublisherDetailsPhase2(int publicationId, int id, [FromBody] PublisherDetailsCreateDto dto)
         {
             if (!ModelState.IsValid)
@@ -99,8 +99,8 @@ namespace WebApi.Controllers.DataTables
         }
 
         [HttpPost("{publicationId}/phase2/skip")]
-        [Authorize(Roles = RoleString.Trainer)]
-        
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
+
         public async Task<IActionResult> SkipPublisherDetailsPhase2(int publicationId)
         {
             var result = await _publicationService.GetByIdAsync(publicationId);
@@ -115,7 +115,7 @@ namespace WebApi.Controllers.DataTables
         // ==========================================
 
         [HttpPost("{publicationId}/phase3/extension-literature")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
         public async Task<IActionResult> AddExtensionLiteraturePhase3(int publicationId, [FromBody] ExtensionLiteratureCreateDto dto)
         {
             if (!ModelState.IsValid)
@@ -134,7 +134,7 @@ namespace WebApi.Controllers.DataTables
         }
 
         [HttpPut("{publicationId}/phase3/extension-literature/{id}")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
         public async Task<IActionResult> UpdateExtensionLiteraturePhase3(int publicationId, int id, [FromBody] ExtensionLiteratureCreateDto dto)
         {
             if (!ModelState.IsValid)
@@ -149,7 +149,7 @@ namespace WebApi.Controllers.DataTables
         }
 
         [HttpDelete("{publicationId}/phase3/extension-literature/{id}")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
         public async Task<IActionResult> DeleteExtensionLiteraturePhase3(int publicationId, int id)
         {
             var result = await _publicationService.DeleteExtensionLiteratureAsync(id);
@@ -160,7 +160,7 @@ namespace WebApi.Controllers.DataTables
         }
 
         [HttpGet("{publicationId}/phase3/extension-literatures")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
         public async Task<IActionResult> GetExtensionLiteraturesPhase3(int publicationId)
         {
             var result = await _publicationService.GetExtensionLiteraturesAsync(publicationId);
@@ -175,7 +175,7 @@ namespace WebApi.Controllers.DataTables
         // ==========================================
 
         [HttpPost("{id}/submit")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
         public async Task<IActionResult> SubmitPublication(int id)
         {
             var result = await _publicationService.SubmitForApprovalAsync(id);
@@ -194,7 +194,7 @@ namespace WebApi.Controllers.DataTables
         // ==========================================
 
         [HttpGet("history")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
         public async Task<IActionResult> GetPublicationHistory(
     [FromQuery] int pageNumber = 1,
     [FromQuery] int pageSize = 20,
@@ -237,7 +237,7 @@ namespace WebApi.Controllers.DataTables
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
         public async Task<IActionResult> DeletePublication(int id)
         {
             var result = await _publicationService.DeleteAsync(id);
@@ -256,7 +256,7 @@ namespace WebApi.Controllers.DataTables
         }
 
         [HttpGet("status-summary")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
         public async Task<IActionResult> GetPublicationStatusSummary()
         {
             var summary = await _publicationService.GetStatusSummaryAsync();
@@ -264,7 +264,7 @@ namespace WebApi.Controllers.DataTables
         }
 
         [HttpGet("my-history")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
         public async Task<IActionResult> GetMyHistory(
      [FromQuery] int pageNumber = 1,
      [FromQuery] int pageSize = 10)
@@ -285,9 +285,10 @@ namespace WebApi.Controllers.DataTables
         [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
         public async Task<IActionResult> GetPendingApprovals(
             [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 10)
+            [FromQuery] int pageSize = 10,
+            int? createdByIdFilter = null)
         {
-            var result = await _publicationService.GetPendingApprovalsAsync(pageNumber, pageSize);
+            var result = await _publicationService.GetPendingApprovalsAsync(pageNumber, pageSize,createdByIdFilter);
             return Ok(result);
         }
 

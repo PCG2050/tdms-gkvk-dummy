@@ -47,7 +47,11 @@ namespace Application.Models.DataTables.KVK
         public decimal? TotalOutlayRs { get; set; }
         public string? Copi { get; set; }
         public int? BatchNo { get; set; }
+<<<<<<< Updated upstream
         public decimal Area { get; set; }
+=======
+        public decimal? Area { get; set; }
+>>>>>>> Stashed changes
         public string? OrganizerBroucherFile { get; set; }
         public string? OrganizerInstitutionName { get; set; }
         public string? OrganizerInstitutionAddress { get; set; }
@@ -109,7 +113,11 @@ namespace Application.Models.DataTables.KVK
         public decimal? TotalOutlayRs { get; set; }
         public string? Copi { get; set; }
         public int? BatchNo { get; set; }
+<<<<<<< Updated upstream
         public decimal Area { get; set; }
+=======
+        public decimal? Area { get; set; }
+>>>>>>> Stashed changes
         public string? OrganizerBroucherFile { get; set; }
         public string? OrganizerInstitutionName { get; set; }
         public string? OrganizerInstitutionAddress { get; set; }
@@ -126,8 +134,8 @@ namespace Application.Models.DataTables.KVK
     public class KvkProgramUpdateDto : IUpdateDto
     {
         public int Id { get; set; }
-        public DateOnly? StartDate { get; set; }
-        public DateOnly? EndDate { get; set; }
+        public DateOnly StartDate { get; set; }
+        public DateOnly EndDate { get; set; }
         public int? ProgramTypeId { get; set; }
         public int? CategoryId { get; set; }
         public string? CategoryOther { get; set; }

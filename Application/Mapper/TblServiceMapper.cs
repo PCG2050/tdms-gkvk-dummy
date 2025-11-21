@@ -15,8 +15,16 @@ namespace Application.Mapper
         public partial RevolvingFundStatusDto MapToDto(RevolvingFundStatus entity);
         public partial VisitorDetailDto MapToDto(VisitorDetail entity);
 
+        [MapProperty(nameof(TblServiceCreateDto.Number), nameof(TblService.Number), Use = nameof(GetIntOrDefault))]
+        [MapProperty(nameof(TblServiceCreateDto.AmountGenerated), nameof(TblService.AmountGenerated), Use = nameof(GetDecimalOrDefault))]
+        [MapProperty(nameof(TblServiceCreateDto.AmountReleased), nameof(TblService.AmountReleased), Use = nameof(GetDecimalOrDefault))]
         public partial TblService MapToEntity(TblServiceCreateDto dto);
         public partial TableHostel MapToEntity(TableHostelCreateDto dto);
+
+        [MapProperty(nameof(RevolvingFundStatusCreateDto.OpeningBalance), nameof(RevolvingFundStatus.OpeningBalance), Use = nameof(GetDecimalOrDefault))]
+        [MapProperty(nameof(RevolvingFundStatusCreateDto.Receipt), nameof(RevolvingFundStatus.Receipt), Use = nameof(GetIntOrDefault))]
+        [MapProperty(nameof(RevolvingFundStatusCreateDto.Expenditure), nameof(RevolvingFundStatus.Expenditure), Use = nameof(GetDecimalOrDefault))]
+        [MapProperty(nameof(RevolvingFundStatusCreateDto.ClosingBalance), nameof(RevolvingFundStatus.ClosingBalance), Use = nameof(GetDoubleOrDefault))]
         public partial RevolvingFundStatus MapToEntity(RevolvingFundStatusCreateDto dto);
         public partial VisitorDetail MapToEntity(VisitorDetailCreateDto dto);
 
@@ -47,6 +55,11 @@ namespace Application.Mapper
 
         private string? GetStateName(OrganizationUnitLocation? location)
             => location?.District?.State?.Name;
+
+        // Helper methods for nullable to non-nullable conversions
+        private decimal GetDecimalOrDefault(decimal? value) => value ?? 0;
+        private int GetIntOrDefault(int? value) => value ?? 0;
+        private double GetDoubleOrDefault(double? value) => value ?? 0;
 
         // ----------------------------
         // Manual mapping for updates
@@ -99,10 +112,10 @@ namespace Application.Mapper
         // ----------------------------
         public void MapUpdateDtoToEntity(RevolvingFundStatusCreateDto dto, RevolvingFundStatus entity)
         {
-            entity.OpeningBalance = dto.OpeningBalance;
-            entity.Receipt = dto.Receipt;
-            entity.Expenditure = dto.Expenditure;
-            entity.ClosingBalance = dto.ClosingBalance;
+            entity.OpeningBalance = dto.OpeningBalance ?? 0;
+            entity.Receipt = dto.Receipt ?? 0;
+            entity.Expenditure = dto.Expenditure ?? 0;
+            entity.ClosingBalance = dto.ClosingBalance ?? 0;
         }
 
         // ----------------------------
@@ -195,20 +208,20 @@ namespace Application.Mapper
 
         public void MapUpdateDtoToEntity(RevolvingFundStatusHybridDto dto, RevolvingFundStatus entity)
         {
-            entity.OpeningBalance = dto.OpeningBalance;
-            entity.Receipt = dto.Receipt;
-            entity.Expenditure = dto.Expenditure;
-            entity.ClosingBalance = dto.ClosingBalance;
+            entity.OpeningBalance = dto.OpeningBalance ?? 0;
+            entity.Receipt = dto.Receipt ?? 0;
+            entity.Expenditure = dto.Expenditure ?? 0;
+            entity.ClosingBalance = dto.ClosingBalance ?? 0;
         }
 
         public RevolvingFundStatus MapToEntity(RevolvingFundStatusHybridDto dto)
         {
             return new RevolvingFundStatus
             {
-                OpeningBalance = dto.OpeningBalance,
-                Receipt = dto.Receipt,
-                Expenditure = dto.Expenditure,
-                ClosingBalance = dto.ClosingBalance
+                OpeningBalance = dto.OpeningBalance ?? 0,
+                Receipt = dto.Receipt ?? 0,
+                Expenditure = dto.Expenditure ?? 0,
+                ClosingBalance = dto.ClosingBalance ?? 0
             };
         }
 

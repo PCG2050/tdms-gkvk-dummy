@@ -12,5 +12,8 @@ namespace Application.Interface
     public interface IUnitHeadAssignmentService 
     {        
         Task<ServiceResult<List<UnitWithLocationsDto>>> GetUnitHeadUnits(int unitHeadId);
+
+        Task<ServiceResult<UnitHeadStatisticsDto>> GetUnitHeadStatisticsAsync(int unitHeadId);
+
     }
 }

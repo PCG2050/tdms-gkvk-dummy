@@ -101,9 +101,11 @@ namespace Application.Interface.Services.DataTables
 
         /// <summary>
         /// Get pending approvals for Unit Head and Admin with pagination
+        /// Optionally filter by the user who created the forms (trainer/unit head)
         /// </summary>
         Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
             int pageNumber = 1,
-            int pageSize = 10);
+            int pageSize = 10,
+            int? createdByIdFilter = null);
     }
 }

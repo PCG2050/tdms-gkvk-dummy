@@ -25,6 +25,7 @@ namespace WebApi.Controllers.DataTables.IBTVA
             // CREATE
             // -------------------------
             [HttpPost]
+            [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
             public async Task<IActionResult> Create([FromBody] NominationRewardDto createDto)
             {
                 var result = await _service.CreateAsync(createDto);
@@ -38,6 +39,7 @@ namespace WebApi.Controllers.DataTables.IBTVA
             // UPDATE
             // -------------------------
             [HttpPut("{id}")]
+            [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
             public async Task<IActionResult> Update(int id, [FromBody] NominationRewardDto updateDto)
             {
                 var result = await _service.UpdateAsync(id, updateDto);
@@ -51,6 +53,7 @@ namespace WebApi.Controllers.DataTables.IBTVA
             // GET BY ID
             // -------------------------
             [HttpGet("{id}")]
+            [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
             public async Task<IActionResult> GetById(int id)
             {
                 var result = await _service.GetByIdAsync(id);
@@ -64,6 +67,7 @@ namespace WebApi.Controllers.DataTables.IBTVA
             // GET COMPLETE DETAILS
             // -------------------------
             [HttpGet("complete/{id}")]
+            [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
             public async Task<IActionResult> GetCompleteById(int id)
             {
                 var result = await _service.GetCompleteByIdAsync(id);
@@ -77,6 +81,7 @@ namespace WebApi.Controllers.DataTables.IBTVA
             // DELETE
             // -------------------------
             [HttpDelete("{id}")]
+            [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
             public async Task<IActionResult> Delete(int id)
             {
                 var result = await _service.DeleteAsync(id);
@@ -90,6 +95,7 @@ namespace WebApi.Controllers.DataTables.IBTVA
             // SUBMIT FOR APPROVAL
             // -------------------------
             [HttpPost("{id}/submit")]
+            [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
             public async Task<IActionResult> SubmitForApproval(int id)
             {
                 var result = await _service.SubmitForApprovalAsync(id);
@@ -103,6 +109,7 @@ namespace WebApi.Controllers.DataTables.IBTVA
             // APPROVE
             // -------------------------
             [HttpPost("{id}/approve")]
+            [Authorize(Roles = $"{RoleString.UnitHead}")]
             public async Task<IActionResult> Approve(int id, [FromQuery] string? remarks = null)
             {
                 var result = await _service.ApproveAsync(id, remarks);
@@ -116,6 +123,7 @@ namespace WebApi.Controllers.DataTables.IBTVA
             // REJECT
             // -------------------------
             [HttpPost("{id}/reject")]
+            [Authorize(Roles = $"{RoleString.UnitHead}")]
             public async Task<IActionResult> Reject(int id, [FromQuery] string remarks)
             {
                 var result = await _service.RejectAsync(id, remarks);
@@ -129,6 +137,7 @@ namespace WebApi.Controllers.DataTables.IBTVA
             // GET PAGINATED
             // -------------------------
             [HttpGet("paginated")]
+            [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
             public async Task<IActionResult> GetPaginated(
                 [FromQuery] int pageNumber = 1,
                 [FromQuery] int pageSize = 10,
@@ -165,10 +174,10 @@ namespace WebApi.Controllers.DataTables.IBTVA
             }
 
             [HttpGet("my-history")]
-            [Authorize(Roles = RoleString.Trainer)]
+            [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
             public async Task<IActionResult> GetMyHistory(
-   [FromQuery] int pageNumber = 1,
-   [FromQuery] int pageSize = 10)
+              [FromQuery] int pageNumber = 1,
+              [FromQuery] int pageSize = 10)                
             {
                 var result = await _service.GetTrainerHistoryAsync(pageNumber, pageSize);
                 return Ok(result);
@@ -186,9 +195,10 @@ namespace WebApi.Controllers.DataTables.IBTVA
             [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
             public async Task<IActionResult> GetPendingApprovals(
                 [FromQuery] int pageNumber = 1,
-                [FromQuery] int pageSize = 10)
+                [FromQuery] int pageSize = 10,
+                int? createdByIdFilter = null)
             {
-                var result = await _service.GetPendingApprovalsAsync(pageNumber, pageSize);
+                var result = await _service.GetPendingApprovalsAsync(pageNumber, pageSize, createdByIdFilter);
                 return Ok(result);
             }
 
