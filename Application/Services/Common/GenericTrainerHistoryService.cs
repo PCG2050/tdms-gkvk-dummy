@@ -72,12 +72,13 @@ namespace Application.Services.Common
                 unitLocationIds = new List<int>();
             }
 
-            // Materialize data first to avoid EF Core translation issues
+            // CRITICAL: Only get forms created by the current user
+            // Filter at database level with explicit null checking
             var allData = await query
-                .Where(x => x.CreatedById == userId)
+                .Where(x => x.CreatedById.HasValue && x.CreatedById.Value == userId)
                 .ToListAsync();
 
-            // Filter by accessible locations in memory
+            // Filter by accessible locations in memory using the Func delegate
             var filteredData = allData
                 .Where(x => unitLocationIds.Contains(getUnitLocationId(x)))
                 .ToList();
