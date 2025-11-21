@@ -41,16 +41,28 @@ namespace Application.Models.DataTables.DEU
         public decimal? TotalOutlayRs { get; set; }
         public string? Copi { get; set; }
         public int? BatchNo { get; set; }
+        public int? Area { get; set; }
         public string? OrganizerBroucherFile { get; set; }
         public string? OrganizerInstitutionName { get; set; }
         public string? OrganizerInstitutionAddress { get; set; }
         public int? SourceId { get; set; }
-        public DateTime? ProposalDate { get; set; }
+        public string? OtherSourceOfInformation { get; set; }
+        public string? SourceOfTitle { get; set; }
+        public DateOnly? ProposalDate { get; set; }
         public string? ProposalUploadFile { get; set; }
-        public DateTime? UniversitySanctionLetterDate { get; set; }
+        public DateOnly? UniversitySanctionLetterDate { get; set; }
         public string? UniversitySanctionLetterUploadFile { get; set; }
-        public DateTime? FundsSanctionLetterDate { get; set; }
+        public DateOnly? ProjectSanctionDate { get; set; }
+        public string? ProjectSanctionFile { get; set; }
+        public DateOnly? UniImplDate { get; set; }
+        public string? UniImplLetterFile { get; set; }
+        public string? FundReleaseYear { get; set; }
+        public double? FundAmount { get; set; }
+        public DateOnly? FundReleaseDate { get; set; }
+        public string? FundReleaseFile { get; set; }
+        public DateOnly? FundsSanctionLetterDate { get; set; }
         public string? FundsSanctionLetterUploadFile { get; set; }
+        public string? ReportingVideo { get; set; }
 
         // --- Derived / Display Fields ---
 
@@ -112,7 +124,24 @@ namespace Application.Models.DataTables.DEU
         public int? SourceOfFundId { get; set; }
         public int? NoOfCourses { get; set; }
         public string? Attachments { get; set; }
-
+        public int? Area { get; set; }
+        public string? OtherSourceOfInformation { get; set; }
+        public string? SourceOfTitle { get; set; }
+        public DateOnly? ProposalDate { get; set; }
+        public string? ProposalUploadFile { get; set; }
+        public DateOnly? UniversitySanctionLetterDate { get; set; }
+        public string? UniversitySanctionLetterUploadFile { get; set; }
+        public DateOnly? ProjectSanctionDate { get; set; }
+        public string? ProjectSanctionFile { get; set; }
+        public DateOnly? UniImplDate { get; set; }
+        public string? UniImplLetterFile { get; set; }
+        public string? FundReleaseYear { get; set; }
+        public double? FundAmount { get; set; }
+        public DateOnly? FundReleaseDate { get; set; }
+        public string? FundReleaseFile { get; set; }
+        public DateOnly? FundsSanctionLetterDate { get; set; }
+        public string? FundsSanctionLetterUploadFile { get; set; }
+        public string? ReportingVideo { get; set; }
 
     }
 
@@ -146,16 +175,28 @@ namespace Application.Models.DataTables.DEU
         public decimal? TotalOutlayRs { get; set; }
         public string? Copi { get; set; }
         public int? BatchNo { get; set; }
+        public int? Area { get; set; }
         public string? OrganizerBroucherFile { get; set; }
         public string? OrganizerInstitutionName { get; set; }
         public string? OrganizerInstitutionAddress { get; set; }
         public int? SourceId { get; set; }
-        public DateTime? ProposalDate { get; set; }
+        public string? OtherSourceOfInformation { get; set; }
+        public string? SourceOfTitle { get; set; }
+        public DateOnly? ProposalDate { get; set; }
         public string? ProposalUploadFile { get; set; }
-        public DateTime? UniversitySanctionLetterDate { get; set; }
+        public DateOnly? UniversitySanctionLetterDate { get; set; }
         public string? UniversitySanctionLetterUploadFile { get; set; }
-        public DateTime? FundsSanctionLetterDate { get; set; }
+        public DateOnly? ProjectSanctionDate { get; set; }
+        public string? ProjectSanctionFile { get; set; }
+        public DateOnly? UniImplDate { get; set; }
+        public string? UniImplLetterFile { get; set; }
+        public string? FundReleaseYear { get; set; }
+        public double? FundAmount { get; set; }
+        public DateOnly? FundReleaseDate { get; set; }
+        public string? FundReleaseFile { get; set; }
+        public DateOnly? FundsSanctionLetterDate { get; set; }
         public string? FundsSanctionLetterUploadFile { get; set; }
+        public string? ReportingVideo { get; set; }
 
     }
 
@@ -453,17 +494,17 @@ namespace Application.Models.DataTables.DEU
         [Required]
         public int DeuProgramDetailsId { get; set; }
 
-        public int NoOfFacebookSMS { get; set; }
-        public int NoOfSMSSentToRegisteredFarmers { get; set; }
-        public int NoOfWhatsappGroups { get; set; }
-        public int NoOfWhatsappSMS { get; set; }
-        public int NoOfAnsweredWhatsappQueries { get; set; }
-        public int NoOfPhoneCalls { get; set; }
-        public int NoOfFaceToFaceDiscussions { get; set; }
-        public int NoOfGroupDiscussions { get; set; }
-        public int NoOfEmailsSent { get; set; }
-        public int NoOfNewspaperCoverage { get; set; }
-        public int NoOfBeneficiaries { get; set; }
+        public int? NoOfFacebookSMS { get; set; }
+        public int? NoOfSMSSentToRegisteredFarmers { get; set; }
+        public int? NoOfWhatsappGroups { get; set; }
+        public int? NoOfWhatsappSMS { get; set; }
+        public int? NoOfAnsweredWhatsappQueries { get; set; }
+        public int? NoOfPhoneCalls { get; set; }
+        public int? NoOfFaceToFaceDiscussions { get; set; }
+        public int? NoOfGroupDiscussions { get; set; }
+        public int? NoOfEmailsSent { get; set; }
+        public int? NoOfNewspaperCoverage { get; set; }
+        public int? NoOfBeneficiaries { get; set; }
     }
 
     public class DeuAdvisoryServicesUpdateDto : IUpdateDto
@@ -485,17 +526,17 @@ namespace Application.Models.DataTables.DEU
     public class DeuAdvisoryServicesDto
     {
         public int Id { get; set; }
-        public int NoOfFacebookSMS { get; set; }
-        public int NoOfSMSSentToRegisteredFarmers { get; set; }
-        public int NoOfWhatsappGroups { get; set; }
-        public int NoOfWhatsappSMS { get; set; }
-        public int NoOfAnsweredWhatsappQueries { get; set; }
-        public int NoOfPhoneCalls { get; set; }
-        public int NoOfFaceToFaceDiscussions { get; set; }
-        public int NoOfGroupDiscussions { get; set; }
-        public int NoOfEmailsSent { get; set; }
-        public int NoOfNewspaperCoverage { get; set; }
-        public int NoOfBeneficiaries { get; set; }
+        public int? NoOfFacebookSMS { get; set; }
+        public int? NoOfSMSSentToRegisteredFarmers { get; set; }
+        public int? NoOfWhatsappGroups { get; set; }
+        public int? NoOfWhatsappSMS { get; set; }
+        public int? NoOfAnsweredWhatsappQueries { get; set; }
+        public int? NoOfPhoneCalls { get; set; }
+        public int? NoOfFaceToFaceDiscussions { get; set; }
+        public int? NoOfGroupDiscussions { get; set; }
+        public int? NoOfEmailsSent { get; set; }
+        public int? NoOfNewspaperCoverage { get; set; }
+        public int? NoOfBeneficiaries { get; set; }
     }
 
     // ==================== REPORTS (Section E) ====================

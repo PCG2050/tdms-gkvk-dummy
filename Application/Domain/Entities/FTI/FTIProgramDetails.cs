@@ -90,21 +90,52 @@ namespace Domain.Entities.FTI
         [MaxLength(100)]
         public int? BatchNo { get; set; }
 
+        public int? Area { get; set; }
+
+        [MaxLength(500)]
+        public string? PiAddress { get; set; }
+
+        [MaxLength(500)]
+        public string? OtherSourceOfInformation { get; set; }
+
+        [MaxLength(500)]
+        public string? SourceOfTitle { get; set; }
+
         // Proposal details
-        public DateTime? ProposalDate { get; set; }
+        public DateOnly? ProposalDate { get; set; }
         [MaxLength(500)]
         public string? ProposalUploadFile { get; set; }
 
-        public DateTime? UniversitySanctionLetterDate { get; set; }
+        public DateOnly? UniversitySanctionLetterDate { get; set; }
         [MaxLength(500)]
         public string? UniversitySanctionLetterUploadFile { get; set; }
 
-        public DateTime? FundsSanctionLetterDate { get; set; }
+        public DateOnly? ProjectSanctionDate { get; set; }
+        [MaxLength(500)]
+        public string? ProjectSanctionFile { get; set; }
+
+        public DateOnly? UniImplDate { get; set; }
+        [MaxLength(500)]
+        public string? UniImplLetterFile { get; set; }
+
+        [MaxLength(100)]
+        public string? FundReleaseYear { get; set; }
+
+        public double? FundAmount { get; set; }
+
+        public DateOnly? FundReleaseDate { get; set; }
+        [MaxLength(500)]
+        public string? FundReleaseFile { get; set; }
+
+        public DateOnly? FundsSanctionLetterDate { get; set; }
         [MaxLength(500)]
         public string? FundsSanctionLetterUploadFile { get; set; }
 
         [MaxLength(500)]
         public string? UploadVideo { get; set; }
+
+        [MaxLength(500)]
+        public string? ReportingVideo { get; set; }
 
         [MaxLength(100)]
         public int? SD { get; set; }
@@ -143,7 +174,7 @@ namespace Domain.Entities.FTI
         [MaxLength(100)]
         public string? PaperPosterAbstract { get; set; }
 
-        public DateTime? PaperPosterAbstractDate { get; set; }
+        public DateOnly? PaperPosterAbstractDate { get; set; }
 
         [MaxLength(500)]
         public string? PaperPosterAbstractLink { get; set; }
