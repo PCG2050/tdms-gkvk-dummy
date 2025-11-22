@@ -13,12 +13,14 @@ namespace Application.Interface.Repository.DataTables.KVK
         Task<KvkProgramContentAndResources> UpdateAsync(KvkProgramContentAndResources entity);
         Task DeleteAsync(int id);
 
-        Task<KvkProgramContentAndResources> CreateWithChildrenAsync(KvkProgramContentAndResources parent,
+        Task<KvkProgramContentAndResources> CreateWithChildrenAsync(
+            KvkProgramContentAndResources parent,
             List<KvkResourcePerson>? resourcePersons,
             List<KvkTopicsCoveredInClass>? topicsCovered,
             List<KvkTeachingAidsDeveloped>? teachingAids);
 
-        Task<KvkProgramContentAndResources> UpdateWithChildrenAsync(KvkProgramContentAndResources parent,
+        Task<KvkProgramContentAndResources> UpdateWithChildrenAsync(
+            KvkProgramContentAndResources parent,
             List<KvkResourcePerson>? resourcePersons,
             List<KvkTopicsCoveredInClass>? topicsCovered,
             List<KvkTeachingAidsDeveloped>? teachingAids);
