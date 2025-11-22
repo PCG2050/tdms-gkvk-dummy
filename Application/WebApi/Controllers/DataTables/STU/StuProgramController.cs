@@ -6,7 +6,7 @@ using Application.Models.DataTables.STU;
 namespace WebApi.Controllers.DataTables.STU
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("api/stu/[controller]")]
     [ApiController]
     public class StuProgramController : ControllerBase
     {
