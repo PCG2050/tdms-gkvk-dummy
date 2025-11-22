@@ -137,13 +137,19 @@ namespace WebApi.Controllers.DataTables.STU
         // SECTION D: ADVISORY SERVICES
         // ============================
 
+        /// <summary>
+        /// Add or update advisory services
+        /// </summary>
         [HttpPost("{programId}/advisory-services")]
-        public async Task<IActionResult> AddAdvisoryServices(int programId, [FromBody] StuAdvisoryServicesCreateDto dto)
+        public async Task<IActionResult> AddOrUpdateAdvisoryServices(int programId, [FromBody] StuAdvisoryServicesCreateDto dto)
         {
-            var result = await _service.AddAdvisoryServicesAsync(programId, dto);
+            var result = await _service.AddOrUpdateAdvisoryServicesAsync(programId, dto);
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
+        /// <summary>
+        /// Get advisory services for a program
+        /// </summary>
         [HttpGet("{programId}/advisory-services")]
         public async Task<IActionResult> GetAdvisoryServices(int programId)
         {
@@ -155,13 +161,19 @@ namespace WebApi.Controllers.DataTables.STU
         // SECTION E: REPORTS
         // ============================
 
+        /// <summary>
+        /// Add or update report
+        /// </summary>
         [HttpPost("{programId}/reports")]
-        public async Task<IActionResult> AddReport(int programId, [FromBody] StuReportCreateDto dto)
+        public async Task<IActionResult> AddOrUpdateReport(int programId, [FromBody] StuReportCreateDto dto)
         {
-            var result = await _service.AddReportAsync(programId, dto);
+            var result = await _service.AddOrUpdateReportAsync(programId, dto);
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
+        /// <summary>
+        /// Get report for a program
+        /// </summary>
         [HttpGet("{programId}/reports")]
         public async Task<IActionResult> GetReport(int programId)
         {
@@ -173,13 +185,19 @@ namespace WebApi.Controllers.DataTables.STU
         // SECTION F: RECOMMENDATIONS
         // ============================
 
+        /// <summary>
+        /// Add or update recommendation
+        /// </summary>
         [HttpPost("{programId}/recommendations")]
-        public async Task<IActionResult> AddRecommendation(int programId, [FromBody] StuRecommendationCreateDto dto)
+        public async Task<IActionResult> AddOrUpdateRecommendation(int programId, [FromBody] StuRecommendationCreateDto dto)
         {
-            var result = await _service.AddRecommendationAsync(programId, dto);
+            var result = await _service.AddOrUpdateRecommendationAsync(programId, dto);
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
+        /// <summary>
+        /// Get recommendation for a program
+        /// </summary>
         [HttpGet("{programId}/recommendations")]
         public async Task<IActionResult> GetRecommendation(int programId)
         {
