@@ -9,7 +9,7 @@ namespace Application.Models.DataTables.STU
         public int Id { get; set; }
 
         // --- Base Fields (same as CreateDto) ---
-        
+
         public string? Title { get; set; }
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }
@@ -35,23 +35,36 @@ namespace Application.Models.DataTables.STU
         public int? StatusId { get; set; }
         public decimal? TotalOutlayRs { get; set; }
         public string? Copi { get; set; }
+        public string? PiAddress { get; set; }
         public int? BatchNo { get; set; }
+        public decimal? Area { get; set; }
         public string? OrganizerBroucherFile { get; set; }
         public string? OrganizerInstitutionName { get; set; }
         public string? OrganizerInstitutionAddress { get; set; }
         public int? SourceId { get; set; }
-        public DateTime? ProposalDate { get; set; }
+        public string? OtherSourceOfInformation { get; set; }
+        public string? SourceOfTitle { get; set; }
+        public DateOnly? ProposalDate { get; set; }
         public string? ProposalUploadFile { get; set; }
-        public DateTime? UniversitySanctionLetterDate { get; set; }
+        public DateOnly? UniversitySanctionLetterDate { get; set; }
         public string? UniversitySanctionLetterUploadFile { get; set; }
-        public DateTime? FundsSanctionLetterDate { get; set; }
+        public DateOnly? ProjectSanctionDate { get; set; }
+        public string? ProjectSanctionFile { get; set; }
+        public DateOnly? UniImplDate { get; set; }
+        public string? UniImplLetterFile { get; set; }
+        public string? FundReleaseYear { get; set; }
+        public double? FundAmount { get; set; }
+        public DateOnly? FundReleaseDate { get; set; }
+        public string? FundReleaseFile { get; set; }
+        public DateOnly? FundsSanctionLetterDate { get; set; }
         public string? FundsSanctionLetterUploadFile { get; set; }
+        public string? ReportingVideo { get; set; }
 
         // --- Derived / Display Fields ---
 
         public int UnitLocationId { get; set; }
 
-        public string? UnitLocationName {get; set; }
+        public string? UnitLocationName { get; set; }
         public string? CategoryName { get; set; }
         public string? ProgramTypeName { get; set; }
         public string? ThemeName { get; set; }
@@ -78,10 +91,10 @@ namespace Application.Models.DataTables.STU
     {
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }
-        
+
         [Required]
         public int UnitLocationId { get; set; }
-        
+
         public int? ProgramTypeId { get; set; }
         public int? CategoryId { get; set; }
         public string? CategoryOther { get; set; }
@@ -93,11 +106,11 @@ namespace Application.Models.DataTables.STU
         public string? ThematicAreaOther { get; set; }
         public int? SponsoredOrganization { get; set; }
         public string? SponsoredOrganizationName { get; set; }
-        
-        
+
+
         [MaxLength(250)]
         public string? Title { get; set; }
-        
+
         public int? Mode { get; set; }
         public string? Duration { get; set; }
         public int? RegionId { get; set; }
@@ -108,7 +121,7 @@ namespace Application.Models.DataTables.STU
         public int? NoOfCourses { get; set; }
         public string? Attachments { get; set; }
 
-       
+
     }
 
     public class StuProgramUpdateDto : IUpdateDto
@@ -137,8 +150,33 @@ namespace Application.Models.DataTables.STU
         public int? SourceOfFundId { get; set; }
         public int? NoOfCourses { get; set; }
         public string? Attachments { get; set; }
-
-       
+        public int? StatusId { get; set; }
+        public decimal? TotalOutlayRs { get; set; }
+        public string? Copi { get; set; }
+        public string? PiAddress { get; set; }
+        public int? BatchNo { get; set; }
+        public decimal? Area { get; set; }
+        public string? OrganizerBroucherFile { get; set; }
+        public string? OrganizerInstitutionName { get; set; }
+        public string? OrganizerInstitutionAddress { get; set; }
+        public int? SourceId { get; set; }
+        public string? OtherSourceOfInformation { get; set; }
+        public string? SourceOfTitle { get; set; }
+        public DateOnly? ProposalDate { get; set; }
+        public string? ProposalUploadFile { get; set; }
+        public DateOnly? UniversitySanctionLetterDate { get; set; }
+        public string? UniversitySanctionLetterUploadFile { get; set; }
+        public DateOnly? ProjectSanctionDate { get; set; }
+        public string? ProjectSanctionFile { get; set; }
+        public DateOnly? UniImplDate { get; set; }
+        public string? UniImplLetterFile { get; set; }
+        public string? FundReleaseYear { get; set; }
+        public double? FundAmount { get; set; }
+        public DateOnly? FundReleaseDate { get; set; }
+        public string? FundReleaseFile { get; set; }
+        public DateOnly? FundsSanctionLetterDate { get; set; }
+        public string? FundsSanctionLetterUploadFile { get; set; }
+        public string? ReportingVideo { get; set; }
 
     }
 
@@ -191,25 +229,25 @@ namespace Application.Models.DataTables.STU
         public int? Male_ST { get; set; }
         public int? Male_OBC { get; set; }
         public int? Male_GEN { get; set; }
-        
+
         // Male hostel
         public int? SC_Male_StayedInHostel { get; set; }
         public int? ST_Male_StayedInHostel { get; set; }
         public int? OBC_Male_StayedInHostel { get; set; }
         public int? GEN_Male_StayedInHostel { get; set; }
-        
+
         // Female counts
         public int? Female_SC { get; set; }
         public int? Female_ST { get; set; }
         public int? Female_OBC { get; set; }
         public int? Female_GEN { get; set; }
-        
+
         // Female hostel
         public int? SC_Female_StayedInHostel { get; set; }
         public int? ST_Female_StayedInHostel { get; set; }
         public int? OBC_Female_StayedInHostel { get; set; }
         public int? GEN_Female_StayedInHostel { get; set; }
-        
+
         public int? Total { get; set; }
     }
 
@@ -236,43 +274,43 @@ namespace Application.Models.DataTables.STU
         public int? Total { get; set; }
     }
 
-    
+
 
     // ==================== PROGRAM CONTENT (Section C) ====================
-    
+
     public class StuProgramContentCreateDto
     {
         [Required]
         public int StuProgramDetailsId { get; set; }
-   
+
     }
 
     public class StuProgramContentUpdateDto : IUpdateDto
     {
         public int Id { get; set; }
-       
+
     }
 
     public class StuProgramContentDto
     {
         public int Id { get; set; }
-       
+
         public List<StuResourcePersonDto> ResourcePersons { get; set; }
         public List<StuTopicsCoveredDto> TopicsCovered { get; set; }
         public List<StuTeachingAidsDto> TeachingAids { get; set; }
     }
 
     // ==================== RESOURCE PERSONS (Section C - Subsection) ====================
-    
+
     public class StuResourcePersonCreateDto
     {
         [Required]
         public int StuProgramContentAndResourcesId { get; set; }
-        
+
         [Required]
         [MaxLength(200)]
         public string Name { get; set; }
-        
+
         public string? Designation { get; set; }
         public int? ResourceType { get; set; }
         public int? Responsibility { get; set; }
@@ -299,12 +337,12 @@ namespace Application.Models.DataTables.STU
     }
 
     // ==================== TOPICS COVERED (Section C - Subsection) ====================
-    
+
     public class StuTopicsCoveredCreateDto
     {
         [Required]
         public int StuProgramContentAndResourcesId { get; set; }
-        
+
         public DateTime? Date { get; set; }
         public string? Title { get; set; }
         public string? PhotoUpload { get; set; }
@@ -327,12 +365,12 @@ namespace Application.Models.DataTables.STU
     }
 
     // ==================== TEACHING AIDS (Section C - Subsection) ====================
-    
+
     public class StuTeachingAidsCreateDto
     {
         [Required]
         public int StuProgramContentAndResourcesId { get; set; }
-        
+
         public int? TypeOfAidId { get; set; }
         public string? OtherTypeOfAid { get; set; }
         public string? Purpose { get; set; }
@@ -357,13 +395,85 @@ namespace Application.Models.DataTables.STU
         public int? Number { get; set; }
     }
 
+    // ==================== COMPOSITE DTOs - HYBRID PATTERN ====================
+
+    /// <summary>
+    /// Composite DTO for creating StuProgramContentAndResources with all child entities in a single transaction
+    /// </summary>
+    public class StuProgramContentWithChildrenCreateDto
+    {
+        // Parent fields (none for ProgramContent)
+
+        // Child collections (optional - can be null or empty if UI doesn't have data yet)
+        public List<StuResourcePersonCreateDto>? ResourcePersons { get; set; }
+        public List<StuTopicsCoveredCreateDto>? TopicsCovered { get; set; }
+        public List<StuTeachingAidsCreateDto>? TeachingAids { get; set; }
+    }
+
+    /// <summary>
+    /// Hybrid item for Resource Person - can be new (no Id) or existing (has Id)
+    /// Used in update operations to support create/update in one call
+    /// </summary>
+    public class StuResourcePersonHybridDto
+    {
+        public int? Id { get; set; }  // null = create new, has value = update existing
+        public string? Name { get; set; }
+        public string? Designation { get; set; }
+        public int? ResourceType { get; set; }
+        public int? Responsibility { get; set; }
+        public string? InstitutionOrDepartment { get; set; }
+    }
+
+    /// <summary>
+    /// Hybrid item for Topics Covered
+    /// </summary>
+    public class StuTopicsCoveredHybridDto
+    {
+        public int? Id { get; set; }  // null = create new, has value = update existing
+        public DateTime? Date { get; set; }
+        public string? Title { get; set; }
+        public string? PhotoUpload { get; set; }
+    }
+
+    /// <summary>
+    /// Hybrid item for Teaching Aids
+    /// </summary>
+    public class StuTeachingAidsHybridDto
+    {
+        public int? Id { get; set; }  // null = create new, has value = update existing
+        public int? TypeOfAidId { get; set; }
+        public string? OtherTypeOfAid { get; set; }
+        public string? Purpose { get; set; }
+        public int? Number { get; set; }
+    }
+
+    /// <summary>
+    /// Composite DTO for updating StuProgramContentAndResources with all child entities in a single transaction
+    /// Uses Hybrid Pattern:
+    /// - Items WITH Id: UPDATE existing
+    /// - Items WITHOUT Id (null): CREATE new
+    /// - Items in DB but NOT in arrays: DELETE
+    /// </summary>
+    public class StuProgramContentWithChildrenUpdateDto
+    {
+        // Parent fields (none for ProgramContent)
+
+        // Child collections - Hybrid Pattern
+        // If item has Id: update it
+        // If item has no Id (null): create it
+        // If existing item not in array: delete it
+        public List<StuResourcePersonHybridDto>? ResourcePersons { get; set; }
+        public List<StuTopicsCoveredHybridDto>? TopicsCovered { get; set; }
+        public List<StuTeachingAidsHybridDto>? TeachingAids { get; set; }
+    }
+
     // ==================== ADVISORY SERVICES (Section D) ====================
-    
+
     public class StuAdvisoryServicesCreateDto
     {
         [Required]
         public int StuProgramDetailsId { get; set; }
-        
+
         public int NoOfFacebookSMS { get; set; }
         public int NoOfSMSSentToRegisteredFarmers { get; set; }
         public int NoOfWhatsappGroups { get; set; }
@@ -410,49 +520,67 @@ namespace Application.Models.DataTables.STU
     }
 
     // ==================== REPORTS (Section E) ====================
-    
+
     public class StuReportCreateDto
     {
         [Required]
         public int StuProgramDetailsId { get; set; }
-        
-        public string? ProgressReportReportingYear { get; set; }
-        public DateTime? Date { get; set; }
-        public string? UploadPhoto { get; set; }
-        public string? PhotosGeotaggedPhotoOrUploadPhoto { get; set; }
-        public string? UploadVideo { get; set; }
-        public string? SignificantOutcome { get; set; }
+
+        public string? ReportingYear { get; set; }
+        public DateOnly? ReportDate { get; set; }
+        public string? ProgressReport { get; set; }
+        public string? GeoTaggedPhoto { get; set; }
+        public string? ReportingVideo { get; set; }
+        public string? Outcome { get; set; }
+        public DateOnly? TestingCompletionDate { get; set; }
+        public string? TestingCompletionLetter { get; set; }
+        public DateOnly? ProjectCompletionDate { get; set; }
+        public string? ProjectCompletionLetter { get; set; }
+        public string? TypeOfReport { get; set; }
+        public string? SpclReport { get; set; }
     }
 
     public class StuReportUpdateDto : IUpdateDto
     {
         public int Id { get; set; }
-        public string? ProgressReportReportingYear { get; set; }
-        public DateTime? Date { get; set; }
-        public string? UploadPhoto { get; set; }
-        public string? PhotosGeotaggedPhotoOrUploadPhoto { get; set; }
-        public string? UploadVideo { get; set; }
-        public string? SignificantOutcome { get; set; }
+        public string? ReportingYear { get; set; }
+        public DateOnly? ReportDate { get; set; }
+        public string? ProgressReport { get; set; }
+        public string? GeoTaggedPhoto { get; set; }
+        public string? ReportingVideo { get; set; }
+        public string? Outcome { get; set; }
+        public DateOnly? TestingCompletionDate { get; set; }
+        public string? TestingCompletionLetter { get; set; }
+        public DateOnly? ProjectCompletionDate { get; set; }
+        public string? ProjectCompletionLetter { get; set; }
+        public string? TypeOfReport { get; set; }
+        public string? SpclReport { get; set; }
     }
 
     public class StuReportDto
     {
         public int Id { get; set; }
-        public string? ProgressReportReportingYear { get; set; }
-        public DateTime? Date { get; set; }
-        public string? UploadPhoto { get; set; }
-        public string? PhotosGeotaggedPhotoOrUploadPhoto { get; set; }
-        public string? UploadVideo { get; set; }
-        public string? SignificantOutcome { get; set; }
+        public string? ReportingYear { get; set; }
+        public DateOnly? ReportDate { get; set; }
+        public string? ProgressReport { get; set; }
+        public string? GeoTaggedPhoto { get; set; }
+        public string? ReportingVideo { get; set; }
+        public string? Outcome { get; set; }
+        public DateOnly? TestingCompletionDate { get; set; }
+        public string? TestingCompletionLetter { get; set; }
+        public DateOnly? ProjectCompletionDate { get; set; }
+        public string? ProjectCompletionLetter { get; set; }
+        public string? TypeOfReport { get; set; }
+        public string? SpclReport { get; set; }
     }
 
     // ==================== RECOMMENDATIONS (Section F) ====================
-    
+
     public class StuRecommendationCreateDto
     {
         [Required]
         public int StuProgramDetailsId { get; set; }
-        
+
         public string? ProblemsIdentified { get; set; }
         public string? Recommendation { get; set; }
         public string? ActionTaken { get; set; }

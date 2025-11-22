@@ -1,6 +1,6 @@
-﻿
-using Application.Models.DataTables.DEU;
-using Domain.Entities.DEU;
+
+using Application.Models.DataTables.STU;
+using Domain.Entities.STU;
 
 namespace Application.Mapper.DataTable.STU
 {
@@ -136,17 +136,30 @@ namespace Application.Mapper.DataTable.STU
             if (dto.StatusId.HasValue) entity.StatusId = dto.StatusId;
             if (dto.TotalOutlayRs.HasValue) entity.TotalOutlayRs = dto.TotalOutlayRs;
             if (dto.Copi != null) entity.Copi = dto.Copi;
+            if (dto.PiAddress != null) entity.PiAddress = dto.PiAddress;
             if (dto.BatchNo.HasValue) entity.BatchNo = dto.BatchNo;
+            if (dto.Area.HasValue) entity.Area = dto.Area;
             if (dto.OrganizerBroucherFile != null) entity.OrganizerBroucherFile = dto.OrganizerBroucherFile;
             if (dto.OrganizerInstitutionName != null) entity.OrganizerInstitutionName = dto.OrganizerInstitutionName;
             if (dto.OrganizerInstitutionAddress != null) entity.OrganizerInstitutionAddress = dto.OrganizerInstitutionAddress;
             if (dto.SourceId.HasValue) entity.SourceId = dto.SourceId;
+            if (dto.OtherSourceOfInformation != null) entity.OtherSourceOfInformation = dto.OtherSourceOfInformation;
+            if (dto.SourceOfTitle != null) entity.SourceOfTitle = dto.SourceOfTitle;
             if (dto.ProposalDate.HasValue) entity.ProposalDate = dto.ProposalDate;
             if (dto.ProposalUploadFile != null) entity.ProposalUploadFile = dto.ProposalUploadFile;
             if (dto.UniversitySanctionLetterDate.HasValue) entity.UniversitySanctionLetterDate = dto.UniversitySanctionLetterDate;
             if (dto.UniversitySanctionLetterUploadFile != null) entity.UniversitySanctionLetterUploadFile = dto.UniversitySanctionLetterUploadFile;
+            if (dto.ProjectSanctionDate.HasValue) entity.ProjectSanctionDate = dto.ProjectSanctionDate;
+            if (dto.ProjectSanctionFile != null) entity.ProjectSanctionFile = dto.ProjectSanctionFile;
+            if (dto.UniImplDate.HasValue) entity.UniImplDate = dto.UniImplDate;
+            if (dto.UniImplLetterFile != null) entity.UniImplLetterFile = dto.UniImplLetterFile;
+            if (dto.FundReleaseYear != null) entity.FundReleaseYear = dto.FundReleaseYear;
+            if (dto.FundAmount.HasValue) entity.FundAmount = dto.FundAmount;
+            if (dto.FundReleaseDate.HasValue) entity.FundReleaseDate = dto.FundReleaseDate;
+            if (dto.FundReleaseFile != null) entity.FundReleaseFile = dto.FundReleaseFile;
             if (dto.FundsSanctionLetterDate.HasValue) entity.FundsSanctionLetterDate = dto.FundsSanctionLetterDate;
             if (dto.FundsSanctionLetterUploadFile != null) entity.FundsSanctionLetterUploadFile = dto.FundsSanctionLetterUploadFile;
+            if (dto.ReportingVideo != null) entity.ReportingVideo = dto.ReportingVideo;
         }
 
         /// <summary>
@@ -239,12 +252,18 @@ namespace Application.Mapper.DataTable.STU
         /// </summary>
         public static void MapUpdateDtoToEntity(StuReportUpdateDto dto, StuReport entity)
         {
-            if (dto.ProgressReportReportingYear != null) entity.ProgressReportReportingYear = dto.ProgressReportReportingYear;
-            if (dto.Date.HasValue) entity.Date = dto.Date;
-            if (dto.UploadPhoto != null) entity.UploadPhoto = dto.UploadPhoto;
-            if (dto.PhotosGeotaggedPhotoOrUploadPhoto != null) entity.PhotosGeotaggedPhotoOrUploadPhoto = dto.PhotosGeotaggedPhotoOrUploadPhoto;
-            if (dto.UploadVideo != null) entity.UploadVideo = dto.UploadVideo;
-            if (dto.SignificantOutcome != null) entity.SignificantOutcome = dto.SignificantOutcome;
+            if (dto.ReportingYear != null) entity.ReportingYear = dto.ReportingYear;
+            if (dto.ReportDate.HasValue) entity.ReportDate = dto.ReportDate;
+            if (dto.ProgressReport != null) entity.ProgressReport = dto.ProgressReport;
+            if (dto.GeoTaggedPhoto != null) entity.GeoTaggedPhoto = dto.GeoTaggedPhoto;
+            if (dto.ReportingVideo != null) entity.ReportingVideo = dto.ReportingVideo;
+            if (dto.Outcome != null) entity.Outcome = dto.Outcome;
+            if (dto.TestingCompletionDate.HasValue) entity.TestingCompletionDate = dto.TestingCompletionDate;
+            if (dto.TestingCompletionLetter != null) entity.TestingCompletionLetter = dto.TestingCompletionLetter;
+            if (dto.ProjectCompletionDate.HasValue) entity.ProjectCompletionDate = dto.ProjectCompletionDate;
+            if (dto.ProjectCompletionLetter != null) entity.ProjectCompletionLetter = dto.ProjectCompletionLetter;
+            if (dto.TypeOfReport != null) entity.TypeOfReport = dto.TypeOfReport;
+            if (dto.SpclReport != null) entity.SpclReport = dto.SpclReport;
         }
 
         /// <summary>

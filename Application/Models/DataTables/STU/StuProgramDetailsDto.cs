@@ -35,17 +35,30 @@ namespace Application.Models.DataTables.STU
         public int? StatusId { get; set; }
         public decimal? TotalOutlayRs { get; set; }
         public string? Copi { get; set; }
+        public string? PiAddress { get; set; }
         public int? BatchNo { get; set; }
+        public decimal? Area { get; set; }
         public string? OrganizerBroucherFile { get; set; }
         public string? OrganizerInstitutionName { get; set; }
         public string? OrganizerInstitutionAddress { get; set; }
         public int? SourceId { get; set; }
-        public DateTime? ProposalDate { get; set; }
+        public string? OtherSourceOfInformation { get; set; }
+        public string? SourceOfTitle { get; set; }
+        public DateOnly? ProposalDate { get; set; }
         public string? ProposalUploadFile { get; set; }
-        public DateTime? UniversitySanctionLetterDate { get; set; }
+        public DateOnly? UniversitySanctionLetterDate { get; set; }
         public string? UniversitySanctionLetterUploadFile { get; set; }
-        public DateTime? FundsSanctionLetterDate { get; set; }
+        public DateOnly? ProjectSanctionDate { get; set; }
+        public string? ProjectSanctionFile { get; set; }
+        public DateOnly? UniImplDate { get; set; }
+        public string? UniImplLetterFile { get; set; }
+        public string? FundReleaseYear { get; set; }
+        public double? FundAmount { get; set; }
+        public DateOnly? FundReleaseDate { get; set; }
+        public string? FundReleaseFile { get; set; }
+        public DateOnly? FundsSanctionLetterDate { get; set; }
         public string? FundsSanctionLetterUploadFile { get; set; }
+        public string? ReportingVideo { get; set; }
 
         // --- Derived / Display Fields ---
 
@@ -140,17 +153,30 @@ namespace Application.Models.DataTables.STU
         public int? StatusId { get; set; }
         public decimal? TotalOutlayRs { get; set; }
         public string? Copi { get; set; }
+        public string? PiAddress { get; set; }
         public int? BatchNo { get; set; }
+        public decimal? Area { get; set; }
         public string? OrganizerBroucherFile { get; set; }
         public string? OrganizerInstitutionName { get; set; }
         public string? OrganizerInstitutionAddress { get; set; }
         public int? SourceId { get; set; }
-        public DateTime? ProposalDate { get; set; }
+        public string? OtherSourceOfInformation { get; set; }
+        public string? SourceOfTitle { get; set; }
+        public DateOnly? ProposalDate { get; set; }
         public string? ProposalUploadFile { get; set; }
-        public DateTime? UniversitySanctionLetterDate { get; set; }
+        public DateOnly? UniversitySanctionLetterDate { get; set; }
         public string? UniversitySanctionLetterUploadFile { get; set; }
-        public DateTime? FundsSanctionLetterDate { get; set; }
+        public DateOnly? ProjectSanctionDate { get; set; }
+        public string? ProjectSanctionFile { get; set; }
+        public DateOnly? UniImplDate { get; set; }
+        public string? UniImplLetterFile { get; set; }
+        public string? FundReleaseYear { get; set; }
+        public double? FundAmount { get; set; }
+        public DateOnly? FundReleaseDate { get; set; }
+        public string? FundReleaseFile { get; set; }
+        public DateOnly? FundsSanctionLetterDate { get; set; }
         public string? FundsSanctionLetterUploadFile { get; set; }
+        public string? ReportingVideo { get; set; }
 
     }
 
@@ -500,34 +526,52 @@ namespace Application.Models.DataTables.STU
         [Required]
         public int StuProgramDetailsId { get; set; }
 
-        public string? ProgressReportReportingYear { get; set; }
-        public DateTime? Date { get; set; }
-        public string? UploadPhoto { get; set; }
-        public string? PhotosGeotaggedPhotoOrUploadPhoto { get; set; }
-        public string? UploadVideo { get; set; }
-        public string? SignificantOutcome { get; set; }
+        public string? ReportingYear { get; set; }
+        public DateOnly? ReportDate { get; set; }
+        public string? ProgressReport { get; set; }
+        public string? GeoTaggedPhoto { get; set; }
+        public string? ReportingVideo { get; set; }
+        public string? Outcome { get; set; }
+        public DateOnly? TestingCompletionDate { get; set; }
+        public string? TestingCompletionLetter { get; set; }
+        public DateOnly? ProjectCompletionDate { get; set; }
+        public string? ProjectCompletionLetter { get; set; }
+        public string? TypeOfReport { get; set; }
+        public string? SpclReport { get; set; }
     }
 
     public class StuReportUpdateDto : IUpdateDto
     {
         public int Id { get; set; }
-        public string? ProgressReportReportingYear { get; set; }
-        public DateTime? Date { get; set; }
-        public string? UploadPhoto { get; set; }
-        public string? PhotosGeotaggedPhotoOrUploadPhoto { get; set; }
-        public string? UploadVideo { get; set; }
-        public string? SignificantOutcome { get; set; }
+        public string? ReportingYear { get; set; }
+        public DateOnly? ReportDate { get; set; }
+        public string? ProgressReport { get; set; }
+        public string? GeoTaggedPhoto { get; set; }
+        public string? ReportingVideo { get; set; }
+        public string? Outcome { get; set; }
+        public DateOnly? TestingCompletionDate { get; set; }
+        public string? TestingCompletionLetter { get; set; }
+        public DateOnly? ProjectCompletionDate { get; set; }
+        public string? ProjectCompletionLetter { get; set; }
+        public string? TypeOfReport { get; set; }
+        public string? SpclReport { get; set; }
     }
 
     public class StuReportDto
     {
         public int Id { get; set; }
-        public string? ProgressReportReportingYear { get; set; }
-        public DateTime? Date { get; set; }
-        public string? UploadPhoto { get; set; }
-        public string? PhotosGeotaggedPhotoOrUploadPhoto { get; set; }
-        public string? UploadVideo { get; set; }
-        public string? SignificantOutcome { get; set; }
+        public string? ReportingYear { get; set; }
+        public DateOnly? ReportDate { get; set; }
+        public string? ProgressReport { get; set; }
+        public string? GeoTaggedPhoto { get; set; }
+        public string? ReportingVideo { get; set; }
+        public string? Outcome { get; set; }
+        public DateOnly? TestingCompletionDate { get; set; }
+        public string? TestingCompletionLetter { get; set; }
+        public DateOnly? ProjectCompletionDate { get; set; }
+        public string? ProjectCompletionLetter { get; set; }
+        public string? TypeOfReport { get; set; }
+        public string? SpclReport { get; set; }
     }
 
     // ==================== RECOMMENDATIONS (Section F) ====================
