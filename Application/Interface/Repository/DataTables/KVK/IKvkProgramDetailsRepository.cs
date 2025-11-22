@@ -1,6 +1,5 @@
-﻿// IEeuProgramDetailsRepository.cs
+﻿// IKvkProgramDetailsRepository.cs
 
-using Domain.Entities.ASM;
 using Domain.Entities.KVK;
 
 namespace Application.Interface.Repository.DataTables.KVK

@@ -1,7 +1,7 @@
 ﻿// StuProgramDetailsRepository.cs
-using Application.Interface.Repository.DataTables.DEU;
+using Application.Interface.Repository.DataTables.STU;
 using Application.Models;
-using Domain.Entities.DEU;
+using Domain.Entities.STU;
 using Infrastructure.DbContext;
 using Microsoft.EntityFrameworkCore;
 

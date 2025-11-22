@@ -1,7 +1,7 @@
 ﻿// KvkProgramDetailsRepository.cs
 using Application.Interface.Repository.DataTables.KVK;
 using Application.Models;
-using Domain.Entities.DEU;
+using Domain.Entities.KVK;
 using Infrastructure.DbContext;
 using Microsoft.EntityFrameworkCore;
 

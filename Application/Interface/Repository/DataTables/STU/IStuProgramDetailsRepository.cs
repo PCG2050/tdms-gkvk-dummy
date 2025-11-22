@@ -1,7 +1,7 @@
 ﻿// IStuProgramDetailsRepository.cs
 
-
-using Domain.Entities.ASM;
+using Application.Models;
+using Domain.Entities.STU;
 
 namespace Application.Interface.Repository.DataTables.STU
 {

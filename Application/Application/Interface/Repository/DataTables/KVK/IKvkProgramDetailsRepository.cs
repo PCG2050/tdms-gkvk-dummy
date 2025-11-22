@@ -1,4 +1,4 @@
-﻿// IEeuProgramDetailsRepository.cs
+﻿// IKvkProgramDetailsRepository.cs
 
 using Domain.Entities.KVK;
 

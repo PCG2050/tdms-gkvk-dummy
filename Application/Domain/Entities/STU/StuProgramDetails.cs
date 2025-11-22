@@ -46,7 +46,6 @@ namespace Domain.Entities.STU
         [MaxLength(200)]
         public string? SponsoredOrganizationName { get; set; }
 
-
         [MaxLength(250)]
         public string? Title { get; set; }
 
@@ -90,10 +89,13 @@ namespace Domain.Entities.STU
         //this is for project dropdown it has to be linked to masterdata table
         public string? Copi { get; set; }
 
-
+        [MaxLength(500)]
+        public string? PiAddress { get; set; }
 
         [MaxLength(100)]
         public int? BatchNo { get; set; }
+
+        public decimal? Area { get; set; }
 
 
         public string? OrganizerBroucherFile { get; set; }
@@ -105,24 +107,53 @@ namespace Domain.Entities.STU
         [JsonIgnore]
         public ParticipatedSource? Source { get; set; }
 
+        [MaxLength(500)]
+        public string? OtherSourceOfInformation { get; set; }
+
+        [MaxLength(500)]
+        public string? SourceOfTitle { get; set; }
+
         // Proposal details
-        public DateTime? ProposalDate { get; set; }
+        public DateOnly? ProposalDate { get; set; }
         [MaxLength(500)]
         public string? ProposalUploadFile { get; set; }
 
-        public DateTime? UniversitySanctionLetterDate { get; set; }
+        public DateOnly? UniversitySanctionLetterDate { get; set; }
         [MaxLength(500)]
         public string? UniversitySanctionLetterUploadFile { get; set; }
 
-        public DateTime? FundsSanctionLetterDate { get; set; }
+        public DateOnly? ProjectSanctionDate { get; set; }
+        [MaxLength(500)]
+        public string? ProjectSanctionFile { get; set; }
+
+        public DateOnly? UniImplDate { get; set; }
+        [MaxLength(500)]
+        public string? UniImplLetterFile { get; set; }
+
+        [MaxLength(100)]
+        public string? FundReleaseYear { get; set; }
+
+        public double? FundAmount { get; set; }
+
+        public DateOnly? FundReleaseDate { get; set; }
+        [MaxLength(500)]
+        public string? FundReleaseFile { get; set; }
+
+        public DateOnly? FundsSanctionLetterDate { get; set; }
         [MaxLength(500)]
         public string? FundsSanctionLetterUploadFile { get; set; }
+
+        [MaxLength(500)]
+        public string? ReportingVideo { get; set; }
 
         public ICollection<StuParticipantDemographics>? ParticipantDemographics { get; set; }
 
         public ICollection<StuProgramContentAndResources>? ProgramContent { get; set; }
         public StuAdvisoryServices? AdvisoryServices { get; set; }
         public StuRecommendation? Recommendations { get; set; }
+
+        // TODO: Create StuResult entity similar to KvkResult
+        // public StuResult? Results { get; set; }
         public StuReport? Reports { get; set; }
 
 
