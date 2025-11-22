@@ -604,6 +604,77 @@ namespace Infrastructure.Services.DataTables.STU
         // SECTION D: ADVISORY SERVICES
         // ============================
 
+        /// <summary>
+        /// Add or update advisory services (upsert pattern)
+        /// </summary>
+        public async Task<ServiceResult<StuAdvisoryServicesDto>> AddOrUpdateAdvisoryServicesAsync(
+            int programId,
+            StuAdvisoryServicesCreateDto dto)
+        {
+            var program = await _programRepository.GetByIdAsync(programId);
+
+            if (program == null)
+                return ServiceResult<StuAdvisoryServicesDto>.Failure(
+                    "Program not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult<StuAdvisoryServicesDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+                return ServiceResult<StuAdvisoryServicesDto>.Failure(
+                    "Cannot modify advisory services for approved programs",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            var existing = await _advisoryRepository.GetByProgramIdAsync(programId);
+
+            if (existing == null)
+            {
+                // Create new
+                var entity = _mapper.MapToEntity(dto);
+                entity.StuProgramDetailsId = programId;
+                entity.OrganizationId = _currentUserService.OrganizationId;
+                entity.UnitLocationId = program.UnitLocationId;
+                entity.CreatedById = _currentUserService.UserId;
+                entity.CreatedAt = DateTimeOffset.UtcNow;
+
+                var created = await _advisoryRepository.CreateAsync(entity);
+                var resultDto = _mapper.MapToDto(created);
+
+                return ServiceResult<StuAdvisoryServicesDto>.Success(resultDto);
+            }
+            else
+            {
+                // Update existing using mapper
+                var updateDto = new StuAdvisoryServicesUpdateDto
+                {
+                    Id = existing.Id,
+                    NoOfFacebookSMS = dto.NoOfFacebookSMS,
+                    NoOfSMSSentToRegisteredFarmers = dto.NoOfSMSSentToRegisteredFarmers,
+                    NoOfWhatsappGroups = dto.NoOfWhatsappGroups,
+                    NoOfWhatsappSMS = dto.NoOfWhatsappSMS,
+                    NoOfAnsweredWhatsappQueries = dto.NoOfAnsweredWhatsappQueries,
+                    NoOfPhoneCalls = dto.NoOfPhoneCalls,
+                    NoOfFaceToFaceDiscussions = dto.NoOfFaceToFaceDiscussions,
+                    NoOfGroupDiscussions = dto.NoOfGroupDiscussions,
+                    NoOfEmailsSent = dto.NoOfEmailsSent,
+                    NoOfNewspaperCoverage = dto.NoOfNewspaperCoverage,
+                    NoOfBeneficiaries = dto.NoOfBeneficiaries
+                };
+
+                StuProgramMapper.MapUpdateDtoToEntity(updateDto, existing);
+                existing.UpdatedById = _currentUserService.UserId;
+                existing.UpdatedAt = DateTimeOffset.UtcNow;
+
+                var updated = await _advisoryRepository.UpdateAsync(existing);
+                var resultDto = _mapper.MapToDto(updated);
+
+                return ServiceResult<StuAdvisoryServicesDto>.Success(resultDto);
+            }
+        }
+
         public async Task<ServiceResult<StuAdvisoryServicesDto>> AddAdvisoryServicesAsync(
             int programId,
             StuAdvisoryServicesCreateDto dto)
@@ -731,6 +802,78 @@ namespace Infrastructure.Services.DataTables.STU
         // SECTION E: REPORTS
         // ============================
 
+        /// <summary>
+        /// Add or update report (upsert pattern)
+        /// </summary>
+        public async Task<ServiceResult<StuReportDto>> AddOrUpdateReportAsync(
+            int programId,
+            StuReportCreateDto dto)
+        {
+            var program = await _programRepository.GetByIdAsync(programId);
+
+            if (program == null)
+                return ServiceResult<StuReportDto>.Failure(
+                    "Program not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult<StuReportDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+                return ServiceResult<StuReportDto>.Failure(
+                    "Cannot modify reports for approved programs",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            var existing = await _reportRepository.GetByProgramIdAsync(programId);
+
+            if (existing == null)
+            {
+                // Create new
+                var entity = _mapper.MapToEntity(dto);
+                entity.StuProgramDetailsId = programId;
+                entity.OrganizationId = _currentUserService.OrganizationId;
+                entity.UnitLocationId = program.UnitLocationId;
+                entity.CreatedById = _currentUserService.UserId;
+                entity.CreatedAt = DateTimeOffset.UtcNow;
+
+                var created = await _reportRepository.CreateAsync(entity);
+                var resultDto = _mapper.MapToDto(created);
+
+                return ServiceResult<StuReportDto>.Success(resultDto);
+            }
+            else
+            {
+                // Update existing using mapper
+                var updateDto = new StuReportUpdateDto
+                {
+                    Id = existing.Id,
+                    ReportingYear = dto.ReportingYear,
+                    ReportDate = dto.ReportDate,
+                    ProgressReport = dto.ProgressReport,
+                    GeoTaggedPhoto = dto.GeoTaggedPhoto,
+                    ReportingVideo = dto.ReportingVideo,
+                    Outcome = dto.Outcome,
+                    TestingCompletionDate = dto.TestingCompletionDate,
+                    TestingCompletionLetter = dto.TestingCompletionLetter,
+                    ProjectCompletionDate = dto.ProjectCompletionDate,
+                    ProjectCompletionLetter = dto.ProjectCompletionLetter,
+                    TypeOfReport = dto.TypeOfReport,
+                    SpclReport = dto.SpclReport
+                };
+
+                StuProgramMapper.MapUpdateDtoToEntity(updateDto, existing);
+                existing.UpdatedById = _currentUserService.UserId;
+                existing.UpdatedAt = DateTimeOffset.UtcNow;
+
+                var updated = await _reportRepository.UpdateAsync(existing);
+                var resultDto = _mapper.MapToDto(updated);
+
+                return ServiceResult<StuReportDto>.Success(resultDto);
+            }
+        }
+
         public async Task<ServiceResult<StuReportDto>> AddReportAsync(
             int programId,
             StuReportCreateDto dto)
@@ -794,13 +937,7 @@ namespace Infrastructure.Services.DataTables.STU
                     "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
-            if (dto.ProgressReportReportingYear != null) report.ProgressReportReportingYear = dto.ProgressReportReportingYear;
-            if (dto.Date.HasValue) report.Date = dto.Date;
-            if (dto.UploadPhoto != null) report.UploadPhoto = dto.UploadPhoto;
-            if (dto.PhotosGeotaggedPhotoOrUploadPhoto != null) report.PhotosGeotaggedPhotoOrUploadPhoto = dto.PhotosGeotaggedPhotoOrUploadPhoto;
-            if (dto.UploadVideo != null) report.UploadVideo = dto.UploadVideo;
-            if (dto.SignificantOutcome != null) report.SignificantOutcome = dto.SignificantOutcome;
-
+            StuProgramMapper.MapUpdateDtoToEntity(dto, report);
             report.UpdatedById = _currentUserService.UserId;
             report.UpdatedAt = DateTimeOffset.UtcNow;
 
@@ -852,6 +989,81 @@ namespace Infrastructure.Services.DataTables.STU
         // ============================
         // SECTION F: RECOMMENDATIONS
         // ============================
+
+        /// <summary>
+        /// Add or update recommendation (upsert pattern)
+        /// </summary>
+        public async Task<ServiceResult<StuRecommendationDto>> AddOrUpdateRecommendationAsync(
+            int programId,
+            StuRecommendationCreateDto dto)
+        {
+            var program = await _programRepository.GetByIdAsync(programId);
+
+            if (program == null)
+                return ServiceResult<StuRecommendationDto>.Failure(
+                    "Program not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult<StuRecommendationDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+                return ServiceResult<StuRecommendationDto>.Failure(
+                    "Cannot modify recommendations for approved programs",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            var existing = await _recommendationRepository.GetByProgramIdAsync(programId);
+
+            if (existing == null)
+            {
+                // Create new
+                var entity = _mapper.MapToEntity(dto);
+                entity.StuProgramDetailsId = programId;
+                entity.OrganizationId = _currentUserService.OrganizationId;
+                entity.UnitLocationId = program.UnitLocationId;
+                entity.CreatedById = _currentUserService.UserId;
+                entity.CreatedAt = DateTimeOffset.UtcNow;
+
+                var created = await _recommendationRepository.CreateAsync(entity);
+
+                // AUTO-SUBMIT: Since Recommendation is the last section, automatically change status to Pending
+                if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
+                {
+                    program.FormStatus = "Pending";
+                    program.UpdatedById = _currentUserService.UserId;
+                    program.UpdatedAt = DateTimeOffset.UtcNow;
+                    await _programRepository.UpdateAsync(program);
+                }
+
+                var resultDto = _mapper.MapToDto(created);
+                return ServiceResult<StuRecommendationDto>.Success(resultDto);
+            }
+            else
+            {
+                // Update existing using mapper
+                var updateDto = new StuRecommendationUpdateDto
+                {
+                    Id = existing.Id,
+                    ProblemsIdentified = dto.ProblemsIdentified,
+                    Recommendation = dto.Recommendation,
+                    ActionTaken = dto.ActionTaken,
+                    SignificantAchievement = dto.SignificantAchievement,
+                    SuccessStories = dto.SuccessStories,
+                    ImpactOutcome = dto.ImpactOutcome
+                };
+
+                StuProgramMapper.MapUpdateDtoToEntity(updateDto, existing);
+                existing.UpdatedById = _currentUserService.UserId;
+                existing.UpdatedAt = DateTimeOffset.UtcNow;
+
+                var updated = await _recommendationRepository.UpdateAsync(existing);
+                var resultDto = _mapper.MapToDto(updated);
+
+                return ServiceResult<StuRecommendationDto>.Success(resultDto);
+            }
+        }
 
         public async Task<ServiceResult<StuRecommendationDto>> AddRecommendationAsync(
             int programId,
@@ -925,11 +1137,7 @@ namespace Infrastructure.Services.DataTables.STU
                     "Cannot modify approved programs",
                     ServiceErrorStatus.CONFLICT);
 
-            if (dto.ProblemsIdentified != null) recommendation.ProblemsIdentified = dto.ProblemsIdentified;
-            if (dto.Recommendation != null) recommendation.Recommendation = dto.Recommendation;
-            if (dto.ActionTaken != null) recommendation.ActionTaken = dto.ActionTaken;
-            if (dto.SignificantAchievement != null) recommendation.SignificantAchievement = dto.SignificantAchievement;
-            if (dto.SuccessStories != null) recommendation.SuccessStories = dto.SuccessStories;
+            StuProgramMapper.MapUpdateDtoToEntity(dto, recommendation);
             if (dto.ImpactOutcome != null) recommendation.ImpactOutcome = dto.ImpactOutcome;
 
             recommendation.UpdatedById = _currentUserService.UserId;

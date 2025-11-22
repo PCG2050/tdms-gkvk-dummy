@@ -1,6 +1,8 @@
 ﻿
 
-namespace Infrastructure.Services.DataTables.EEU
+using Application.Services.Common;
+
+namespace Infrastructure.Services.DataTables.STU
 {
     public class StuProgramService : IStuProgramService
     {
@@ -19,6 +21,8 @@ namespace Infrastructure.Services.DataTables.EEU
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
+        private readonly GenericTrainerHistoryService<StuProgramDetails> _historyService;
+        private readonly IUserRepository _userRepository;
 
         public StuProgramService(
             IStuProgramDetailsRepository programRepository,
@@ -35,6 +39,7 @@ namespace Infrastructure.Services.DataTables.EEU
             StuProgramMapper mapper,
             IOrganizationUnitRepository organizationUnitRepository,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
+            IUserRepository userRepository,
             ITrainerAssignmentRepository trainerAssignmentRepository)
         {
             _programRepository = programRepository;
@@ -52,6 +57,8 @@ namespace Infrastructure.Services.DataTables.EEU
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
+            _userRepository = userRepository;
+            _historyService = new GenericTrainerHistoryService<StuProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository,userRepository);
         }
 
         // ============================
@@ -130,7 +137,7 @@ namespace Infrastructure.Services.DataTables.EEU
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<StuProgramDetailsDto>.Failure(
                     "Cannot edit programs that have been submitted",
                     ServiceErrorStatus.INVALIDOPERATION);
@@ -157,7 +164,7 @@ namespace Infrastructure.Services.DataTables.EEU
             if (!await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
                     "Only draft programs can be deleted",
                     ServiceErrorStatus.INVALIDOPERATION);
@@ -186,9 +193,9 @@ namespace Infrastructure.Services.DataTables.EEU
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<StuParticipantDemographicsDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             var demographics = _mapper.MapToEntity(dto);
@@ -221,9 +228,9 @@ namespace Infrastructure.Services.DataTables.EEU
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<StuParticipantDemographicsDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             StuProgramMapper.MapUpdateDtoToEntity(dto, demographics);
@@ -247,9 +254,9 @@ namespace Infrastructure.Services.DataTables.EEU
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             await _demographicsRepository.DeleteAsync(demographicsId);
@@ -291,9 +298,9 @@ namespace Infrastructure.Services.DataTables.EEU
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<StuProgramContentDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             var content = _mapper.MapToEntity(dto);
@@ -324,6 +331,240 @@ namespace Infrastructure.Services.DataTables.EEU
             return ServiceResult<StuProgramContentDto>.Success(dto);
         }
 
+        /// <summary>
+        /// Create StuProgramContentAndResources along with all child entities (ResourcePersons, Topics, TeachingAids) in a single transaction
+        /// This solves the problem of needing parent ID before creating children
+        /// </summary>
+        public async Task<ServiceResult<StuProgramContentDto>> AddProgramContentWithChildrenAsync(
+            int programId,
+            StuProgramContentWithChildrenCreateDto dto)
+        {
+            // Validate program exists
+            var program = await _programRepository.GetByIdAsync(programId);
+            if (program == null)
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    "Program not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            // Check permissions
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            // Validate form status
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending" && program.FormStatus != "Rejected")
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    "Cannot add content to approved programs",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            try
+            {
+                // Prepare parent entity
+                var parentEntity = _mapper.MapToEntity(new StuProgramContentCreateDto
+                {
+                   
+                });
+                parentEntity.StuProgramDetailsId = programId;
+                parentEntity.UnitLocationId = program.UnitLocationId;
+                parentEntity.OrganizationId = program.OrganizationId;
+                parentEntity.CreatedById = _currentUserService.UserId;
+                parentEntity.CreatedAt = DateTimeOffset.UtcNow;
+
+                // Prepare child entities
+                var resourcePersons = dto.ResourcePersons?.Select(rp =>
+                {
+                    var entity = _mapper.MapToEntity(rp);
+                    entity.UnitLocationId = program.UnitLocationId;
+                    entity.OrganizationId = program.OrganizationId;
+                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedAt = DateTimeOffset.UtcNow;
+                    return entity;
+                }).ToList();
+
+                var topicsCovered = dto.TopicsCovered?.Select(tc =>
+                {
+                    var entity = _mapper.MapToEntity(tc);
+                    entity.UnitLocationId = program.UnitLocationId;
+                    entity.OrganizationId = program.OrganizationId;
+                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedAt = DateTimeOffset.UtcNow;
+                    return entity;
+                }).ToList();
+
+                var teachingAids = dto.TeachingAids?.Select(ta =>
+                {
+                    var entity = _mapper.MapToEntity(ta);
+                    entity.UnitLocationId = program.UnitLocationId;
+                    entity.OrganizationId = program.OrganizationId;
+                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedAt = DateTimeOffset.UtcNow;
+                    return entity;
+                }).ToList();
+
+                // Repository handles transaction internally
+                var createdContent = await _contentRepository.CreateWithChildrenAsync(
+                    parentEntity,
+                    resourcePersons,
+                    topicsCovered,
+                    teachingAids);
+
+                var resultDto = _mapper.MapToDto(createdContent);
+                return ServiceResult<StuProgramContentDto>.Success(resultDto);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    $"Failed to create program content with children: {ex.Message}",
+                    ServiceErrorStatus.INVALIDOPERATION);
+            }
+        }
+
+        /// <summary>
+        /// Update StuProgramContentAndResources with all child entities using Hybrid Pattern
+        /// - Items WITH Id: UPDATE existing
+        /// - Items WITHOUT Id: CREATE new
+        /// - Items in DB but NOT in arrays: DELETE
+        /// </summary>
+        public async Task<ServiceResult<StuProgramContentDto>> UpdateProgramContentWithChildrenAsync(
+            int contentId,
+            StuProgramContentWithChildrenUpdateDto dto)
+        {
+            // Validate content exists
+            var content = await _contentRepository.GetWithDetailsAsync(contentId);
+            if (content == null)
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    "Content not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            // Validate program and permissions
+            var program = await _programRepository.GetByIdAsync(content.StuProgramDetailsId ?? 0);
+            if (program == null)
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    "Program not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending" && program.FormStatus != "Rejected")
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    "Cannot update content in approved programs",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            try
+            {
+                // Prepare parent entity for update
+                var parentEntity = new StuProgramContentAndResources
+                {
+                    Id = contentId,
+                    UpdatedById = _currentUserService.UserId,
+                    UpdatedAt = DateTimeOffset.UtcNow
+                };
+
+                // Prepare child entities (hybrid: mix of new and existing)
+                var resourcePersons = dto.ResourcePersons?.Select(rp =>
+                {
+                    var entity = new StuResourcePerson
+                    {
+                        Id = rp.Id ?? 0, // 0 means new
+                        Name = rp.Name,
+                        Designation = rp.Designation,
+                        ResourceType = rp.ResourceType,
+                        Responsibility = rp.Responsibility,
+                        InstitutionOrDepartment = rp.InstitutionOrDepartment,
+                        UnitLocationId = program.UnitLocationId,
+                        OrganizationId = program.OrganizationId
+                    };
+
+                    if (entity.Id == 0)
+                    {
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
+
+                    return entity;
+                }).ToList();
+
+                var topicsCovered = dto.TopicsCovered?.Select(tc =>
+                {
+                    var entity = new StuTopicsCoveredInClass
+                    {
+                        Id = tc.Id ?? 0,
+                        Date = tc.Date,
+                        Title = tc.Title,
+                        PhotoUpload = tc.PhotoUpload,
+                        UnitLocationId = program.UnitLocationId,
+                        OrganizationId = program.OrganizationId
+                    };
+
+                    if (entity.Id == 0)
+                    {
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
+
+                    return entity;
+                }).ToList();
+
+                var teachingAids = dto.TeachingAids?.Select(ta =>
+                {
+                    var entity = new StuTeachingAidsDeveloped
+                    {
+                        Id = ta.Id ?? 0,
+                        TypeOfAidId = ta.TypeOfAidId,
+                        OtherTypeOfAid = ta.OtherTypeOfAid,
+                        Purpose = ta.Purpose,
+                        Number = ta.Number,
+                        UnitLocationId = program.UnitLocationId,
+                        OrganizationId = program.OrganizationId
+                    };
+
+                    if (entity.Id == 0)
+                    {
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
+
+                    return entity;
+                }).ToList();
+
+                // Repository handles transaction internally
+                var updatedContent = await _contentRepository.UpdateWithChildrenAsync(
+                    parentEntity,
+                    resourcePersons,
+                    topicsCovered,
+                    teachingAids);
+
+                var resultDto = _mapper.MapToDto(updatedContent);
+                return ServiceResult<StuProgramContentDto>.Success(resultDto);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<StuProgramContentDto>.Failure(
+                    $"Failed to update program content with children: {ex.Message}",
+                    ServiceErrorStatus.INVALIDOPERATION);
+            }
+        }
+
+
         public async Task<ServiceResult> DeleteProgramContentAsync(int contentId)
         {
             var content = await _contentRepository.GetByIdAsync(contentId);
@@ -335,9 +576,9 @@ namespace Infrastructure.Services.DataTables.EEU
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             await _contentRepository.DeleteAsync(contentId);
@@ -360,351 +601,79 @@ namespace Infrastructure.Services.DataTables.EEU
         }
 
         // ============================
-        // SECTION C1: RESOURCE PERSONS
-        // ============================
-
-        public async Task<ServiceResult<StuResourcePersonDto>> AddResourcePersonAsync(
-            int contentId,
-            StuResourcePersonCreateDto dto)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<StuResourcePersonDto>.Failure(
-                    "Program content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var program = await _programRepository.GetByIdAsync(content.StuProgramDetailsId ?? 0);
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<StuResourcePersonDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult<StuResourcePersonDto>.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            var person = _mapper.MapToEntity(dto);
-            person.StuProgramContentAndResourcesId = contentId;
-            person.OrganizationId = _currentUserService.OrganizationId;
-            person.UnitLocationId = program.UnitLocationId;
-            person.CreatedById = _currentUserService.UserId;
-            person.CreatedAt = DateTimeOffset.UtcNow;
-
-            await _resourcePersonRepository.CreateAsync(person);
-
-            var resultDto = _mapper.MapToDto(person);
-            return ServiceResult<StuResourcePersonDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult<StuResourcePersonDto>> UpdateResourcePersonAsync(
-            int personId,
-            StuResourcePersonUpdateDto dto)
-        {
-            var person = await _resourcePersonRepository.GetByIdAsync(personId);
-
-            if (person == null)
-                return ServiceResult<StuResourcePersonDto>.Failure(
-                    "Resource person not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(person.StuProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.StuProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<StuResourcePersonDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult<StuResourcePersonDto>.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            // Apply updates from DTO
-            if (dto.Name != null) person.Name = dto.Name;
-            if (dto.Designation != null) person.Designation = dto.Designation;
-            if (dto.ResourceType.HasValue) person.ResourceType = dto.ResourceType;
-            if (dto.Responsibility.HasValue) person.Responsibility = dto.Responsibility;
-            if (dto.InstitutionOrDepartment != null) person.InstitutionOrDepartment = dto.InstitutionOrDepartment;
-
-            person.UpdatedById = _currentUserService.UserId;
-            person.UpdatedAt = DateTimeOffset.UtcNow;
-
-            await _resourcePersonRepository.UpdateAsync(person);
-
-            var resultDto = _mapper.MapToDto(person);
-            return ServiceResult<StuResourcePersonDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult> DeleteResourcePersonAsync(int personId)
-        {
-            var person = await _resourcePersonRepository.GetByIdAsync(personId);
-
-            if (person == null)
-                return ServiceResult.Failure("Resource person not found", ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(person.StuProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.StuProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            await _resourcePersonRepository.DeleteAsync(personId);
-            return ServiceResult.Success();
-        }
-
-        public async Task<ServiceResult<List<StuResourcePersonDto>>> GetResourcePersonsByContentIdAsync(int contentId)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<List<StuResourcePersonDto>>.Failure(
-                    "Content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var persons = await _resourcePersonRepository.GetByContentIdAsync(contentId);
-            var dtos = persons.Select(p => _mapper.MapToDto(p)).ToList();
-
-            return ServiceResult<List<StuResourcePersonDto>>.Success(dtos);
-        }
-
-        // ============================
-        // SECTION C2: TOPICS COVERED
-        // ============================
-
-        public async Task<ServiceResult<StuTopicsCoveredDto>> AddTopicAsync(
-            int contentId,
-            StuTopicsCoveredCreateDto dto)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<StuTopicsCoveredDto>.Failure(
-                    "Program content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var program = await _programRepository.GetByIdAsync(content.StuProgramDetailsId ?? 0);
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<StuTopicsCoveredDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult<StuTopicsCoveredDto>.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            var topic = _mapper.MapToEntity(dto);
-            topic.StuProgramContentAndResourcesId = contentId;
-            topic.OrganizationId = _currentUserService.OrganizationId;
-            topic.UnitLocationId = program.UnitLocationId;
-            topic.CreatedById = _currentUserService.UserId;
-            topic.CreatedAt = DateTimeOffset.UtcNow;
-
-            await _topicsRepository.CreateAsync(topic);
-
-            var resultDto = _mapper.MapToDto(topic);
-            return ServiceResult<StuTopicsCoveredDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult<StuTopicsCoveredDto>> UpdateTopicAsync(
-            int topicId,
-            StuTopicsCoveredUpdateDto dto)
-        {
-            var topic = await _topicsRepository.GetByIdAsync(topicId);
-
-            if (topic == null)
-                return ServiceResult<StuTopicsCoveredDto>.Failure(
-                    "Topic not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(topic.StuProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.StuProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<StuTopicsCoveredDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult<StuTopicsCoveredDto>.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            if (dto.Date.HasValue) topic.Date = dto.Date;
-            if (dto.Title != null) topic.Title = dto.Title;
-            if (dto.PhotoUpload != null) topic.PhotoUpload = dto.PhotoUpload;
-
-            topic.UpdatedById = _currentUserService.UserId;
-            topic.UpdatedAt = DateTimeOffset.UtcNow;
-
-            await _topicsRepository.UpdateAsync(topic);
-
-            var resultDto = _mapper.MapToDto(topic);
-            return ServiceResult<StuTopicsCoveredDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult> DeleteTopicAsync(int topicId)
-        {
-            var topic = await _topicsRepository.GetByIdAsync(topicId);
-
-            if (topic == null)
-                return ServiceResult.Failure("Topic not found", ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(topic.StuProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.StuProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            await _topicsRepository.DeleteAsync(topicId);
-            return ServiceResult.Success();
-        }
-
-        public async Task<ServiceResult<List<StuTopicsCoveredDto>>> GetTopicsByContentIdAsync(int contentId)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<List<StuTopicsCoveredDto>>.Failure(
-                    "Content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var topics = await _topicsRepository.GetByContentIdAsync(contentId);
-            var dtos = topics.Select(t => _mapper.MapToDto(t)).ToList();
-
-            return ServiceResult<List<StuTopicsCoveredDto>>.Success(dtos);
-        }
-
-        // ============================
-        // SECTION C3: TEACHING AIDS
-        // ============================
-
-        public async Task<ServiceResult<StuTeachingAidsDto>> AddTeachingAidAsync(
-            int contentId,
-            StuTeachingAidsCreateDto dto)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<StuTeachingAidsDto>.Failure(
-                    "Program content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var program = await _programRepository.GetByIdAsync(content.StuProgramDetailsId ?? 0);
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<StuTeachingAidsDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult<StuTeachingAidsDto>.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            var aid = _mapper.MapToEntity(dto);
-            aid.StuProgramContentAndResourcesId = contentId;
-            aid.OrganizationId = _currentUserService.OrganizationId;
-            aid.UnitLocationId = program.UnitLocationId;
-            aid.CreatedById = _currentUserService.UserId;
-            aid.CreatedAt = DateTimeOffset.UtcNow;
-
-            await _teachingAidsRepository.CreateAsync(aid);
-
-            var resultDto = _mapper.MapToDto(aid);
-            return ServiceResult<StuTeachingAidsDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult<StuTeachingAidsDto>> UpdateTeachingAidAsync(
-            int aidId,
-            StuTeachingAidsUpdateDto dto)
-        {
-            var aid = await _teachingAidsRepository.GetByIdAsync(aidId);
-
-            if (aid == null)
-                return ServiceResult<StuTeachingAidsDto>.Failure(
-                    "Teaching aid not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(aid.StuProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.StuProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult<StuTeachingAidsDto>.Failure(
-                    "Access denied",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult<StuTeachingAidsDto>.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            if (dto.TypeOfAidId.HasValue) aid.TypeOfAidId = dto.TypeOfAidId;
-            if (dto.OtherTypeOfAid != null) aid.OtherTypeOfAid = dto.OtherTypeOfAid;
-            if (dto.Purpose != null) aid.Purpose = dto.Purpose;
-            if (dto.Number.HasValue) aid.Number = dto.Number.Value;
-
-            aid.UpdatedById = _currentUserService.UserId;
-            aid.UpdatedAt = DateTimeOffset.UtcNow;
-
-            await _teachingAidsRepository.UpdateAsync(aid);
-
-            var resultDto = _mapper.MapToDto(aid);
-            return ServiceResult<StuTeachingAidsDto>.Success(resultDto);
-        }
-
-        public async Task<ServiceResult> DeleteTeachingAidAsync(int aidId)
-        {
-            var aid = await _teachingAidsRepository.GetByIdAsync(aidId);
-
-            if (aid == null)
-                return ServiceResult.Failure("Teaching aid not found", ServiceErrorStatus.NOTFOUND);
-
-            var content = await _contentRepository.GetByIdAsync(aid.StuProgramContentAndResourcesId ?? 0);
-            var program = await _programRepository.GetByIdAsync(content?.StuProgramDetailsId ?? 0);
-
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            await _teachingAidsRepository.DeleteAsync(aidId);
-            return ServiceResult.Success();
-        }
-
-        public async Task<ServiceResult<List<StuTeachingAidsDto>>> GetTeachingAidsByContentIdAsync(int contentId)
-        {
-            var content = await _contentRepository.GetByIdAsync(contentId);
-
-            if (content == null)
-                return ServiceResult<List<StuTeachingAidsDto>>.Failure(
-                    "Content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            var aids = await _teachingAidsRepository.GetByContentIdAsync(contentId);
-            var dtos = aids.Select(a => _mapper.MapToDto(a)).ToList();
-
-            return ServiceResult<List<StuTeachingAidsDto>>.Success(dtos);
-        }
-
-        // ============================
         // SECTION D: ADVISORY SERVICES
         // ============================
+
+        /// <summary>
+        /// Add or update advisory services (upsert pattern)
+        /// </summary>
+        public async Task<ServiceResult<StuAdvisoryServicesDto>> AddOrUpdateAdvisoryServicesAsync(
+            int programId,
+            StuAdvisoryServicesCreateDto dto)
+        {
+            var program = await _programRepository.GetByIdAsync(programId);
+
+            if (program == null)
+                return ServiceResult<StuAdvisoryServicesDto>.Failure(
+                    "Program not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult<StuAdvisoryServicesDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+                return ServiceResult<StuAdvisoryServicesDto>.Failure(
+                    "Cannot modify advisory services for approved programs",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            var existing = await _advisoryRepository.GetByProgramIdAsync(programId);
+
+            if (existing == null)
+            {
+                // Create new
+                var entity = _mapper.MapToEntity(dto);
+                entity.StuProgramDetailsId = programId;
+                entity.OrganizationId = _currentUserService.OrganizationId;
+                entity.UnitLocationId = program.UnitLocationId;
+                entity.CreatedById = _currentUserService.UserId;
+                entity.CreatedAt = DateTimeOffset.UtcNow;
+
+                var created = await _advisoryRepository.CreateAsync(entity);
+                var resultDto = _mapper.MapToDto(created);
+
+                return ServiceResult<StuAdvisoryServicesDto>.Success(resultDto);
+            }
+            else
+            {
+                // Update existing using mapper
+                var updateDto = new StuAdvisoryServicesUpdateDto
+                {
+                    Id = existing.Id,
+                    NoOfFacebookSMS = dto.NoOfFacebookSMS,
+                    NoOfSMSSentToRegisteredFarmers = dto.NoOfSMSSentToRegisteredFarmers,
+                    NoOfWhatsappGroups = dto.NoOfWhatsappGroups,
+                    NoOfWhatsappSMS = dto.NoOfWhatsappSMS,
+                    NoOfAnsweredWhatsappQueries = dto.NoOfAnsweredWhatsappQueries,
+                    NoOfPhoneCalls = dto.NoOfPhoneCalls,
+                    NoOfFaceToFaceDiscussions = dto.NoOfFaceToFaceDiscussions,
+                    NoOfGroupDiscussions = dto.NoOfGroupDiscussions,
+                    NoOfEmailsSent = dto.NoOfEmailsSent,
+                    NoOfNewspaperCoverage = dto.NoOfNewspaperCoverage,
+                    NoOfBeneficiaries = dto.NoOfBeneficiaries
+                };
+
+                StuProgramMapper.MapUpdateDtoToEntity(updateDto, existing);
+                existing.UpdatedById = _currentUserService.UserId;
+                existing.UpdatedAt = DateTimeOffset.UtcNow;
+
+                var updated = await _advisoryRepository.UpdateAsync(existing);
+                var resultDto = _mapper.MapToDto(updated);
+
+                return ServiceResult<StuAdvisoryServicesDto>.Success(resultDto);
+            }
+        }
 
         public async Task<ServiceResult<StuAdvisoryServicesDto>> AddAdvisoryServicesAsync(
             int programId,
@@ -722,9 +691,9 @@ namespace Infrastructure.Services.DataTables.EEU
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<StuAdvisoryServicesDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             // Check if advisory services already exist
@@ -764,9 +733,9 @@ namespace Infrastructure.Services.DataTables.EEU
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<StuAdvisoryServicesDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             if (dto.NoOfFacebookSMS.HasValue) advisory.NoOfFacebookSMS = dto.NoOfFacebookSMS.Value;
@@ -801,9 +770,9 @@ namespace Infrastructure.Services.DataTables.EEU
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             await _advisoryRepository.DeleteAsync(advisoryId);
@@ -833,6 +802,78 @@ namespace Infrastructure.Services.DataTables.EEU
         // SECTION E: REPORTS
         // ============================
 
+        /// <summary>
+        /// Add or update report (upsert pattern)
+        /// </summary>
+        public async Task<ServiceResult<StuReportDto>> AddOrUpdateReportAsync(
+            int programId,
+            StuReportCreateDto dto)
+        {
+            var program = await _programRepository.GetByIdAsync(programId);
+
+            if (program == null)
+                return ServiceResult<StuReportDto>.Failure(
+                    "Program not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult<StuReportDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+                return ServiceResult<StuReportDto>.Failure(
+                    "Cannot modify reports for approved programs",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            var existing = await _reportRepository.GetByProgramIdAsync(programId);
+
+            if (existing == null)
+            {
+                // Create new
+                var entity = _mapper.MapToEntity(dto);
+                entity.StuProgramDetailsId = programId;
+                entity.OrganizationId = _currentUserService.OrganizationId;
+                entity.UnitLocationId = program.UnitLocationId;
+                entity.CreatedById = _currentUserService.UserId;
+                entity.CreatedAt = DateTimeOffset.UtcNow;
+
+                var created = await _reportRepository.CreateAsync(entity);
+                var resultDto = _mapper.MapToDto(created);
+
+                return ServiceResult<StuReportDto>.Success(resultDto);
+            }
+            else
+            {
+                // Update existing using mapper
+                var updateDto = new StuReportUpdateDto
+                {
+                    Id = existing.Id,
+                    ReportingYear = dto.ReportingYear,
+                    ReportDate = dto.ReportDate,
+                    ProgressReport = dto.ProgressReport,
+                    GeoTaggedPhoto = dto.GeoTaggedPhoto,
+                    ReportingVideo = dto.ReportingVideo,
+                    Outcome = dto.Outcome,
+                    TestingCompletionDate = dto.TestingCompletionDate,
+                    TestingCompletionLetter = dto.TestingCompletionLetter,
+                    ProjectCompletionDate = dto.ProjectCompletionDate,
+                    ProjectCompletionLetter = dto.ProjectCompletionLetter,
+                    TypeOfReport = dto.TypeOfReport,
+                    SpclReport = dto.SpclReport
+                };
+
+                StuProgramMapper.MapUpdateDtoToEntity(updateDto, existing);
+                existing.UpdatedById = _currentUserService.UserId;
+                existing.UpdatedAt = DateTimeOffset.UtcNow;
+
+                var updated = await _reportRepository.UpdateAsync(existing);
+                var resultDto = _mapper.MapToDto(updated);
+
+                return ServiceResult<StuReportDto>.Success(resultDto);
+            }
+        }
+
         public async Task<ServiceResult<StuReportDto>> AddReportAsync(
             int programId,
             StuReportCreateDto dto)
@@ -849,9 +890,9 @@ namespace Infrastructure.Services.DataTables.EEU
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<StuReportDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             // Check if report already exists
@@ -891,18 +932,12 @@ namespace Infrastructure.Services.DataTables.EEU
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<StuReportDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
-            if (dto.ProgressReportReportingYear != null) report.ProgressReportReportingYear = dto.ProgressReportReportingYear;
-            if (dto.Date.HasValue) report.Date = dto.Date;
-            if (dto.UploadPhoto != null) report.UploadPhoto = dto.UploadPhoto;
-            if (dto.PhotosGeotaggedPhotoOrUploadPhoto != null) report.PhotosGeotaggedPhotoOrUploadPhoto = dto.PhotosGeotaggedPhotoOrUploadPhoto;
-            if (dto.UploadVideo != null) report.UploadVideo = dto.UploadVideo;
-            if (dto.SignificantOutcome != null) report.SignificantOutcome = dto.SignificantOutcome;
-
+            StuProgramMapper.MapUpdateDtoToEntity(dto, report);
             report.UpdatedById = _currentUserService.UserId;
             report.UpdatedAt = DateTimeOffset.UtcNow;
 
@@ -923,9 +958,9 @@ namespace Infrastructure.Services.DataTables.EEU
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.CONFLICT);
 
             await _reportRepository.DeleteAsync(reportId);
@@ -955,6 +990,81 @@ namespace Infrastructure.Services.DataTables.EEU
         // SECTION F: RECOMMENDATIONS
         // ============================
 
+        /// <summary>
+        /// Add or update recommendation (upsert pattern)
+        /// </summary>
+        public async Task<ServiceResult<StuRecommendationDto>> AddOrUpdateRecommendationAsync(
+            int programId,
+            StuRecommendationCreateDto dto)
+        {
+            var program = await _programRepository.GetByIdAsync(programId);
+
+            if (program == null)
+                return ServiceResult<StuRecommendationDto>.Failure(
+                    "Program not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult<StuRecommendationDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+                return ServiceResult<StuRecommendationDto>.Failure(
+                    "Cannot modify recommendations for approved programs",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            var existing = await _recommendationRepository.GetByProgramIdAsync(programId);
+
+            if (existing == null)
+            {
+                // Create new
+                var entity = _mapper.MapToEntity(dto);
+                entity.StuProgramDetailsId = programId;
+                entity.OrganizationId = _currentUserService.OrganizationId;
+                entity.UnitLocationId = program.UnitLocationId;
+                entity.CreatedById = _currentUserService.UserId;
+                entity.CreatedAt = DateTimeOffset.UtcNow;
+
+                var created = await _recommendationRepository.CreateAsync(entity);
+
+                // AUTO-SUBMIT: Since Recommendation is the last section, automatically change status to Pending
+                if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
+                {
+                    program.FormStatus = "Pending";
+                    program.UpdatedById = _currentUserService.UserId;
+                    program.UpdatedAt = DateTimeOffset.UtcNow;
+                    await _programRepository.UpdateAsync(program);
+                }
+
+                var resultDto = _mapper.MapToDto(created);
+                return ServiceResult<StuRecommendationDto>.Success(resultDto);
+            }
+            else
+            {
+                // Update existing using mapper
+                var updateDto = new StuRecommendationUpdateDto
+                {
+                    Id = existing.Id,
+                    ProblemsIdentified = dto.ProblemsIdentified,
+                    Recommendation = dto.Recommendation,
+                    ActionTaken = dto.ActionTaken,
+                    SignificantAchievement = dto.SignificantAchievement,
+                    SuccessStories = dto.SuccessStories,
+                    ImpactOutcome = dto.ImpactOutcome
+                };
+
+                StuProgramMapper.MapUpdateDtoToEntity(updateDto, existing);
+                existing.UpdatedById = _currentUserService.UserId;
+                existing.UpdatedAt = DateTimeOffset.UtcNow;
+
+                var updated = await _recommendationRepository.UpdateAsync(existing);
+                var resultDto = _mapper.MapToDto(updated);
+
+                return ServiceResult<StuRecommendationDto>.Success(resultDto);
+            }
+        }
+
         public async Task<ServiceResult<StuRecommendationDto>> AddRecommendationAsync(
             int programId,
             StuRecommendationCreateDto dto)
@@ -971,9 +1081,9 @@ namespace Infrastructure.Services.DataTables.EEU
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<StuRecommendationDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             // Check if recommendation already exists
@@ -991,6 +1101,15 @@ namespace Infrastructure.Services.DataTables.EEU
             recommendation.CreatedAt = DateTimeOffset.UtcNow;
 
             await _recommendationRepository.CreateAsync(recommendation);
+
+            // AUTO-SUBMIT: Since Recommendation is the last section, automatically change status to Pending
+            if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
+            {
+                program.FormStatus = "Pending";
+                program.UpdatedById = _currentUserService.UserId;
+                program.UpdatedAt = DateTimeOffset.UtcNow;
+                await _programRepository.UpdateAsync(program);
+            }
 
             var resultDto = _mapper.MapToDto(recommendation);
             return ServiceResult<StuRecommendationDto>.Success(resultDto);
@@ -1013,22 +1132,27 @@ namespace Infrastructure.Services.DataTables.EEU
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult<StuRecommendationDto>.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.CONFLICT);
 
-            if (dto.ProblemsIdentified != null) recommendation.ProblemsIdentified = dto.ProblemsIdentified;
-            if (dto.Recommendation != null) recommendation.Recommendation = dto.Recommendation;
-            if (dto.ActionTaken != null) recommendation.ActionTaken = dto.ActionTaken;
-            if (dto.SignificantAchievement != null) recommendation.SignificantAchievement = dto.SignificantAchievement;
-            if (dto.SuccessStories != null) recommendation.SuccessStories = dto.SuccessStories;
+            StuProgramMapper.MapUpdateDtoToEntity(dto, recommendation);
             if (dto.ImpactOutcome != null) recommendation.ImpactOutcome = dto.ImpactOutcome;
 
             recommendation.UpdatedById = _currentUserService.UserId;
             recommendation.UpdatedAt = DateTimeOffset.UtcNow;
 
             await _recommendationRepository.UpdateAsync(recommendation);
+
+            // AUTO-SUBMIT: Since Recommendation is the last section, automatically change status to Pending
+            if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
+            {
+                program.FormStatus = "Pending";
+                program.UpdatedById = _currentUserService.UserId;
+                program.UpdatedAt = DateTimeOffset.UtcNow;
+                await _programRepository.UpdateAsync(program);
+            }
 
             var resultDto = _mapper.MapToDto(recommendation);
             return ServiceResult<StuRecommendationDto>.Success(resultDto);
@@ -1045,9 +1169,9 @@ namespace Infrastructure.Services.DataTables.EEU
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
-                    "Cannot modify submitted programs",
+                    "Cannot modify approved programs",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             await _recommendationRepository.DeleteAsync(recommendationId);
@@ -1087,7 +1211,7 @@ namespace Infrastructure.Services.DataTables.EEU
             if (!await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
+            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
                 return ServiceResult.Failure(
                     "Only draft programs can be submitted",
                     ServiceErrorStatus.INVALIDOPERATION);
@@ -1225,6 +1349,53 @@ namespace Infrastructure.Services.DataTables.EEU
         {
             var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
             return await _programRepository.GetStatusSummaryAsync(unitLocationIds);
+        }
+
+
+        // -------------------------------------------------------
+        // HISTORY: Using Generic Service
+        // -------------------------------------------------------
+
+        /// <summary>
+        /// Get trainer's submission history with pagination
+        /// </summary>
+        public async Task<PaginatedResult<TrainerHistoryItemDto>> GetTrainerHistoryAsync(
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            // Get base query with necessary includes
+            var query = _programRepository.GetQueryable()
+                .Include(x => x.Type);
+
+            return await _historyService.GetTrainerHistoryAsync(
+                query,
+                getUnitLocationId: x => x.UnitLocationId,
+                getTitleOrName: x => x.Title ?? x.ProgramType?.Name,
+                getFormStatus: x => x.FormStatus,
+                getRemarks: x => x.FormStatusRemarks ?? "-",
+                pageNumber,
+                pageSize);
+        }
+
+        /// <summary>
+        /// Get pending approvals for Unit Head with pagination
+        /// </summary>
+        public async Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            var query = _programRepository.GetQueryable()
+                .Include(x => x.Type);
+
+            return await _historyService.GetPendingApprovalsAsync(
+                query,
+                getUnitLocationId: x => x.UnitLocationId,
+                getTitleOrName: x => x.Title ?? x.ProgramType?.Name,
+                getFormStatus: x => x.FormStatus,
+                getCreatedById: x => x.CreatedById ?? 0,
+                _unitHeadAssignmentRepository,
+                pageNumber,
+                pageSize);
         }
 
         // ============================
