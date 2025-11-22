@@ -26,6 +26,7 @@ namespace Infrastructure.Services.DataTables
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
+        private readonly IUserRepository _userRepository;
         // Generic history service
         private readonly GenericTrainerHistoryService<NominationReward> _historyService;
 
@@ -36,6 +37,7 @@ namespace Infrastructure.Services.DataTables
             NominationRewardMapper mapper,
             IOrganizationUnitRepository organizationUnitRepository,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
+            IUserRepository userRepository,
             ITrainerAssignmentRepository trainerAssignmentRepository)
         {
             _repository = repository;
@@ -45,8 +47,9 @@ namespace Infrastructure.Services.DataTables
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
+            _userRepository = userRepository;
             //  generic history service
-            _historyService = new GenericTrainerHistoryService<NominationReward>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository);
+            _historyService = new GenericTrainerHistoryService<NominationReward>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository, userRepository);
 
         }
 
@@ -96,7 +99,7 @@ namespace Infrastructure.Services.DataTables
                     ServiceErrorStatus.FORBIDDEN);
 
             // Check status - can only edit Draft, Saved, or Rejected
-            if (entity.FormStatus == "Pending" || entity.FormStatus == "Approved")
+            if (entity.FormStatus == "Approved")
                 return ServiceResult<NominationRewardDto>.Failure(
                     $"Cannot edit {entity.FormStatus} entries",
                     ServiceErrorStatus.INVALIDOPERATION);
@@ -347,6 +350,7 @@ namespace Infrastructure.Services.DataTables
                 getUnitLocationId: x => x.UnitLocationId,
                 getTitleOrName: x => x.Type?.Name,
                 getFormStatus: x => x.FormStatus,
+                getRemarks: x => x.FormStatusRemarks ?? "-",
                 pageNumber,
                 pageSize);
         }

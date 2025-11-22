@@ -21,6 +21,7 @@ namespace Infrastructure.Services.DataTables.IBTVA
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
+        private readonly IUserRepository _userRepository;
         private readonly GenericTrainerHistoryService<IbtvaProgramDetails> _historyService;
 
         public IbtvaProgramService(
@@ -38,6 +39,7 @@ namespace Infrastructure.Services.DataTables.IBTVA
             IbtvaProgramMapper mapper,
             IOrganizationUnitRepository organizationUnitRepository,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
+            IUserRepository userRepository,
             ITrainerAssignmentRepository trainerAssignmentRepository)
         {
             _programRepository = programRepository;
@@ -55,8 +57,9 @@ namespace Infrastructure.Services.DataTables.IBTVA
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
+            _userRepository = userRepository;
             //  generic history service
-            _historyService = new GenericTrainerHistoryService<IbtvaProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository);
+            _historyService = new GenericTrainerHistoryService<IbtvaProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository, userRepository);
         }
 
         // ============================
@@ -1163,6 +1166,7 @@ namespace Infrastructure.Services.DataTables.IBTVA
                 getUnitLocationId: x => x.UnitLocationId,
                 getTitleOrName: x => x.Title ?? x.ProgramType?.Name,
                 getFormStatus: x => x.FormStatus,
+                getRemarks: x => x.FormStatusRemarks ?? "-",
                 pageNumber,
                 pageSize);
         }

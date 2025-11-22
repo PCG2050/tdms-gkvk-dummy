@@ -12,7 +12,7 @@ namespace Application.Interface.Repository.DataTables
         // ============================
         // CORE CRUD OPERATIONS
         // ============================
-
+        Task<List<TableOtherActivity>> GetAllAsync();
         Task<TableOtherActivity?> GetByIdAsync(int id);
 
         /// <summary>

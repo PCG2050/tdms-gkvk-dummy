@@ -285,6 +285,9 @@ namespace WebApi
 
             builder.Services.AddScoped<IAdminReportService, AdminReportService>();
 
+            // Success Story Service
+            builder.Services.AddScoped<ISuccessStoryService, SuccessStoryService>();
+
 
 
 
@@ -294,12 +297,16 @@ namespace WebApi
                     o.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateAudience = true,
+                        ValidateIssuerSigningKey = true,
                         ValidAudience = builder.Configuration["AppSettings:Audience"],
                         ValidateIssuer = true,
                         ValidIssuer = builder.Configuration["AppSettings:Issuer"],
                         ValidateLifetime = true,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:TokenKey"]!)),
-                        ValidateIssuerSigningKey = true
+
+                        RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
+                        NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+
                     };
                 });
 

@@ -21,6 +21,7 @@ namespace Infrastructure.Services.DataTables.DEU
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
+        private readonly IUserRepository _userRepository;
         private readonly GenericTrainerHistoryService<DeuProgramDetails> _historyService;
 
         public DeuProgramService(
@@ -36,6 +37,7 @@ namespace Infrastructure.Services.DataTables.DEU
             ICurrentUserService currentUserService,
             IEntityPermissionService entityPermissionService,
             DeuProgramMapper mapper,
+            IUserRepository userRepository,
             IOrganizationUnitRepository organizationUnitRepository,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
             ITrainerAssignmentRepository trainerAssignmentRepository)
@@ -51,11 +53,13 @@ namespace Infrastructure.Services.DataTables.DEU
             _recommendationRepository = recommendationRepository;
             _currentUserService = currentUserService;
             _entityPermissionService = entityPermissionService;
+            _userRepository = userRepository;
             _mapper = mapper;
+            
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
-            _historyService = new GenericTrainerHistoryService<DeuProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository);
+            _historyService = new GenericTrainerHistoryService<DeuProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository,userRepository);
         }
 
         // ============================
@@ -1159,6 +1163,7 @@ namespace Infrastructure.Services.DataTables.DEU
                 getUnitLocationId: x => x.UnitLocationId,
                 getTitleOrName: x => x.Title ?? x.ProgramType?.Name,
                 getFormStatus: x => x.FormStatus,
+                getRemarks: x => x.FormStatusRemarks ?? "-",
                 pageNumber,
                 pageSize);
         }

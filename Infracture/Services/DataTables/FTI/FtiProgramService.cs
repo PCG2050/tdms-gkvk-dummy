@@ -26,6 +26,7 @@ namespace Infrastructure.Services.DataTables.FTI
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
+        private readonly IUserRepository _userRepository;
         private readonly GenericTrainerHistoryService<FtiProgramDetails> _historyService;
 
         public FtiProgramService(
@@ -41,6 +42,7 @@ namespace Infrastructure.Services.DataTables.FTI
             ICurrentUserService currentUserService,
             IEntityPermissionService entityPermissionService,
             FtiProgramMapper mapper,
+            IUserRepository userRepository,
             IOrganizationUnitRepository organizationUnitRepository,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
             ITrainerAssignmentRepository trainerAssignmentRepository)
@@ -60,7 +62,8 @@ namespace Infrastructure.Services.DataTables.FTI
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
-            _historyService = new GenericTrainerHistoryService<FtiProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository);
+            _userRepository = userRepository;
+            _historyService = new GenericTrainerHistoryService<FtiProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository,userRepository);
         }
 
         // ============================
@@ -1165,6 +1168,7 @@ namespace Infrastructure.Services.DataTables.FTI
                 getUnitLocationId: x => x.UnitLocationId,
                 getTitleOrName: x => x.Title ?? x.ProgramType?.Name,
                 getFormStatus: x => x.FormStatus,
+                getRemarks: x => x.FormStatusRemarks ?? "-",
                 pageNumber,
                 pageSize);
         }

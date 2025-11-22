@@ -28,6 +28,7 @@ namespace Infrastructure.Services.DataTables.KVK
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
+        private readonly IUserRepository _userRepository;
         private readonly GenericTrainerHistoryService<KvkProgramDetails> _historyService;
 
         private const int FLD_CATEGORY_ID = 18;
@@ -51,6 +52,7 @@ namespace Infrastructure.Services.DataTables.KVK
             IEntityPermissionService entityPermissionService,
             ITrainerAssignmentRepository trainerAssignmentRepository,
             IOrganizationUnitRepository organizationUnitRepository,
+            IUserRepository userRepository,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
             KvkProgramMapper mapper)
         {
@@ -71,10 +73,11 @@ namespace Infrastructure.Services.DataTables.KVK
             _trainerAssignmentRepository = trainerAssignmentRepository;
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
+            _userRepository = userRepository;
             _mapper = mapper;
 
             //  generic history service
-            _historyService = new GenericTrainerHistoryService<KvkProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository);
+            _historyService = new GenericTrainerHistoryService<KvkProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository,userRepository);
         }
 
         // ============================
@@ -984,13 +987,22 @@ namespace Infrastructure.Services.DataTables.KVK
                 var updateDto = new KvkReportUpdateDto
                 {
                     Id = existing.Id,
-                    ProgressReportReportingYear = dto.ProgressReportReportingYear,
-                    Date = dto.Date,
-                    UploadPhoto = dto.UploadPhoto,
-                    PhotosGeotaggedPhotoOrUploadPhoto = dto.PhotosGeotaggedPhotoOrUploadPhoto,
-                    UploadVideo = dto.UploadVideo,
-                    SignificantOutcome = dto.SignificantOutcome
-                };
+                    ReportingYear = dto.ReportingYear,
+                    ReportDate = dto.ReportDate,
+                    ProgressReport = dto.ProgressReport,
+                    GeoTaggedPhoto = dto.GeoTaggedPhoto,
+                    ReportingVideo = dto.ReportingVideo,
+                    Outcome = dto.Outcome,
+                    TestingCompletionDate = dto.TestingCompletionDate,
+                    TestingCompletionLetter = dto.TestingCompletionLetter,
+                    ProjectCompletionDate = dto.ProjectCompletionDate,
+                    ProjectCompletionLetter = dto.ProjectCompletionLetter,
+                    TypeOfReport = dto.TypeOfReport,
+                    SpclReport = dto.SpclReport
+                };     
+
+      
+            
 
                 _mapper.MapUpdateDtoToEntity(updateDto, existing);
                 existing.UpdatedById = _currentUserService.UserId;
@@ -1375,6 +1387,7 @@ namespace Infrastructure.Services.DataTables.KVK
                 getUnitLocationId: x => x.UnitLocationId,
                 getTitleOrName: x => x.Title ?? x.ProgramType?.Name,
                 getFormStatus: x => x.FormStatus,
+                getRemarks: x => x.FormStatusRemarks ?? "-",
                 pageNumber,
                 pageSize);
         }

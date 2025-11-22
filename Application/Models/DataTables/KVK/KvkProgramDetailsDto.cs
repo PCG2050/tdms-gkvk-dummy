@@ -763,32 +763,69 @@ namespace Application.Models.DataTables.KVK
     {
         public int Id { get; set; }
         public string? ProgressReportReportingYear { get; set; }
-        public DateTime? Date { get; set; }
-        public string? UploadPhoto { get; set; }
-        public string? PhotosGeotaggedPhotoOrUploadPhoto { get; set; }
-        public string? UploadVideo { get; set; }
-        public string? SignificantOutcome { get; set; }
+
+        public string? ReportingYear { get; set; }
+        public DateOnly? ReportDate { get; set; }
+
+        public string? ProgressReport { get; set; }
+
+        public string? GeoTaggedPhoto { get; set; }
+        public string? ReportingVideo { get; set; }
+
+        public string? Outcome { get; set; }
+        public DateOnly? TestingCompletionDate { get; set; }
+        public string? TestingCompletionLetter { get; set; }
+
+        public DateOnly? ProjectCompletionDate { get; set; }
+        public string? ProjectCompletionLetter { get; set; }
+
+        public string? TypeOfReport { get; set; }
+        public string? SpclReport { get; set; }
     }
 
     public class KvkReportCreateDto
     {
         public string? ProgressReportReportingYear { get; set; }
-        public DateTime? Date { get; set; }
-        public string? UploadPhoto { get; set; }
-        public string? PhotosGeotaggedPhotoOrUploadPhoto { get; set; }
-        public string? UploadVideo { get; set; }
-        public string? SignificantOutcome { get; set; }
+
+        public string? ReportingYear { get; set; }
+        public DateOnly? ReportDate { get; set; }
+
+        public string? ProgressReport { get; set; }
+
+        public string? GeoTaggedPhoto { get; set; }
+        public string? ReportingVideo { get; set; }
+
+        public string? Outcome { get; set; }
+        public DateOnly? TestingCompletionDate { get; set; }
+        public string? TestingCompletionLetter { get; set; }
+
+        public DateOnly? ProjectCompletionDate { get; set; }
+        public string? ProjectCompletionLetter { get; set; }
+
+        public string? TypeOfReport { get; set; }
+        public string? SpclReport { get; set; }
     }
 
     public class KvkReportUpdateDto : IUpdateDto
     {
         public int Id { get; set; }
-        public string? ProgressReportReportingYear { get; set; }
-        public DateTime? Date { get; set; }
-        public string? UploadPhoto { get; set; }
-        public string? PhotosGeotaggedPhotoOrUploadPhoto { get; set; }
-        public string? UploadVideo { get; set; }
-        public string? SignificantOutcome { get; set; }
+        public string? ReportingYear { get; set; }
+        public DateOnly? ReportDate { get; set; }
+
+        public string? ProgressReport { get; set; }
+
+        public string? GeoTaggedPhoto { get; set; }
+        public string? ReportingVideo { get; set; }
+
+        public string? Outcome { get; set; }
+        public DateOnly? TestingCompletionDate { get; set; }
+        public string? TestingCompletionLetter { get; set; }
+
+        public DateOnly? ProjectCompletionDate { get; set; }
+        public string? ProjectCompletionLetter { get; set; }
+
+        public string? TypeOfReport { get; set; }
+        public string? SpclReport { get; set; }
     }
 
     // ============================

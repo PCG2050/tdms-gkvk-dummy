@@ -25,6 +25,12 @@ namespace Infrastructure.Repository.DataTables
             return await _context.OtherActivities.FindAsync(id);
         }
 
+        public async Task<List<TableOtherActivity>> GetAllAsync()
+        {
+            return await _context.OtherActivities              
+                .ToListAsync();
+        }
+
         public async Task<TableOtherActivity?> GetByIdWithDetailsAsync(int id)
         {
             return await _context.OtherActivities

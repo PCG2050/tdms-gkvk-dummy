@@ -21,6 +21,7 @@ namespace Infrastructure.Services.DataTables.EEU
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
+        private readonly IUserRepository _userRepository;
         private readonly GenericTrainerHistoryService<EeuProgramDetails> _historyService;
 
         public EeuProgramService(
@@ -38,6 +39,7 @@ namespace Infrastructure.Services.DataTables.EEU
             EeuProgramMapper mapper,
             IOrganizationUnitRepository organizationUnitRepository,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
+            IUserRepository userRepository,
             ITrainerAssignmentRepository trainerAssignmentRepository)
         {
             _programRepository = programRepository;
@@ -55,7 +57,8 @@ namespace Infrastructure.Services.DataTables.EEU
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
-            _historyService = new GenericTrainerHistoryService<EeuProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository);
+            _userRepository = userRepository;
+            _historyService = new GenericTrainerHistoryService<EeuProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository, userRepository);
         }
 
         // ============================
@@ -1162,6 +1165,7 @@ namespace Infrastructure.Services.DataTables.EEU
                 getUnitLocationId: x => x.UnitLocationId,
                 getTitleOrName: x => x.Title ?? x.ProgramType?.Name,
                 getFormStatus: x => x.FormStatus,
+                getRemarks: x => x.FormStatusRemarks ?? "-",
                 pageNumber,
                 pageSize);
         }

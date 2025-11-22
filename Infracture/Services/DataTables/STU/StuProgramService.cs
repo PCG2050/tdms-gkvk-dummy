@@ -22,6 +22,7 @@ namespace Infrastructure.Services.DataTables.STU
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
         private readonly GenericTrainerHistoryService<StuProgramDetails> _historyService;
+        private readonly IUserRepository _userRepository;
 
         public StuProgramService(
             IStuProgramDetailsRepository programRepository,
@@ -38,6 +39,7 @@ namespace Infrastructure.Services.DataTables.STU
             StuProgramMapper mapper,
             IOrganizationUnitRepository organizationUnitRepository,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
+            IUserRepository userRepository,
             ITrainerAssignmentRepository trainerAssignmentRepository)
         {
             _programRepository = programRepository;
@@ -55,7 +57,8 @@ namespace Infrastructure.Services.DataTables.STU
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
-            _historyService = new GenericTrainerHistoryService<StuProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository);
+            _userRepository = userRepository;
+            _historyService = new GenericTrainerHistoryService<StuProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository,userRepository);
         }
 
         // ============================
@@ -1161,6 +1164,7 @@ namespace Infrastructure.Services.DataTables.STU
                 getUnitLocationId: x => x.UnitLocationId,
                 getTitleOrName: x => x.Title ?? x.ProgramType?.Name,
                 getFormStatus: x => x.FormStatus,
+                getRemarks: x => x.FormStatusRemarks ?? "-",
                 pageNumber,
                 pageSize);
         }

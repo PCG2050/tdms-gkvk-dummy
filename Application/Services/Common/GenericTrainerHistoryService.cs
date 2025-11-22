@@ -18,17 +18,20 @@ namespace Application.Services.Common
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
+        private readonly IUserRepository _userRepository;
 
         public GenericTrainerHistoryService(
             ICurrentUserService currentUserService,
             ITrainerAssignmentRepository trainerAssignmentRepository,
             IOrganizationUnitRepository organizationUnitRepository,
-            IUnitHeadAssignmentRepository unitHeadAssignmentRepository)
+            IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
+            IUserRepository userRepository)
         {
             _currentUserService = currentUserService;
             _trainerAssignmentRepository = trainerAssignmentRepository;
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
+            _userRepository = userRepository;
         }
 
         /// <summary>
@@ -40,6 +43,7 @@ namespace Application.Services.Common
             Func<TEntity, int> getUnitLocationId,
             Func<TEntity, string?> getTitleOrName,
             Func<TEntity, string> getFormStatus,
+            Func<TEntity, string> getRemarks,
             int pageNumber = 1,
             int pageSize = 10)
         {
@@ -71,7 +75,7 @@ namespace Application.Services.Common
 
             // Materialize data first to avoid EF Core translation issues
             var allData = await query
-                .Where(x => x.CreatedById == userId)
+                .Where(x => x.CreatedById.HasValue && x.CreatedById.Value == userId)
                 .ToListAsync();
 
             // Filter by accessible locations in memory
@@ -79,23 +83,40 @@ namespace Application.Services.Common
                 .Where(x => unitLocationIds.Contains(getUnitLocationId(x)))
                 .ToList();
 
-
-
             // Get total count
             var totalCount = filteredData.Count;
 
             // Get paginated items
-            var items = filteredData
+            var paginatedData = filteredData
                 .OrderByDescending(x => x.CreatedAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
+                .ToList();
+
+            // Fetch user information for all creators
+            var creatorIds = paginatedData
+                .Where(x => x.CreatedById.HasValue)
+                .Select(x => x.CreatedById!.Value)
+                .Distinct()
+                .ToList();
+
+            var users = await _userRepository.GetUsersByIdsAsync(creatorIds);
+            var userDictionary = users.ToDictionary(u => u.Id, u => $"{u.FirstName} {u.LastName}");
+
+            // Build DTOs with user names
+            var items = paginatedData
                 .Select(x => new TrainerHistoryItemDto
                 {
                     Id = x.Id,
                     Title = getTitleOrName(x) ?? "Untitled",
                     CreatedAt = x.CreatedAt,
-                    UpdatedAt = x.UpdatedAt,
-                    FormStatus = getFormStatus(x)
+                    UpdatedAt = x.UpdatedAt,                   
+                    FormStatus = getFormStatus(x),
+                    FormStatusRemarks = getRemarks(x),
+                    CreatedById = x.CreatedById ?? 0,
+                    CreatedByName = x.CreatedById.HasValue
+                        ? userDictionary.GetValueOrDefault(x.CreatedById.Value, "Unknown User")
+                        : "Unknown User"
                 })
                 .ToList();
 
@@ -111,13 +132,14 @@ namespace Application.Services.Common
         /// <summary>
         /// Get pending approvals for Unit Head with pagination
         /// Shows all entries in Pending status for unit locations assigned to Unit Head
+        /// Optionally filter by creator ID
         /// </summary>
         public async Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
             IQueryable<TEntity> query,
             Func<TEntity, int> getUnitLocationId,
             Func<TEntity, string?> getTitleOrName,
             Func<TEntity, string> getFormStatus,
-            Func<TEntity, int> getCreatedById,
+            Func<TEntity, int> getCreatedById,            
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
             int pageNumber = 1,
             int pageSize = 10,
@@ -168,10 +190,20 @@ namespace Application.Services.Common
 
             var totalCount = filteredData.Count;
 
-            var items = filteredData
+            // Get paginated data
+            var paginatedData = filteredData
                 .OrderByDescending(x => x.CreatedAt)
                 .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
+                .Take(pageSize)                
+                .ToList();
+
+            // Fetch user information for all creators
+            var creatorIds = paginatedData.Select(x => getCreatedById(x)).Distinct().ToList();
+            var users = await _userRepository.GetUsersByIdsAsync(creatorIds);
+            var userDictionary = users.ToDictionary(u => u.Id, u => $"{u.FirstName} {u.LastName}");
+
+            // Build DTOs with user names
+            var items = paginatedData
                 .Select(x => new PendingApprovalItemDto
                 {
                     Id = x.Id,
@@ -179,7 +211,9 @@ namespace Application.Services.Common
                     CreatedAt = x.CreatedAt,
                     UpdatedAt = x.UpdatedAt,
                     FormStatus = getFormStatus(x),
-                    CreatedById = getCreatedById(x)
+                    CreatedById = getCreatedById(x),
+
+                    CreatedByName = userDictionary.GetValueOrDefault(getCreatedById(x), "Unknown User")
                 })
                 .ToList();
 
@@ -200,6 +234,9 @@ namespace Application.Services.Common
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset? UpdatedAt { get; set; }
         public string FormStatus { get; set; } = string.Empty;
+        public string FormStatusRemarks { get; set; } = string.Empty;
+        public int CreatedById { get; set; }
+        public string CreatedByName { get; set; } = string.Empty;
     }
 
     public class PendingApprovalItemDto
@@ -210,5 +247,6 @@ namespace Application.Services.Common
         public DateTimeOffset? UpdatedAt { get; set; }
         public string FormStatus { get; set; } = string.Empty;
         public int CreatedById { get; set; }
+        public string CreatedByName { get; set; } = string.Empty;
     }
 }

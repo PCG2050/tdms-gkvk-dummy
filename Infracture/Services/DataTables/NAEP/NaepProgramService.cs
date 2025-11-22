@@ -22,7 +22,7 @@ namespace Infrastructure.Services.DataTables.NAEP
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
         private readonly GenericTrainerHistoryService<NaepProgramDetails> _historyService;
-
+        private readonly IUserRepository _userRepository;
 
         public NaepProgramService(
             INaepProgramDetailsRepository programRepository,
@@ -38,6 +38,7 @@ namespace Infrastructure.Services.DataTables.NAEP
             IEntityPermissionService entityPermissionService,
             NaepProgramMapper mapper,
             IOrganizationUnitRepository organizationUnitRepository,
+            IUserRepository userRepository,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
             ITrainerAssignmentRepository trainerAssignmentRepository)
         {
@@ -55,9 +56,10 @@ namespace Infrastructure.Services.DataTables.NAEP
             _mapper = mapper;
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
+            _userRepository = userRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
             //  generic history service
-            _historyService = new GenericTrainerHistoryService<NaepProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository);
+            _historyService = new GenericTrainerHistoryService<NaepProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository, userRepository);
         }
 
         // ============================
@@ -1164,6 +1166,7 @@ namespace Infrastructure.Services.DataTables.NAEP
                 getUnitLocationId: x => x.UnitLocationId,
                 getTitleOrName: x => x.Title ?? x.ProgramType?.Name,
                 getFormStatus: x => x.FormStatus,
+                getRemarks: x => x.FormStatusRemarks ?? "-",
                 pageNumber,
                 pageSize);
         }

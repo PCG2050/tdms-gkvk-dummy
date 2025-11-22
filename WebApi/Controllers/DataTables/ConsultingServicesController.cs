@@ -266,15 +266,32 @@ namespace WebApi.Controllers.DataTables
 
             return Ok(new { message = "Consulting service rejected" });
         }
-
-
-        [HttpGet("pending-review")]
+        /// <summary>
+        /// Get pending approvals for Unit Head
+        /// Shows all entries in Pending status for unit locations
+        /// assigned to the logged-in Unit Head
+        /// </summary>
+        /// <param name="pageNumber">Page number (default: 1)</param>
+        /// <param name="pageSize">Items per page (default: 20)</param>
+        /// <response code="200">Paginated list of pending approvals</response>
+        [HttpGet("pending-approvals")]
         [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
-        public async Task<IActionResult> GetPendingConsultingServices([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
+        public async Task<IActionResult> GetPendingApprovals(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+            int? createdByIdFilter = null)
         {
-            var result = await _consultingServiceService.GetByStatusAsync("pending", pageNumber, pageSize);
-            return Ok(new { data = result.Items, pagination = result });
+            var result = await _consultingServiceService.GetPendingApprovalsAsync(pageNumber, pageSize, createdByIdFilter);
+            return Ok(result);
         }
+
+        //[HttpGet("pending-review")]
+        //[Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
+        //public async Task<IActionResult> GetPendingConsultingServices([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
+        //{
+        //    var result = await _consultingServiceService.GetByStatusAsync("pending", pageNumber, pageSize);
+        //    return Ok(new { data = result.Items, pagination = result });
+        //}
 
     }
 

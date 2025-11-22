@@ -128,6 +128,7 @@ namespace Application.Interface.Services.DataTables
         /// </summary>
         Task<PaginatedResult<TableOtherActivityDto>> GetPendingApprovalsAsync(
             int pageNumber = 1,
-            int pageSize = 20);
+            int pageSize = 20,
+             int? createdByIdFilter = null);
     }
 }

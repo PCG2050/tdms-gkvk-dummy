@@ -330,7 +330,7 @@ namespace Infrastructure.Services.DataTables
 
         public async Task<PaginatedResult<TableOtherActivityDto>> GetPendingApprovalsAsync(
             int pageNumber = 1,
-            int pageSize = 20)
+            int pageSize = 20, int? createdByIdFilter = null)
         {
             var currentUserRole = _currentUserService.Role;
 

@@ -128,6 +128,10 @@ namespace Application.Models.Reports
         public string Category { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
         public string Pages { get; set; }   = string.Empty;
+
+        public string Mode { get; set; } = string.Empty;
+        
+        public int CopiesSold { get; set; } = 0;
     }
 
     public class ReportNominationDto
@@ -149,9 +153,15 @@ namespace Application.Models.Reports
     {
         public string Category { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
-        public string Discipline { get; set; } = string.Empty;
-        public string Particular { get; set; } = string.Empty;        
-        public DateOnly Date { get; set; }
+
+        public string Theme { get; set; } = string.Empty;
+        public int Quantity { get; set; }
+
+        public string Unit { get; set; } = string.Empty;
+        public decimal Amount { get; set; }
+        //public string Discipline { get; set; } = string.Empty;
+        //public string Particular { get; set; } = string.Empty;        
+        //public DateOnly Date { get; set; }
     }
 
     public class ReportOtherActivityDto

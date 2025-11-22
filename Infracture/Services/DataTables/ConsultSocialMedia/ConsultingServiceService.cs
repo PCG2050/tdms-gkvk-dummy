@@ -13,6 +13,7 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
+        private readonly IUserRepository _userRepository;
         // Generic history service
         private readonly GenericTrainerHistoryService<ConsultingAndSocialMediaService> _historyService;
 
@@ -24,6 +25,7 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
             IEntityPermissionService entityPermissionService,
             ConsultingServiceMapper mapper,
             IOrganizationUnitRepository organizationUnitRepository,
+            IUserRepository userRepository,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
             ITrainerAssignmentRepository trainerAssignmentRepository)
         {
@@ -35,8 +37,9 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
+            _userRepository = userRepository;
             //  generic history service
-            _historyService = new GenericTrainerHistoryService<ConsultingAndSocialMediaService>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository);
+            _historyService = new GenericTrainerHistoryService<ConsultingAndSocialMediaService>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository, userRepository);
         }
 
         // ==========================================
@@ -483,6 +486,7 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
                 getUnitLocationId: x => x.UnitLocationId,
                 getTitleOrName: x => x.Title ?? x.Category?.Name,
                 getFormStatus: x => x.FormStatus,
+                getRemarks: x=> x.FormStatusRemarks ?? "-",
                 pageNumber,
                 pageSize);
         }
@@ -492,7 +496,8 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
         /// </summary>
         public async Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
             int pageNumber = 1,
-            int pageSize = 10)
+            int pageSize = 10,
+            int? createdByIdFilter = null)
         {
             var query = _consultingServiceRepository.GetQueryable()
                 .Include(x => x.Category);
@@ -505,7 +510,8 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
                 getCreatedById: x => x.CreatedById ?? 0,
                 _unitHeadAssignmentRepository,
                 pageNumber,
-                pageSize);
+                pageSize,
+                createdByIdFilter);
         }
 
         // ==========================================

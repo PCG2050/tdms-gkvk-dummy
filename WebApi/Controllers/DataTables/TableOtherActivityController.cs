@@ -67,7 +67,7 @@ namespace WebApi.Controllers.DataTables
         /// <response code="400">Validation error or access denied</response>
         /// <response code="401">Unauthorized - authentication required</response>
         [HttpPost]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
         public async Task<IActionResult> Create([FromBody] TableOtherActivityCreateDto createDto)
         {
             var result = await _service.CreateAsync(createDto);
@@ -132,7 +132,7 @@ namespace WebApi.Controllers.DataTables
         /// <response code="400">Cannot modify (wrong status or access denied)</response>
         /// <response code="404">Activity not found</response>
         [HttpPut("{id}")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
         public async Task<IActionResult> Update(int id, [FromBody] TableOtherActivityUpdateDto updateDto)
         {
             var result = await _service.UpdateAsync(id, updateDto);
@@ -161,7 +161,7 @@ namespace WebApi.Controllers.DataTables
         /// <response code="400">Cannot delete (wrong status)</response>
         /// <response code="404">Activity not found</response>
         [HttpDelete("{id}")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _service.DeleteAsync(id);
@@ -341,7 +341,7 @@ namespace WebApi.Controllers.DataTables
         /// <param name="pageSize">Items per page (default: 20)</param>
         /// <response code="200">Paginated history of trainer's submissions</response>
         [HttpGet("my-history")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
         public async Task<IActionResult> GetMyHistory(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 20)
@@ -362,9 +362,10 @@ namespace WebApi.Controllers.DataTables
         [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
         public async Task<IActionResult> GetPendingApprovals(
             [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 20)
+            [FromQuery] int pageSize = 20,
+             int? createdByIdFilter = null)
         {
-            var result = await _service.GetPendingApprovalsAsync(pageNumber, pageSize);
+            var result = await _service.GetPendingApprovalsAsync(pageNumber, pageSize,createdByIdFilter);
             return Ok(result);
         }
     }

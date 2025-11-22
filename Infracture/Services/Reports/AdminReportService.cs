@@ -2,7 +2,6 @@
 using Application.Interface.Repository;
 using Application.Interface.Repository.DataTables;
 using Application.Interface.Repository.DataTables.FIU;
-using Application.Interface.Repository.DataTables.FTI;
 using Application.Interface.Repository.DataTables.TblService;
 using Application.Interface.Services.Reports;
 using Application.Models;
@@ -29,17 +28,18 @@ namespace Infrastructure.Services.Reports
         private readonly INaepProgramDetailsRepository _naepRepository;
         private readonly IStuProgramDetailsRepository _stuRepository;
         private readonly IAticProgramDetailsRepository _aticRepository;
-        private readonly IFtiProgramDetailsRepository _ftiRepository;
+        //private readonly IFtiProgramDetailsRepository _ftiRepository;
         private readonly IASMVisitorDetailsRepository _asmRepository;
+
         private readonly IPublicationRepository _publicationRepository;
         private readonly INominationRewardRepository _nominationRewardRepository;
+
         private readonly IConsultingServiceRepository _consultingRepository;
-      
+        private readonly ITableServiceRepository _tblServiceRepository;
+        private readonly ITableOtherActivityRepository _otherActivityRepository;
 
         // NEW: FIU Repository
         private readonly IFIUProgramActivityRepository _fiuRepository;
-        private readonly ITableServiceRepository _tblserviceRepository;
-        private readonly ITableOtherActivityRepository _otheractivitiesrepository;
 
         public AdminReportService(
             ICurrentUserService currentUserService,
@@ -59,8 +59,7 @@ namespace Infrastructure.Services.Reports
             IDeuProgramDetailsRepository deuRepository,
             IFIUProgramActivityRepository fiuRepository,
             IASMVisitorDetailsRepository asmRepository,
-            ITableOtherActivityRepository otherActivityRepository,
-            ITableServiceRepository tableServiceRepository
+            ITableOtherActivityRepository otherActivityRepository
             )
         {
             _currentUserService = currentUserService;
@@ -70,7 +69,8 @@ namespace Infrastructure.Services.Reports
             _nominationRewardRepository = nominationRewardRepository;
             _publicationRepository = publicationRepository;
             _consultingRepository = consultingRepository;
-            _tblserviceRepository = tableServiceRepository;
+            _tblServiceRepository = tblServiceRepository;
+            _otherActivityRepository = otherActivityRepository;
             _naepRepository = naepRepository;
             _ibtvaRepository = ibtvaRepository;
             _kvkRepository = kvkRepository;
@@ -84,24 +84,35 @@ namespace Infrastructure.Services.Reports
 
         public async Task<ServiceResult<ReportFilterOptionsDto>> GetFilterOptionsAsync()
         {
-            if (_currentUserService.Role != Role.ADMIN)
-                return ServiceResult<ReportFilterOptionsDto>.Failure("Only admins can access reports");
+            // Allow both Admin and UnitHead
+            if (_currentUserService.Role != Role.ADMIN && _currentUserService.Role != Role.UNITHEAD)
+                return ServiceResult<ReportFilterOptionsDto>.Failure("Access denied");
 
             var orgId = _currentUserService.OrganizationId;
+            List<int> allowedLocationIds;
 
-            // Get assigned unit locations
-            var unitHeadAssignments = await _unitHeadAssignmentRepository.GetAllAsync();
-            var trainerAssignments = await _trainerAssignmentRepository.GetAllAsync();
+            if (_currentUserService.Role == Role.ADMIN)
+            {
+                // Admin: Get ALL assigned locations in organization
+                var unitHeadAssignments = await _unitHeadAssignmentRepository.GetAllAsync();
+                var trainerAssignments = await _trainerAssignmentRepository.GetAllAsync();
 
-            var assignedLocationIds = unitHeadAssignments.Select(x => x.UnitLocationId)
-                .Union(trainerAssignments.Select(x => x.UnitLocationId))
-                .Distinct().ToList();
+                allowedLocationIds = unitHeadAssignments.Select(x => x.UnitLocationId)
+                    .Union(trainerAssignments.Select(x => x.UnitLocationId))
+                    .Distinct().ToList();
+            }
+            else // UNITHEAD
+            {
+                // Unit Head: Get ONLY their assigned locations
+                allowedLocationIds = await _unitHeadAssignmentRepository
+                    .GetUnitLocationIdsByUnitHeadIdAsync(_currentUserService.UserId);
+            }
 
-            var allLocations = await _organizationUnitRepository.GetOrganizationUnitsAsync(orgId);
-            var activeLocations = allLocations.Where(ul => assignedLocationIds.Contains(ul.Id)).ToList();
+            // Get location details
+            var locations = await _organizationUnitRepository.GetByIdsAsync(allowedLocationIds);
 
             // Group by unit
-            var units = activeLocations
+            var units = locations
                 .GroupBy(ul => new { ul.Unit.Id, ul.Unit.Name })
                 .Select(g => new UnitWithLocationsDto
                 {
@@ -128,8 +139,23 @@ namespace Infrastructure.Services.Reports
 
         public async Task<ServiceResult<AdminReportResponseDto>> GenerateReportAsync(AdminReportFilterDto filter)
         {
-            if (_currentUserService.Role != Role.ADMIN)
-                return ServiceResult<AdminReportResponseDto>.Failure("Only admins can access reports");
+            // Allow both Admin and UnitHead
+            if (_currentUserService.Role != Role.ADMIN && _currentUserService.Role != Role.UNITHEAD)
+                return ServiceResult<AdminReportResponseDto>.Failure("Access denied");
+
+            // Validate Unit Head has access to this location
+            if (_currentUserService.Role == Role.UNITHEAD)
+            {
+                var allowedLocationIds = await _unitHeadAssignmentRepository
+                    .GetUnitLocationIdsByUnitHeadIdAsync(_currentUserService.UserId);
+
+                if (!allowedLocationIds.Contains(filter.UnitLocationId))
+                {
+                    return ServiceResult<AdminReportResponseDto>.Failure(
+                        "You don't have access to this unit location",
+                        ServiceErrorStatus.FORBIDDEN);
+                }
+            }
 
             if (filter.Month < 1 || filter.Month > 12)
                 return ServiceResult<AdminReportResponseDto>.Failure("Month must be 1-12");
@@ -154,26 +180,26 @@ namespace Infrastructure.Services.Reports
             };
 
             // ========== NEW: CHECK IF FIU UNIT AND ADD FIU ACTIVITIES ==========
-           
+
             if (location.UnitId == UnitConstants.FIU_UNIT_ID)
             {
                 // Get FIU monthly summary
                 var (fiuActivities, totalEntries) = await _fiuRepository.GetMonthlyActivitySummaryAsync(new List<int> { filter.UnitLocationId }, filter.Year, filter.Month);
-                
-               
-                    report.FIUActivities = new ReportFIUActivitiesDto
-                    {
-                        Activities = fiuActivities.Select(a => new ReportFIUActivityItemDto
-                        {
-                            SlNo = a.SlNo,
-                            ActivityName = a.ActivityName,
-                            Count = a.Count
-                        }).ToList(),
-                        TotalActivities = fiuActivities.Count,
-                        TotalCount = fiuActivities.Sum(a => a.Count),
-                        TotalEntries = totalEntries
 
-                    };
+
+                report.FIUActivities = new ReportFIUActivitiesDto
+                {
+                    Activities = fiuActivities.Select(a => new ReportFIUActivityItemDto
+                    {
+                        SlNo = a.SlNo,
+                        ActivityName = a.ActivityName,
+                        Count = a.Count
+                    }).ToList(),
+                    TotalActivities = fiuActivities.Count,
+                    TotalCount = fiuActivities.Sum(a => a.Count),
+                    TotalEntries = totalEntries
+
+                };
 
                 // IMPORTANT: Set total entries to FIU count
                 report.TotalEntries = totalEntries;
@@ -182,7 +208,7 @@ namespace Infrastructure.Services.Reports
             }
 
             // ========== NEW: ASM UNIT LOGIC ==========
-           
+
             if (location.UnitId == UnitConstants.ASM_UNIT_ID)
             {
                 var (summary, totalEntries) = await _asmRepository.GetMonthlyVisitorSummaryAsync(
@@ -191,7 +217,7 @@ namespace Infrastructure.Services.Reports
                     filter.Month
                 );
 
-                
+
                 var visitorItems = new List<ASMVisitorReportItemDto>
             {
                 new ASMVisitorReportItemDto
@@ -226,16 +252,16 @@ namespace Infrastructure.Services.Reports
             }
 
 
-           
+
 
             // ========== EXISTING LOGIC FOR OTHER UNITS ==========
-           
+
 
             // ========== NOMINATION & REWARDS ==========
             var nominations = await _nominationRewardRepository.GetAllAsync();
             report.Nominations = nominations
                 .Where(x => x.UnitLocationId == filter.UnitLocationId &&
-                           (x.FormStatus == "Approved") &&
+                           (x.FormStatus == "Draft" || x.FormStatus == "Pending" || x.FormStatus == "Approved") &&
                            x.CreatedAt >= startDate && x.CreatedAt < endDate)
                 .Select(x => new ReportNominationDto
                 {
@@ -250,13 +276,15 @@ namespace Infrastructure.Services.Reports
             var publications = await _publicationRepository.GetAllAsync();
             report.Publications = publications
                 .Where(x => x.UnitLocationId == filter.UnitLocationId &&
-                          (x.FormStatus == "Approved") &&
+                          (x.FormStatus == "Draft" || x.FormStatus == "Pending" || x.FormStatus == "Approved") &&
                            x.CreatedAt >= startDate && x.CreatedAt <= endDate)
                 .Select(x => new ReportPublicationDto
                 {
                     Category = x.Category != null ? (x.Category.Name.Equals("Others") ? (string.IsNullOrWhiteSpace(x.OtherPublication) ? "-" : x.OtherPublication) : x.Category.Name) : "-",
                     Title = x.Title ?? "N/A",
-                    Pages = $"{x.PublicationPagesFrom}-{x.PublicationPagesTo}"
+                    Pages = $"{x.PublicationPagesFrom}-{x.PublicationPagesTo}",
+                    Mode = x.Mode != null ? (x.Mode.Name.Equals("Others") ? (string.IsNullOrWhiteSpace(x.OtherPublication) ? "-" : x.OtherPublication) : x.Mode.Name) : "-"                  
+
                 })
                 .ToList();
 
@@ -265,7 +293,7 @@ namespace Infrastructure.Services.Reports
             var deuPrograms = await _deuRepository.GetAllAsync();
             report.Programs.AddRange(deuPrograms
                 .Where(x => x.UnitLocationId == filter.UnitLocationId &&
-                          ( x.FormStatus == "Approved") &&
+                          (x.FormStatus == "Draft" || x.FormStatus == "Pending" || x.FormStatus == "Approved") &&
                            x.CreatedAt >= startDate && x.CreatedAt < endDate)
                 .Select(x => new ReportProgramDto
                 {
@@ -282,7 +310,7 @@ namespace Infrastructure.Services.Reports
             var eeuPrograms = await _eeuRepository.GetAllAsync();
             report.Programs.AddRange(eeuPrograms
                 .Where(x => x.UnitLocationId == filter.UnitLocationId &&
-                          (x.FormStatus == "Approved") &&
+                          (x.FormStatus == "Draft" || x.FormStatus == "Pending" || x.FormStatus == "Approved") &&
                            x.CreatedAt >= startDate && x.CreatedAt < endDate)
                 .Select(x => new ReportProgramDto
                 {
@@ -299,7 +327,7 @@ namespace Infrastructure.Services.Reports
             var kvkPrograms = await _kvkRepository.GetAllAsync();
             report.Programs.AddRange(kvkPrograms
                 .Where(x => x.UnitLocationId == filter.UnitLocationId &&
-                           (x.FormStatus == "Approved") &&
+                           (x.FormStatus == "Draft" || x.FormStatus == "Pending" || x.FormStatus == "Approved") &&
                            x.CreatedAt >= startDate && x.CreatedAt < endDate)
                 .Select(x => new ReportProgramDto
                 {
@@ -316,7 +344,7 @@ namespace Infrastructure.Services.Reports
             var ibtvaPrograms = await _ibtvaRepository.GetAllAsync();
             report.Programs.AddRange(ibtvaPrograms
                 .Where(x => x.UnitLocationId == filter.UnitLocationId &&
-                          (x.FormStatus == "Approved") &&
+                          (x.FormStatus == "Draft" || x.FormStatus == "Pending" || x.FormStatus == "Approved") &&
                            x.CreatedAt >= startDate && x.CreatedAt < endDate)
                 .Select(x => new ReportProgramDto
                 {
@@ -333,7 +361,7 @@ namespace Infrastructure.Services.Reports
             var stuPrograms = await _stuRepository.GetAllAsync();
             report.Programs.AddRange(stuPrograms
                 .Where(x => x.UnitLocationId == filter.UnitLocationId &&
-                           (x.FormStatus == "Approved") &&
+                           (x.FormStatus == "Draft" || x.FormStatus == "Pending" || x.FormStatus == "Approved") &&
                            x.CreatedAt >= startDate && x.CreatedAt < endDate)
                 .Select(x => new ReportProgramDto
                 {
@@ -350,7 +378,7 @@ namespace Infrastructure.Services.Reports
             var aticPrograms = await _aticRepository.GetAllAsync();
             report.Programs.AddRange(aticPrograms
                 .Where(x => x.UnitLocationId == filter.UnitLocationId &&
-                           (x.FormStatus == "Approved") &&
+                           (x.FormStatus == "Draft" || x.FormStatus == "Pending" || x.FormStatus == "Approved") &&
                            x.CreatedAt >= startDate && x.CreatedAt < endDate)
                 .Select(x => new ReportProgramDto
                 {
@@ -367,7 +395,7 @@ namespace Infrastructure.Services.Reports
             var consultancies = await _consultingRepository.GetAllAsync();
             report.Consultancies = consultancies
                 .Where(x => x.UnitLocationId == filter.UnitLocationId &&
-                           (x.FormStatus == "Approved") &&
+                           (x.FormStatus == "Draft" || x.FormStatus == "Pending" || x.FormStatus == "Approved") &&
                            x.CreatedAt >= startDate && x.CreatedAt < endDate)
                 .Select(x => new ReportConsultancyDto
                 {
@@ -377,35 +405,35 @@ namespace Infrastructure.Services.Reports
                 })
                 .ToList();
 
-            //// ========== services ==========
-            //var services = await _tblserviceRepository.getallasync();
-            //report.services = services
-            //    .where(x => x.unitlocationid == filter.unitlocationid &&
-            //               x.formstatus == "draft" &&
-            //               x.createdat >= startdate && x.createdat < enddate)
-            //    .select(x => new reportservicedto
-            //    {
-            //        category = x.category != null ? (x.category.name.equals("others") ? (string.isnullorwhitespace(x.othercategory) ? "-" : x.othercategory) : x.category.name) : "-",
-            //        theme = x.theme != null ? (x.theme.name.equals("others") ? (string.isnullorwhitespace(x.othertheme) ? "-" : x.othertheme) : x.theme.name) : "-",
-            //        title = x.titleofactivityconducted ?? "-",
-            //        unit = x.quantityunit?.name ?? "-",
-            //        quantity = x.number,
-            //        amount = x.amountgenerated
-            //    })
-            //    .tolist();
+            // ========== SERVICES ==========
+            var services = await _tblServiceRepository.GetAllAsync();
+            report.Services = services
+                .Where(x => x.UnitLocationId == filter.UnitLocationId &&
+                           x.FormStatus == "Draft" &&
+                           x.CreatedAt >= startDate && x.CreatedAt < endDate)
+                .Select(x => new ReportServiceDto
+                {
+                    Category = x.Category != null ? (x.Category.Name.Equals("Others") ? (string.IsNullOrWhiteSpace(x.OtherCategory) ? "-" : x.OtherCategory) : x.Category.Name) : "-",
+                    Theme = x.Theme != null ? (x.Theme.Name.Equals("Others") ? (string.IsNullOrWhiteSpace(x.OtherTheme) ? "-" : x.OtherTheme) : x.Theme.Name) : "-",
+                    Title = x.TitleOfActivityConducted ?? "-",
+                    Unit = x.QuantityUnit?.Name ?? "-",
+                    Quantity = x.Number,
+                    Amount = x.AmountGenerated
+                })
+                .ToList();
 
-            //// ========== other activities ==========
-            //var otheractivities = await _otheractivitiesrepository.getallasync();
-            //report.otheractivities = otheractivities
-            //    .where(x => x.unitlocationid == filter.unitlocationid &&
-            //               x.formstatus == "approved" &&
-            //               x.createdat >= startdate && x.createdat < enddate)
-            //    .select(x => new reportotheractivitydto
-            //    {sol
-            //        title = x.title ?? "-",
-            //        description = x.description ?? "-"
-            //    })
-            //    .tolist();
+            // ========== OTHER ACTIVITIES ==========
+            var otherActivities = await _otherActivityRepository.GetAllAsync();
+            report.OtherActivities = otherActivities
+                .Where(x => x.UnitLocationId == filter.UnitLocationId &&
+                           x.FormStatus == "Approved" &&
+                           x.CreatedAt >= startDate && x.CreatedAt < endDate)
+                .Select(x => new ReportOtherActivityDto
+                {
+                    Title = x.Title ?? "-",
+                    Description = x.Description ?? "-"
+                })
+                .ToList();
 
             report.TotalEntries = report.Programs.Count + report.Publications.Count +
                                  report.Nominations.Count + report.Consultancies.Count +

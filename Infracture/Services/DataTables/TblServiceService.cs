@@ -17,6 +17,7 @@ namespace Infrastructure.Services.DataTables
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
+        private readonly IUserRepository _userRepository;
         // Generic history service
         private readonly GenericTrainerHistoryService<TblService> _historyService;
 
@@ -30,7 +31,7 @@ namespace Infrastructure.Services.DataTables
             TblServiceMapper mapper,
             IOrganizationUnitRepository organizationUnitRepository,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
-            ITrainerAssignmentRepository trainerAssignmentRepository)
+            ITrainerAssignmentRepository trainerAssignmentRepository, IUserRepository userRepository)
         {
             _tableServiceRepository = tableServiceRepository;
             _tableHostelRepository = tableHostelRepository;
@@ -42,8 +43,9 @@ namespace Infrastructure.Services.DataTables
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
+            _userRepository = userRepository;
             //  generic history service
-            _historyService = new GenericTrainerHistoryService<TblService>(currentUserService, trainerAssignmentRepository, organizationUnitRepository,unitHeadAssignmentRepository);
+            _historyService = new GenericTrainerHistoryService<TblService>(currentUserService, trainerAssignmentRepository, organizationUnitRepository,unitHeadAssignmentRepository,userRepository);
         }
 
         // ============================
@@ -772,6 +774,7 @@ namespace Infrastructure.Services.DataTables
                 getUnitLocationId: x => x.UnitLocationId,
                 getTitleOrName: x => x.Category?.Name,
                 getFormStatus: x => x.FormStatus,
+                getRemarks: x => x.FormStatusRemarks ?? "-",
                 pageNumber,
                 pageSize);
         }

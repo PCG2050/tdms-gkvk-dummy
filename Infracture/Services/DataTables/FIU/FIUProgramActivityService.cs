@@ -19,6 +19,7 @@ namespace Infrastructure.Services.DataTables.FIU
         private readonly ICurrentUserService _currentUserService;
         private readonly FIUProgramActivityMapper _mapper;
         private readonly GenericTrainerHistoryService<FIUProgramActivity> _historyService;
+        private readonly IUserRepository userRepository;
 
         public FIUProgramActivityService(
             IFIUProgramActivityRepository activityRepository,
@@ -27,6 +28,7 @@ namespace Infrastructure.Services.DataTables.FIU
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
             IOrganizationUnitRepository organizationUnitRepository,
             ICurrentUserService currentUserService,
+            IUserRepository userRepository,
             FIUProgramActivityMapper mapper)
         {
             _activityRepository = activityRepository;
@@ -37,7 +39,7 @@ namespace Infrastructure.Services.DataTables.FIU
             _currentUserService = currentUserService;
             _mapper = mapper;
             //  generic history service
-            _historyService = new GenericTrainerHistoryService<FIUProgramActivity>(currentUserService, trainerAssignmentRepository, organizationUnitRepository,unitHeadAssignmentRepository);
+            _historyService = new GenericTrainerHistoryService<FIUProgramActivity>(currentUserService, trainerAssignmentRepository, organizationUnitRepository,unitHeadAssignmentRepository, userRepository);
         }
 
         // ==========================================
@@ -234,8 +236,8 @@ namespace Infrastructure.Services.DataTables.FIU
             if (activity.CreatedById != _currentUserService.UserId)
                 return ServiceResult<bool>.Failure("You can only delete your own activities");
 
-            if (activity.FormStatus == "Approved")
-                return ServiceResult<bool>.Failure("Cannot delete approved activities");
+            //if (activity.FormStatus == "Approved")
+            //    return ServiceResult<bool>.Failure("Cannot delete approved activities");
 
             var deleted = await _activityRepository.DeleteAsync(id);
             return ServiceResult<bool>.Success(deleted, "Activity deleted successfully");
@@ -429,6 +431,7 @@ namespace Infrastructure.Services.DataTables.FIU
                 getUnitLocationId: x => x.UnitLocationId,
                 getTitleOrName: x => x.FIUActivity.ActivityName,
                 getFormStatus: x => x.FormStatus,
+                getRemarks: x => x.FormStatusRemarks ?? "-",
                 pageNumber,
                 pageSize);
         }

@@ -506,27 +506,27 @@ namespace WebApi.Controllers.DataTables
             return Ok(new { data = summary });
         }
 
-        /// <summary>
-        /// Get pending services for Unit Head review
-        /// </summary>
-        [HttpGet("pending-review")]
-        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
-        public async Task<IActionResult> GetPendingReview(
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 20)
-        {
-            var result = await _service.GetByStatusAsync("Pending", pageNumber, pageSize);
-            return Ok(new
-            {
-                data = result.Items,
-                pagination = new
-                {
-                    pageNumber = result.PageNumber,
-                    pageSize = result.PageSize,
-                    totalItems = result.TotalItems
-                }
-            });
-        }
+        ///// <summary>
+        ///// Get pending services for Unit Head review
+        ///// </summary>
+        //[HttpGet("pending-review")]
+        //[Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
+        //public async Task<IActionResult> GetPendingReview(
+        //    [FromQuery] int pageNumber = 1,
+        //    [FromQuery] int pageSize = 20)
+        //{
+        //    var result = await _service.GetByStatusAsync("Pending", pageNumber, pageSize);
+        //    return Ok(new
+        //    {
+        //        data = result.Items,
+        //        pagination = new
+        //        {
+        //            pageNumber = result.PageNumber,
+        //            pageSize = result.PageSize,
+        //            totalItems = result.TotalItems
+        //        }
+        //    });
+        //}
 
         // ==========================================
         // FILTERS & PAGINATION
