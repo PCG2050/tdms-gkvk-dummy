@@ -1,31 +1,16 @@
 ﻿// IStuProgramDetailsRepository.cs
 
+using Application.Interface.Repository.Common;
 
 namespace Application.Interface.Repository.DataTables.STU
 {
-    public interface IStuProgramDetailsRepository
+    /// <summary>
+    /// Repository interface for StuProgramDetails.
+    /// Extends the generic base repository with STU-specific methods.
+    /// </summary>
+    public interface IStuProgramDetailsRepository : IBaseReportEntryRepository<StuProgramDetails>
     {
-        Task<StuProgramDetails?> GetByIdAsync(int id);
-        Task<StuProgramDetails?> GetWithDetailsAsync(int id);
-        Task<StuProgramDetails> CreateAsync(StuProgramDetails entity);
-        Task<StuProgramDetails> UpdateAsync(StuProgramDetails entity);
-        Task DeleteAsync(int id);
-
-        Task<PaginatedResult<StuProgramDetails>> GetPaginatedAsync(
-            List<int> unitLocationIds,
-            int pageNumber = 1,
-            int pageSize = 10,
-            DateOnly? startDate = null,
-            DateOnly? endDate = null,
-            int? programTypeId = null,
-            string? searchTerm = null);
-
-        Task<PaginatedResult<StuProgramDetails>> GetByStatusAsync(
-            List<int> unitLocationIds,
-            string status,
-            int pageNumber = 1,
-            int pageSize = 10);
-
-        Task<Dictionary<string, int>> GetStatusSummaryAsync(List<int> unitLocationIds);
+        // Add any STU-specific repository methods here
+        // For now, all required methods are inherited from IBaseReportEntryRepository
     }
 }

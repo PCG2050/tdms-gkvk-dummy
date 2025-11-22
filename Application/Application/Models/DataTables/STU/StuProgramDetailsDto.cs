@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Application.Models.DataTables.STU
 {
     // ==================== PROGRAM DETAILS (Section A) ====================
-    public class StuProgramDetailsDto
+    public class StuProgramDetailsDto : IBaseDto
     {
         public int Id { get; set; }
 
@@ -74,7 +74,7 @@ namespace Application.Models.DataTables.STU
         public int? ApprovedById { get; set; }
         public string? ApprovedByName { get; set; }
     }
-    public class StuProgramCreateDto
+    public class StuProgramCreateDto : ICreateDto
     {
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }
@@ -145,7 +145,7 @@ namespace Application.Models.DataTables.STU
 
 
 
-    public class StuProgramDetailsCompleteDto : StuProgramDetailsDto
+    public class StuProgramDetailsCompleteDto : StuProgramDetailsDto, ICompleteDto
     {
         public List<StuParticipantDemographicsDto>? Demographics { get; set; }
         public List<StuProgramContentDto>? ProgramContent { get; set; }

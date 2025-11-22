@@ -1,11 +1,16 @@
 ﻿
-using Application.Models.DataTables.DEU;
-using Domain.Entities.DEU;
+using Application.Interface.Mappers;
+using Application.Models.DataTables.STU;
+using Domain.Entities.STU;
 
 namespace Application.Mapper.DataTable.STU
 {
+    /// <summary>
+    /// Mapperly-based mapper for StuProgramDetails.
+    /// Implements the generic IBaseMapper interface for main entity mappings.
+    /// </summary>
     [Mapper]
-    public partial class StuProgramMapper
+    public partial class StuProgramMapper : IBaseMapper<StuProgramDetails, StuProgramDetailsDto, StuProgramCreateDto, StuProgramUpdateDto>
     {
         // ============================
         // MAIN PROGRAM DETAILS MAPPINGS
@@ -107,8 +112,9 @@ namespace Application.Mapper.DataTable.STU
 
         /// <summary>
         /// Maps StuProgramUpdateDto to StuProgramDetails entity (only non-null values)
+        /// Implements IBaseMapper.MapUpdateDtoToEntity
         /// </summary>
-        public static void MapUpdateDtoToEntity(StuProgramUpdateDto dto, StuProgramDetails entity)
+        public void MapUpdateDtoToEntity(StuProgramUpdateDto dto, StuProgramDetails entity)
         {
             if (dto.StartDate.HasValue) entity.StartDate = dto.StartDate.Value;
             if (dto.EndDate.HasValue) entity.EndDate = dto.EndDate.Value;
