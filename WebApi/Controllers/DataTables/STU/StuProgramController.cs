@@ -144,20 +144,6 @@ namespace WebApi.Controllers.DataTables.STU
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
-        [HttpPut("advisory-services/{advisoryId}")]
-        public async Task<IActionResult> UpdateAdvisoryServices(int advisoryId, [FromBody] StuAdvisoryServicesUpdateDto dto)
-        {
-            var result = await _service.UpdateAdvisoryServicesAsync(advisoryId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpDelete("advisory-services/{advisoryId}")]
-        public async Task<IActionResult> DeleteAdvisoryServices(int advisoryId)
-        {
-            var result = await _service.DeleteAdvisoryServicesAsync(advisoryId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
         [HttpGet("{programId}/advisory-services")]
         public async Task<IActionResult> GetAdvisoryServices(int programId)
         {
@@ -176,20 +162,6 @@ namespace WebApi.Controllers.DataTables.STU
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
-        [HttpPut("reports/{reportId}")]
-        public async Task<IActionResult> UpdateReport(int reportId, [FromBody] StuReportUpdateDto dto)
-        {
-            var result = await _service.UpdateReportAsync(reportId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpDelete("reports/{reportId}")]
-        public async Task<IActionResult> DeleteReport(int reportId)
-        {
-            var result = await _service.DeleteReportAsync(reportId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
         [HttpGet("{programId}/reports")]
         public async Task<IActionResult> GetReport(int programId)
         {
@@ -205,20 +177,6 @@ namespace WebApi.Controllers.DataTables.STU
         public async Task<IActionResult> AddRecommendation(int programId, [FromBody] StuRecommendationCreateDto dto)
         {
             var result = await _service.AddRecommendationAsync(programId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpPut("recommendations/{recommendationId}")]
-        public async Task<IActionResult> UpdateRecommendation(int recommendationId, [FromBody] StuRecommendationUpdateDto dto)
-        {
-            var result = await _service.UpdateRecommendationAsync(recommendationId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpDelete("recommendations/{recommendationId}")]
-        public async Task<IActionResult> DeleteRecommendation(int recommendationId)
-        {
-            var result = await _service.DeleteRecommendationAsync(recommendationId);
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 

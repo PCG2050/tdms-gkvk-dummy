@@ -113,90 +113,23 @@ namespace WebApi.Controllers.DataTables.STU
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
-        // C1: Resource Persons
-        [HttpPost("content/{contentId}/resource-persons")]
-        public async Task<IActionResult> AddResourcePerson(int contentId, [FromBody] StuResourcePersonCreateDto dto)
+        /// <summary>
+        /// Creates program content with all children in one transaction (RECOMMENDED)
+        /// </summary>
+        [HttpPost("{programId}/content-with-children")]
+        public async Task<IActionResult> AddProgramContentWithChildren(int programId, [FromBody] StuProgramContentWithChildrenCreateDto dto)
         {
-            var result = await _service.AddResourcePersonAsync(contentId, dto);
+            var result = await _service.AddProgramContentWithChildrenAsync(programId, dto);
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
-        [HttpPut("resource-persons/{personId}")]
-        public async Task<IActionResult> UpdateResourcePerson(int personId, [FromBody] StuResourcePersonUpdateDto dto)
+        /// <summary>
+        /// Updates program content with all children using hybrid pattern (RECOMMENDED)
+        /// </summary>
+        [HttpPut("content/{contentId}/with-children")]
+        public async Task<IActionResult> UpdateProgramContentWithChildren(int contentId, [FromBody] StuProgramContentWithChildrenUpdateDto dto)
         {
-            var result = await _service.UpdateResourcePersonAsync(personId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpDelete("resource-persons/{personId}")]
-        public async Task<IActionResult> DeleteResourcePerson(int personId)
-        {
-            var result = await _service.DeleteResourcePersonAsync(personId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpGet("content/{contentId}/resource-persons")]
-        public async Task<IActionResult> GetResourcePersons(int contentId)
-        {
-            var result = await _service.GetResourcePersonsByContentIdAsync(contentId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        // C2: Topics Covered
-        [HttpPost("content/{contentId}/topics")]
-        public async Task<IActionResult> AddTopic(int contentId, [FromBody] StuTopicsCoveredCreateDto dto)
-        {
-            var result = await _service.AddTopicAsync(contentId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpPut("topics/{topicId}")]
-        public async Task<IActionResult> UpdateTopic(int topicId, [FromBody] StuTopicsCoveredUpdateDto dto)
-        {
-            var result = await _service.UpdateTopicAsync(topicId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpDelete("topics/{topicId}")]
-        public async Task<IActionResult> DeleteTopic(int topicId)
-        {
-            var result = await _service.DeleteTopicAsync(topicId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpGet("content/{contentId}/topics")]
-        public async Task<IActionResult> GetTopics(int contentId)
-        {
-            var result = await _service.GetTopicsByContentIdAsync(contentId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        // C3: Teaching Aids
-        [HttpPost("content/{contentId}/teaching-aids")]
-        public async Task<IActionResult> AddTeachingAid(int contentId, [FromBody] StuTeachingAidsCreateDto dto)
-        {
-            var result = await _service.AddTeachingAidAsync(contentId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpPut("teaching-aids/{aidId}")]
-        public async Task<IActionResult> UpdateTeachingAid(int aidId, [FromBody] StuTeachingAidsUpdateDto dto)
-        {
-            var result = await _service.UpdateTeachingAidAsync(aidId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpDelete("teaching-aids/{aidId}")]
-        public async Task<IActionResult> DeleteTeachingAid(int aidId)
-        {
-            var result = await _service.DeleteTeachingAidAsync(aidId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpGet("content/{contentId}/teaching-aids")]
-        public async Task<IActionResult> GetTeachingAids(int contentId)
-        {
-            var result = await _service.GetTeachingAidsByContentIdAsync(contentId);
+            var result = await _service.UpdateProgramContentWithChildrenAsync(contentId, dto);
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
@@ -208,20 +141,6 @@ namespace WebApi.Controllers.DataTables.STU
         public async Task<IActionResult> AddAdvisoryServices(int programId, [FromBody] StuAdvisoryServicesCreateDto dto)
         {
             var result = await _service.AddAdvisoryServicesAsync(programId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpPut("advisory-services/{advisoryId}")]
-        public async Task<IActionResult> UpdateAdvisoryServices(int advisoryId, [FromBody] StuAdvisoryServicesUpdateDto dto)
-        {
-            var result = await _service.UpdateAdvisoryServicesAsync(advisoryId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpDelete("advisory-services/{advisoryId}")]
-        public async Task<IActionResult> DeleteAdvisoryServices(int advisoryId)
-        {
-            var result = await _service.DeleteAdvisoryServicesAsync(advisoryId);
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
@@ -243,20 +162,6 @@ namespace WebApi.Controllers.DataTables.STU
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
-        [HttpPut("reports/{reportId}")]
-        public async Task<IActionResult> UpdateReport(int reportId, [FromBody] StuReportUpdateDto dto)
-        {
-            var result = await _service.UpdateReportAsync(reportId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpDelete("reports/{reportId}")]
-        public async Task<IActionResult> DeleteReport(int reportId)
-        {
-            var result = await _service.DeleteReportAsync(reportId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
         [HttpGet("{programId}/reports")]
         public async Task<IActionResult> GetReport(int programId)
         {
@@ -275,20 +180,6 @@ namespace WebApi.Controllers.DataTables.STU
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
-        [HttpPut("recommendations/{recommendationId}")]
-        public async Task<IActionResult> UpdateRecommendation(int recommendationId, [FromBody] StuRecommendationUpdateDto dto)
-        {
-            var result = await _service.UpdateRecommendationAsync(recommendationId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpDelete("recommendations/{recommendationId}")]
-        public async Task<IActionResult> DeleteRecommendation(int recommendationId)
-        {
-            var result = await _service.DeleteRecommendationAsync(recommendationId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
         [HttpGet("{programId}/recommendations")]
         public async Task<IActionResult> GetRecommendation(int programId)
         {
@@ -300,12 +191,12 @@ namespace WebApi.Controllers.DataTables.STU
         // STATUS MANAGEMENT
         // ============================
 
-        [HttpPost("{programId}/submit")]
-        public async Task<IActionResult> SubmitForApproval(int programId)
-        {
-            var result = await _service.SubmitForApprovalAsync(programId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
+        // [HttpPost("{programId}/submit")]
+        // public async Task<IActionResult> SubmitForApproval(int programId)
+        // {
+        //     var result = await _service.SubmitForApprovalAsync(programId);
+        //     return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        // }
 
         [HttpPost("{programId}/approve")]
         public async Task<IActionResult> Approve(int programId, [FromBody] ApprovalDto dto)
@@ -359,7 +250,25 @@ namespace WebApi.Controllers.DataTables.STU
             var result = await _service.GetStatusSummaryAsync();
             return Ok(result);
         }
+        [HttpGet("my-history")]
+        [Authorize(Roles = RoleString.Trainer)]
+        public async Task<IActionResult> GetMyHistory(
+      [FromQuery] int pageNumber = 1,
+      [FromQuery] int pageSize = 20)
+        {
+            var result = await _service.GetTrainerHistoryAsync(pageNumber, pageSize);
+            return Ok(result);
+        }
 
+        [HttpGet("pending-approvals")]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
+        public async Task<IActionResult> GetPendingApprovals(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 20)
+        {
+            var result = await _service.GetPendingApprovalsAsync(pageNumber, pageSize);
+            return Ok(result);
+        }
         // ============================
         // HELPER METHOD
         // ============================
