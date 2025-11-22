@@ -1,19 +1,40 @@
 ﻿// Application/Interface/Services/DataTables/IStuProgramService.cs
 
-using Application.Models.DataTables.DEU;
+using Application.Interface.Services.Common;
+using Application.Models;
+using Application.Models.DataTables.STU;
 
 namespace Application.Interface.Services.DataTables.STU
 {
-    public interface IStuProgramService
+    /// <summary>
+    /// Service interface for STU Program management using HYBRID PATTERN.
+    ///
+    /// HYBRID PATTERN:
+    /// - Extends IBaseReportEntryService for main entity CRUD operations
+    /// - Adds specific methods for nested entities (Demographics, Content, ResourcePersons, etc.)
+    ///
+    /// INHERITED METHODS FROM BASE (for main entity - StuProgramDetails):
+    /// - CreateAsync(StuProgramCreateDto dto) - Create new program
+    /// - GetByIdAsync(int id) - Get program by ID
+    /// - UpdateAsync(int id, StuProgramUpdateDto dto) - Update program
+    /// - DeleteAsync(int id) - Delete program
+    /// - SubmitForApprovalAsync(int id) - Submit for approval
+    /// - ApproveAsync(int id, string? remarks) - Approve program
+    /// - RejectAsync(int id, string remarks) - Reject program
+    /// - GetPaginatedAsync(...) - Get paginated programs
+    /// - GetByStatusAsync(string status, ...) - Get programs by status
+    /// - GetStatusSummaryAsync() - Get status summary
+    /// </summary>
+    public interface IStuProgramService : IBaseReportEntryService<StuProgramDetailsDto, StuProgramCreateDto, StuProgramUpdateDto>
     {
         // ============================
-        // SECTION A: PROGRAM DETAILS
+        // MAIN ENTITY - ADDITIONAL METHODS
         // ============================
-        Task<ServiceResult<StuProgramDetailsDto>> CreateProgramAsync(StuProgramCreateDto dto);
-        Task<ServiceResult<StuProgramDetailsDto>> GetProgramByIdAsync(int id);
+
+        /// <summary>
+        /// Gets complete program with all nested entities loaded
+        /// </summary>
         Task<ServiceResult<StuProgramDetailsCompleteDto>> GetCompleteProgramAsync(int id);
-        Task<ServiceResult<StuProgramDetailsDto>> UpdateProgramAsync(int id, StuProgramUpdateDto dto);
-        Task<ServiceResult> DeleteProgramAsync(int id);
 
         // ============================
         // SECTION B: PARTICIPANT DEMOGRAPHICS
@@ -80,29 +101,17 @@ namespace Application.Interface.Services.DataTables.STU
         Task<ServiceResult<StuRecommendationDto>> GetRecommendationByProgramIdAsync(int programId);
 
         // ============================
-        // STATUS MANAGEMENT & SUBMISSION
+        // STATUS MANAGEMENT & SUBMISSION - Inherited from IBaseReportEntryService
         // ============================
-        Task<ServiceResult> SubmitForApprovalAsync(int programId);
-        Task<ServiceResult> ApproveAsync(int programId, string? remarks = null);
-        Task<ServiceResult> RejectAsync(int programId, string remarks);
+        // Task<ServiceResult> SubmitForApprovalAsync(int id);
+        // Task<ServiceResult> ApproveAsync(int id, string? remarks);
+        // Task<ServiceResult> RejectAsync(int id, string remarks);
 
         // ============================
-        // PAGINATION & FILTERING
+        // PAGINATION & FILTERING - Inherited from IBaseReportEntryService
         // ============================
-        Task<PaginatedResult<StuProgramDetailsDto>> GetPaginatedAsync(
-            int pageNumber = 1,
-            int pageSize = 10,
-            DateOnly? startDate = null,
-            DateOnly? endDate = null,
-            int? programTypeId = null,
-            string? searchTerm = null,
-            int? unitLocationId = null);
-
-        Task<PaginatedResult<StuProgramDetailsDto>> GetByStatusAsync(
-            string status,
-            int pageNumber = 1,
-            int pageSize = 10);
-
-        Task<Dictionary<string, int>> GetStatusSummaryAsync();
+        // Task<PaginatedResult<StuProgramDetailsDto>> GetPaginatedAsync(...);
+        // Task<PaginatedResult<StuProgramDetailsDto>> GetByStatusAsync(...);
+        // Task<Dictionary<string, int>> GetStatusSummaryAsync();
     }
 }
