@@ -139,6 +139,33 @@ namespace Application.Mapper.DataTable.STU
             if (dto.SourceOfFundId.HasValue) entity.SourceOfFundId = dto.SourceOfFundId;
             if (dto.NoOfCourses.HasValue) entity.Funds = dto.NoOfCourses;
             if (dto.Attachments != null) entity.Attachements = dto.Attachments;
+
+            // Additional Fields
+            if (dto.PiAddress != null) entity.PiAddress = dto.PiAddress;
+            if (dto.Area.HasValue) entity.Area = dto.Area;
+            if (dto.OtherSourceOfInformation != null) entity.OtherSourceOfInformation = dto.OtherSourceOfInformation;
+            if (dto.SourceOfTitle != null) entity.SourceOfTitle = dto.SourceOfTitle;
+
+            // Proposal & Sanction Dates
+            if (dto.ProposalDate.HasValue) entity.ProposalDate = dto.ProposalDate;
+            if (dto.ProposalUploadFile != null) entity.ProposalUploadFile = dto.ProposalUploadFile;
+            if (dto.UniversitySanctionLetterDate.HasValue) entity.UniversitySanctionLetterDate = dto.UniversitySanctionLetterDate;
+            if (dto.UniversitySanctionLetterUploadFile != null) entity.UniversitySanctionLetterUploadFile = dto.UniversitySanctionLetterUploadFile;
+            if (dto.ProjectSanctionDate.HasValue) entity.ProjectSanctionDate = dto.ProjectSanctionDate;
+            if (dto.ProjectSanctionFile != null) entity.ProjectSanctionFile = dto.ProjectSanctionFile;
+            if (dto.UniImplDate.HasValue) entity.UniImplDate = dto.UniImplDate;
+            if (dto.UniImplLetterFile != null) entity.UniImplLetterFile = dto.UniImplLetterFile;
+
+            // Fund Release Information
+            if (dto.FundReleaseYear != null) entity.FundReleaseYear = dto.FundReleaseYear;
+            if (dto.FundAmount.HasValue) entity.FundAmount = dto.FundAmount;
+            if (dto.FundReleaseDate.HasValue) entity.FundReleaseDate = dto.FundReleaseDate;
+            if (dto.FundReleaseFile != null) entity.FundReleaseFile = dto.FundReleaseFile;
+            if (dto.FundsSanctionLetterDate.HasValue) entity.FundsSanctionLetterDate = dto.FundsSanctionLetterDate;
+            if (dto.FundsSanctionLetterUploadFile != null) entity.FundsSanctionLetterUploadFile = dto.FundsSanctionLetterUploadFile;
+
+            // Media
+            if (dto.ReportingVideo != null) entity.ReportingVideo = dto.ReportingVideo;
         }
 
         /// <summary>

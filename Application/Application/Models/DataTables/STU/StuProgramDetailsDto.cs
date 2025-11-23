@@ -40,12 +40,37 @@ namespace Application.Models.DataTables.STU
         public string? OrganizerInstitutionName { get; set; }
         public string? OrganizerInstitutionAddress { get; set; }
         public int? SourceId { get; set; }
-        public DateTime? ProposalDate { get; set; }
+
+        // === Additional Fields ===
+        public string? PiAddress { get; set; }
+        public decimal? Area { get; set; }
+        public string? OtherSourceOfInformation { get; set; }
+        public string? SourceOfTitle { get; set; }
+
+        // === Proposal & Sanction Dates ===
+        public DateOnly? ProposalDate { get; set; }
         public string? ProposalUploadFile { get; set; }
-        public DateTime? UniversitySanctionLetterDate { get; set; }
+
+        public DateOnly? UniversitySanctionLetterDate { get; set; }
         public string? UniversitySanctionLetterUploadFile { get; set; }
-        public DateTime? FundsSanctionLetterDate { get; set; }
+
+        public DateOnly? ProjectSanctionDate { get; set; }
+        public string? ProjectSanctionFile { get; set; }
+
+        public DateOnly? UniImplDate { get; set; }
+        public string? UniImplLetterFile { get; set; }
+
+        // === Fund Release Information ===
+        public string? FundReleaseYear { get; set; }
+        public double? FundAmount { get; set; }
+        public DateOnly? FundReleaseDate { get; set; }
+        public string? FundReleaseFile { get; set; }
+
+        public DateOnly? FundsSanctionLetterDate { get; set; }
         public string? FundsSanctionLetterUploadFile { get; set; }
+
+        // === Media ===
+        public string? ReportingVideo { get; set; }
 
         // --- Derived / Display Fields ---
 
@@ -108,7 +133,36 @@ namespace Application.Models.DataTables.STU
         public int? NoOfCourses { get; set; }
         public string? Attachments { get; set; }
 
-       
+        // === Additional Fields ===
+        public string? PiAddress { get; set; }
+        public decimal? Area { get; set; }
+        public string? OtherSourceOfInformation { get; set; }
+        public string? SourceOfTitle { get; set; }
+
+        // === Proposal & Sanction Dates ===
+        public DateOnly? ProposalDate { get; set; }
+        public string? ProposalUploadFile { get; set; }
+
+        public DateOnly? UniversitySanctionLetterDate { get; set; }
+        public string? UniversitySanctionLetterUploadFile { get; set; }
+
+        public DateOnly? ProjectSanctionDate { get; set; }
+        public string? ProjectSanctionFile { get; set; }
+
+        public DateOnly? UniImplDate { get; set; }
+        public string? UniImplLetterFile { get; set; }
+
+        // === Fund Release Information ===
+        public string? FundReleaseYear { get; set; }
+        public double? FundAmount { get; set; }
+        public DateOnly? FundReleaseDate { get; set; }
+        public string? FundReleaseFile { get; set; }
+
+        public DateOnly? FundsSanctionLetterDate { get; set; }
+        public string? FundsSanctionLetterUploadFile { get; set; }
+
+        // === Media ===
+        public string? ReportingVideo { get; set; }
     }
 
     public class StuProgramUpdateDto : IUpdateDto
@@ -138,8 +192,36 @@ namespace Application.Models.DataTables.STU
         public int? NoOfCourses { get; set; }
         public string? Attachments { get; set; }
 
-       
+        // === Additional Fields ===
+        public string? PiAddress { get; set; }
+        public decimal? Area { get; set; }
+        public string? OtherSourceOfInformation { get; set; }
+        public string? SourceOfTitle { get; set; }
 
+        // === Proposal & Sanction Dates ===
+        public DateOnly? ProposalDate { get; set; }
+        public string? ProposalUploadFile { get; set; }
+
+        public DateOnly? UniversitySanctionLetterDate { get; set; }
+        public string? UniversitySanctionLetterUploadFile { get; set; }
+
+        public DateOnly? ProjectSanctionDate { get; set; }
+        public string? ProjectSanctionFile { get; set; }
+
+        public DateOnly? UniImplDate { get; set; }
+        public string? UniImplLetterFile { get; set; }
+
+        // === Fund Release Information ===
+        public string? FundReleaseYear { get; set; }
+        public double? FundAmount { get; set; }
+        public DateOnly? FundReleaseDate { get; set; }
+        public string? FundReleaseFile { get; set; }
+
+        public DateOnly? FundsSanctionLetterDate { get; set; }
+        public string? FundsSanctionLetterUploadFile { get; set; }
+
+        // === Media ===
+        public string? ReportingVideo { get; set; }
     }
 
 
