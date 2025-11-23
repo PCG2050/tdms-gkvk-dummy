@@ -108,7 +108,22 @@ namespace WebApi.Controllers
                 return ServiceResponseToActionResult.Error(result.ErrorMessage, result.ErrorStatus);
             }
             _logger.LogInformation($"Updated user {userId} successfully");
-            return NoContent();
+
+            // Fetch and return the updated user data
+            var user = await _userService.GetUserByIdAsync(userId);
+            if (user is null) return NotFound();
+
+            return Ok(new
+            {
+                user.Id,
+                user.FirstName,
+                user.LastName,
+                user.Email,
+                user.OrganizationId,
+                user.ProfileImageUrl,
+                user.Phone,
+                message = "User updated successfully"
+            });
         }
         // Anyone can request a reset link
         [HttpPost("forgot-password")]
