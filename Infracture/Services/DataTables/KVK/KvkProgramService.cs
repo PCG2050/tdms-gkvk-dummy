@@ -1019,6 +1019,12 @@ namespace Infrastructure.Services.DataTables.KVK
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
+            // Check if category allows Reports (not FLD/OFT)
+            if (program.CategoryId == FLD_CATEGORY_ID || program.CategoryId == OFT_CATEGORY_ID)
+                return ServiceResult<KvkReportDto>.Failure(
+                    $"Reports are not available for FLD/OFT categories (CategoryId {FLD_CATEGORY_ID} or {OFT_CATEGORY_ID}). Use Results endpoint instead.",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
             var report = await _reportRepository.GetByProgramIdAsync(programId);
 
             if (report == null)
