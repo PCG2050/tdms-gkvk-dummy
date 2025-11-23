@@ -171,15 +171,10 @@ namespace Infrastructure.Services.DataTables.KVK
                 return ServiceResult.Failure("Program not found", ServiceErrorStatus.NOTFOUND);
 
             if (!await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult.Failure(
-                    "Only draft programs can be deleted",
-                    ServiceErrorStatus.INVALIDOPERATION);
+                return ServiceResult.Failure("Access denied. You can only delete your own forms.", ServiceErrorStatus.FORBIDDEN);
 
             await _programRepository.DeleteAsync(id);
-            return ServiceResult.Success();
+            return ServiceResult.Success("Program deleted successfully");
         }
 
         // ============================
