@@ -261,7 +261,7 @@ namespace Infrastructure.Services.Reports
             var nominations = await _nominationRewardRepository.GetAllAsync();
             report.Nominations = nominations
                 .Where(x => x.UnitLocationId == filter.UnitLocationId &&
-                           (x.FormStatus == "Draft" || x.FormStatus == "Pending" || x.FormStatus == "Approved") &&
+                           ( x.FormStatus == "Approved") &&
                            x.CreatedAt >= startDate && x.CreatedAt < endDate)
                 .Select(x => new ReportNominationDto
                 {
@@ -276,7 +276,7 @@ namespace Infrastructure.Services.Reports
             var publications = await _publicationRepository.GetAllAsync();
             report.Publications = publications
                 .Where(x => x.UnitLocationId == filter.UnitLocationId &&
-                          (x.FormStatus == "Draft" || x.FormStatus == "Pending" || x.FormStatus == "Approved") &&
+                            (x.FormStatus == "Approved") &&
                            x.CreatedAt >= startDate && x.CreatedAt <= endDate)
                 .Select(x => new ReportPublicationDto
                 {
@@ -293,7 +293,7 @@ namespace Infrastructure.Services.Reports
             var deuPrograms = await _deuRepository.GetAllAsync();
             report.Programs.AddRange(deuPrograms
                 .Where(x => x.UnitLocationId == filter.UnitLocationId &&
-                          (x.FormStatus == "Draft" || x.FormStatus == "Pending" || x.FormStatus == "Approved") &&
+                             (x.FormStatus == "Approved") &&
                            x.CreatedAt >= startDate && x.CreatedAt < endDate)
                 .Select(x => new ReportProgramDto
                 {
@@ -310,7 +310,7 @@ namespace Infrastructure.Services.Reports
             var eeuPrograms = await _eeuRepository.GetAllAsync();
             report.Programs.AddRange(eeuPrograms
                 .Where(x => x.UnitLocationId == filter.UnitLocationId &&
-                          (x.FormStatus == "Draft" || x.FormStatus == "Pending" || x.FormStatus == "Approved") &&
+                            (x.FormStatus == "Approved") &&
                            x.CreatedAt >= startDate && x.CreatedAt < endDate)
                 .Select(x => new ReportProgramDto
                 {
@@ -327,7 +327,7 @@ namespace Infrastructure.Services.Reports
             var kvkPrograms = await _kvkRepository.GetAllAsync();
             report.Programs.AddRange(kvkPrograms
                 .Where(x => x.UnitLocationId == filter.UnitLocationId &&
-                           (x.FormStatus == "Draft" || x.FormStatus == "Pending" || x.FormStatus == "Approved") &&
+                           (x.FormStatus == "Approved") &&
                            x.CreatedAt >= startDate && x.CreatedAt < endDate)
                 .Select(x => new ReportProgramDto
                 {
@@ -344,7 +344,7 @@ namespace Infrastructure.Services.Reports
             var ibtvaPrograms = await _ibtvaRepository.GetAllAsync();
             report.Programs.AddRange(ibtvaPrograms
                 .Where(x => x.UnitLocationId == filter.UnitLocationId &&
-                          (x.FormStatus == "Draft" || x.FormStatus == "Pending" || x.FormStatus == "Approved") &&
+                          (x.FormStatus == "Approved") &&
                            x.CreatedAt >= startDate && x.CreatedAt < endDate)
                 .Select(x => new ReportProgramDto
                 {
@@ -361,7 +361,7 @@ namespace Infrastructure.Services.Reports
             var stuPrograms = await _stuRepository.GetAllAsync();
             report.Programs.AddRange(stuPrograms
                 .Where(x => x.UnitLocationId == filter.UnitLocationId &&
-                           (x.FormStatus == "Draft" || x.FormStatus == "Pending" || x.FormStatus == "Approved") &&
+                           (x.FormStatus == "Approved") &&
                            x.CreatedAt >= startDate && x.CreatedAt < endDate)
                 .Select(x => new ReportProgramDto
                 {
@@ -378,7 +378,7 @@ namespace Infrastructure.Services.Reports
             var aticPrograms = await _aticRepository.GetAllAsync();
             report.Programs.AddRange(aticPrograms
                 .Where(x => x.UnitLocationId == filter.UnitLocationId &&
-                           (x.FormStatus == "Draft" || x.FormStatus == "Pending" || x.FormStatus == "Approved") &&
+                           (x.FormStatus == "Approved") &&
                            x.CreatedAt >= startDate && x.CreatedAt < endDate)
                 .Select(x => new ReportProgramDto
                 {
@@ -395,7 +395,7 @@ namespace Infrastructure.Services.Reports
             var consultancies = await _consultingRepository.GetAllAsync();
             report.Consultancies = consultancies
                 .Where(x => x.UnitLocationId == filter.UnitLocationId &&
-                           (x.FormStatus == "Draft" || x.FormStatus == "Pending" || x.FormStatus == "Approved") &&
+                           (x.FormStatus == "Approved") &&
                            x.CreatedAt >= startDate && x.CreatedAt < endDate)
                 .Select(x => new ReportConsultancyDto
                 {
@@ -409,7 +409,7 @@ namespace Infrastructure.Services.Reports
             var services = await _tblServiceRepository.GetAllAsync();
             report.Services = services
                 .Where(x => x.UnitLocationId == filter.UnitLocationId &&
-                           x.FormStatus == "Draft" &&
+                           x.FormStatus == "Approved" &&
                            x.CreatedAt >= startDate && x.CreatedAt < endDate)
                 .Select(x => new ReportServiceDto
                 {

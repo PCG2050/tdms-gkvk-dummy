@@ -30,7 +30,9 @@ namespace Infrastructure.Repository.DataTables
         {
             
         
-            return await _context.Services    
+            return await _context.Services
+                .Include(n => n.Category)                
+                
                 .Include(n => n.Hostels)
                 .Include(n => n.RevolvingFundStatuses)
                 .Include(n => n.VisitorDetails)   
