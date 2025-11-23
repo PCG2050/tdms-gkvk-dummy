@@ -183,12 +183,23 @@ namespace Infrastructure.Services.Reports
                            x.CreatedAt >= startDate && x.CreatedAt < endDate)
                 .Select(x => new ReportServiceDto
                 {
-                    Category = x.Category?.Name ?? "-",
+                    Category = x.Category != null ? (x.Category.Name.Equals("Others") ? (string.IsNullOrWhiteSpace(x.OtherCategory) ? "-" : x.OtherCategory) : x.Category.Name) : "-",
+                    Theme = x.Theme != null ? (x.Theme.Name.Equals("Others") ? (string.IsNullOrWhiteSpace(x.OtherTheme) ? "-" : x.OtherTheme) : x.Theme.Name) : "-",
                     Title = x.TitleOfActivityConducted ?? "-",
-                    Discipline = x.RelatedToDiscipline?.Name ?? "-",
-                    Particular = x.Particular?.Name ?? "-",
-                    Location = x.Location ?? "-",
-                    Date = x.Date != default(DateTime) ? x.Date.ToString("dd/MM/yyyy") : "-"
+                    Unit = x.QuantityUnit?.Name ?? "-",
+                    Quantity = x.Number,
+                    Amount = x.AmountGenerated,
+                    // Add hostel data if CategoryId == 1
+                    HostelData = x.CategoryId == 1 && x.Hostels != null && x.Hostels.Any()
+                        ? x.Hostels.Select(h => new ReportHostelDto
+                        {
+                            Date = h.Date?.ToString("dd/MM/yyyy") ?? "-",
+                            TotalMale = h.Male_SC + h.Male_ST + h.Male_OBC + h.Male_GEN,
+                            TotalFemale = h.Female_SC + h.Female_ST + h.Female_OBC + h.Female_GEN,
+                            DurationOfStay = h.NumberOfDaysStayed,
+                            AmountGenerated = h.AmountGenerated
+                        }).ToList()
+                        : null
                 })
                 .ToList();
 

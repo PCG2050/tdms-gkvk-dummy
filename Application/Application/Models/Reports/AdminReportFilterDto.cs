@@ -93,17 +93,35 @@ namespace Application.Models.Reports
 
     public class ReportServiceDto
     {
-        public string Category { get; set; }
-        public string Title { get; set; }
-        public string Discipline { get; set; }
-        public string Particular { get; set; }
-        public string Location { get; set; }
-        public string Date { get; set; }
+        public string Category { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
+
+        public string Theme { get; set; } = string.Empty;
+        public int Quantity { get; set; }
+
+        public string Unit { get; set; } = string.Empty;
+        public decimal Amount { get; set; }
+
+        // Hostel data (only populated when CategoryId == 1)
+        public List<ReportHostelDto>? HostelData { get; set; }
+        //public string Discipline { get; set; } = string.Empty;
+        //public string Particular { get; set; } = string.Empty;
+        //public string Location { get; set; } = string.Empty;
+        //public string Date { get; set; } = string.Empty;
+    }
+
+    public class ReportHostelDto
+    {
+        public string Date { get; set; } = string.Empty;
+        public int TotalMale { get; set; }
+        public int TotalFemale { get; set; }
+        public int DurationOfStay { get; set; }
+        public decimal AmountGenerated { get; set; }
     }
 
     public class ReportOtherActivityDto
     {
-        public string Title { get; set; }
-        public string Description { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
     }
 }

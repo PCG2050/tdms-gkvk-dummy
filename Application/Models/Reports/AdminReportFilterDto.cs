@@ -159,9 +159,21 @@ namespace Application.Models.Reports
 
         public string Unit { get; set; } = string.Empty;
         public decimal Amount { get; set; }
+
+        // Hostel data (only populated when CategoryId == 1)
+        public List<ReportHostelDto>? HostelData { get; set; }
         //public string Discipline { get; set; } = string.Empty;
-        //public string Particular { get; set; } = string.Empty;        
+        //public string Particular { get; set; } = string.Empty;
         //public DateOnly Date { get; set; }
+    }
+
+    public class ReportHostelDto
+    {
+        public string Date { get; set; } = string.Empty;
+        public int TotalMale { get; set; }
+        public int TotalFemale { get; set; }
+        public int DurationOfStay { get; set; }
+        public decimal AmountGenerated { get; set; }
     }
 
     public class ReportOtherActivityDto

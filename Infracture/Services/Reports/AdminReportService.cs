@@ -418,7 +418,18 @@ namespace Infrastructure.Services.Reports
                     Title = x.TitleOfActivityConducted ?? "-",
                     Unit = x.QuantityUnit?.Name ?? "-",
                     Quantity = x.Number,
-                    Amount = x.AmountGenerated
+                    Amount = x.AmountGenerated,
+                    // Add hostel data if CategoryId == 1
+                    HostelData = x.CategoryId == 1 && x.Hostels != null && x.Hostels.Any()
+                        ? x.Hostels.Select(h => new ReportHostelDto
+                        {
+                            Date = h.Date?.ToString("dd/MM/yyyy") ?? "-",
+                            TotalMale = h.Male_SC + h.Male_ST + h.Male_OBC + h.Male_GEN,
+                            TotalFemale = h.Female_SC + h.Female_ST + h.Female_OBC + h.Female_GEN,
+                            DurationOfStay = h.NumberOfDaysStayed,
+                            AmountGenerated = h.AmountGenerated
+                        }).ToList()
+                        : null
                 })
                 .ToList();
 
