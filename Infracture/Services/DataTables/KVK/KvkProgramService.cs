@@ -602,6 +602,8 @@ namespace Infrastructure.Services.DataTables.KVK
                 // Create new
                 var entity = _mapper.MapToEntity(dto);
                 entity.KvkProgramDetailsId = programId;
+                entity.UnitLocationId = program.UnitLocationId;
+                entity.OrganizationId = program.OrganizationId;
                 entity.CreatedById = _currentUserService.UserId;
                 entity.CreatedAt = DateTimeOffset.UtcNow;
 
@@ -630,6 +632,8 @@ namespace Infrastructure.Services.DataTables.KVK
                 };
 
                 _mapper.MapUpdateDtoToEntity(updateDto, existing);
+                existing.UnitLocationId = program.UnitLocationId;
+                existing.OrganizationId = program.OrganizationId;
                 existing.UpdatedById = _currentUserService.UserId;
                 existing.UpdatedAt = DateTimeOffset.UtcNow;
 
