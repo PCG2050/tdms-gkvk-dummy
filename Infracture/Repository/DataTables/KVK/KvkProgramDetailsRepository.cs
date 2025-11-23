@@ -24,6 +24,8 @@ namespace Infrastructure.Repository.DataTables.KVK
         public async Task<List<KvkProgramDetails>> GetAllAsync()
         {
             return await _context.KvkProgramDetails
+                .Include(p => p.ProgramType)
+                .Include(p => p.Status)
                 .Include(p => p.ParticipantDemographics!)
                     .ThenInclude(pd => pd.Participant)
                 .Include(p => p.ProgramContent!)
