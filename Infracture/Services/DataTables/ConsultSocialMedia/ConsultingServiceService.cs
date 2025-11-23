@@ -167,12 +167,12 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
 
             try
             {
-                // Step 2: Create parent ConsultingService
+                // Step 2: Create parent ConsultingService with Pending status
                 var parentEntity = _mapper.MapToEntity(dto);
                 parentEntity.CreatedById = _currentUserService.UserId;
                 parentEntity.CreatedAt = DateTimeOffset.UtcNow;
                 parentEntity.OrganizationId = _currentUserService.OrganizationId;
-                parentEntity.FormStatus = "Draft";
+                parentEntity.FormStatus = "Pending";
 
                 var createdService = await _consultingServiceRepository.CreateAsync(parentEntity);
                 var serviceId = createdService.Id;
@@ -187,15 +187,6 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
                         modeEntity.CreatedById = _currentUserService.UserId;
                         modeEntity.CreatedAt = DateTimeOffset.UtcNow;
                         await _modeAndOutreachRepository.CreateAsync(modeEntity);
-                    }
-
-                    // AUTO-SUBMIT: Since ModeAndOutreach is saved, automatically change status to Pending
-                    if (createdService.FormStatus == "Draft" || createdService.FormStatus == "Rejected")
-                    {
-                        createdService.FormStatus = "Pending";
-                        createdService.UpdatedById = _currentUserService.UserId;
-                        createdService.UpdatedAt = DateTimeOffset.UtcNow;
-                        await _consultingServiceRepository.UpdateAsync(createdService);
                     }
                 }
 
@@ -234,10 +225,11 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
 
             try
             {
-                // Step 4: Update parent ConsultingService
+                // Step 4: Update parent ConsultingService and set to Pending
                 _mapper.MapUpdateDtoToEntity(dto, existingService);
                 existingService.UpdatedById = _currentUserService.UserId;
                 existingService.UpdatedAt = DateTimeOffset.UtcNow;
+                existingService.FormStatus = "Pending";
                 await _consultingServiceRepository.UpdateAsync(existingService);
 
                 // Step 5: Handle ModeAndOutreach children - Hybrid Pattern (CREATE/UPDATE/DELETE)
@@ -290,17 +282,6 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
                     {
                         await _modeAndOutreachRepository.DeleteAsync(item.Id);
                     }
-                }
-
-                // AUTO-SUBMIT: If ModeAndOutreach children exist, automatically change status to Pending
-                var updatedModeAndOutreaches = await _modeAndOutreachRepository.GetByConsultingServiceIdAsync(consultingServiceId);
-                if (updatedModeAndOutreaches.Any() &&
-                    (existingService.FormStatus == "Draft" || existingService.FormStatus == "Rejected"))
-                {
-                    existingService.FormStatus = "Pending";
-                    existingService.UpdatedById = _currentUserService.UserId;
-                    existingService.UpdatedAt = DateTimeOffset.UtcNow;
-                    await _consultingServiceRepository.UpdateAsync(existingService);
                 }
 
                 // Step 6: Get complete entity with all children and return
