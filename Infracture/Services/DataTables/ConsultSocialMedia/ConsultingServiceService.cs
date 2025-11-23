@@ -57,7 +57,7 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
             consultingService.CreatedById = _currentUserService.UserId;
             consultingService.CreatedAt = DateTimeOffset.UtcNow;
             consultingService.OrganizationId = _currentUserService.OrganizationId;
-            consultingService.FormStatus = "Draft";
+            consultingService.FormStatus = "Pending";
 
             var savedService = await _consultingServiceRepository.CreateAsync(consultingService);
             var serviceWithDetails = await _consultingServiceRepository.GetWithDetailsAsync(savedService.Id);
@@ -124,6 +124,7 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
             _mapper.MapUpdateDtoToEntity(updateDto, consultingService);
             consultingService.UpdatedById = _currentUserService.UserId;
             consultingService.UpdatedAt = DateTimeOffset.UtcNow;
+            consultingService.FormStatus = "Pending";
 
             await _consultingServiceRepository.UpdateAsync(consultingService);
 

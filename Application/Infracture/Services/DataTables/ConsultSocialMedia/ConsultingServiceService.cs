@@ -48,7 +48,7 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
             consultingService.CreatedById = _currentUserService.UserId;
             consultingService.CreatedAt = DateTimeOffset.UtcNow;
             consultingService.OrganizationId = _currentUserService.OrganizationId;
-            consultingService.FormStatus = "Draft";
+            consultingService.FormStatus = "Pending";
 
             var savedService = await _consultingServiceRepository.CreateAsync(consultingService);
             var serviceWithDetails = await _consultingServiceRepository.GetWithDetailsAsync(savedService.Id);
@@ -107,14 +107,15 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (consultingService.FormStatus != "Draft")
+            if (consultingService.FormStatus != "Draft" && consultingService.FormStatus != "Rejected" && consultingService.FormStatus != "Pending")
                 return ServiceResult<ConsultingServiceDto>.Failure(
-                    "Cannot edit consulting services that have been submitted",
+                    "Cannot edit approved consulting services",
                     ServiceErrorStatus.INVALIDOPERATION);
 
             _mapper.MapUpdateDtoToEntity(updateDto, consultingService);
             consultingService.UpdatedById = _currentUserService.UserId;
             consultingService.UpdatedAt = DateTimeOffset.UtcNow;
+            consultingService.FormStatus = "Pending";
 
             await _consultingServiceRepository.UpdateAsync(consultingService);
 
