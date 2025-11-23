@@ -485,6 +485,7 @@ namespace Infrastructure.Services.DataTables
                             if (existing != null)
                             {
                                 _mapper.MapUpdateDtoToEntity(hostelDto, existing);
+                                existing.ServiceId = serviceId; // Explicitly preserve ServiceId
                                 existing.UpdatedById = _currentUserService.UserId;
                                 existing.UpdatedAt = DateTimeOffset.UtcNow;
                                 await _tableHostelRepository.UpdateTableHostelAsync(existing);
@@ -537,6 +538,7 @@ namespace Infrastructure.Services.DataTables
                             if (existing != null)
                             {
                                 _mapper.MapUpdateDtoToEntity(fundDto, existing);
+                                existing.ServiceId = serviceId; // Explicitly preserve ServiceId
                                 existing.UpdatedById = _currentUserService.UserId;
                                 existing.UpdatedAt = DateTimeOffset.UtcNow;
                                 await _revolvingFundRepository.UpdateRevolvingFundStatusAsync(existing);
@@ -588,6 +590,7 @@ namespace Infrastructure.Services.DataTables
                             if (existing != null)
                             {
                                 _mapper.MapUpdateDtoToEntity(visitorDto, existing);
+                                existing.ServiceId = serviceId; // Explicitly preserve ServiceId
                                 existing.UpdatedById = _currentUserService.UserId;
                                 existing.UpdatedAt = DateTimeOffset.UtcNow;
                                 await _visitorDetailsRepository.UpdateVisitorDetailAsync(existing);
