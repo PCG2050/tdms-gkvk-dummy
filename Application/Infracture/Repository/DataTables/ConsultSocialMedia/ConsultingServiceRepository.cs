@@ -23,9 +23,7 @@ namespace Infrastructure.Repository.DataTables.ConsultSocialMedia
         public async Task<List<ConsultingAndSocialMediaService>> GetAllAsync()
         {
             return await _context.TableConsultingAndSocialMediaServices
-                .Include(n => n.Category)  
-                .Include( n=> n.Title)
-                .Include(n=>n.Date)
+                .Include(n => n.Category)
                 .ToListAsync();
         }
 

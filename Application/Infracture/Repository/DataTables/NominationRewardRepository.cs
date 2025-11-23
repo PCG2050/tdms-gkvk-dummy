@@ -74,6 +74,8 @@ namespace Infrastructure.Repository.DataTables
         public async Task<List<NominationReward>> GetAllAsync()
         {
             return await _context.NominationRewards
+                .Include(n => n.Type)
+                .Include(n => n.NominationCategory)
                 .Include(n => n.NominationRewardIFSFarmers)
                 .Include(n => n.NominationRewardIFSEntrepreneurs)
                 .Include(n => n.NominationRewardFarmerInnovations)

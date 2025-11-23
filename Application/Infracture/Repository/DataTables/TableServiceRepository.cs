@@ -22,14 +22,17 @@ namespace Infrastructure.Repository.DataTables
 
         public async Task<List<TblService>> GetAllAsync()
         {
-            
-        
-            return await _context.Services    
+
+
+            return await _context.Services
+                .Include(n => n.Category)
+                .Include(n => n.RelatedToDiscipline)
+                .Include(n => n.Particular)
                 .Include(n => n.Hostels)
                 .Include(n => n.RevolvingFundStatuses)
-                .Include(n => n.VisitorDetails)            
+                .Include(n => n.VisitorDetails)
                 .ToListAsync();
-        
+
         }
         public async Task<TblService?> GetByIdAsync(int id)
         {
