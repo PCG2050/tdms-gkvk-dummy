@@ -1,13 +1,11 @@
-﻿// NaepProgramController.cs
-using Application.Interface.Services.DataTables.NAEP;
-using Application.Models.DataTables.KVK;
+﻿// WebApi/Controllers/DataTables/NAEP/NaepProgramController.cs
 using Application.Models.DataTables.NAEP;
-
+using Application.Interface.Services.DataTables.NAEP;
 
 namespace WebApi.Controllers.DataTables.NAEP
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("api/naep/[controller]")]
     [ApiController]
     public class NaepProgramController : ControllerBase
     {
@@ -22,6 +20,9 @@ namespace WebApi.Controllers.DataTables.NAEP
         // SECTION A: PROGRAM DETAILS
         // ============================
 
+        /// <summary>
+        /// Create a new NAEP program entry
+        /// </summary>
         [HttpPost]
         public async Task<IActionResult> CreateProgram([FromBody] NaepProgramCreateDto dto)
         {
@@ -29,6 +30,9 @@ namespace WebApi.Controllers.DataTables.NAEP
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
+        /// <summary>
+        /// Get program by ID
+        /// </summary>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProgram(int id)
         {
@@ -36,6 +40,11 @@ namespace WebApi.Controllers.DataTables.NAEP
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
+        /// <summary>
+        /// Get complete program with all sections (conditional loading based on CategoryId)
+        /// - CategoryId 18 or 24: Loads Results with FLD/OFT data
+        /// - Other categories: Loads Reports
+        /// </summary>
         [HttpGet("{id}/complete")]
         public async Task<IActionResult> GetCompleteProgram(int id)
         {
@@ -43,6 +52,9 @@ namespace WebApi.Controllers.DataTables.NAEP
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
+        /// <summary>
+        /// Update program details
+        /// </summary>
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProgram(int id, [FromBody] NaepProgramUpdateDto dto)
         {
@@ -50,6 +62,9 @@ namespace WebApi.Controllers.DataTables.NAEP
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
+        /// <summary>
+        /// Delete program
+        /// </summary>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProgram(int id)
         {
@@ -61,6 +76,9 @@ namespace WebApi.Controllers.DataTables.NAEP
         // SECTION B: DEMOGRAPHICS
         // ============================
 
+        /// <summary>
+        /// Add demographic entry to program
+        /// </summary>
         [HttpPost("{programId}/demographics")]
         public async Task<IActionResult> AddDemographics(int programId, [FromBody] NaepParticipantDemographicsCreateDto dto)
         {
@@ -68,6 +86,9 @@ namespace WebApi.Controllers.DataTables.NAEP
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
+        /// <summary>
+        /// Update demographic entry
+        /// </summary>
         [HttpPut("demographics/{demographicsId}")]
         public async Task<IActionResult> UpdateDemographics(int demographicsId, [FromBody] NaepParticipantDemographicsUpdateDto dto)
         {
@@ -75,6 +96,9 @@ namespace WebApi.Controllers.DataTables.NAEP
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
+        /// <summary>
+        /// Delete demographic entry
+        /// </summary>
         [HttpDelete("demographics/{demographicsId}")]
         public async Task<IActionResult> DeleteDemographics(int demographicsId)
         {
@@ -82,6 +106,9 @@ namespace WebApi.Controllers.DataTables.NAEP
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
+        /// <summary>
+        /// Get all demographics for a program
+        /// </summary>
         [HttpGet("{programId}/demographics")]
         public async Task<IActionResult> GetDemographics(int programId)
         {
@@ -90,16 +117,13 @@ namespace WebApi.Controllers.DataTables.NAEP
         }
 
         // ============================
-        // SECTION C: PROGRAM CONTENT
+        // SECTION C: PROGRAM CONTENT & RESOURCES
         // ============================
 
-        [HttpPost("{programId}/content")]
-        public async Task<IActionResult> AddProgramContent(int programId, [FromBody] NaepProgramContentCreateDto dto)
-        {
-            var result = await _service.AddProgramContentAsync(programId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
+        /// <summary>
+        /// Add program content entry with all child entities (ResourcePersons, Topics, TeachingAids) in one request
+        /// This endpoint solves the problem of needing parent ID before creating children by handling everything in a single transaction
+        /// </summary>
         [HttpPost("{programId}/content-with-children")]
         public async Task<IActionResult> AddProgramContentWithChildren(int programId, [FromBody] NaepProgramContentWithChildrenCreateDto dto)
         {
@@ -107,7 +131,13 @@ namespace WebApi.Controllers.DataTables.NAEP
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
-
+        /// <summary>
+        /// Update program content with all child entities using Hybrid Pattern (perfect for "Save & Next" button)
+        /// - Items WITH Id: UPDATE existing
+        /// - Items WITHOUT Id: CREATE new
+        /// - Items in DB but NOT in request: DELETE
+        /// All changes happen in a single transaction with automatic rollback on failure
+        /// </summary>
         [HttpPut("content/{contentId}/with-children")]
         public async Task<IActionResult> UpdateProgramContentWithChildren(int contentId, [FromBody] NaepProgramContentWithChildrenUpdateDto dto)
         {
@@ -115,6 +145,9 @@ namespace WebApi.Controllers.DataTables.NAEP
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
+        /// <summary>
+        /// Get program content by ID
+        /// </summary>
         [HttpGet("content/{contentId}")]
         public async Task<IActionResult> GetProgramContent(int contentId)
         {
@@ -122,6 +155,9 @@ namespace WebApi.Controllers.DataTables.NAEP
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
+        /// <summary>
+        /// Delete program content
+        /// </summary>
         [HttpDelete("content/{contentId}")]
         public async Task<IActionResult> DeleteProgramContent(int contentId)
         {
@@ -129,32 +165,33 @@ namespace WebApi.Controllers.DataTables.NAEP
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
+        /// <summary>
+        /// Get all content entries for a program
+        /// </summary>
+        [HttpGet("{programId}/content")]
+        public async Task<IActionResult> GetProgramContents(int programId)
+        {
+            var result = await _service.GetProgramContentsByProgramIdAsync(programId);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
 
         // ============================
         // SECTION D: ADVISORY SERVICES
         // ============================
 
+        /// <summary>
+        /// Add or update advisory services
+        /// </summary>
         [HttpPost("{programId}/advisory-services")]
-        public async Task<IActionResult> AddAdvisoryServices(int programId, [FromBody] NaepAdvisoryServicesCreateDto dto)
+        public async Task<IActionResult> AddOrUpdateAdvisoryServices(int programId, [FromBody] NaepAdvisoryServicesCreateDto dto)
         {
-            var result = await _service.AddAdvisoryServicesAsync(programId, dto);
+            var result = await _service.AddOrUpdateAdvisoryServicesAsync(programId, dto);
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
-        [HttpPut("advisory-services/{advisoryId}")]
-        public async Task<IActionResult> UpdateAdvisoryServices(int advisoryId, [FromBody] NaepAdvisoryServicesUpdateDto dto)
-        {
-            var result = await _service.UpdateAdvisoryServicesAsync(advisoryId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpDelete("advisory-services/{advisoryId}")]
-        public async Task<IActionResult> DeleteAdvisoryServices(int advisoryId)
-        {
-            var result = await _service.DeleteAdvisoryServicesAsync(advisoryId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
+        /// <summary>
+        /// Get advisory services for a program
+        /// </summary>
         [HttpGet("{programId}/advisory-services")]
         public async Task<IActionResult> GetAdvisoryServices(int programId)
         {
@@ -162,31 +199,25 @@ namespace WebApi.Controllers.DataTables.NAEP
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
+
+
         // ============================
-        // SECTION E: REPORTS
+        // SECTION F: REPORTS (Non-FLD/OFT categories)
         // ============================
 
+        /// <summary>
+        /// Add or update report (for non-FLD/OFT categories)
+        /// </summary>
         [HttpPost("{programId}/reports")]
-        public async Task<IActionResult> AddReport(int programId, [FromBody] NaepReportCreateDto dto)
+        public async Task<IActionResult> AddOrUpdateReport(int programId, [FromBody] NaepReportCreateDto dto)
         {
-            var result = await _service.AddReportAsync(programId, dto);
+            var result = await _service.AddOrUpdateReportAsync(programId, dto);
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
-        [HttpPut("reports/{reportId}")]
-        public async Task<IActionResult> UpdateReport(int reportId, [FromBody] NaepReportUpdateDto dto)
-        {
-            var result = await _service.UpdateReportAsync(reportId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpDelete("reports/{reportId}")]
-        public async Task<IActionResult> DeleteReport(int reportId)
-        {
-            var result = await _service.DeleteReportAsync(reportId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
+        /// <summary>
+        /// Get report for a program
+        /// </summary>
         [HttpGet("{programId}/reports")]
         public async Task<IActionResult> GetReport(int programId)
         {
@@ -195,30 +226,22 @@ namespace WebApi.Controllers.DataTables.NAEP
         }
 
         // ============================
-        // SECTION F: RECOMMENDATIONS
+        // SECTION G: RECOMMENDATIONS
         // ============================
 
+        /// <summary>
+        /// Add or update recommendation
+        /// </summary>
         [HttpPost("{programId}/recommendations")]
-        public async Task<IActionResult> AddRecommendation(int programId, [FromBody] NaepRecommendationCreateDto dto)
+        public async Task<IActionResult> AddOrUpdateRecommendation(int programId, [FromBody] NaepRecommendationCreateDto dto)
         {
-            var result = await _service.AddRecommendationAsync(programId, dto);
+            var result = await _service.AddOrUpdateRecommendationAsync(programId, dto);
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
-        [HttpPut("recommendations/{recommendationId}")]
-        public async Task<IActionResult> UpdateRecommendation(int recommendationId, [FromBody] NaepRecommendationUpdateDto dto)
-        {
-            var result = await _service.UpdateRecommendationAsync(recommendationId, dto);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
-        [HttpDelete("recommendations/{recommendationId}")]
-        public async Task<IActionResult> DeleteRecommendation(int recommendationId)
-        {
-            var result = await _service.DeleteRecommendationAsync(recommendationId);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
-
+        /// <summary>
+        /// Get recommendation for a program
+        /// </summary>
         [HttpGet("{programId}/recommendations")]
         public async Task<IActionResult> GetRecommendation(int programId)
         {
@@ -230,6 +253,9 @@ namespace WebApi.Controllers.DataTables.NAEP
         // STATUS MANAGEMENT
         // ============================
 
+        /// <summary>
+        /// Submit program for approval (Trainer) - changes status from Draft/Rejected to Pending
+        /// </summary>
         // [HttpPost("{programId}/submit")]
         // public async Task<IActionResult> SubmitForApproval(int programId)
         // {
@@ -237,14 +263,22 @@ namespace WebApi.Controllers.DataTables.NAEP
         //     return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         // }
 
+        /// <summary>
+        /// Approve program (UnitHead/Admin) - changes status from Pending to Approved
+        /// </summary>
         [HttpPost("{programId}/approve")]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
         public async Task<IActionResult> Approve(int programId, [FromBody] ApprovalDto dto)
         {
             var result = await _service.ApproveAsync(programId, dto?.Remarks);
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
+        /// <summary>
+        /// Reject program (UnitHead/Admin) - changes status from Pending to Rejected
+        /// </summary>
         [HttpPost("{programId}/reject")]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
         public async Task<IActionResult> Reject(int programId, [FromBody] RejectionDto dto)
         {
             if (string.IsNullOrWhiteSpace(dto?.Remarks))
@@ -258,40 +292,58 @@ namespace WebApi.Controllers.DataTables.NAEP
         // LISTING & FILTERING
         // ============================
 
+        /// <summary>
+        /// Search and filter NAEP programs with pagination (Admin/UnitHead only)
+        /// </summary>
         [HttpGet]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
         public async Task<IActionResult> GetPaginated(
             [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 10,
+            [FromQuery] int pageSize = 20,
             [FromQuery] DateOnly? startDate = null,
             [FromQuery] DateOnly? endDate = null,
-            [FromQuery] int? programTypeId = null,
+            [FromQuery] int? categoryId = null,
             [FromQuery] string? searchTerm = null,
+            [FromQuery] string? formStatus = null,
+            [FromQuery] int? createdById = null,
             [FromQuery] int? unitLocationId = null)
         {
             var result = await _service.GetPaginatedAsync(
-                pageNumber, pageSize, startDate, endDate, programTypeId, searchTerm, unitLocationId);
+                pageNumber, pageSize, startDate, endDate, categoryId,
+                searchTerm, formStatus, createdById, unitLocationId);
             return Ok(result);
         }
 
+        /// <summary>
+        /// Get programs by status (Admin/UnitHead only)
+        /// </summary>
         [HttpGet("status/{status}")]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
         public async Task<IActionResult> GetByStatus(
             string status,
             [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 10)
+            [FromQuery] int pageSize = 20)
         {
             var result = await _service.GetByStatusAsync(status, pageNumber, pageSize);
             return Ok(result);
         }
 
+        /// <summary>
+        /// Get summary of programs by status (Admin/UnitHead only)
+        /// </summary>
         [HttpGet("status-summary")]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
         public async Task<IActionResult> GetStatusSummary()
         {
             var result = await _service.GetStatusSummaryAsync();
             return Ok(result);
         }
 
+        /// <summary>
+        /// Get trainer's own program history with pagination
+        /// </summary>
         [HttpGet("my-history")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
         public async Task<IActionResult> GetMyHistory(
       [FromQuery] int pageNumber = 1,
       [FromQuery] int pageSize = 20)
@@ -300,6 +352,9 @@ namespace WebApi.Controllers.DataTables.NAEP
             return Ok(result);
         }
 
+        /// <summary>
+        /// Get pending approvals for Unit Head and Admin with pagination
+        /// </summary>
         [HttpGet("pending-approvals")]
         [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
         public async Task<IActionResult> GetPendingApprovals(
@@ -313,22 +368,23 @@ namespace WebApi.Controllers.DataTables.NAEP
         // ============================
         // HELPER METHOD
         // ============================
-
         private int GetStatusCode(ServiceErrorStatus? errorStatus)
         {
             return errorStatus switch
             {
                 ServiceErrorStatus.NOTFOUND => 404,
                 ServiceErrorStatus.FORBIDDEN => 403,
-                ServiceErrorStatus.BADREQUEST => 400,
                 ServiceErrorStatus.INVALIDOPERATION => 400,
-                ServiceErrorStatus.CONFLICT => 409,
-                _ => StatusCodes.Status500InternalServerError
+                ServiceErrorStatus.UNAUTHORIZED => 401,
+                _ => 500
             };
         }
     }
 
-    // DTOs for approval/rejection
+    // ============================
+    // DTOs FOR STATUS MANAGEMENT
+    // ============================
+
     public class ApprovalDto
     {
         public string? Remarks { get; set; }

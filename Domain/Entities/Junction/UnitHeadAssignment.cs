@@ -13,5 +13,13 @@ namespace Domain.Entities.Junction
         public int UnitHeadId { get; set; }
         public OrganizationUnitLocation UnitLocation { get; set; } = null!;        
         public User UnitHead { get; set; } = null!;
+
+        //soft delete
+
+        public bool IsDeactivated { get; set; } = false;
+        public DateTimeOffset? DeactivatedAt { get; set; }
+
+        public int? DeactivatedById { get;set; }
+
     }
 }

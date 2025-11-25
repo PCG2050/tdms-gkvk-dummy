@@ -4,10 +4,10 @@
     {
         [Required]
         public int? NaepProgramDetailsId { get; set; }
-
         [JsonIgnore]
         [ForeignKey(nameof(NaepProgramDetailsId))]
         public NaepProgramDetails? ProgramDetails { get; set; }
+
 
         // Advisory service metrics
         public int NoOfFacebookSMS { get; set; }

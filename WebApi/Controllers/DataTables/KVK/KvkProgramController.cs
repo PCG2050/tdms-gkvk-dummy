@@ -398,7 +398,7 @@ namespace WebApi.Controllers.DataTables.KVK
         /// Get trainer's own program history with pagination
         /// </summary>
         [HttpGet("my-history")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
         public async Task<IActionResult> GetMyHistory(
       [FromQuery] int pageNumber = 1,
       [FromQuery] int pageSize = 20)

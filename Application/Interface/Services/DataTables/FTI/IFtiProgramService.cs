@@ -1,6 +1,7 @@
-﻿// Application/Interface/Services/DataTables/IFtiProgramService.cs
-
+﻿
+using Application.Models;
 using Application.Models.DataTables.FTI;
+using Application.Models.DataTables.STU;
 using Application.Services.Common;
 
 namespace Application.Interface.Services.DataTables.FTI
@@ -12,7 +13,7 @@ namespace Application.Interface.Services.DataTables.FTI
         // ============================
         Task<ServiceResult<FtiProgramDetailsDto>> CreateProgramAsync(FtiProgramCreateDto dto);
         Task<ServiceResult<FtiProgramDetailsDto>> GetProgramByIdAsync(int id);
-        Task<ServiceResult<FtiProgramDetailsCompleteDto>> GetCompleteProgramAsync(int id);
+        Task<ServiceResult<FtiProgramCompleteDto>> GetCompleteProgramAsync(int id);
         Task<ServiceResult<FtiProgramDetailsDto>> UpdateProgramAsync(int id, FtiProgramUpdateDto dto);
         Task<ServiceResult> DeleteProgramAsync(int id);
 
@@ -27,69 +28,94 @@ namespace Application.Interface.Services.DataTables.FTI
         // ============================
         // SECTION C: PROGRAM CONTENT & RESOURCES
         // ============================
-        Task<ServiceResult<FtiProgramContentDto>> AddProgramContentAsync(int programId, FtiProgramContentCreateDto dto);
+
+        /// <summary>
+        /// Create FtiProgramContentAndResources along with all child entities (ResourcePersons, Topics, TeachingAids) in a single transaction
+        /// </summary>
+        Task<ServiceResult<FtiProgramContentDto>> AddProgramContentWithChildrenAsync(int programId, FtiProgramContentWithChildrenCreateDto dto);
+
+        /// <summary>
+        /// Update FtiProgramContentAndResources with all child entities using Hybrid Pattern in a single transaction
+        /// - Items WITH Id: UPDATE existing
+        /// - Items WITHOUT Id: CREATE new
+        /// - Items in DB but NOT in arrays: DELETE
+        /// Perfect for "Save & Next" button with inline editing
+        /// </summary>
+        Task<ServiceResult<FtiProgramContentDto>> UpdateProgramContentWithChildrenAsync(int contentId, FtiProgramContentWithChildrenUpdateDto dto);
+
         Task<ServiceResult<FtiProgramContentDto>> GetProgramContentByIdAsync(int contentId);
         Task<ServiceResult> DeleteProgramContentAsync(int contentId);
         Task<ServiceResult<List<FtiProgramContentDto>>> GetProgramContentsByProgramIdAsync(int programId);
 
-        // Hybrid pattern methods for bulk create/update operations (RECOMMENDED)
-        Task<ServiceResult<FtiProgramContentDto>> AddProgramContentWithChildrenAsync(int programId, FtiProgramContentWithChildrenCreateDto dto);
-        Task<ServiceResult<FtiProgramContentDto>> UpdateProgramContentWithChildrenAsync(int contentId, FtiProgramContentWithChildrenUpdateDto dto);
-
-        // ============================
-        // SECTION C1-C3: RESOURCE PERSONS, TOPICS, TEACHING AIDS
-        // Individual CRUD methods REMOVED - Use hybrid endpoints instead
-        // ============================
-
         // ============================
         // SECTION D: ADVISORY SERVICES
         // ============================
-        Task<ServiceResult<FtiAdvisoryServicesDto>> AddAdvisoryServicesAsync(int programId, FtiAdvisoryServicesCreateDto dto);
-        Task<ServiceResult<FtiAdvisoryServicesDto>> UpdateAdvisoryServicesAsync(int advisoryId, FtiAdvisoryServicesUpdateDto dto);
-        Task<ServiceResult> DeleteAdvisoryServicesAsync(int advisoryId);
+        Task<ServiceResult<FtiAdvisoryServicesDto>> AddOrUpdateAdvisoryServicesAsync(int programId, FtiAdvisoryServicesCreateDto dto);
         Task<ServiceResult<FtiAdvisoryServicesDto>> GetAdvisoryServicesByProgramIdAsync(int programId);
 
+
         // ============================
-        // SECTION E: REPORTS
+        // SECTION F: REPORTS (Non-FLD/OFT categories)
         // ============================
-        Task<ServiceResult<FtiReportDto>> AddReportAsync(int programId, FtiReportCreateDto dto);
-        Task<ServiceResult<FtiReportDto>> UpdateReportAsync(int reportId, FtiReportUpdateDto dto);
-        Task<ServiceResult> DeleteReportAsync(int reportId);
+        Task<ServiceResult<FtiReportDto>> AddOrUpdateReportAsync(int programId, FtiReportCreateDto dto);
         Task<ServiceResult<FtiReportDto>> GetReportByProgramIdAsync(int programId);
 
         // ============================
-        // SECTION F: RECOMMENDATIONS
+        // SECTION G: RECOMMENDATIONS
         // ============================
-        Task<ServiceResult<FtiRecommendationDto>> AddRecommendationAsync(int programId, FtiRecommendationCreateDto dto);
-        Task<ServiceResult<FtiRecommendationDto>> UpdateRecommendationAsync(int recommendationId, FtiRecommendationUpdateDto dto);
-        Task<ServiceResult> DeleteRecommendationAsync(int recommendationId);
+        Task<ServiceResult<FtiRecommendationDto>> AddOrUpdateRecommendationAsync(int programId, FtiRecommendationCreateDto dto);
         Task<ServiceResult<FtiRecommendationDto>> GetRecommendationByProgramIdAsync(int programId);
 
         // ============================
-        // STATUS MANAGEMENT & SUBMISSION
+        // STATUS MANAGEMENT
         // ============================
+
+        /// <summary>
+        /// Submit program for approval (Trainer role - changes status from Draft to Pending)
+        /// </summary>
         Task<ServiceResult> SubmitForApprovalAsync(int programId);
+
+        /// <summary>
+        /// Approve program (UnitHead/Admin roles - changes status from Pending to Approved)
+        /// </summary>
         Task<ServiceResult> ApproveAsync(int programId, string? remarks = null);
+
+        /// <summary>
+        /// Reject program (UnitHead/Admin roles - changes status from Pending to Rejected)
+        /// </summary>
         Task<ServiceResult> RejectAsync(int programId, string remarks);
 
         // ============================
-        // PAGINATION & FILTERING
+        // LISTING & FILTERING
         // ============================
-        Task<PaginatedResult<FtiProgramDetailsDto>> GetPaginatedAsync(
-            int pageNumber = 1,
-            int pageSize = 10,
-            DateOnly? startDate = null,
-            DateOnly? endDate = null,
-            int? programTypeId = null,
-            string? searchTerm = null,
-            int? unitLocationId = null);
 
-        Task<PaginatedResult<FtiProgramDetailsDto>> GetByStatusAsync(
+        /// <summary>
+        /// Search and filter FTI programs with pagination (Admin/UnitHead)
+        /// </summary>
+        Task<PaginatedResult<FtiProgramListItemDto>> GetPaginatedAsync(
+            int pageNumber,
+            int pageSize,
+            DateOnly? startDate,
+            DateOnly? endDate,
+            int? categoryId,
+            string? searchTerm,
+            string? formStatus,
+            int? createdById,
+            int? unitLocationId);
+
+        /// <summary>
+        /// Get programs by status with pagination
+        /// </summary>
+        Task<PaginatedResult<FtiProgramListItemDto>> GetByStatusAsync(
             string status,
-            int pageNumber = 1,
-            int pageSize = 10);
+            int pageNumber,
+            int pageSize);
 
+        /// <summary>
+        /// Get summary of programs grouped by status
+        /// </summary>
         Task<Dictionary<string, int>> GetStatusSummaryAsync();
+
         /// <summary>
         /// Get trainer's submission history with pagination
         /// </summary>

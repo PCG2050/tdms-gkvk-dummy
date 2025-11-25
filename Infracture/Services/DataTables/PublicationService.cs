@@ -175,21 +175,16 @@ namespace Infrastructure.Services.DataTables
 
         public async Task<ServiceResult> DeleteAsync(int id)
         {
-            var publication = await _publicationRepository.GetByIdAsync(id);
+            var program = await _publicationRepository.GetByIdAsync(id);
 
-            if (publication == null)
-                return ServiceResult.Failure("Publication not found", ServiceErrorStatus.NOTFOUND);
+            if (program == null)
+                return ServiceResult.Failure("Program not found", ServiceErrorStatus.NOTFOUND);
 
-            if (!await _entityPermissionService.CanModifyForm(publication))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (publication.FormStatus != "Draft")
-                return ServiceResult.Failure(
-                    "Only draft publications can be deleted",
-                    ServiceErrorStatus.INVALIDOPERATION);
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult.Failure("Access denied. You can only delete your own forms.", ServiceErrorStatus.FORBIDDEN);
 
             await _publicationRepository.DeleteAsync(id);
-            return ServiceResult.Success();
+            return ServiceResult.Success("Program deleted successfully");
         }
 
         // PHASE 2: Publisher Details

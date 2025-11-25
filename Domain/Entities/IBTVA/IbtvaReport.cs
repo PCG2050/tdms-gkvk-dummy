@@ -1,8 +1,4 @@
-﻿
-using System.ComponentModel.DataAnnotations.Schema;
-
-
-namespace Domain.Entities.IBTVA
+﻿namespace Domain.Entities.IBTVA
 {
     public class IbtvaReport : AuditableBaseEntity
     {
@@ -12,27 +8,48 @@ namespace Domain.Entities.IBTVA
         [ForeignKey(nameof(IbtvaProgramDetailsId))]
         public IbtvaProgramDetails? ProgramDetails { get; set; }
 
-        // Report details
+        [MaxLength(4)]
+        public string? ReportingYear { get; set; }
+
+        public DateOnly? ReportDate { get; set; }
+
+        [MaxLength(500)]
+        public string? ProgressReport { get; set; }
+
+        [MaxLength(500)]
+        public string? GeoTaggedPhoto { get; set; }
+
+        // Video path or URL
+        [MaxLength(500)]
+        public string? ReportingVideo { get; set; }
+
+        // Text explanation, can be long
+        [MaxLength(2000)]
+        public string? Outcome { get; set; }
+
+        public DateOnly? TestingCompletionDate { get; set; }
+
+        // File upload for testing completion
+        [MaxLength(500)]
+        public string? TestingCompletionLetter { get; set; }
+
+        public DateOnly? ProjectCompletionDate { get; set; }
+
+        // File upload for completion certificate
+        [MaxLength(500)]
+        public string? ProjectCompletionLetter { get; set; }
+
+        // Dropdown text — short
         [MaxLength(150)]
-        public string? ProgressReportReportingYear { get; set; }
+        public string? TypeOfReport { get; set; }
 
-        public DateTime? Date { get; set; }
-
-        // File / media paths or URLs
+        // Special remarks or additional context
         [MaxLength(500)]
-        public string? UploadPhoto { get; set; }
-
-        [MaxLength(500)]
-        public string? PhotosGeotaggedPhotoOrUploadPhoto { get; set; }
-
-        [MaxLength(500)]
-        public string? UploadVideo { get; set; }
-
-        [MaxLength(1000)]
-        public string? SignificantOutcome { get; set; }
+        public string? SpclReport { get; set; }
 
         public int? UnitLocationId { get; set; }
 
         public int? OrganizationId { get; set; }
+
     }
 }

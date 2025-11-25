@@ -1,5 +1,5 @@
-﻿// Application/Interface/Services/DataTables/IDeuProgramService.cs
-
+﻿
+using Application.Models;
 using Application.Models.DataTables.DEU;
 using Application.Services.Common;
 
@@ -12,7 +12,7 @@ namespace Application.Interface.Services.DataTables.DEU
         // ============================
         Task<ServiceResult<DeuProgramDetailsDto>> CreateProgramAsync(DeuProgramCreateDto dto);
         Task<ServiceResult<DeuProgramDetailsDto>> GetProgramByIdAsync(int id);
-        Task<ServiceResult<DeuProgramDetailsCompleteDto>> GetCompleteProgramAsync(int id);
+        Task<ServiceResult<DeuProgramCompleteDto>> GetCompleteProgramAsync(int id);
         Task<ServiceResult<DeuProgramDetailsDto>> UpdateProgramAsync(int id, DeuProgramUpdateDto dto);
         Task<ServiceResult> DeleteProgramAsync(int id);
 
@@ -27,8 +27,19 @@ namespace Application.Interface.Services.DataTables.DEU
         // ============================
         // SECTION C: PROGRAM CONTENT & RESOURCES
         // ============================
-        Task<ServiceResult<DeuProgramContentDto>> AddProgramContentAsync(int programId, DeuProgramContentCreateDto dto);
+
+        /// <summary>
+        /// Create DeuProgramContentAndResources along with all child entities (ResourcePersons, Topics, TeachingAids) in a single transaction
+        /// </summary>
         Task<ServiceResult<DeuProgramContentDto>> AddProgramContentWithChildrenAsync(int programId, DeuProgramContentWithChildrenCreateDto dto);
+
+        /// <summary>
+        /// Update DeuProgramContentAndResources with all child entities using Hybrid Pattern in a single transaction
+        /// - Items WITH Id: UPDATE existing
+        /// - Items WITHOUT Id: CREATE new
+        /// - Items in DB but NOT in arrays: DELETE
+        /// Perfect for "Save & Next" button with inline editing
+        /// </summary>
         Task<ServiceResult<DeuProgramContentDto>> UpdateProgramContentWithChildrenAsync(int contentId, DeuProgramContentWithChildrenUpdateDto dto);
 
         Task<ServiceResult<DeuProgramContentDto>> GetProgramContentByIdAsync(int contentId);
@@ -38,51 +49,70 @@ namespace Application.Interface.Services.DataTables.DEU
         // ============================
         // SECTION D: ADVISORY SERVICES
         // ============================
-        Task<ServiceResult<DeuAdvisoryServicesDto>> AddAdvisoryServicesAsync(int programId, DeuAdvisoryServicesCreateDto dto);
-        Task<ServiceResult<DeuAdvisoryServicesDto>> UpdateAdvisoryServicesAsync(int advisoryId, DeuAdvisoryServicesUpdateDto dto);
-        Task<ServiceResult> DeleteAdvisoryServicesAsync(int advisoryId);
+        Task<ServiceResult<DeuAdvisoryServicesDto>> AddOrUpdateAdvisoryServicesAsync(int programId, DeuAdvisoryServicesCreateDto dto);
         Task<ServiceResult<DeuAdvisoryServicesDto>> GetAdvisoryServicesByProgramIdAsync(int programId);
 
+
         // ============================
-        // SECTION E: REPORTS
+        // SECTION F: REPORTS (Non-FLD/OFT categories)
         // ============================
-        Task<ServiceResult<DeuReportDto>> AddReportAsync(int programId, DeuReportCreateDto dto);
-        Task<ServiceResult<DeuReportDto>> UpdateReportAsync(int reportId, DeuReportUpdateDto dto);
-        Task<ServiceResult> DeleteReportAsync(int reportId);
+        Task<ServiceResult<DeuReportDto>> AddOrUpdateReportAsync(int programId, DeuReportCreateDto dto);
         Task<ServiceResult<DeuReportDto>> GetReportByProgramIdAsync(int programId);
 
         // ============================
-        // SECTION F: RECOMMENDATIONS
+        // SECTION G: RECOMMENDATIONS
         // ============================
-        Task<ServiceResult<DeuRecommendationDto>> AddRecommendationAsync(int programId, DeuRecommendationCreateDto dto);
-        Task<ServiceResult<DeuRecommendationDto>> UpdateRecommendationAsync(int recommendationId, DeuRecommendationUpdateDto dto);
-        Task<ServiceResult> DeleteRecommendationAsync(int recommendationId);
+        Task<ServiceResult<DeuRecommendationDto>> AddOrUpdateRecommendationAsync(int programId, DeuRecommendationCreateDto dto);
         Task<ServiceResult<DeuRecommendationDto>> GetRecommendationByProgramIdAsync(int programId);
 
         // ============================
-        // STATUS MANAGEMENT & SUBMISSION
+        // STATUS MANAGEMENT
         // ============================
+
+        /// <summary>
+        /// Submit program for approval (Trainer role - changes status from Draft to Pending)
+        /// </summary>
         Task<ServiceResult> SubmitForApprovalAsync(int programId);
+
+        /// <summary>
+        /// Approve program (UnitHead/Admin roles - changes status from Pending to Approved)
+        /// </summary>
         Task<ServiceResult> ApproveAsync(int programId, string? remarks = null);
+
+        /// <summary>
+        /// Reject program (UnitHead/Admin roles - changes status from Pending to Rejected)
+        /// </summary>
         Task<ServiceResult> RejectAsync(int programId, string remarks);
 
         // ============================
-        // PAGINATION & FILTERING
+        // LISTING & FILTERING
         // ============================
-        Task<PaginatedResult<DeuProgramDetailsDto>> GetPaginatedAsync(
-            int pageNumber = 1,
-            int pageSize = 10,
-            DateOnly? startDate = null,
-            DateOnly? endDate = null,
-            int? programTypeId = null,
-            string? searchTerm = null,
-            int? unitLocationId = null);
 
-        Task<PaginatedResult<DeuProgramDetailsDto>> GetByStatusAsync(
+        /// <summary>
+        /// Search and filter DEU programs with pagination (Admin/UnitHead)
+        /// </summary>
+        Task<PaginatedResult<DeuProgramListItemDto>> GetPaginatedAsync(
+            int pageNumber,
+            int pageSize,
+            DateOnly? startDate,
+            DateOnly? endDate,
+            int? categoryId,
+            string? searchTerm,
+            string? formStatus,
+            int? createdById,
+            int? unitLocationId);
+
+        /// <summary>
+        /// Get programs by status with pagination
+        /// </summary>
+        Task<PaginatedResult<DeuProgramListItemDto>> GetByStatusAsync(
             string status,
-            int pageNumber = 1,
-            int pageSize = 10);
+            int pageNumber,
+            int pageSize);
 
+        /// <summary>
+        /// Get summary of programs grouped by status
+        /// </summary>
         Task<Dictionary<string, int>> GetStatusSummaryAsync();
 
         /// <summary>

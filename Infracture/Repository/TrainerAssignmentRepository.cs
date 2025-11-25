@@ -51,11 +51,12 @@ namespace Infrastructure.Repository
         {
 
             return await (from unitLocation in _context.OrganizationUnitLocations
-                              join trainer in _context.UnitTrainers on unitLocation.Id equals trainer.UnitLocationId
-                              where unitLocation.UnitId == trainerAssignment.UnitId
-                              && unitLocation.DistrictId == trainerAssignment.DistrictId
-                              && trainer.TrainerId == trainerAssignment.TrainerId
-                              select trainer).AnyAsync();
+                          join trainer in _context.UnitTrainers on unitLocation.Id equals trainer.UnitLocationId
+                          where unitLocation.UnitId == trainerAssignment.UnitId
+                          && unitLocation.DistrictId == trainerAssignment.DistrictId
+                          && trainer.TrainerId == trainerAssignment.TrainerId
+                          && !trainer.IsDeactivated
+                          select trainer).AnyAsync();
         }
 
         public async Task<List<TrainerAssignment>> GetByTrainerIdAsync(int trainerId)
@@ -73,7 +74,7 @@ namespace Infrastructure.Repository
         public async Task DeleteAsync(int id)
         {
             throw new NotImplementedException();
-          
+
         }
 
         public async Task DeleteAsync(TrainerAssignment unitLocationTrainer)
@@ -94,31 +95,31 @@ namespace Infrastructure.Repository
         {
             throw new NotImplementedException();
         }
-           
-        
+
+
         public async Task<List<TrainerUnitWithLocationsDto>> GetAssignmentsDetailsByTrainerAsync(int trainerId)
         {
-           var trainerAssignments = await _context.UnitTrainers
-                .Include(x => x.UnitLocation)
-                    .ThenInclude(l => l.Unit)
-                .Include(x => x.UnitLocation)
-                    .ThenInclude(l => l.District)
-                    .ThenInclude(d => d.State)
-                .Where(x => x.TrainerId == trainerId)
-                .GroupBy(ut => new { ut.UnitLocation.Unit.Id, ut.UnitLocation.Unit.Name })
-            .Select(g => new TrainerUnitWithLocationsDto
-            {
-                UnitId = g.Key.Id,
-                UnitName = g.Key.Name,
-                Locations = g.Select(ut => new UnitLocationDto
-                {
-                    UnitLocationId = ut.UnitLocation.Id,
-                    DistrictId = ut.UnitLocation.District.Id,
-                    DistrictName = ut.UnitLocation.District.Name,
-                    StateId = ut.UnitLocation.District.State.Id,
-                    StateName = ut.UnitLocation.District.State.Name
-                }).ToList()
-            }).ToListAsync();
+            var trainerAssignments = await _context.UnitTrainers
+                 .Include(x => x.UnitLocation)
+                     .ThenInclude(l => l.Unit)
+                 .Include(x => x.UnitLocation)
+                     .ThenInclude(l => l.District)
+                     .ThenInclude(d => d.State)
+                 .Where(x => x.TrainerId == trainerId && !x.IsDeactivated)
+                 .GroupBy(ut => new { ut.UnitLocation.Unit.Id, ut.UnitLocation.Unit.Name })
+             .Select(g => new TrainerUnitWithLocationsDto
+             {
+                 UnitId = g.Key.Id,
+                 UnitName = g.Key.Name,
+                 Locations = g.Select(ut => new UnitLocationDto
+                 {
+                     UnitLocationId = ut.UnitLocation.Id,
+                     DistrictId = ut.UnitLocation.District.Id,
+                     DistrictName = ut.UnitLocation.District.Name,
+                     StateId = ut.UnitLocation.District.State.Id,
+                     StateName = ut.UnitLocation.District.State.Name
+                 }).ToList()
+             }).ToListAsync();
             return trainerAssignments;
         }
 

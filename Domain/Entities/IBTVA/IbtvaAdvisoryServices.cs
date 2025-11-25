@@ -4,10 +4,10 @@
     {
         [Required]
         public int? IbtvaProgramDetailsId { get; set; }
-
         [JsonIgnore]
         [ForeignKey(nameof(IbtvaProgramDetailsId))]
         public IbtvaProgramDetails? ProgramDetails { get; set; }
+
 
         // Advisory service metrics
         public int NoOfFacebookSMS { get; set; }

@@ -8,6 +8,7 @@
         [ForeignKey(nameof(FtiProgramDetailsId))]
         public FtiProgramDetails? ProgramDetails { get; set; }
 
+
         // Advisory service metrics
         public int NoOfFacebookSMS { get; set; }
         public int NoOfSMSSentToRegisteredFarmers { get; set; }

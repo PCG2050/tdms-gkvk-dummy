@@ -1,5 +1,5 @@
-﻿// Application/Interface/Services/DataTables/INaepProgramService.cs
-
+﻿
+using Application.Models;
 using Application.Models.DataTables.NAEP;
 using Application.Services.Common;
 
@@ -12,7 +12,7 @@ namespace Application.Interface.Services.DataTables.NAEP
         // ============================
         Task<ServiceResult<NaepProgramDetailsDto>> CreateProgramAsync(NaepProgramCreateDto dto);
         Task<ServiceResult<NaepProgramDetailsDto>> GetProgramByIdAsync(int id);
-        Task<ServiceResult<NaepProgramDetailsCompleteDto>> GetCompleteProgramAsync(int id);
+        Task<ServiceResult<NaepProgramCompleteDto>> GetCompleteProgramAsync(int id);
         Task<ServiceResult<NaepProgramDetailsDto>> UpdateProgramAsync(int id, NaepProgramUpdateDto dto);
         Task<ServiceResult> DeleteProgramAsync(int id);
 
@@ -27,9 +27,19 @@ namespace Application.Interface.Services.DataTables.NAEP
         // ============================
         // SECTION C: PROGRAM CONTENT & RESOURCES
         // ============================
-        Task<ServiceResult<NaepProgramContentDto>> AddProgramContentAsync(int programId, NaepProgramContentCreateDto dto);
 
+        /// <summary>
+        /// Create NaepProgramContentAndResources along with all child entities (ResourcePersons, Topics, TeachingAids) in a single transaction
+        /// </summary>
         Task<ServiceResult<NaepProgramContentDto>> AddProgramContentWithChildrenAsync(int programId, NaepProgramContentWithChildrenCreateDto dto);
+
+        /// <summary>
+        /// Update NaepProgramContentAndResources with all child entities using Hybrid Pattern in a single transaction
+        /// - Items WITH Id: UPDATE existing
+        /// - Items WITHOUT Id: CREATE new
+        /// - Items in DB but NOT in arrays: DELETE
+        /// Perfect for "Save & Next" button with inline editing
+        /// </summary>
         Task<ServiceResult<NaepProgramContentDto>> UpdateProgramContentWithChildrenAsync(int contentId, NaepProgramContentWithChildrenUpdateDto dto);
 
         Task<ServiceResult<NaepProgramContentDto>> GetProgramContentByIdAsync(int contentId);
@@ -39,51 +49,70 @@ namespace Application.Interface.Services.DataTables.NAEP
         // ============================
         // SECTION D: ADVISORY SERVICES
         // ============================
-        Task<ServiceResult<NaepAdvisoryServicesDto>> AddAdvisoryServicesAsync(int programId, NaepAdvisoryServicesCreateDto dto);
-        Task<ServiceResult<NaepAdvisoryServicesDto>> UpdateAdvisoryServicesAsync(int advisoryId, NaepAdvisoryServicesUpdateDto dto);
-        Task<ServiceResult> DeleteAdvisoryServicesAsync(int advisoryId);
+        Task<ServiceResult<NaepAdvisoryServicesDto>> AddOrUpdateAdvisoryServicesAsync(int programId, NaepAdvisoryServicesCreateDto dto);
         Task<ServiceResult<NaepAdvisoryServicesDto>> GetAdvisoryServicesByProgramIdAsync(int programId);
 
+
         // ============================
-        // SECTION E: REPORTS
+        // SECTION F: REPORTS (Non-FLD/OFT categories)
         // ============================
-        Task<ServiceResult<NaepReportDto>> AddReportAsync(int programId, NaepReportCreateDto dto);
-        Task<ServiceResult<NaepReportDto>> UpdateReportAsync(int reportId, NaepReportUpdateDto dto);
-        Task<ServiceResult> DeleteReportAsync(int reportId);
+        Task<ServiceResult<NaepReportDto>> AddOrUpdateReportAsync(int programId, NaepReportCreateDto dto);
         Task<ServiceResult<NaepReportDto>> GetReportByProgramIdAsync(int programId);
 
         // ============================
-        // SECTION F: RECOMMENDATIONS
+        // SECTION G: RECOMMENDATIONS
         // ============================
-        Task<ServiceResult<NaepRecommendationDto>> AddRecommendationAsync(int programId, NaepRecommendationCreateDto dto);
-        Task<ServiceResult<NaepRecommendationDto>> UpdateRecommendationAsync(int recommendationId, NaepRecommendationUpdateDto dto);
-        Task<ServiceResult> DeleteRecommendationAsync(int recommendationId);
+        Task<ServiceResult<NaepRecommendationDto>> AddOrUpdateRecommendationAsync(int programId, NaepRecommendationCreateDto dto);
         Task<ServiceResult<NaepRecommendationDto>> GetRecommendationByProgramIdAsync(int programId);
 
         // ============================
-        // STATUS MANAGEMENT & SUBMISSION
+        // STATUS MANAGEMENT
         // ============================
+
+        /// <summary>
+        /// Submit program for approval (Trainer role - changes status from Draft to Pending)
+        /// </summary>
         Task<ServiceResult> SubmitForApprovalAsync(int programId);
+
+        /// <summary>
+        /// Approve program (UnitHead/Admin roles - changes status from Pending to Approved)
+        /// </summary>
         Task<ServiceResult> ApproveAsync(int programId, string? remarks = null);
+
+        /// <summary>
+        /// Reject program (UnitHead/Admin roles - changes status from Pending to Rejected)
+        /// </summary>
         Task<ServiceResult> RejectAsync(int programId, string remarks);
 
         // ============================
-        // PAGINATION & FILTERING
+        // LISTING & FILTERING
         // ============================
-        Task<PaginatedResult<NaepProgramDetailsDto>> GetPaginatedAsync(
-            int pageNumber = 1,
-            int pageSize = 10,
-            DateOnly? startDate = null,
-            DateOnly? endDate = null,
-            int? programTypeId = null,
-            string? searchTerm = null,
-            int? unitLocationId = null);
 
-        Task<PaginatedResult<NaepProgramDetailsDto>> GetByStatusAsync(
+        /// <summary>
+        /// Search and filter NAEP programs with pagination (Admin/UnitHead)
+        /// </summary>
+        Task<PaginatedResult<NaepProgramListItemDto>> GetPaginatedAsync(
+            int pageNumber,
+            int pageSize,
+            DateOnly? startDate,
+            DateOnly? endDate,
+            int? categoryId,
+            string? searchTerm,
+            string? formStatus,
+            int? createdById,
+            int? unitLocationId);
+
+        /// <summary>
+        /// Get programs by status with pagination
+        /// </summary>
+        Task<PaginatedResult<NaepProgramListItemDto>> GetByStatusAsync(
             string status,
-            int pageNumber = 1,
-            int pageSize = 10);
+            int pageNumber,
+            int pageSize);
 
+        /// <summary>
+        /// Get summary of programs grouped by status
+        /// </summary>
         Task<Dictionary<string, int>> GetStatusSummaryAsync();
 
         /// <summary>

@@ -2,13 +2,12 @@
 {
     public class DeuAdvisoryServices : AuditableBaseEntity
     {
+        [Required]
+        public int? DeuProgramDetailsId { get; set; }
+        [JsonIgnore]
+        [ForeignKey(nameof(DeuProgramDetailsId))]
+        public DeuProgramDetails? ProgramDetails { get; set; }
 
-     
-            [Required]
-            public int? DeuProgramDetailsId { get; set; }
-
-            [ForeignKey(nameof(DeuProgramDetailsId))]
-            public DeuProgramDetails? ProgramDetails { get; set; }
 
         // Advisory service metrics
         public int NoOfFacebookSMS { get; set; }
@@ -25,8 +24,5 @@
         public int? UnitLocationId { get; set; }
 
         public int? OrganizationId { get; set; }
-
     }
-
 }
-

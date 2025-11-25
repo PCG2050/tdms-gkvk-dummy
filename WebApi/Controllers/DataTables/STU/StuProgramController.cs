@@ -296,7 +296,7 @@ namespace WebApi.Controllers.DataTables.STU
         /// Search and filter STU programs with pagination (Admin/UnitHead only)
         /// </summary>
         [HttpGet]
-        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
+        
         public async Task<IActionResult> GetPaginated(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 20,
@@ -343,7 +343,7 @@ namespace WebApi.Controllers.DataTables.STU
         /// Get trainer's own program history with pagination
         /// </summary>
         [HttpGet("my-history")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
         public async Task<IActionResult> GetMyHistory(
       [FromQuery] int pageNumber = 1,
       [FromQuery] int pageSize = 20)

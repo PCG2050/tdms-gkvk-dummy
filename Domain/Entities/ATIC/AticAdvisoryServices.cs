@@ -1,13 +1,15 @@
-﻿namespace Domain.Entities.ATIC
+﻿using Domain.Entities.FTI;
+
+namespace Domain.Entities.ATIC
 {
     public class AticAdvisoryServices : AuditableBaseEntity
     {
         [Required]
         public int? AticProgramDetailsId { get; set; }
-
         [JsonIgnore]
         [ForeignKey(nameof(AticProgramDetailsId))]
         public AticProgramDetails? ProgramDetails { get; set; }
+
 
         // Advisory service metrics
         public int NoOfFacebookSMS { get; set; }

@@ -29,7 +29,7 @@ namespace Domain.Entities.GenericTables.Service
         // Foreign keys
         public int? CategoryId { get; set; }
      
-        public ConsultancyServicesCategory? Category { get; set; }
+        public ServiceCategory? Category { get; set; }
         [MaxLength(200)]
         public string? OtherCategory { get; set; }
 

@@ -96,7 +96,7 @@ namespace Infrastructure.Repository
 
         public async Task<UnitHeadAssignment> UpdateAsync(UnitHeadAssignment unitLocationUnitHead)
         {
-          _context.UnitHeadAssignments.Update(unitLocationUnitHead);
+            _context.UnitHeadAssignments.Update(unitLocationUnitHead);
             await _context.SaveChangesAsync();
             return unitLocationUnitHead;
         }
@@ -129,7 +129,7 @@ namespace Infrastructure.Repository
         }
 
 
-    public async Task<PaginatedResult<UnitHeadFlatDto>> GetPaginatedUnitHeadsAsync(int organizationId,int pageNumber = 1,QueryFilter? queryFilter = null,int pageSize = 10)
+        public async Task<PaginatedResult<UnitHeadFlatDto>> GetPaginatedUnitHeadsAsync(int organizationId, int pageNumber = 1, QueryFilter? queryFilter = null, int pageSize = 10)
         {
             var query = _context.Users
                 .Where(x => x.OrganizationId == organizationId && x.Role == Role.UNITHEAD);

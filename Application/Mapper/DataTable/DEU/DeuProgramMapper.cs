@@ -1,6 +1,8 @@
-﻿
+﻿// Application/Mapper/DataTable/DEU/DeuProgramMapper.cs
 using Application.Models.DataTables.DEU;
+using Application.Models.DataTables.STU;
 using Domain.Entities.DEU;
+using Riok.Mapperly.Abstractions;
 
 namespace Application.Mapper.DataTable.DEU
 {
@@ -8,256 +10,171 @@ namespace Application.Mapper.DataTable.DEU
     public partial class DeuProgramMapper
     {
         // ============================
-        // MAIN PROGRAM DETAILS MAPPINGS
+        // PROGRAM DETAILS MAPPINGS
         // ============================
 
         public partial DeuProgramDetailsDto MapToDto(DeuProgramDetails entity);
-        public partial DeuProgramDetailsCompleteDto MapToCompleteDto(DeuProgramDetails entity);
+
         public partial DeuProgramDetails MapToEntity(DeuProgramCreateDto dto);
 
+        [MapperIgnoreTarget(nameof(DeuProgramDetails.Id))]
+        [MapperIgnoreTarget(nameof(DeuProgramDetails.CreatedAt))]
+        [MapperIgnoreTarget(nameof(DeuProgramDetails.CreatedById))]
+        [MapperIgnoreTarget(nameof(DeuProgramDetails.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(DeuProgramDetails.UpdatedById))]
+        [MapperIgnoreTarget(nameof(DeuProgramDetails.FormStatus))]
+        [MapperIgnoreTarget(nameof(DeuProgramDetails.FormStatusRemarks))]
+        [MapperIgnoreTarget(nameof(DeuProgramDetails.ApprovedAt))]
+        [MapperIgnoreTarget(nameof(DeuProgramDetails.ApprovedById))]
+        public partial void MapUpdateDtoToEntity(DeuProgramUpdateDto dto, DeuProgramDetails entity);
+
+        // Custom mapping for complete program
+        public DeuProgramCompleteDto MapToCompleteDto(DeuProgramDetails entity)
+        {
+            var dto = new DeuProgramCompleteDto
+            {
+                ProgramDetails = MapToDto(entity),
+                Demographics = entity.ParticipantDemographics?.Select(MapToDto).ToList(),
+                ProgramContent = entity.ProgramContent?.Select(MapToDto).ToList(),
+                AdvisoryServices = entity.AdvisoryServices != null ? MapToDto(entity.AdvisoryServices) : null,
+
+                Report = entity.Reports != null ? MapToDto(entity.Reports) : null,
+                Recommendation = entity.Recommendations != null ? MapToDto(entity.Recommendations) : null
+            };
+
+            return dto;
+        }
+
         // ============================
-        // DEMOGRAPHICS
+        // DEMOGRAPHICS MAPPINGS
         // ============================
 
         public partial DeuParticipantDemographicsDto MapToDto(DeuParticipantDemographics entity);
+
         public partial DeuParticipantDemographics MapToEntity(DeuParticipantDemographicsCreateDto dto);
 
+        [MapperIgnoreTarget(nameof(DeuParticipantDemographics.Id))]
+        [MapperIgnoreTarget(nameof(DeuParticipantDemographics.DeuProgramDetailsId))]
+        [MapperIgnoreTarget(nameof(DeuParticipantDemographics.CreatedAt))]
+        [MapperIgnoreTarget(nameof(DeuParticipantDemographics.CreatedById))]
+        [MapperIgnoreTarget(nameof(DeuParticipantDemographics.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(DeuParticipantDemographics.UpdatedById))]
+        public partial void MapUpdateDtoToEntity(DeuParticipantDemographicsUpdateDto dto, DeuParticipantDemographics entity);
+
         // ============================
-        // PROGRAM CONTENT
+        // PROGRAM CONTENT MAPPINGS
         // ============================
 
-        public partial DeuProgramContentDto MapToDto(DeuProgramContentAndResources entity);
+        public DeuProgramContentDto MapToDto(DeuProgramContentAndResources entity)
+        {
+            return new DeuProgramContentDto
+            {
+                Id = entity.Id,
+                DeuProgramDetailsId = entity.DeuProgramDetailsId ?? 0,
+                ResourcePersons = entity.ResourcePersons?.Select(MapToDto).ToList(),
+                TopicsCovered = entity.TopicsCovered?.Select(MapToDto).ToList(),
+                TeachingAids = entity.TeachingAids?.Select(MapToDto).ToList()
+            };
+        }
+
         public partial DeuProgramContentAndResources MapToEntity(DeuProgramContentCreateDto dto);
 
+
         // ============================
-        // RESOURCE PERSON
+        // RESOURCE PERSON MAPPINGS
         // ============================
 
         public partial DeuResourcePersonDto MapToDto(DeuResourcePerson entity);
+
         public partial DeuResourcePerson MapToEntity(DeuResourcePersonCreateDto dto);
 
+        [MapperIgnoreTarget(nameof(DeuResourcePerson.Id))]
+        [MapperIgnoreTarget(nameof(DeuResourcePerson.DeuProgramContentAndResourcesId))]
+        [MapperIgnoreTarget(nameof(DeuResourcePerson.CreatedAt))]
+        [MapperIgnoreTarget(nameof(DeuResourcePerson.CreatedById))]
+        [MapperIgnoreTarget(nameof(DeuResourcePerson.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(DeuResourcePerson.UpdatedById))]
+        public partial void MapUpdateDtoToEntity(DeuResourcePersonUpdateDto dto, DeuResourcePerson entity);
+
         // ============================
-        // TOPICS COVERED
+        // TOPICS COVERED MAPPINGS
         // ============================
 
         public partial DeuTopicsCoveredDto MapToDto(DeuTopicsCoveredInClass entity);
+
         public partial DeuTopicsCoveredInClass MapToEntity(DeuTopicsCoveredCreateDto dto);
 
+        [MapperIgnoreTarget(nameof(DeuTopicsCoveredInClass.Id))]
+        [MapperIgnoreTarget(nameof(DeuTopicsCoveredInClass.DeuProgramContentAndResourcesId))]
+        [MapperIgnoreTarget(nameof(DeuTopicsCoveredInClass.CreatedAt))]
+        [MapperIgnoreTarget(nameof(DeuTopicsCoveredInClass.CreatedById))]
+        [MapperIgnoreTarget(nameof(DeuTopicsCoveredInClass.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(DeuTopicsCoveredInClass.UpdatedById))]
+        public partial void MapUpdateDtoToEntity(DeuTopicsCoveredUpdateDto dto, DeuTopicsCoveredInClass entity);
+
         // ============================
-        // TEACHING AIDS
+        // TEACHING AIDS MAPPINGS
         // ============================
 
         public partial DeuTeachingAidsDto MapToDto(DeuTeachingAidsDeveloped entity);
+
         public partial DeuTeachingAidsDeveloped MapToEntity(DeuTeachingAidsCreateDto dto);
 
+        [MapperIgnoreTarget(nameof(DeuTeachingAidsDeveloped.Id))]
+        [MapperIgnoreTarget(nameof(DeuTeachingAidsDeveloped.DeuProgramContentAndResourcesId))]
+        [MapperIgnoreTarget(nameof(DeuTeachingAidsDeveloped.CreatedAt))]
+        [MapperIgnoreTarget(nameof(DeuTeachingAidsDeveloped.CreatedById))]
+        [MapperIgnoreTarget(nameof(DeuTeachingAidsDeveloped.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(DeuTeachingAidsDeveloped.UpdatedById))]
+        public partial void MapUpdateDtoToEntity(DeuTeachingAidsUpdateDto dto, DeuTeachingAidsDeveloped entity);
+
         // ============================
-        // ADVISORY SERVICES
+        // ADVISORY SERVICES MAPPINGS
         // ============================
 
         public partial DeuAdvisoryServicesDto MapToDto(DeuAdvisoryServices entity);
+
         public partial DeuAdvisoryServices MapToEntity(DeuAdvisoryServicesCreateDto dto);
 
+        [MapperIgnoreTarget(nameof(DeuAdvisoryServices.Id))]
+        [MapperIgnoreTarget(nameof(DeuAdvisoryServices.DeuProgramDetailsId))]
+        [MapperIgnoreTarget(nameof(DeuAdvisoryServices.CreatedAt))]
+        [MapperIgnoreTarget(nameof(DeuAdvisoryServices.CreatedById))]
+        [MapperIgnoreTarget(nameof(DeuAdvisoryServices.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(DeuAdvisoryServices.UpdatedById))]
+        public partial void MapUpdateDtoToEntity(DeuAdvisoryServicesUpdateDto dto, DeuAdvisoryServices entity);
+
+
         // ============================
-        // REPORT
+        // REPORT MAPPINGS
         // ============================
 
         public partial DeuReportDto MapToDto(DeuReport entity);
+
         public partial DeuReport MapToEntity(DeuReportCreateDto dto);
 
+        [MapperIgnoreTarget(nameof(DeuReport.Id))]
+        [MapperIgnoreTarget(nameof(DeuReport.DeuProgramDetailsId))]
+        [MapperIgnoreTarget(nameof(DeuReport.CreatedAt))]
+        [MapperIgnoreTarget(nameof(DeuReport.CreatedById))]
+        [MapperIgnoreTarget(nameof(DeuReport.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(DeuReport.UpdatedById))]
+        public partial void MapUpdateDtoToEntity(DeuReportUpdateDto dto, DeuReport entity);
+
         // ============================
-        // RECOMMENDATION
+        // RECOMMENDATION MAPPINGS
         // ============================
 
         public partial DeuRecommendationDto MapToDto(DeuRecommendation entity);
+
         public partial DeuRecommendation MapToEntity(DeuRecommendationCreateDto dto);
 
-        // ============================
-        // HELPER METHODS FOR NESTED PROPERTIES
-        // ============================
-
-        private string? GetUnitName(OrganizationUnitLocation? location)
-            => location?.Unit?.Name;
-
-        private string? GetDistrictName(OrganizationUnitLocation? location)
-            => location?.District?.Name;
-
-        private string? GetStateName(OrganizationUnitLocation? location)
-            => location?.District?.State?.Name;
-
-        // ============================
-        // MAPPING WITH NAVIGATION DETAILS
-        // ============================
-
-        [MapProperty(nameof(DeuProgramDetails.UnitLocation), nameof(DeuProgramDetailsDto.UnitName), Use = nameof(GetUnitName))]
-        [MapProperty(nameof(DeuProgramDetails.UnitLocation), nameof(DeuProgramDetailsDto.DistrictName), Use = nameof(GetDistrictName))]
-        [MapProperty(nameof(DeuProgramDetails.UnitLocation), nameof(DeuProgramDetailsDto.StateName), Use = nameof(GetStateName))]
-        [MapProperty(nameof(DeuProgramDetails.Category.Name), nameof(DeuProgramDetailsDto.CategoryName))]
-        [MapProperty(nameof(DeuProgramDetails.ProgramType.Name), nameof(DeuProgramDetailsDto.ProgramTypeName))]
-        [MapProperty(nameof(DeuProgramDetails.Theme.Name), nameof(DeuProgramDetailsDto.ThemeName))]
-        [MapProperty(nameof(DeuProgramDetails.Region.Name), nameof(DeuProgramDetailsDto.RegionName))]
-        [MapProperty(nameof(DeuProgramDetails.Mode.Name), nameof(DeuProgramDetailsDto.ModeName))]
-        [MapProperty(nameof(DeuProgramDetails.SourceOfFund.Name), nameof(DeuProgramDetailsDto.SourceOfFundName))]
-        [MapProperty(nameof(DeuProgramDetails.CreatedBy.FirstName), nameof(DeuProgramDetailsDto.CreatedByName))]
-        [MapProperty(nameof(DeuProgramDetails.ApprovedBy.FirstName), nameof(DeuProgramDetailsDto.ApprovedByName))]
-        public partial DeuProgramDetailsDto MapToDtoWithDetails(DeuProgramDetails entity);
-
-        // ============================
-        // MANUAL UPDATE MAPPINGS
-        // ============================
-
-        /// <summary>
-        /// Maps DeuProgramUpdateDto to DeuProgramDetails entity (only non-null values)
-        /// </summary>
-        public static void MapUpdateDtoToEntity(DeuProgramUpdateDto dto, DeuProgramDetails entity)
-        {
-            if (dto.StartDate.HasValue) entity.StartDate = dto.StartDate.Value;
-            if (dto.EndDate.HasValue) entity.EndDate = dto.EndDate.Value;
-            if (dto.ProgramTypeId.HasValue) entity.ProgramTypeId = dto.ProgramTypeId;
-            if (dto.CategoryId.HasValue) entity.CategoryId = dto.CategoryId;
-            if (dto.CategoryOther != null) entity.CategoryOther = dto.CategoryOther;
-            if (dto.TypeId.HasValue) entity.TypeId = dto.TypeId;
-            if (dto.TypeOther != null) entity.TypeOther = dto.TypeOther;
-            if (dto.ThemeId.HasValue) entity.ThemeId = dto.ThemeId;
-            if (dto.ThemeOther != null) entity.ThemeOther = dto.ThemeOther;
-            if (dto.ThematicAreaId.HasValue) entity.ThematicAreaId = dto.ThematicAreaId;
-            if (dto.ThematicAreaOther != null) entity.ThematicAreaOther = dto.ThematicAreaOther;
-            if (dto.SponsoredOrganization.HasValue) entity.SponsoredOrganization = dto.SponsoredOrganization;
-            if (dto.SponsoredOrganizationName != null) entity.SponsoredOrganizationName = dto.SponsoredOrganizationName;
-            if (dto.Title != null) entity.Title = dto.Title;
-            if (dto.Mode.HasValue) entity.ModeId = dto.Mode;
-            if (dto.Duration != null) entity.Duration = dto.Duration;
-            if (dto.RegionId.HasValue) entity.RegionId = dto.RegionId;
-            if (dto.RegionOther != null) entity.RegionOther = dto.RegionOther;
-            if (dto.TPNo.HasValue) entity.TPNo = dto.TPNo;
-            if (dto.Location != null) entity.Location = dto.Location;
-            if (dto.SourceOfFundId.HasValue) entity.SourceOfFundId = dto.SourceOfFundId;
-            if (dto.NoOfCourses.HasValue) entity.Funds = dto.NoOfCourses;
-            if (dto.Attachments != null) entity.Attachements = dto.Attachments;
-            if (dto.StatusId.HasValue) entity.StatusId = dto.StatusId;
-            if (dto.TotalOutlayRs.HasValue) entity.TotalOutlayRs = dto.TotalOutlayRs;
-            if (dto.Copi != null) entity.Copi = dto.Copi;
-            if (dto.BatchNo.HasValue) entity.BatchNo = dto.BatchNo;
-            if (dto.OrganizerBroucherFile != null) entity.OrganizerBroucherFile = dto.OrganizerBroucherFile;
-            if (dto.OrganizerInstitutionName != null) entity.OrganizerInstitutionName = dto.OrganizerInstitutionName;
-            if (dto.OrganizerInstitutionAddress != null) entity.OrganizerInstitutionAddress = dto.OrganizerInstitutionAddress;
-            if (dto.SourceId.HasValue) entity.SourceId = dto.SourceId;
-            if (dto.ProposalDate.HasValue) entity.ProposalDate = dto.ProposalDate;
-            if (dto.ProposalUploadFile != null) entity.ProposalUploadFile = dto.ProposalUploadFile;
-            if (dto.UniversitySanctionLetterDate.HasValue) entity.UniversitySanctionLetterDate = dto.UniversitySanctionLetterDate;
-            if (dto.UniversitySanctionLetterUploadFile != null) entity.UniversitySanctionLetterUploadFile = dto.UniversitySanctionLetterUploadFile;
-            if (dto.FundsSanctionLetterDate.HasValue) entity.FundsSanctionLetterDate = dto.FundsSanctionLetterDate;
-            if (dto.FundsSanctionLetterUploadFile != null) entity.FundsSanctionLetterUploadFile = dto.FundsSanctionLetterUploadFile;
-        }
-
-        /// <summary>
-        /// Maps DeuParticipantDemographicsUpdateDto to DeuParticipantDemographics entity
-        /// </summary>
-        public static void MapUpdateDtoToEntity(DeuParticipantDemographicsUpdateDto dto, DeuParticipantDemographics entity)
-        {
-            if (dto.ParticipantId.HasValue) entity.ParticipantId = dto.ParticipantId;
-            if (dto.Male_SC.HasValue) entity.Male_SC = dto.Male_SC;
-            if (dto.Male_ST.HasValue) entity.Male_ST = dto.Male_ST;
-            if (dto.Male_OBC.HasValue) entity.Male_OBC = dto.Male_OBC;
-            if (dto.Male_GEN.HasValue) entity.Male_GEN = dto.Male_GEN;
-            if (dto.SC_Male_StayedInHostel.HasValue) entity.SC_Male_StayedInHostel = dto.SC_Male_StayedInHostel;
-            if (dto.ST_Male_StayedInHostel.HasValue) entity.ST_Male_StayedInHostel = dto.ST_Male_StayedInHostel;
-            if (dto.OBC_Male_StayedInHostel.HasValue) entity.OBC_Male_StayedInHostel = dto.OBC_Male_StayedInHostel;
-            if (dto.GEN_Male_StayedInHostel.HasValue) entity.GEN_Male_StayedInHostel = dto.GEN_Male_StayedInHostel;
-            if (dto.Female_SC.HasValue) entity.Female_SC = dto.Female_SC;
-            if (dto.Female_ST.HasValue) entity.Female_ST = dto.Female_ST;
-            if (dto.Female_OBC.HasValue) entity.Female_OBC = dto.Female_OBC;
-            if (dto.Female_GEN.HasValue) entity.Female_GEN = dto.Female_GEN;
-            if (dto.SC_Female_StayedInHostel.HasValue) entity.SC_Female_StayedInHostel = dto.SC_Female_StayedInHostel;
-            if (dto.ST_Female_StayedInHostel.HasValue) entity.ST_Female_StayedInHostel = dto.ST_Female_StayedInHostel;
-            if (dto.OBC_Female_StayedInHostel.HasValue) entity.OBC_Female_StayedInHostel = dto.OBC_Female_StayedInHostel;
-            if (dto.GEN_Female_StayedInHostel.HasValue) entity.GEN_Female_StayedInHostel = dto.GEN_Female_StayedInHostel;
-            if (dto.Total.HasValue) entity.Total = dto.Total;
-        }
-
-        /// <summary>
-        /// Maps DeuProgramContentUpdateDto to DeuProgramContentAndResources entity
-        /// </summary>
-        public static void MapUpdateDtoToEntity(DeuProgramContentUpdateDto dto, DeuProgramContentAndResources entity)
-        {
-            // Currently the update DTO has only Id, but keeping for future expansion
-            // Add mappings here if more fields are added to the update DTO
-        }
-
-        /// <summary>
-        /// Maps DeuResourcePersonUpdateDto to DeuResourcePerson entity
-        /// </summary>
-        public static void MapUpdateDtoToEntity(DeuResourcePersonUpdateDto dto, DeuResourcePerson entity)
-        {
-            if (dto.Name != null) entity.Name = dto.Name;
-            if (dto.Designation != null) entity.Designation = dto.Designation;
-            if (dto.ResourceType.HasValue) entity.ResourceType = dto.ResourceType;
-            if (dto.Responsibility.HasValue) entity.Responsibility = dto.Responsibility;
-            if (dto.InstitutionOrDepartment != null) entity.InstitutionOrDepartment = dto.InstitutionOrDepartment;
-        }
-
-        /// <summary>
-        /// Maps DeuTopicsCoveredUpdateDto to DeuTopicsCoveredInClass entity
-        /// </summary>
-        public static void MapUpdateDtoToEntity(DeuTopicsCoveredUpdateDto dto, DeuTopicsCoveredInClass entity)
-        {
-            if (dto.Date.HasValue) entity.Date = dto.Date;
-            if (dto.Title != null) entity.Title = dto.Title;
-            if (dto.PhotoUpload != null) entity.PhotoUpload = dto.PhotoUpload;
-        }
-
-        /// <summary>
-        /// Maps DeuTeachingAidsUpdateDto to DeuTeachingAidsDeveloped entity
-        /// </summary>
-        public static void MapUpdateDtoToEntity(DeuTeachingAidsUpdateDto dto, DeuTeachingAidsDeveloped entity)
-        {
-            if (dto.TypeOfAidId.HasValue) entity.TypeOfAidId = dto.TypeOfAidId;
-            if (dto.OtherTypeOfAid != null) entity.OtherTypeOfAid = dto.OtherTypeOfAid;
-            if (dto.Purpose != null) entity.Purpose = dto.Purpose;
-            if (dto.Number.HasValue) entity.Number = dto.Number.Value;
-        }
-
-        /// <summary>
-        /// Maps DeuAdvisoryServicesUpdateDto to DeuAdvisoryServices entity
-        /// </summary>
-        public static void MapUpdateDtoToEntity(DeuAdvisoryServicesUpdateDto dto, DeuAdvisoryServices entity)
-        {
-            if (dto.NoOfFacebookSMS.HasValue) entity.NoOfFacebookSMS = dto.NoOfFacebookSMS.Value;
-            if (dto.NoOfSMSSentToRegisteredFarmers.HasValue) entity.NoOfSMSSentToRegisteredFarmers = dto.NoOfSMSSentToRegisteredFarmers.Value;
-            if (dto.NoOfWhatsappGroups.HasValue) entity.NoOfWhatsappGroups = dto.NoOfWhatsappGroups.Value;
-            if (dto.NoOfWhatsappSMS.HasValue) entity.NoOfWhatsappSMS = dto.NoOfWhatsappSMS.Value;
-            if (dto.NoOfAnsweredWhatsappQueries.HasValue) entity.NoOfAnsweredWhatsappQueries = dto.NoOfAnsweredWhatsappQueries.Value;
-            if (dto.NoOfPhoneCalls.HasValue) entity.NoOfPhoneCalls = dto.NoOfPhoneCalls.Value;
-            if (dto.NoOfFaceToFaceDiscussions.HasValue) entity.NoOfFaceToFaceDiscussions = dto.NoOfFaceToFaceDiscussions.Value;
-            if (dto.NoOfGroupDiscussions.HasValue) entity.NoOfGroupDiscussions = dto.NoOfGroupDiscussions.Value;
-            if (dto.NoOfEmailsSent.HasValue) entity.NoOfEmailsSent = dto.NoOfEmailsSent.Value;
-            if (dto.NoOfNewspaperCoverage.HasValue) entity.NoOfNewspaperCoverage = dto.NoOfNewspaperCoverage.Value;
-            if (dto.NoOfBeneficiaries.HasValue) entity.NoOfBeneficiaries = dto.NoOfBeneficiaries.Value;
-        }
-
-        /// <summary>
-        /// Maps DeuReportUpdateDto to DeuReport entity
-        /// </summary>
-        public static void MapUpdateDtoToEntity(DeuReportUpdateDto dto, DeuReport entity)
-        {
-            if (dto.ProgressReportReportingYear != null) entity.ProgressReportReportingYear = dto.ProgressReportReportingYear;
-            if (dto.Date.HasValue) entity.Date = dto.Date;
-            if (dto.UploadPhoto != null) entity.UploadPhoto = dto.UploadPhoto;
-            if (dto.PhotosGeotaggedPhotoOrUploadPhoto != null) entity.PhotosGeotaggedPhotoOrUploadPhoto = dto.PhotosGeotaggedPhotoOrUploadPhoto;
-            if (dto.UploadVideo != null) entity.UploadVideo = dto.UploadVideo;
-            if (dto.SignificantOutcome != null) entity.SignificantOutcome = dto.SignificantOutcome;
-        }
-
-        /// <summary>
-        /// Maps DeuRecommendationUpdateDto to DeuRecommendation entity
-        /// </summary>
-        public static void MapUpdateDtoToEntity(DeuRecommendationUpdateDto dto, DeuRecommendation entity)
-        {
-            if (dto.ProblemsIdentified != null) entity.ProblemsIdentified = dto.ProblemsIdentified;
-            if (dto.Recommendation != null) entity.Recommendation = dto.Recommendation;
-            if (dto.ActionTaken != null) entity.ActionTaken = dto.ActionTaken;
-            if (dto.SignificantAchievement != null) entity.SignificantAchievement = dto.SignificantAchievement;
-            if (dto.SuccessStories != null) entity.SuccessStories = dto.SuccessStories;
-            if (dto.ImpactOutcome != null) entity.ImpactOutcome = dto.ImpactOutcome;
-        }
+        [MapperIgnoreTarget(nameof(DeuRecommendation.Id))]
+        [MapperIgnoreTarget(nameof(DeuRecommendation.DeuProgramDetailsId))]
+        [MapperIgnoreTarget(nameof(DeuRecommendation.CreatedAt))]
+        [MapperIgnoreTarget(nameof(DeuRecommendation.CreatedById))]
+        [MapperIgnoreTarget(nameof(DeuRecommendation.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(DeuRecommendation.UpdatedById))]
+        public partial void MapUpdateDtoToEntity(DeuRecommendationUpdateDto dto, DeuRecommendation entity);
     }
 }

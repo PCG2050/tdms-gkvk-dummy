@@ -45,7 +45,7 @@ namespace Infrastructure.Services.DataTables
             _trainerAssignmentRepository = trainerAssignmentRepository;
             _userRepository = userRepository;
             //  generic history service
-            _historyService = new GenericTrainerHistoryService<TblService>(currentUserService, trainerAssignmentRepository, organizationUnitRepository,unitHeadAssignmentRepository,userRepository);
+            _historyService = new GenericTrainerHistoryService<TblService>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository, userRepository);
         }
 
         // ============================
@@ -121,18 +121,16 @@ namespace Infrastructure.Services.DataTables
 
         public async Task<ServiceResult> DeleteAsync(int id)
         {
-            var entity = await _tableServiceRepository.GetByIdAsync(id);
-            if (entity == null)
-                return ServiceResult.Failure("Service not found", ServiceErrorStatus.NOTFOUND);
+            var program = await _tableServiceRepository.GetByIdAsync(id);
 
-            if (!await _entityPermissionService.CanDeleteForm(entity))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
+            if (program == null)
+                return ServiceResult.Failure("Program not found", ServiceErrorStatus.NOTFOUND);
 
-            if (entity.FormStatus != "Draft")
-                return ServiceResult.Failure("Only draft services can be deleted", ServiceErrorStatus.INVALIDOPERATION);
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult.Failure("Access denied. You can only delete your own forms.", ServiceErrorStatus.FORBIDDEN);
 
             await _tableServiceRepository.DeleteAsync(id);
-            return ServiceResult.Success();
+            return ServiceResult.Success("Program deleted successfully");
         }
 
         // ============================
@@ -485,6 +483,7 @@ namespace Infrastructure.Services.DataTables
                             if (existing != null)
                             {
                                 _mapper.MapUpdateDtoToEntity(hostelDto, existing);
+                                existing.ServiceId = serviceId;
                                 existing.UpdatedById = _currentUserService.UserId;
                                 existing.UpdatedAt = DateTimeOffset.UtcNow;
                                 await _tableHostelRepository.UpdateTableHostelAsync(existing);
@@ -537,6 +536,7 @@ namespace Infrastructure.Services.DataTables
                             if (existing != null)
                             {
                                 _mapper.MapUpdateDtoToEntity(fundDto, existing);
+                                existing.ServiceId = serviceId;
                                 existing.UpdatedById = _currentUserService.UserId;
                                 existing.UpdatedAt = DateTimeOffset.UtcNow;
                                 await _revolvingFundRepository.UpdateRevolvingFundStatusAsync(existing);
@@ -588,6 +588,7 @@ namespace Infrastructure.Services.DataTables
                             if (existing != null)
                             {
                                 _mapper.MapUpdateDtoToEntity(visitorDto, existing);
+                                existing.ServiceId = serviceId;
                                 existing.UpdatedById = _currentUserService.UserId;
                                 existing.UpdatedAt = DateTimeOffset.UtcNow;
                                 await _visitorDetailsRepository.UpdateVisitorDetailAsync(existing);

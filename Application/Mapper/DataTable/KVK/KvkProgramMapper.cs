@@ -5,7 +5,8 @@ using Riok.Mapperly.Abstractions;
 
 namespace Application.Mapper.DataTable.KVK
 {
-    [Mapper]
+   
+    [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target, AllowNullPropertyAssignment = true)]
     public partial class KvkProgramMapper
     {
         // ============================
@@ -48,17 +49,36 @@ namespace Application.Mapper.DataTable.KVK
         // DEMOGRAPHICS MAPPINGS
         // ============================
 
+        //public partial KvkParticipantDemographicsDto MapToDto(KvkParticipantDemographics entity);
+
+        //public partial KvkParticipantDemographics MapToEntity(KvkParticipantDemographicsCreateDto dto);
+
+        //[MapperIgnoreTarget(nameof(KvkParticipantDemographics.Id))]
+        //[MapperIgnoreTarget(nameof(KvkParticipantDemographics.KvkProgramDetailsId))]
+        //[MapperIgnoreTarget(nameof(KvkParticipantDemographics.CreatedAt))]
+        //[MapperIgnoreTarget(nameof(KvkParticipantDemographics.CreatedById))]
+        //[MapperIgnoreTarget(nameof(KvkParticipantDemographics.UpdatedAt))]
+        //[MapperIgnoreTarget(nameof(KvkParticipantDemographics.UpdatedById))]
+        //public partial void MapUpdateDtoToEntity(KvkParticipantDemographicsUpdateDto dto, KvkParticipantDemographics entity);
+
+
+        //public partial class KvkProgramMapper
+        //{
         public partial KvkParticipantDemographicsDto MapToDto(KvkParticipantDemographics entity);
+            public partial KvkParticipantDemographics MapToEntity(KvkParticipantDemographicsCreateDto dto);
 
-        public partial KvkParticipantDemographics MapToEntity(KvkParticipantDemographicsCreateDto dto);
+            [MapperIgnoreTarget(nameof(KvkParticipantDemographics.Id))]
+            [MapperIgnoreTarget(nameof(KvkParticipantDemographics.KvkProgramDetailsId))]
+            [MapperIgnoreTarget(nameof(KvkParticipantDemographics.CreatedAt))]
+            [MapperIgnoreTarget(nameof(KvkParticipantDemographics.CreatedById))]
+            [MapperIgnoreTarget(nameof(KvkParticipantDemographics.UpdatedAt))]
+            [MapperIgnoreTarget(nameof(KvkParticipantDemographics.UpdatedById))]
+            public partial void MapUpdateDtoToEntity(KvkParticipantDemographicsUpdateDto dto, KvkParticipantDemographics entity);
+        
 
-        [MapperIgnoreTarget(nameof(KvkParticipantDemographics.Id))]
-        [MapperIgnoreTarget(nameof(KvkParticipantDemographics.KvkProgramDetailsId))]
-        [MapperIgnoreTarget(nameof(KvkParticipantDemographics.CreatedAt))]
-        [MapperIgnoreTarget(nameof(KvkParticipantDemographics.CreatedById))]
-        [MapperIgnoreTarget(nameof(KvkParticipantDemographics.UpdatedAt))]
-        [MapperIgnoreTarget(nameof(KvkParticipantDemographics.UpdatedById))]
-        public partial void MapUpdateDtoToEntity(KvkParticipantDemographicsUpdateDto dto, KvkParticipantDemographics entity);
+
+
+
 
         // ============================
         // PROGRAM CONTENT MAPPINGS

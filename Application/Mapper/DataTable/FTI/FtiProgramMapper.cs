@@ -1,6 +1,8 @@
-﻿
+﻿// Application/Mapper/DataTable/FTI/FtiProgramMapper.cs
 using Application.Models.DataTables.FTI;
+using Application.Models.DataTables.STU;
 using Domain.Entities.FTI;
+using Riok.Mapperly.Abstractions;
 
 namespace Application.Mapper.DataTable.FTI
 {
@@ -8,256 +10,171 @@ namespace Application.Mapper.DataTable.FTI
     public partial class FtiProgramMapper
     {
         // ============================
-        // MAIN PROGRAM DETAILS MAPPINGS
+        // PROGRAM DETAILS MAPPINGS
         // ============================
 
         public partial FtiProgramDetailsDto MapToDto(FtiProgramDetails entity);
-        public partial FtiProgramDetailsCompleteDto MapToCompleteDto(FtiProgramDetails entity);
+
         public partial FtiProgramDetails MapToEntity(FtiProgramCreateDto dto);
 
+        [MapperIgnoreTarget(nameof(FtiProgramDetails.Id))]
+        [MapperIgnoreTarget(nameof(FtiProgramDetails.CreatedAt))]
+        [MapperIgnoreTarget(nameof(FtiProgramDetails.CreatedById))]
+        [MapperIgnoreTarget(nameof(FtiProgramDetails.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(FtiProgramDetails.UpdatedById))]
+        [MapperIgnoreTarget(nameof(FtiProgramDetails.FormStatus))]
+        [MapperIgnoreTarget(nameof(FtiProgramDetails.FormStatusRemarks))]
+        [MapperIgnoreTarget(nameof(FtiProgramDetails.ApprovedAt))]
+        [MapperIgnoreTarget(nameof(FtiProgramDetails.ApprovedById))]
+        public partial void MapUpdateDtoToEntity(FtiProgramUpdateDto dto, FtiProgramDetails entity);
+
+        // Custom mapping for complete program
+        public FtiProgramCompleteDto MapToCompleteDto(FtiProgramDetails entity)
+        {
+            var dto = new FtiProgramCompleteDto
+            {
+                ProgramDetails = MapToDto(entity),
+                Demographics = entity.ParticipantDemographics?.Select(MapToDto).ToList(),
+                ProgramContent = entity.ProgramContent?.Select(MapToDto).ToList(),
+                AdvisoryServices = entity.AdvisoryServices != null ? MapToDto(entity.AdvisoryServices) : null,
+
+                Report = entity.Reports != null ? MapToDto(entity.Reports) : null,
+                Recommendation = entity.Recommendations != null ? MapToDto(entity.Recommendations) : null
+            };
+
+            return dto;
+        }
+
         // ============================
-        // DEMOGRAPHICS
+        // DEMOGRAPHICS MAPPINGS
         // ============================
 
         public partial FtiParticipantDemographicsDto MapToDto(FtiParticipantDemographics entity);
+
         public partial FtiParticipantDemographics MapToEntity(FtiParticipantDemographicsCreateDto dto);
 
+        [MapperIgnoreTarget(nameof(FtiParticipantDemographics.Id))]
+        [MapperIgnoreTarget(nameof(FtiParticipantDemographics.FtiProgramDetailsId))]
+        [MapperIgnoreTarget(nameof(FtiParticipantDemographics.CreatedAt))]
+        [MapperIgnoreTarget(nameof(FtiParticipantDemographics.CreatedById))]
+        [MapperIgnoreTarget(nameof(FtiParticipantDemographics.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(FtiParticipantDemographics.UpdatedById))]
+        public partial void MapUpdateDtoToEntity(FtiParticipantDemographicsUpdateDto dto, FtiParticipantDemographics entity);
+
         // ============================
-        // PROGRAM CONTENT
+        // PROGRAM CONTENT MAPPINGS
         // ============================
 
-        public partial FtiProgramContentDto MapToDto(FtiProgramContentAndResources entity);
+        public FtiProgramContentDto MapToDto(FtiProgramContentAndResources entity)
+        {
+            return new FtiProgramContentDto
+            {
+                Id = entity.Id,
+                FtiProgramDetailsId = entity.FtiProgramDetailsId ?? 0,
+                ResourcePersons = entity.ResourcePersons?.Select(MapToDto).ToList(),
+                TopicsCovered = entity.TopicsCovered?.Select(MapToDto).ToList(),
+                TeachingAids = entity.TeachingAids?.Select(MapToDto).ToList()
+            };
+        }
+
         public partial FtiProgramContentAndResources MapToEntity(FtiProgramContentCreateDto dto);
 
+
         // ============================
-        // RESOURCE PERSON
+        // RESOURCE PERSON MAPPINGS
         // ============================
 
         public partial FtiResourcePersonDto MapToDto(FtiResourcePerson entity);
+
         public partial FtiResourcePerson MapToEntity(FtiResourcePersonCreateDto dto);
 
+        [MapperIgnoreTarget(nameof(FtiResourcePerson.Id))]
+        [MapperIgnoreTarget(nameof(FtiResourcePerson.FtiProgramContentAndResourcesId))]
+        [MapperIgnoreTarget(nameof(FtiResourcePerson.CreatedAt))]
+        [MapperIgnoreTarget(nameof(FtiResourcePerson.CreatedById))]
+        [MapperIgnoreTarget(nameof(FtiResourcePerson.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(FtiResourcePerson.UpdatedById))]
+        public partial void MapUpdateDtoToEntity(FtiResourcePersonUpdateDto dto, FtiResourcePerson entity);
+
         // ============================
-        // TOPICS COVERED
+        // TOPICS COVERED MAPPINGS
         // ============================
 
         public partial FtiTopicsCoveredDto MapToDto(FtiTopicsCoveredInClass entity);
+
         public partial FtiTopicsCoveredInClass MapToEntity(FtiTopicsCoveredCreateDto dto);
 
+        [MapperIgnoreTarget(nameof(FtiTopicsCoveredInClass.Id))]
+        [MapperIgnoreTarget(nameof(FtiTopicsCoveredInClass.FtiProgramContentAndResourcesId))]
+        [MapperIgnoreTarget(nameof(FtiTopicsCoveredInClass.CreatedAt))]
+        [MapperIgnoreTarget(nameof(FtiTopicsCoveredInClass.CreatedById))]
+        [MapperIgnoreTarget(nameof(FtiTopicsCoveredInClass.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(FtiTopicsCoveredInClass.UpdatedById))]
+        public partial void MapUpdateDtoToEntity(FtiTopicsCoveredUpdateDto dto, FtiTopicsCoveredInClass entity);
+
         // ============================
-        // TEACHING AIDS
+        // TEACHING AIDS MAPPINGS
         // ============================
 
         public partial FtiTeachingAidsDto MapToDto(FtiTeachingAidsDeveloped entity);
+
         public partial FtiTeachingAidsDeveloped MapToEntity(FtiTeachingAidsCreateDto dto);
 
+        [MapperIgnoreTarget(nameof(FtiTeachingAidsDeveloped.Id))]
+        [MapperIgnoreTarget(nameof(FtiTeachingAidsDeveloped.FtiProgramContentAndResourcesId))]
+        [MapperIgnoreTarget(nameof(FtiTeachingAidsDeveloped.CreatedAt))]
+        [MapperIgnoreTarget(nameof(FtiTeachingAidsDeveloped.CreatedById))]
+        [MapperIgnoreTarget(nameof(FtiTeachingAidsDeveloped.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(FtiTeachingAidsDeveloped.UpdatedById))]
+        public partial void MapUpdateDtoToEntity(FtiTeachingAidsUpdateDto dto, FtiTeachingAidsDeveloped entity);
+
         // ============================
-        // ADVISORY SERVICES
+        // ADVISORY SERVICES MAPPINGS
         // ============================
 
         public partial FtiAdvisoryServicesDto MapToDto(FtiAdvisoryServices entity);
+
         public partial FtiAdvisoryServices MapToEntity(FtiAdvisoryServicesCreateDto dto);
 
+        [MapperIgnoreTarget(nameof(FtiAdvisoryServices.Id))]
+        [MapperIgnoreTarget(nameof(FtiAdvisoryServices.FtiProgramDetailsId))]
+        [MapperIgnoreTarget(nameof(FtiAdvisoryServices.CreatedAt))]
+        [MapperIgnoreTarget(nameof(FtiAdvisoryServices.CreatedById))]
+        [MapperIgnoreTarget(nameof(FtiAdvisoryServices.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(FtiAdvisoryServices.UpdatedById))]
+        public partial void MapUpdateDtoToEntity(FtiAdvisoryServicesUpdateDto dto, FtiAdvisoryServices entity);
+
+
         // ============================
-        // REPORT
+        // REPORT MAPPINGS
         // ============================
 
         public partial FtiReportDto MapToDto(FtiReport entity);
+
         public partial FtiReport MapToEntity(FtiReportCreateDto dto);
 
+        [MapperIgnoreTarget(nameof(FtiReport.Id))]
+        [MapperIgnoreTarget(nameof(FtiReport.FtiProgramDetailsId))]
+        [MapperIgnoreTarget(nameof(FtiReport.CreatedAt))]
+        [MapperIgnoreTarget(nameof(FtiReport.CreatedById))]
+        [MapperIgnoreTarget(nameof(FtiReport.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(FtiReport.UpdatedById))]
+        public partial void MapUpdateDtoToEntity(FtiReportUpdateDto dto, FtiReport entity);
+
         // ============================
-        // RECOMMENDATION
+        // RECOMMENDATION MAPPINGS
         // ============================
 
         public partial FtiRecommendationDto MapToDto(FtiRecommendation entity);
+
         public partial FtiRecommendation MapToEntity(FtiRecommendationCreateDto dto);
 
-        // ============================
-        // HELPER METHODS FOR NESTED PROPERTIES
-        // ============================
-
-        private string? GetUnitName(OrganizationUnitLocation? location)
-            => location?.Unit?.Name;
-
-        private string? GetDistrictName(OrganizationUnitLocation? location)
-            => location?.District?.Name;
-
-        private string? GetStateName(OrganizationUnitLocation? location)
-            => location?.District?.State?.Name;
-
-        // ============================
-        // MAPPING WITH NAVIGATION DETAILS
-        // ============================
-
-        [MapProperty(nameof(FtiProgramDetails.UnitLocation), nameof(FtiProgramDetailsDto.UnitName), Use = nameof(GetUnitName))]
-        [MapProperty(nameof(FtiProgramDetails.UnitLocation), nameof(FtiProgramDetailsDto.DistrictName), Use = nameof(GetDistrictName))]
-        [MapProperty(nameof(FtiProgramDetails.UnitLocation), nameof(FtiProgramDetailsDto.StateName), Use = nameof(GetStateName))]
-        [MapProperty(nameof(FtiProgramDetails.Category.Name), nameof(FtiProgramDetailsDto.CategoryName))]
-        [MapProperty(nameof(FtiProgramDetails.ProgramType.Name), nameof(FtiProgramDetailsDto.ProgramTypeName))]
-        [MapProperty(nameof(FtiProgramDetails.Theme.Name), nameof(FtiProgramDetailsDto.ThemeName))]
-        [MapProperty(nameof(FtiProgramDetails.Region.Name), nameof(FtiProgramDetailsDto.RegionName))]
-        [MapProperty(nameof(FtiProgramDetails.Mode.Name), nameof(FtiProgramDetailsDto.ModeName))]
-        [MapProperty(nameof(FtiProgramDetails.SourceOfFund.Name), nameof(FtiProgramDetailsDto.SourceOfFundName))]
-        [MapProperty(nameof(FtiProgramDetails.CreatedBy.FirstName), nameof(FtiProgramDetailsDto.CreatedByName))]
-        [MapProperty(nameof(FtiProgramDetails.ApprovedBy.FirstName), nameof(FtiProgramDetailsDto.ApprovedByName))]
-        public partial FtiProgramDetailsDto MapToDtoWithDetails(FtiProgramDetails entity);
-
-        // ============================
-        // MANUAL UPDATE MAPPINGS
-        // ============================
-
-        /// <summary>
-        /// Maps FtiProgramUpdateDto to FtiProgramDetails entity (only non-null values)
-        /// </summary>
-        public static void MapUpdateDtoToEntity(FtiProgramUpdateDto dto, FtiProgramDetails entity)
-        {
-            if (dto.StartDate.HasValue) entity.StartDate = dto.StartDate.Value;
-            if (dto.EndDate.HasValue) entity.EndDate = dto.EndDate.Value;
-            if (dto.ProgramTypeId.HasValue) entity.ProgramTypeId = dto.ProgramTypeId;
-            if (dto.CategoryId.HasValue) entity.CategoryId = dto.CategoryId;
-            if (dto.CategoryOther != null) entity.CategoryOther = dto.CategoryOther;
-            if (dto.TypeId.HasValue) entity.TypeId = dto.TypeId;
-            if (dto.TypeOther != null) entity.TypeOther = dto.TypeOther;
-            if (dto.ThemeId.HasValue) entity.ThemeId = dto.ThemeId;
-            if (dto.ThemeOther != null) entity.ThemeOther = dto.ThemeOther;
-            if (dto.ThematicAreaId.HasValue) entity.ThematicAreaId = dto.ThematicAreaId;
-            if (dto.ThematicAreaOther != null) entity.ThematicAreaOther = dto.ThematicAreaOther;
-            if (dto.SponsoredOrganization.HasValue) entity.SponsoredOrganization = dto.SponsoredOrganization;
-            if (dto.SponsoredOrganizationName != null) entity.SponsoredOrganizationName = dto.SponsoredOrganizationName;
-            if (dto.Title != null) entity.Title = dto.Title;
-            if (dto.Mode.HasValue) entity.ModeId = dto.Mode;
-            if (dto.Duration != null) entity.Duration = dto.Duration;
-            if (dto.RegionId.HasValue) entity.RegionId = dto.RegionId;
-            if (dto.RegionOther != null) entity.RegionOther = dto.RegionOther;
-            if (dto.TPNo.HasValue) entity.TPNo = dto.TPNo;
-            if (dto.Location != null) entity.Location = dto.Location;
-            if (dto.SourceOfFundId.HasValue) entity.SourceOfFundId = dto.SourceOfFundId;
-            if (dto.NoOfCourses.HasValue) entity.Funds = dto.NoOfCourses;
-            if (dto.Attachments != null) entity.Attachements = dto.Attachments;
-            if (dto.StatusId.HasValue) entity.StatusId = dto.StatusId;
-            if (dto.TotalOutlayRs.HasValue) entity.TotalOutlayRs = dto.TotalOutlayRs;
-            if (dto.Copi != null) entity.Copi = dto.Copi;
-            if (dto.BatchNo.HasValue) entity.BatchNo = dto.BatchNo;
-            if (dto.OrganizerBroucherFile != null) entity.OrganizerBroucherFile = dto.OrganizerBroucherFile;
-            if (dto.OrganizerInstitutionName != null) entity.OrganizerInstitutionName = dto.OrganizerInstitutionName;
-            if (dto.OrganizerInstitutionAddress != null) entity.OrganizerInstitutionAddress = dto.OrganizerInstitutionAddress;
-            if (dto.SourceId.HasValue) entity.SourceId = dto.SourceId;
-            if (dto.ProposalDate.HasValue) entity.ProposalDate = dto.ProposalDate;
-            if (dto.ProposalUploadFile != null) entity.ProposalUploadFile = dto.ProposalUploadFile;
-            if (dto.UniversitySanctionLetterDate.HasValue) entity.UniversitySanctionLetterDate = dto.UniversitySanctionLetterDate;
-            if (dto.UniversitySanctionLetterUploadFile != null) entity.UniversitySanctionLetterUploadFile = dto.UniversitySanctionLetterUploadFile;
-            if (dto.FundsSanctionLetterDate.HasValue) entity.FundsSanctionLetterDate = dto.FundsSanctionLetterDate;
-            if (dto.FundsSanctionLetterUploadFile != null) entity.FundsSanctionLetterUploadFile = dto.FundsSanctionLetterUploadFile;
-        }
-
-        /// <summary>
-        /// Maps FtiParticipantDemographicsUpdateDto to FtiParticipantDemographics entity
-        /// </summary>
-        public static void MapUpdateDtoToEntity(FtiParticipantDemographicsUpdateDto dto, FtiParticipantDemographics entity)
-        {
-            if (dto.ParticipantId.HasValue) entity.ParticipantId = dto.ParticipantId;
-            if (dto.Male_SC.HasValue) entity.Male_SC = dto.Male_SC;
-            if (dto.Male_ST.HasValue) entity.Male_ST = dto.Male_ST;
-            if (dto.Male_OBC.HasValue) entity.Male_OBC = dto.Male_OBC;
-            if (dto.Male_GEN.HasValue) entity.Male_GEN = dto.Male_GEN;
-            if (dto.SC_Male_StayedInHostel.HasValue) entity.SC_Male_StayedInHostel = dto.SC_Male_StayedInHostel;
-            if (dto.ST_Male_StayedInHostel.HasValue) entity.ST_Male_StayedInHostel = dto.ST_Male_StayedInHostel;
-            if (dto.OBC_Male_StayedInHostel.HasValue) entity.OBC_Male_StayedInHostel = dto.OBC_Male_StayedInHostel;
-            if (dto.GEN_Male_StayedInHostel.HasValue) entity.GEN_Male_StayedInHostel = dto.GEN_Male_StayedInHostel;
-            if (dto.Female_SC.HasValue) entity.Female_SC = dto.Female_SC;
-            if (dto.Female_ST.HasValue) entity.Female_ST = dto.Female_ST;
-            if (dto.Female_OBC.HasValue) entity.Female_OBC = dto.Female_OBC;
-            if (dto.Female_GEN.HasValue) entity.Female_GEN = dto.Female_GEN;
-            if (dto.SC_Female_StayedInHostel.HasValue) entity.SC_Female_StayedInHostel = dto.SC_Female_StayedInHostel;
-            if (dto.ST_Female_StayedInHostel.HasValue) entity.ST_Female_StayedInHostel = dto.ST_Female_StayedInHostel;
-            if (dto.OBC_Female_StayedInHostel.HasValue) entity.OBC_Female_StayedInHostel = dto.OBC_Female_StayedInHostel;
-            if (dto.GEN_Female_StayedInHostel.HasValue) entity.GEN_Female_StayedInHostel = dto.GEN_Female_StayedInHostel;
-            if (dto.Total.HasValue) entity.Total = dto.Total;
-        }
-
-        /// <summary>
-        /// Maps FtiProgramContentUpdateDto to FtiProgramContentAndResources entity
-        /// </summary>
-        public static void MapUpdateDtoToEntity(FtiProgramContentUpdateDto dto, FtiProgramContentAndResources entity)
-        {
-            // Currently the update DTO has only Id, but keeping for future expansion
-            // Add mappings here if more fields are added to the update DTO
-        }
-
-        /// <summary>
-        /// Maps FtiResourcePersonUpdateDto to FtiResourcePerson entity
-        /// </summary>
-        public static void MapUpdateDtoToEntity(FtiResourcePersonUpdateDto dto, FtiResourcePerson entity)
-        {
-            if (dto.Name != null) entity.Name = dto.Name;
-            if (dto.Designation != null) entity.Designation = dto.Designation;
-            if (dto.ResourceType.HasValue) entity.ResourceType = dto.ResourceType;
-            if (dto.Responsibility.HasValue) entity.Responsibility = dto.Responsibility;
-            if (dto.InstitutionOrDepartment != null) entity.InstitutionOrDepartment = dto.InstitutionOrDepartment;
-        }
-
-        /// <summary>
-        /// Maps FtiTopicsCoveredUpdateDto to FtiTopicsCoveredInClass entity
-        /// </summary>
-        public static void MapUpdateDtoToEntity(FtiTopicsCoveredUpdateDto dto, FtiTopicsCoveredInClass entity)
-        {
-            if (dto.Date.HasValue) entity.Date = dto.Date;
-            if (dto.Title != null) entity.Title = dto.Title;
-            if (dto.PhotoUpload != null) entity.PhotoUpload = dto.PhotoUpload;
-        }
-
-        /// <summary>
-        /// Maps FtiTeachingAidsUpdateDto to FtiTeachingAidsDeveloped entity
-        /// </summary>
-        public static void MapUpdateDtoToEntity(FtiTeachingAidsUpdateDto dto, FtiTeachingAidsDeveloped entity)
-        {
-            if (dto.TypeOfAidId.HasValue) entity.TypeOfAidId = dto.TypeOfAidId;
-            if (dto.OtherTypeOfAid != null) entity.OtherTypeOfAid = dto.OtherTypeOfAid;
-            if (dto.Purpose != null) entity.Purpose = dto.Purpose;
-            if (dto.Number.HasValue) entity.Number = dto.Number.Value;
-        }
-
-        /// <summary>
-        /// Maps FtiAdvisoryServicesUpdateDto to FtiAdvisoryServices entity
-        /// </summary>
-        public static void MapUpdateDtoToEntity(FtiAdvisoryServicesUpdateDto dto, FtiAdvisoryServices entity)
-        {
-            if (dto.NoOfFacebookSMS.HasValue) entity.NoOfFacebookSMS = dto.NoOfFacebookSMS.Value;
-            if (dto.NoOfSMSSentToRegisteredFarmers.HasValue) entity.NoOfSMSSentToRegisteredFarmers = dto.NoOfSMSSentToRegisteredFarmers.Value;
-            if (dto.NoOfWhatsappGroups.HasValue) entity.NoOfWhatsappGroups = dto.NoOfWhatsappGroups.Value;
-            if (dto.NoOfWhatsappSMS.HasValue) entity.NoOfWhatsappSMS = dto.NoOfWhatsappSMS.Value;
-            if (dto.NoOfAnsweredWhatsappQueries.HasValue) entity.NoOfAnsweredWhatsappQueries = dto.NoOfAnsweredWhatsappQueries.Value;
-            if (dto.NoOfPhoneCalls.HasValue) entity.NoOfPhoneCalls = dto.NoOfPhoneCalls.Value;
-            if (dto.NoOfFaceToFaceDiscussions.HasValue) entity.NoOfFaceToFaceDiscussions = dto.NoOfFaceToFaceDiscussions.Value;
-            if (dto.NoOfGroupDiscussions.HasValue) entity.NoOfGroupDiscussions = dto.NoOfGroupDiscussions.Value;
-            if (dto.NoOfEmailsSent.HasValue) entity.NoOfEmailsSent = dto.NoOfEmailsSent.Value;
-            if (dto.NoOfNewspaperCoverage.HasValue) entity.NoOfNewspaperCoverage = dto.NoOfNewspaperCoverage.Value;
-            if (dto.NoOfBeneficiaries.HasValue) entity.NoOfBeneficiaries = dto.NoOfBeneficiaries.Value;
-        }
-
-        /// <summary>
-        /// Maps FtiReportUpdateDto to FtiReport entity
-        /// </summary>
-        public static void MapUpdateDtoToEntity(FtiReportUpdateDto dto, FtiReport entity)
-        {
-            if (dto.ProgressReportReportingYear != null) entity.ProgressReportReportingYear = dto.ProgressReportReportingYear;
-            if (dto.Date.HasValue) entity.Date = dto.Date;
-            if (dto.UploadPhoto != null) entity.UploadPhoto = dto.UploadPhoto;
-            if (dto.PhotosGeotaggedPhotoOrUploadPhoto != null) entity.PhotosGeotaggedPhotoOrUploadPhoto = dto.PhotosGeotaggedPhotoOrUploadPhoto;
-            if (dto.UploadVideo != null) entity.UploadVideo = dto.UploadVideo;
-            if (dto.SignificantOutcome != null) entity.SignificantOutcome = dto.SignificantOutcome;
-        }
-
-        /// <summary>
-        /// Maps FtiRecommendationUpdateDto to FtiRecommendation entity
-        /// </summary>
-        public static void MapUpdateDtoToEntity(FtiRecommendationUpdateDto dto, FtiRecommendation entity)
-        {
-            if (dto.ProblemsIdentified != null) entity.ProblemsIdentified = dto.ProblemsIdentified;
-            if (dto.Recommendation != null) entity.Recommendation = dto.Recommendation;
-            if (dto.ActionTaken != null) entity.ActionTaken = dto.ActionTaken;
-            if (dto.SignificantAchievement != null) entity.SignificantAchievement = dto.SignificantAchievement;
-            if (dto.SuccessStories != null) entity.SuccessStories = dto.SuccessStories;
-            if (dto.ImpactOutcome != null) entity.ImpactOutcome = dto.ImpactOutcome;
-        }
+        [MapperIgnoreTarget(nameof(FtiRecommendation.Id))]
+        [MapperIgnoreTarget(nameof(FtiRecommendation.FtiProgramDetailsId))]
+        [MapperIgnoreTarget(nameof(FtiRecommendation.CreatedAt))]
+        [MapperIgnoreTarget(nameof(FtiRecommendation.CreatedById))]
+        [MapperIgnoreTarget(nameof(FtiRecommendation.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(FtiRecommendation.UpdatedById))]
+        public partial void MapUpdateDtoToEntity(FtiRecommendationUpdateDto dto, FtiRecommendation entity);
     }
 }

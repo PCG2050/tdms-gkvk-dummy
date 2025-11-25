@@ -27,6 +27,7 @@ namespace WebApi
                      options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                      //options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                      options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                     options.JsonSerializerOptions.Converters.Add(new WebApi.JsonConverters.NullableIntConverter());
                  });
 
             //API Versioning Configuration

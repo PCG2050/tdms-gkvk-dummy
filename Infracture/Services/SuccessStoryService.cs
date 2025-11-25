@@ -125,7 +125,9 @@ namespace Infrastructure.Services
                     UserName = $"{p.CreatedBy?.FirstName} {p.CreatedBy?.LastName}".Trim(),
                     ProfileImageUrl = p.CreatedBy?.ProfileImageUrl,
                     Department = p.UnitLocation?.Unit?.Name ?? "Unknown",
-                    Position = p.CreatedBy?.Role.ToString() ?? "Unknown",
+                    Position = string.Equals(p.CreatedBy?.Role.ToString(), "TRAINER", StringComparison.OrdinalIgnoreCase)
+                        ? "STAFF"
+                        : (p.CreatedBy?.Role.ToString() ?? "Unknown"),
                     SuccessStoryContent = p.Recommendations!.SuccessStories!,
                     CreatedAt = p.CreatedAt
                 }).ToList();
@@ -164,7 +166,9 @@ namespace Infrastructure.Services
                     UserName = $"{p.CreatedBy?.FirstName} {p.CreatedBy?.LastName}".Trim(),
                     ProfileImageUrl = p.CreatedBy?.ProfileImageUrl,
                     Department = p.UnitLocation?.Unit?.Name ?? "Unknown",
-                    Position = p.CreatedBy?.Role.ToString() ?? "Unknown",
+                    Position = string.Equals(p.CreatedBy?.Role.ToString(), "TRAINER", StringComparison.OrdinalIgnoreCase)
+                        ? "STAFF"
+                        : (p.CreatedBy?.Role.ToString() ?? "Unknown"),
                     SuccessStoryContent = p.Recommendations!.SuccessStories!,
                     CreatedAt = p.CreatedAt
                 }).ToList();
@@ -203,7 +207,9 @@ namespace Infrastructure.Services
                     UserName = $"{p.CreatedBy?.FirstName} {p.CreatedBy?.LastName}".Trim(),
                     ProfileImageUrl = p.CreatedBy?.ProfileImageUrl,
                     Department = p.UnitLocation?.Unit?.Name ?? "Unknown",
-                    Position = p.CreatedBy?.Role.ToString() ?? "Unknown",
+                    Position = string.Equals(p.CreatedBy?.Role.ToString(), "TRAINER", StringComparison.OrdinalIgnoreCase)
+                        ? "STAFF"
+                        : (p.CreatedBy?.Role.ToString() ?? "Unknown"),
                     SuccessStoryContent = p.Recommendations!.SuccessStories!,
                     CreatedAt = p.CreatedAt
                 }).ToList();
@@ -242,7 +248,9 @@ namespace Infrastructure.Services
                     UserName = $"{p.CreatedBy?.FirstName} {p.CreatedBy?.LastName}".Trim(),
                     ProfileImageUrl = p.CreatedBy?.ProfileImageUrl,
                     Department = p.UnitLocation?.Unit?.Name ?? "Unknown",
-                    Position = p.CreatedBy?.Role.ToString() ?? "Unknown",
+                    Position = string.Equals(p.CreatedBy?.Role.ToString(), "TRAINER", StringComparison.OrdinalIgnoreCase)
+                        ? "STAFF"
+                        : (p.CreatedBy?.Role.ToString() ?? "Unknown"),
                     SuccessStoryContent = p.Recommendations!.SuccessStories!,
                     CreatedAt = p.CreatedAt
                 }).ToList();
@@ -281,7 +289,9 @@ namespace Infrastructure.Services
                     UserName = $"{p.CreatedBy?.FirstName} {p.CreatedBy?.LastName}".Trim(),
                     ProfileImageUrl = p.CreatedBy?.ProfileImageUrl,
                     Department = p.UnitLocation?.Unit?.Name ?? "Unknown",
-                    Position = p.CreatedBy?.Role.ToString() ?? "Unknown",
+                    Position = string.Equals(p.CreatedBy?.Role.ToString(), "TRAINER", StringComparison.OrdinalIgnoreCase)
+                        ? "STAFF"
+                        : (p.CreatedBy?.Role.ToString() ?? "Unknown"),
                     SuccessStoryContent = p.Recommendations!.SuccessStories!,
                     CreatedAt = p.CreatedAt
                 }).ToList();
@@ -320,7 +330,9 @@ namespace Infrastructure.Services
                     UserName = $"{p.CreatedBy?.FirstName} {p.CreatedBy?.LastName}".Trim(),
                     ProfileImageUrl = p.CreatedBy?.ProfileImageUrl,
                     Department = p.UnitLocation?.Unit?.Name ?? "Unknown",
-                    Position = p.CreatedBy?.Role.ToString() ?? "Unknown",
+                    Position = string.Equals(p.CreatedBy?.Role.ToString(), "TRAINER", StringComparison.OrdinalIgnoreCase)
+                        ? "STAFF"
+                        : (p.CreatedBy?.Role.ToString() ?? "Unknown"),
                     SuccessStoryContent = p.Recommendations!.SuccessStories!,
                     CreatedAt = p.CreatedAt
                 }).ToList();
@@ -359,7 +371,9 @@ namespace Infrastructure.Services
                     UserName = $"{p.CreatedBy?.FirstName} {p.CreatedBy?.LastName}".Trim(),
                     ProfileImageUrl = p.CreatedBy?.ProfileImageUrl,
                     Department = p.UnitLocation?.Unit?.Name ?? "Unknown",
-                    Position = p.CreatedBy?.Role.ToString() ?? "Unknown",
+                    Position = string.Equals(p.CreatedBy?.Role.ToString(), "TRAINER", StringComparison.OrdinalIgnoreCase)
+                        ? "STAFF"
+                        : (p.CreatedBy?.Role.ToString() ?? "Unknown"),
                     SuccessStoryContent = p.Recommendations!.SuccessStories!,
                     CreatedAt = p.CreatedAt
                 }).ToList();
@@ -398,7 +412,9 @@ namespace Infrastructure.Services
                     UserName = $"{p.CreatedBy?.FirstName} {p.CreatedBy?.LastName}".Trim(),
                     ProfileImageUrl = p.CreatedBy?.ProfileImageUrl,
                     Department = p.UnitLocation?.Unit?.Name ?? "Unknown",
-                    Position = p.CreatedBy?.Role.ToString() ?? "Unknown",
+                    Position = string.Equals(p.CreatedBy?.Role.ToString(), "TRAINER", StringComparison.OrdinalIgnoreCase)
+                        ? "STAFF"
+                        : (p.CreatedBy?.Role.ToString() ?? "Unknown"),
                     SuccessStoryContent = p.Recommendations!.SuccessStories!,
                     CreatedAt = p.CreatedAt
                 }).ToList();

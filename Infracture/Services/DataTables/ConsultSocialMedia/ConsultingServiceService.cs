@@ -135,21 +135,16 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
 
         public async Task<ServiceResult> DeleteAsync(int id)
         {
-            var consultingService = await _consultingServiceRepository.GetByIdAsync(id);
+            var program = await _consultingServiceRepository.GetByIdAsync(id);
 
-            if (consultingService == null)
-                return ServiceResult.Failure("Consulting service not found", ServiceErrorStatus.NOTFOUND);
+            if (program == null)
+                return ServiceResult.Failure("Program not found", ServiceErrorStatus.NOTFOUND);
 
-            if (!await _entityPermissionService.CanModifyForm(consultingService))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (consultingService.FormStatus != "Draft" && consultingService.FormStatus != "Rejected" && consultingService.FormStatus != "Pending")
-                return ServiceResult.Failure(
-                    "Only draft consulting services can be deleted",
-                    ServiceErrorStatus.INVALIDOPERATION);
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult.Failure("Access denied. You can only delete your own forms.", ServiceErrorStatus.FORBIDDEN);
 
             await _consultingServiceRepository.DeleteAsync(id);
-            return ServiceResult.Success();
+            return ServiceResult.Success("Program deleted successfully");
         }
 
         // ==========================================
@@ -486,7 +481,7 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
                 getUnitLocationId: x => x.UnitLocationId,
                 getTitleOrName: x => x.Title ?? x.Category?.Name,
                 getFormStatus: x => x.FormStatus,
-                getRemarks: x=> x.FormStatusRemarks ?? "-",
+                getRemarks: x => x.FormStatusRemarks ?? "-",
                 pageNumber,
                 pageSize);
         }
