@@ -22,13 +22,15 @@ namespace Infrastructure.Repository
 
         public async Task<List<TrainerAssignment>> GetAllAsync()
         {
-            return await _context.UnitTrainers.ToListAsync();
+            return await _context.UnitTrainers
+                .Where(x => !x.IsDeactivated)
+                .ToListAsync();
         }
 
         public async Task<List<int>> GetUnitLocationIdsByTrainerIdAsync(int trainerId)
         {
             return await _context.UnitTrainers
-                .Where(ta => ta.TrainerId == trainerId)
+                .Where(ta => ta.TrainerId == trainerId && !ta.IsDeactivated)
                 .Select(ta => ta.UnitLocationId)
                 .Distinct()
                 .ToListAsync();
@@ -37,6 +39,7 @@ namespace Infrastructure.Repository
         public async Task<bool> IsTrainerAssignedToLocationAsync(int trainerId, int unitLocationId)
         {
             return await _context.UnitTrainers
+                .Where(a => !a.IsDeactivated)
                 .AnyAsync(a => a.TrainerId == trainerId && a.UnitLocationId == unitLocationId);
         }
 
@@ -55,6 +58,7 @@ namespace Infrastructure.Repository
                               where unitLocation.UnitId == trainerAssignment.UnitId
                               && unitLocation.DistrictId == trainerAssignment.DistrictId
                               && trainer.TrainerId == trainerAssignment.TrainerId
+                              && !trainer.IsDeactivated
                               select trainer).AnyAsync();
         }
 
@@ -66,7 +70,7 @@ namespace Infrastructure.Repository
                                     .Include(ut => ut.UnitLocation)
                                         .ThenInclude(ul => ul.District)
                                             .ThenInclude(d => d.State)
-                                    .Where(ut => ut.TrainerId == trainerId)
+                                    .Where(ut => ut.TrainerId == trainerId && !ut.IsDeactivated)
                                     .ToListAsync();
         }
 
@@ -86,8 +90,9 @@ namespace Infrastructure.Repository
 
         public async Task<TrainerAssignment?> GetByTrainerLocationAsync(int unitLocationId, int trainerId)
         {
-            return await _context.UnitTrainers.FirstOrDefaultAsync(x => x.UnitLocationId == unitLocationId
-            && x.TrainerId == trainerId);
+            return await _context.UnitTrainers
+                .Where(x => !x.IsDeactivated)
+                .FirstOrDefaultAsync(x => x.UnitLocationId == unitLocationId && x.TrainerId == trainerId);
         }
 
         public Task<TrainerAssignment> UpdateAsync(TrainerAssignment unitLocationTrainer)
@@ -104,7 +109,7 @@ namespace Infrastructure.Repository
                 .Include(x => x.UnitLocation)
                     .ThenInclude(l => l.District)
                     .ThenInclude(d => d.State)
-                .Where(x => x.TrainerId == trainerId)
+                .Where(x => x.TrainerId == trainerId && !x.IsDeactivated)
                 .GroupBy(ut => new { ut.UnitLocation.Unit.Id, ut.UnitLocation.Unit.Name })
             .Select(g => new TrainerUnitWithLocationsDto
             {
@@ -126,6 +131,7 @@ namespace Infrastructure.Repository
         public async Task<bool> HasAssignmentsForUnitLocationAsync(int unitLocationId)
         {
             return await _context.UnitTrainers
+                .Where(ta => !ta.IsDeactivated)
                 .AnyAsync(ta => ta.UnitLocationId == unitLocationId);
         }
 
@@ -146,10 +152,25 @@ namespace Infrastructure.Repository
         public async Task<List<int>> GetTrainerIdsByUnitLocationIdAsync(int unitLocationId)
         {
             return await _context.UnitTrainers
-                .Where(ta => ta.UnitLocationId == unitLocationId)
+                .Where(ta => ta.UnitLocationId == unitLocationId && !ta.IsDeactivated)
                 .Select(ta => ta.TrainerId)
                 .Distinct()
                 .ToListAsync();
+        }
+
+        public async Task<TrainerAssignment?> GetDeactivatedAssignmentAsync(int trainerId, int unitLocationId)
+        {
+            return await _context.UnitTrainers
+                .FirstOrDefaultAsync(x => x.TrainerId == trainerId
+                    && x.UnitLocationId == unitLocationId
+                    && x.IsDeactivated);
+        }
+
+        public async Task<TrainerAssignment> SaveAsync(TrainerAssignment assignment)
+        {
+            _context.UnitTrainers.Update(assignment);
+            await _context.SaveChangesAsync();
+            return assignment;
         }
     }
 

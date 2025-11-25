@@ -128,6 +128,16 @@ namespace Infrastructure.Services
                     user.Phone = updateDto.Phone;
                     user.IsPhoneConfirmed = false;
                 }
+                if (updateDto.Email is not null && updateDto.Email != user.Email)
+                {
+                    // Check if new email already exists
+                    var existingUser = await _userRepository.GetByEmailAsync(updateDto.Email);
+                    if (existingUser != null && existingUser.Id != user.Id)
+                        return ServiceResult.Failure("Email already in use", ServiceErrorStatus.INVALIDOPERATION);
+
+                    user.Email = updateDto.Email;
+                    user.IsEmailConfirmed = false; // Reset confirmation when email changes
+                }
                 if (updateDto.DateOfBirth is not null) user.DateOfBirth = updateDto.DateOfBirth.Value;
                 if (updateDto.DateOfJoining is not null) user.DateOfJoining = updateDto.DateOfJoining.Value;
                 if (updateDto.Gender is not null) user.Gender = updateDto.Gender.Value;

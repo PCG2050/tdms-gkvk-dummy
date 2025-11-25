@@ -33,7 +33,8 @@ namespace Application.Interface.Repository
         // New method for checking assignments before deletion
         Task<bool> HasAssignmentsForUnitLocationAsync(int unitLocationId);
 
-        
-
+        // Soft delete methods
+        Task<UnitHeadAssignment?> GetDeactivatedAssignmentAsync(int unitHeadId, int unitLocationId);
+        Task<UnitHeadAssignment> SaveAsync(UnitHeadAssignment assignment);
     }
 }

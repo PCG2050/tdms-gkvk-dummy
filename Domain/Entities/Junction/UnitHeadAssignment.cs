@@ -11,7 +11,12 @@ namespace Domain.Entities.Junction
     {
         public int UnitLocationId { get; set; }
         public int UnitHeadId { get; set; }
-        public OrganizationUnitLocation UnitLocation { get; set; } = null!;        
+        public OrganizationUnitLocation UnitLocation { get; set; } = null!;
         public User UnitHead { get; set; } = null!;
+
+        // Soft delete fields
+        public bool IsDeactivated { get; set; } = false;
+        public DateTimeOffset? DeactivatedAt { get; set; }
+        public int? DeactivatedById { get; set; }
     }
 }

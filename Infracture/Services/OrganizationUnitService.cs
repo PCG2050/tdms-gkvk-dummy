@@ -124,17 +124,16 @@ namespace Infrastructure.Services
             if (unitHead is null)
                 return ServiceResult.Failure($"UnitHead {request.UnitHeadId} does not exist");
 
-            // Current assignments
+            // Current active assignments
             var existingAssignments = await _unitHeadAssignment.GetByUnitHeadIdAsync(request.UnitHeadId);
             var existingIds = existingAssignments.Select(x => x.UnitLocationId).ToList();
             var newIds = request.OrganizationUnitLocationIds ?? new List<int>();
 
             // Find what to add / remove
             var toAddIds = newIds.Except(existingIds).ToList();
-            var toRemove = existingAssignments.Where(x => !newIds.Contains(x.UnitLocationId)).ToList();
+            var toDeactivate = existingAssignments.Where(x => !newIds.Contains(x.UnitLocationId)).ToList();
 
-            // ---- ADD ----
-            var newAssignments = new List<UnitHeadAssignment>();
+            // ---- ADD/REACTIVATE ----
             foreach (var locationId in toAddIds)
             {
                 var unitLocation = await _organizationUnit.GetByOrganizationUnitLocationsIdAsync(locationId);
@@ -144,21 +143,43 @@ namespace Infrastructure.Services
                 if (unitLocation.CreatedById != unitHead.CreatedById)
                     continue;
 
-                newAssignments.Add(new UnitHeadAssignment
+                // Check if there's a deactivated assignment we can reactivate
+                var deactivatedAssignment = await _unitHeadAssignment.GetDeactivatedAssignmentAsync(request.UnitHeadId, locationId);
+                if (deactivatedAssignment != null)
                 {
-                    UnitHeadId = request.UnitHeadId,
-                    UnitLocationId = locationId,
-                    CreatedAt = DateTimeOffset.UtcNow,
-                    CreatedById = _currentUser.UserId
-                });
+                    // Reactivate existing assignment
+                    deactivatedAssignment.IsDeactivated = false;
+                    deactivatedAssignment.DeactivatedAt = null;
+                    deactivatedAssignment.DeactivatedById = null;
+                    deactivatedAssignment.UpdatedAt = DateTimeOffset.UtcNow;
+                    deactivatedAssignment.UpdatedById = _currentUser.UserId;
+                    await _unitHeadAssignment.SaveAsync(deactivatedAssignment);
+                }
+                else
+                {
+                    // Create new assignment
+                    var newAssignment = new UnitHeadAssignment
+                    {
+                        UnitHeadId = request.UnitHeadId,
+                        UnitLocationId = locationId,
+                        IsDeactivated = false,
+                        CreatedAt = DateTimeOffset.UtcNow,
+                        CreatedById = _currentUser.UserId
+                    };
+                    await _unitHeadAssignment.AddAsync(newAssignment);
+                }
             }
 
-            if (newAssignments.Any())
-                await _unitHeadAssignment.AddRangeAsync(newAssignments);
-
-            // ---- REMOVE ----
-            if (toRemove.Any())
-                await _unitHeadAssignment.DeleteRangeAsync(toRemove);
+            // ---- SOFT DELETE (DEACTIVATE) ----
+            foreach (var assignment in toDeactivate)
+            {
+                assignment.IsDeactivated = true;
+                assignment.DeactivatedAt = DateTimeOffset.UtcNow;
+                assignment.DeactivatedById = _currentUser.UserId;
+                assignment.UpdatedAt = DateTimeOffset.UtcNow;
+                assignment.UpdatedById = _currentUser.UserId;
+                await _unitHeadAssignment.SaveAsync(assignment);
+            }
 
             return ServiceResult.Success("Assignments synced successfully");
         }
@@ -173,17 +194,16 @@ namespace Infrastructure.Services
             if (trainer.Role != Role.TRAINER)
                 return ServiceResult.Failure($"User {request.TrainerId} is not a trainer");
 
-            // Current assignments
+            // Current active assignments
             var existingAssignments = await _trainerAssignment.GetByTrainerIdAsync(request.TrainerId);
             var existingIds = existingAssignments.Select(x => x.UnitLocationId).ToList();
             var newIds = request.OrganizationUnitLocationIds ?? new List<int>();
 
             // Find what to add / remove
             var toAddIds = newIds.Except(existingIds).ToList();
-            var toRemove = existingAssignments.Where(x => !newIds.Contains(x.UnitLocationId)).ToList();
+            var toDeactivate = existingAssignments.Where(x => !newIds.Contains(x.UnitLocationId)).ToList();
 
-            // ---- ADD ----
-            var newAssignments = new List<TrainerAssignment>();
+            // ---- ADD/REACTIVATE ----
             foreach (var locationId in toAddIds)
             {
                 var unitLocation = await _organizationUnit.GetByOrganizationUnitLocationsIdAsync(locationId);
@@ -193,21 +213,43 @@ namespace Infrastructure.Services
                 if (unitLocation.CreatedById != trainer.CreatedById)
                     continue;
 
-                newAssignments.Add(new TrainerAssignment
+                // Check if there's a deactivated assignment we can reactivate
+                var deactivatedAssignment = await _trainerAssignment.GetDeactivatedAssignmentAsync(request.TrainerId, locationId);
+                if (deactivatedAssignment != null)
                 {
-                    TrainerId = request.TrainerId,
-                    UnitLocationId = locationId,
-                    CreatedAt = DateTimeOffset.UtcNow,
-                    CreatedById = _currentUser.UserId
-                });
+                    // Reactivate existing assignment
+                    deactivatedAssignment.IsDeactivated = false;
+                    deactivatedAssignment.DeactivatedAt = null;
+                    deactivatedAssignment.DeactivatedById = null;
+                    deactivatedAssignment.UpdatedAt = DateTimeOffset.UtcNow;
+                    deactivatedAssignment.UpdatedById = _currentUser.UserId;
+                    await _trainerAssignment.SaveAsync(deactivatedAssignment);
+                }
+                else
+                {
+                    // Create new assignment
+                    var newAssignment = new TrainerAssignment
+                    {
+                        TrainerId = request.TrainerId,
+                        UnitLocationId = locationId,
+                        IsDeactivated = false,
+                        CreatedAt = DateTimeOffset.UtcNow,
+                        CreatedById = _currentUser.UserId
+                    };
+                    await _trainerAssignment.AddAsync(newAssignment);
+                }
             }
 
-            if (newAssignments.Any())
-                await _trainerAssignment.AddRangeAsync(newAssignments);
-
-            // ---- REMOVE ----
-            if (toRemove.Any())
-                await _trainerAssignment.DeleteRangeAsync(toRemove);
+            // ---- SOFT DELETE (DEACTIVATE) ----
+            foreach (var assignment in toDeactivate)
+            {
+                assignment.IsDeactivated = true;
+                assignment.DeactivatedAt = DateTimeOffset.UtcNow;
+                assignment.DeactivatedById = _currentUser.UserId;
+                assignment.UpdatedAt = DateTimeOffset.UtcNow;
+                assignment.UpdatedById = _currentUser.UserId;
+                await _trainerAssignment.SaveAsync(assignment);
+            }
 
             return ServiceResult.Success("Trainer assignments synced successfully");
         }
