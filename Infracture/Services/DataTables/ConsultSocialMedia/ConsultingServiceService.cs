@@ -57,7 +57,7 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
             consultingService.CreatedById = _currentUserService.UserId;
             consultingService.CreatedAt = DateTimeOffset.UtcNow;
             consultingService.OrganizationId = _currentUserService.OrganizationId;
-            consultingService.FormStatus = "Draft";
+            consultingService.FormStatus = "Pending";
 
             var savedService = await _consultingServiceRepository.CreateAsync(consultingService);
             var serviceWithDetails = await _consultingServiceRepository.GetWithDetailsAsync(savedService.Id);
@@ -166,7 +166,7 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
                 parentEntity.CreatedById = _currentUserService.UserId;
                 parentEntity.CreatedAt = DateTimeOffset.UtcNow;
                 parentEntity.OrganizationId = _currentUserService.OrganizationId;
-                parentEntity.FormStatus = "Draft";
+                parentEntity.FormStatus = "Pending";
 
                 var createdService = await _consultingServiceRepository.CreateAsync(parentEntity);
                 var serviceId = createdService.Id;

@@ -57,7 +57,7 @@ namespace WebApi.Controllers.DataTables.FIU
         /// <response code="200">Activity created successfully</response>
         /// <response code="400">Validation error</response>
         [HttpPost]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
         [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateActivity([FromBody] FIUProgramActivityCreateDto createDto)
@@ -113,7 +113,7 @@ namespace WebApi.Controllers.DataTables.FIU
         /// <response code="200">Activity updated successfully</response>
         /// <response code="400">Validation error or cannot update (approved status)</response>
         [HttpPut("{id}")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
         [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> UpdateActivity(int id, [FromBody] FIUProgramActivityUpdateDto updateDto)
@@ -195,7 +195,7 @@ namespace WebApi.Controllers.DataTables.FIU
         /// <response code="200">Batch creation completed (includes success and failure details)</response>
         /// <response code="400">Validation error</response>
         [HttpPost("batch")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
         public async Task<IActionResult> CreateBatchAsync([FromBody] FIUProgramActivityBatchCreateDto batchCreateDto)
         {
             var result = await _service.CreateBatchAsync(batchCreateDto);
@@ -263,7 +263,7 @@ namespace WebApi.Controllers.DataTables.FIU
         /// <response code="200">Batch update completed (includes success and failure details)</response>
         /// <response code="400">Validation error</response>
         [HttpPut("batch")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
         public async Task<IActionResult> UpdateBatchAsync([FromBody] FIUProgramActivityBatchUpdateDto batchUpdateDto)
         {
             var result = await _service.UpdateBatchAsync(batchUpdateDto);
@@ -289,6 +289,7 @@ namespace WebApi.Controllers.DataTables.FIU
         /// Get available activity types (master data dropdown)
         /// </summary>
         [HttpGet("activity-types")]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
         [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetActivityTypes()
         {
@@ -308,6 +309,7 @@ namespace WebApi.Controllers.DataTables.FIU
         /// <response code="200">Activity found</response>
         /// <response code="404">Activity not found</response>
         [HttpGet("{id}")]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
         [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetActivityById(int id)
@@ -329,7 +331,7 @@ namespace WebApi.Controllers.DataTables.FIU
         /// <response code="400">Cannot delete (wrong status)</response>
         /// <response code="404">Activity not found</response>
         [HttpDelete("{id}")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> DeleteActivity(int id)
@@ -534,7 +536,7 @@ namespace WebApi.Controllers.DataTables.FIU
         }
 
         [HttpGet("my-history")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
         public async Task<IActionResult> GetMyHistory(
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 20)

@@ -96,7 +96,7 @@ namespace WebApi.Controllers.DataTables.ASM
         /// <response code="200">Batch creation completed (includes success and failure details)</response>
         /// <response code="400">Validation error</response>
         [HttpPost("batch")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
         public async Task<IActionResult> AddBatchAsync([FromBody] ASMVisitorDetailsBatchCreateDto batchCreateDto)
         {
             var result = await _service.AddBatchAsync(batchCreateDto);
@@ -162,7 +162,7 @@ namespace WebApi.Controllers.DataTables.ASM
         /// <response code="200">Batch update completed (includes success and failure details)</response>
         /// <response code="400">Validation error</response>
         [HttpPut("batch")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
         public async Task<IActionResult> UpdateBatchAsync([FromBody] ASMVisitorDetailsBatchUpdateDto batchUpdateDto)
         {
             var result = await _service.UpdateBatchAsync(batchUpdateDto);
@@ -218,7 +218,7 @@ namespace WebApi.Controllers.DataTables.ASM
         /// <response code="400">Cannot delete (wrong status)</response>
         /// <response code="404">Visitor detail not found</response>
         [HttpDelete("{id}")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _service.DeleteAsync(id);

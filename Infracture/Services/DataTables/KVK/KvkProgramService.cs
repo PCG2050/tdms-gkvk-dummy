@@ -171,15 +171,10 @@ namespace Infrastructure.Services.DataTables.KVK
                 return ServiceResult.Failure("Program not found", ServiceErrorStatus.NOTFOUND);
 
             if (!await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft")
-                return ServiceResult.Failure(
-                    "Only draft programs can be deleted",
-                    ServiceErrorStatus.INVALIDOPERATION);
+                return ServiceResult.Failure("Access denied. You can only delete your own forms.", ServiceErrorStatus.FORBIDDEN);
 
             await _programRepository.DeleteAsync(id);
-            return ServiceResult.Success();
+            return ServiceResult.Success("Program deleted successfully");
         }
 
         // ============================
@@ -209,6 +204,8 @@ namespace Infrastructure.Services.DataTables.KVK
 
             var entity = _mapper.MapToEntity(dto);
             entity.KvkProgramDetailsId = programId;
+            entity.UnitLocationId = program.UnitLocationId;
+            entity.OrganizationId = program.OrganizationId;
             entity.CreatedById = _currentUserService.UserId;
             entity.CreatedAt = DateTimeOffset.UtcNow;
 
@@ -241,6 +238,8 @@ namespace Infrastructure.Services.DataTables.KVK
                     ServiceErrorStatus.INVALIDOPERATION);
 
             _mapper.MapUpdateDtoToEntity(dto, demographics);
+            demographics.UnitLocationId = program.UnitLocationId;
+            demographics.OrganizationId = program.OrganizationId;
             demographics.UpdatedById = _currentUserService.UserId;
             demographics.UpdatedAt = DateTimeOffset.UtcNow;
 
@@ -603,6 +602,8 @@ namespace Infrastructure.Services.DataTables.KVK
                 // Create new
                 var entity = _mapper.MapToEntity(dto);
                 entity.KvkProgramDetailsId = programId;
+                entity.UnitLocationId = program.UnitLocationId;
+                entity.OrganizationId = program.OrganizationId;
                 entity.CreatedById = _currentUserService.UserId;
                 entity.CreatedAt = DateTimeOffset.UtcNow;
 
@@ -631,6 +632,8 @@ namespace Infrastructure.Services.DataTables.KVK
                 };
 
                 _mapper.MapUpdateDtoToEntity(updateDto, existing);
+                existing.UnitLocationId = program.UnitLocationId;
+                existing.OrganizationId = program.OrganizationId;
                 existing.UpdatedById = _currentUserService.UserId;
                 existing.UpdatedAt = DateTimeOffset.UtcNow;
 

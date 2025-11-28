@@ -24,27 +24,30 @@ namespace Infrastructure.Repository
 
         public async Task<List<UnitHeadAssignment>> GetAllAsync()
         {
-            return await _context.UnitHeadAssignments.ToListAsync();
+            return await _context.UnitHeadAssignments
+                .Where(x => !x.IsDeactivated)
+                .ToListAsync();
         }
 
         public async Task<List<int>> GetUnitLocationIdsByUnitHeadIdAsync(int unitHeadId)
         {
             return await _context.UnitHeadAssignments
-             .Where(uha => uha.UnitHeadId == unitHeadId)
-             .Select(uha => uha.UnitLocationId) 
+             .Where(uha => uha.UnitHeadId == unitHeadId && !uha.IsDeactivated)
+             .Select(uha => uha.UnitLocationId)
              .Distinct()
              .ToListAsync();
         }
         public async Task<bool> IsUnitHeadAssignedToLocationAsync(int unitHeadId, int unitLocationId)
         {
             return await _context.UnitHeadAssignments
+                .Where(a => !a.IsDeactivated)
                 .AnyAsync(a => a.UnitHeadId == unitHeadId && a.UnitLocationId == unitLocationId);
         }
         public async Task<List<int>> GetUnitIdsByUnitHeadIdAsync(int unitHeadId)
         {
             return await _context.UnitHeadAssignments
                 .Include(a => a.UnitLocation)
-                .Where(a => a.UnitHeadId == unitHeadId)
+                .Where(a => a.UnitHeadId == unitHeadId && !a.IsDeactivated)
                 .Select(a => a.UnitLocation.UnitId)
                 .Distinct()
                 .ToListAsync();
@@ -66,6 +69,7 @@ namespace Infrastructure.Repository
                           where unitLocation.UnitId == unitHeadAssignment.UnitId
                           && unitLocation.DistrictId == unitHeadAssignment.DistrictId
                           && unitHead.UnitHeadId == unitHeadAssignment.UnitHeadId
+                          && !unitHead.IsDeactivated
                           select unitHead).AnyAsync();
         }
 
@@ -84,14 +88,16 @@ namespace Infrastructure.Repository
         public async Task<bool> AssignmentExistsByLocationAsync(int unitLocationId, int unitHeadId)
         {
             return await _context.UnitHeadAssignments
+                .Where(x => !x.IsDeactivated)
                 .AnyAsync(x => x.UnitLocationId == unitLocationId && x.UnitHeadId == unitHeadId);
         }
 
         public async Task<UnitHeadAssignment?> GetByUnitHeadLocationAsync(int unitLocationId, int unitHeadId)
         {
-          
-            return await _context.UnitHeadAssignments.FirstOrDefaultAsync(x => x.UnitLocationId == unitLocationId
-            && x.UnitHeadId == unitHeadId);
+
+            return await _context.UnitHeadAssignments
+                .Where(x => !x.IsDeactivated)
+                .FirstOrDefaultAsync(x => x.UnitLocationId == unitLocationId && x.UnitHeadId == unitHeadId);
         }
 
         public async Task<UnitHeadAssignment> UpdateAsync(UnitHeadAssignment unitLocationUnitHead)
@@ -110,7 +116,7 @@ namespace Infrastructure.Repository
                  .Include(x => x.UnitLocation)
                      .ThenInclude(l => l.District)
                      .ThenInclude(d => d.State)
-                 .Where(x => x.UnitHeadId == unitHeadId)
+                 .Where(x => x.UnitHeadId == unitHeadId && !x.IsDeactivated)
                  .GroupBy(ut => new { ut.UnitLocation.Unit.Id, ut.UnitLocation.Unit.Name })
              .Select(g => new UnitWithLocationsDto
              {
@@ -147,23 +153,25 @@ namespace Infrastructure.Repository
                 .OrderBy(u => u.Id)
                 .Skip(offset)
                 .Take(pageSize)
-                .SelectMany(u => u.UnitHeadAssignments.Select(assignment => new UnitHeadFlatDto
-                {
-                    UserId = u.Id,
-                    FirstName = u.FirstName,
-                    LastName = u.LastName,
-                    Email = u.Email,
-                    
+                .SelectMany(u => u.UnitHeadAssignments
+                    .Where(assignment => !assignment.IsDeactivated)
+                    .Select(assignment => new UnitHeadFlatDto
+                    {
+                        UserId = u.Id,
+                        FirstName = u.FirstName,
+                        LastName = u.LastName,
+                        Email = u.Email,
 
-                    UnitId = assignment.UnitLocation.Unit.Id,
-                    UnitName = assignment.UnitLocation.Unit.Name,
 
-                    StateId = assignment.UnitLocation.District.State.Id,
-                    StateName = assignment.UnitLocation.District.State.Name,
+                        UnitId = assignment.UnitLocation.Unit.Id,
+                        UnitName = assignment.UnitLocation.Unit.Name,
 
-                    DistrictId = assignment.UnitLocation.District.Id,
-                    DistrictName = assignment.UnitLocation.District.Name
-                }))
+                        StateId = assignment.UnitLocation.District.State.Id,
+                        StateName = assignment.UnitLocation.District.State.Name,
+
+                        DistrictId = assignment.UnitLocation.District.Id,
+                        DistrictName = assignment.UnitLocation.District.Name
+                    }))
                 .ToListAsync();
 
             result.Items = unitHeadsDtoQuery;
@@ -181,7 +189,7 @@ namespace Infrastructure.Repository
              .Include(x => x.UnitLocation)
                  .ThenInclude(l => l.District)
                  .ThenInclude(d => d.State)
-             .Where(x => x.UnitHeadId == unitHeadId)           
+             .Where(x => x.UnitHeadId == unitHeadId && !x.IsDeactivated)
                 .ToListAsync();
         }
 
@@ -201,7 +209,23 @@ namespace Infrastructure.Repository
         public async Task<bool> HasAssignmentsForUnitLocationAsync(int unitLocationId)
         {
             return await _context.UnitHeadAssignments
+                .Where(ta => !ta.IsDeactivated)
                 .AnyAsync(ta => ta.UnitLocationId == unitLocationId);
+        }
+
+        public async Task<UnitHeadAssignment?> GetDeactivatedAssignmentAsync(int unitHeadId, int unitLocationId)
+        {
+            return await _context.UnitHeadAssignments
+                .FirstOrDefaultAsync(x => x.UnitHeadId == unitHeadId
+                    && x.UnitLocationId == unitLocationId
+                    && x.IsDeactivated);
+        }
+
+        public async Task<UnitHeadAssignment> SaveAsync(UnitHeadAssignment assignment)
+        {
+            _context.UnitHeadAssignments.Update(assignment);
+            await _context.SaveChangesAsync();
+            return assignment;
         }
     }
 }

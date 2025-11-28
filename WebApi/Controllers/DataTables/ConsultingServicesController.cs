@@ -11,7 +11,7 @@ namespace WebApi.Controllers.DataTables
 {
     [ApiController]
     [Route("api/consulting-services")]
-    [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead},{RoleString.Admin}")]
+    [Authorize]
     public class ConsultingServicesController : ControllerBase
     {
         private readonly IConsultingServiceService _consultingServiceService;
@@ -26,7 +26,7 @@ namespace WebApi.Controllers.DataTables
         // ==========================================
 
         [HttpPost]
-        [Authorize(Roles = RoleString.Trainer)]
+       
         public async Task<IActionResult> CreateConsultingService([FromBody] ConsultingServiceCreateDto createDto)
         {
             if (!ModelState.IsValid)
@@ -46,7 +46,7 @@ namespace WebApi.Controllers.DataTables
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = RoleString.Trainer)]
+       
         public async Task<IActionResult> UpdateConsultingService(int id, [FromBody] ConsultingServiceUpdateDto updateDto)
         {
             if (!ModelState.IsValid)
@@ -88,7 +88,7 @@ namespace WebApi.Controllers.DataTables
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = RoleString.Trainer)]
+        
         public async Task<IActionResult> DeleteConsultingService(int id)
         {
             var result = await _consultingServiceService.DeleteAsync(id);
@@ -115,7 +115,7 @@ namespace WebApi.Controllers.DataTables
         /// Perfect for "Save & Next" button - solves parent-child ID dependency.
         /// </summary>
         [HttpPost("with-children")]
-        [Authorize(Roles = RoleString.Trainer)]
+        
         public async Task<IActionResult> CreateConsultingServiceWithChildren([FromBody] ConsultingServiceWithChildrenCreateDto dto)
         {
             if (!ModelState.IsValid)
@@ -147,7 +147,7 @@ namespace WebApi.Controllers.DataTables
         /// Perfect for "Save & Next" button with inline editing.
         /// </summary>
         [HttpPut("{id}/with-children")]
-        [Authorize(Roles = RoleString.Trainer)]
+       
         public async Task<IActionResult> UpdateConsultingServiceWithChildren(int id, [FromBody] ConsultingServiceWithChildrenUpdateDto dto)
         {
             if (!ModelState.IsValid)
@@ -197,7 +197,7 @@ namespace WebApi.Controllers.DataTables
         // ==========================================
 
         [HttpGet("history")]
-        [Authorize(Roles = RoleString.Trainer)]
+       
         public async Task<IActionResult> GetConsultingServiceHistory(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 20,
@@ -221,7 +221,7 @@ namespace WebApi.Controllers.DataTables
 
 
         [HttpGet("my-history")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
         public async Task<IActionResult> GetMyHistory(
      [FromQuery] int pageNumber = 1,
      [FromQuery] int pageSize = 10)

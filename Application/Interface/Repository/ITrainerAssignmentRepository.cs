@@ -36,5 +36,9 @@ namespace Application.Interface.Repository
         /// Get all trainers assigned to a specific unit location
         /// </summary>
         Task<List<int>> GetTrainerIdsByUnitLocationIdAsync(int unitLocationId);
+
+        // Soft delete methods
+        Task<TrainerAssignment?> GetDeactivatedAssignmentAsync(int trainerId, int unitLocationId);
+        Task<TrainerAssignment> SaveAsync(TrainerAssignment assignment);
     }
 }

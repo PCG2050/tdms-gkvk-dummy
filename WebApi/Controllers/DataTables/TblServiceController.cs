@@ -30,6 +30,7 @@ namespace WebApi.Controllers.DataTables
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class TblServiceController : ControllerBase
     {
         private readonly ITblServiceService _service;
@@ -49,7 +50,7 @@ namespace WebApi.Controllers.DataTables
         /// Can include child entities inline
         /// </summary>
         [HttpPost]
-        [Authorize(Roles = RoleString.Trainer)]
+      
         public async Task<IActionResult> Create([FromBody] TblServiceCreateDto createDto)
         {
             var result = await _service.CreateAsync(createDto);
@@ -69,7 +70,7 @@ namespace WebApi.Controllers.DataTables
         /// Can update if status is Draft, Saved, or Rejected
         /// </summary>
         [HttpPut("{id}")]
-        [Authorize(Roles = RoleString.Trainer)]
+       
         public async Task<IActionResult> Update(int id, [FromBody] TblServiceUpdateDto updateDto)
         {
             var result = await _service.UpdateAsync(id, updateDto);
@@ -96,7 +97,7 @@ namespace WebApi.Controllers.DataTables
         /// Get service by ID (Trainer can view their own)
         /// </summary>
         [HttpGet("{id}")]
-        [Authorize(Roles = RoleString.Trainer)]
+       
         public async Task<IActionResult> GetById(int id)
         {
             var result = await _service.GetByIdAsync(id);
@@ -110,7 +111,7 @@ namespace WebApi.Controllers.DataTables
         /// Get complete service with all child entities (for editing)
         /// </summary>
         [HttpGet("complete/{id}")]
-        [Authorize(Roles = RoleString.Trainer)]
+        
         public async Task<IActionResult> GetCompleteById(int id)
         {
             var result = await _service.GetCompleteTblServiceAsync(id);
@@ -124,7 +125,7 @@ namespace WebApi.Controllers.DataTables
         /// Delete service (Trainer - only Draft status)
         /// </summary>
         [HttpDelete("{id}")]
-        [Authorize(Roles = RoleString.Trainer)]
+      
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _service.DeleteAsync(id);
@@ -150,7 +151,7 @@ namespace WebApi.Controllers.DataTables
         /// Add hostel accommodation entry to a service
         /// </summary>
         [HttpPost("{serviceId}/hostels")]
-        [Authorize(Roles = RoleString.Trainer)]
+        
         public async Task<IActionResult> AddTableHostel(int serviceId, [FromBody] TableHostelCreateDto dto)
         {
             var result = await _service.AddTableHostelAsync(serviceId, dto);
@@ -168,7 +169,7 @@ namespace WebApi.Controllers.DataTables
         /// Update hostel accommodation entry
         /// </summary>
         [HttpPut("hostels/{tableHostelId}")]
-        [Authorize(Roles = RoleString.Trainer)]
+        
         public async Task<IActionResult> UpdateTableHostel(int tableHostelId, [FromBody] TableHostelCreateDto dto)
         {
             var result = await _service.UpdateTableHostelAsync(tableHostelId, dto);
@@ -186,7 +187,7 @@ namespace WebApi.Controllers.DataTables
         /// Delete hostel accommodation entry
         /// </summary>
         [HttpDelete("hostels/{tableHostelId}")]
-        [Authorize(Roles = RoleString.Trainer)]
+    
         public async Task<IActionResult> DeleteTableHostel(int tableHostelId)
         {
             var result = await _service.DeleteTableHostelAsync(tableHostelId);
@@ -200,7 +201,7 @@ namespace WebApi.Controllers.DataTables
         /// Get all hostel entries for a service
         /// </summary>
         [HttpGet("{serviceId}/hostels")]
-        [Authorize(Roles = RoleString.Trainer)]
+       
         public async Task<IActionResult> GetTableHostels(int serviceId)
         {
             var result = await _service.GetTableHostelsAsync(serviceId);
@@ -218,7 +219,7 @@ namespace WebApi.Controllers.DataTables
         /// Add revolving fund status entry to a service
         /// </summary>
         [HttpPost("{serviceId}/revolving-funds")]
-        [Authorize(Roles = RoleString.Trainer)]
+        
         public async Task<IActionResult> AddRevolvingFundStatus(int serviceId, [FromBody] RevolvingFundStatusCreateDto dto)
         {
             var result = await _service.AddRevolvingFundStatusAsync(serviceId, dto);
@@ -236,7 +237,7 @@ namespace WebApi.Controllers.DataTables
         /// Update revolving fund status entry
         /// </summary>
         [HttpPut("revolving-funds/{fundStatusId}")]
-        [Authorize(Roles = RoleString.Trainer)]
+       
         public async Task<IActionResult> UpdateRevolvingFundStatus(int fundStatusId, [FromBody] RevolvingFundStatusCreateDto dto)
         {
             var result = await _service.UpdateRevolvingFundStatusAsync(fundStatusId, dto);
@@ -254,7 +255,7 @@ namespace WebApi.Controllers.DataTables
         /// Delete revolving fund status entry
         /// </summary>
         [HttpDelete("revolving-funds/{fundStatusId}")]
-        [Authorize(Roles = RoleString.Trainer)]
+        
         public async Task<IActionResult> DeleteRevolvingFundStatus(int fundStatusId)
         {
             var result = await _service.DeleteRevolvingFundStatusAsync(fundStatusId);
@@ -268,7 +269,7 @@ namespace WebApi.Controllers.DataTables
         /// Get all revolving fund statuses for a service
         /// </summary>
         [HttpGet("{serviceId}/revolving-funds")]
-        [Authorize(Roles = RoleString.Trainer)]
+       
         public async Task<IActionResult> GetRevolvingFundStatuses(int serviceId)
         {
             var result = await _service.GetRevolvingFundStatusesAsync(serviceId);
@@ -286,7 +287,7 @@ namespace WebApi.Controllers.DataTables
         /// Add visitor detail entry to a service
         /// </summary>
         [HttpPost("{serviceId}/visitors")]
-        [Authorize(Roles = RoleString.Trainer)]
+        
         public async Task<IActionResult> AddVisitorDetail(int serviceId, [FromBody] VisitorDetailCreateDto dto)
         {
             var result = await _service.AddVisitorDetailAsync(serviceId, dto);
@@ -304,7 +305,7 @@ namespace WebApi.Controllers.DataTables
         /// Update visitor detail entry
         /// </summary>
         [HttpPut("visitors/{visitorDetailId}")]
-        [Authorize(Roles = RoleString.Trainer)]
+       
         public async Task<IActionResult> UpdateVisitorDetail(int visitorDetailId, [FromBody] VisitorDetailCreateDto dto)
         {
             var result = await _service.UpdateVisitorDetailAsync(visitorDetailId, dto);
@@ -322,7 +323,7 @@ namespace WebApi.Controllers.DataTables
         /// Delete visitor detail entry
         /// </summary>
         [HttpDelete("visitors/{visitorDetailId}")]
-        [Authorize(Roles = RoleString.Trainer)]
+       
         public async Task<IActionResult> DeleteVisitorDetail(int visitorDetailId)
         {
             var result = await _service.DeleteVisitorDetailAsync(visitorDetailId);
@@ -336,7 +337,7 @@ namespace WebApi.Controllers.DataTables
         /// Get all visitor details for a service
         /// </summary>
         [HttpGet("{serviceId}/visitors")]
-        [Authorize(Roles = RoleString.Trainer)]
+       
         public async Task<IActionResult> GetVisitorDetails(int serviceId)
         {
             var result = await _service.GetVisitorDetailsAsync(serviceId);
@@ -355,7 +356,7 @@ namespace WebApi.Controllers.DataTables
         /// Solves the parent-child ID dependency - perfect for "Save & Next" button
         /// </summary>
         [HttpPost("with-children")]
-        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
+       
         public async Task<IActionResult> CreateWithChildren([FromBody] TblServiceCreateDto dto)
         {
             var result = await _service.CreateWithChildrenAsync(dto);
@@ -386,7 +387,7 @@ namespace WebApi.Controllers.DataTables
         /// Perfect for "Save & Next" button with inline editing
         /// </summary>
         [HttpPut("{id}/with-children")]
-        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
+        
         public async Task<IActionResult> UpdateWithChildren(int id, [FromBody] TblServiceWithChildrenUpdateDto dto)
         {
             var result = await _service.UpdateWithChildrenAsync(id, dto);
@@ -419,7 +420,7 @@ namespace WebApi.Controllers.DataTables
         /// Can only submit Draft or Saved services
         /// </summary>
         [HttpPost("{id}/submit")]
-        [Authorize(Roles = RoleString.Trainer)]
+        
         public async Task<IActionResult> SubmitForApproval(int id)
         {
             var result = await _service.SubmitForApprovalAsync(id);
@@ -472,7 +473,7 @@ namespace WebApi.Controllers.DataTables
         /// Shows all entries with their status (Draft, Saved, Pending, Approved, Rejected)
         /// </summary>
         [HttpGet("history")]
-        [Authorize(Roles = RoleString.Trainer)]
+        
         public async Task<IActionResult> GetHistory(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 20,
@@ -499,7 +500,7 @@ namespace WebApi.Controllers.DataTables
         /// Returns: { "Draft": 5, "Saved": 3, "Pending": 8, "Approved": 12, "Rejected": 2 }
         /// </summary>
         [HttpGet("status-summary")]
-        [Authorize(Roles = RoleString.Trainer)]
+       
         public async Task<IActionResult> GetStatusSummary()
         {
             var summary = await _service.GetStatusSummaryAsync();
@@ -589,7 +590,7 @@ namespace WebApi.Controllers.DataTables
         }
 
         [HttpGet("my-history")]
-        [Authorize(Roles = RoleString.Trainer)]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
         public async Task<IActionResult> GetMyHistory(
    [FromQuery] int pageNumber = 1,
    [FromQuery] int pageSize = 10)

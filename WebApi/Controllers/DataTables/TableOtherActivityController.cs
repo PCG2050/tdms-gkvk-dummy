@@ -341,7 +341,7 @@ namespace WebApi.Controllers.DataTables
         /// <param name="pageSize">Items per page (default: 20)</param>
         /// <response code="200">Paginated history of trainer's submissions</response>
         [HttpGet("my-history")]
-        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
         public async Task<IActionResult> GetMyHistory(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 20)
