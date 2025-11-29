@@ -57,6 +57,44 @@ namespace Infrastructure.Services.DataTables
             entity.FormStatus = "Draft";
 
             var created = await _tableServiceRepository.CreateAsync(entity);
+
+            // Handle child entities if provided
+            if (createDto.TableHostels != null && createDto.TableHostels.Any())
+            {
+                foreach (var hostelDto in createDto.TableHostels)
+                {
+                    var hostelEntity = _mapper.MapToEntity(hostelDto);
+                    hostelEntity.ServiceId = created.Id;
+                    hostelEntity.CreatedById = _currentUserService.UserId;
+                    hostelEntity.CreatedAt = DateTimeOffset.UtcNow;
+                    await _tableHostelRepository.CreateTableHostelAsync(hostelEntity);
+                }
+            }
+
+            if (createDto.RevolvingFundStatuses != null && createDto.RevolvingFundStatuses.Any())
+            {
+                foreach (var fundDto in createDto.RevolvingFundStatuses)
+                {
+                    var fundEntity = _mapper.MapToEntity(fundDto);
+                    fundEntity.ServiceId = created.Id;
+                    fundEntity.CreatedById = _currentUserService.UserId;
+                    fundEntity.CreatedAt = DateTimeOffset.UtcNow;
+                    await _revolvingFundRepository.CreateRevolvingFundStatusAsync(fundEntity);
+                }
+            }
+
+            if (createDto.VisitorDetails != null && createDto.VisitorDetails.Any())
+            {
+                foreach (var visitorDto in createDto.VisitorDetails)
+                {
+                    var visitorEntity = _mapper.MapToEntity(visitorDto);
+                    visitorEntity.ServiceId = created.Id;
+                    visitorEntity.CreatedById = _currentUserService.UserId;
+                    visitorEntity.CreatedAt = DateTimeOffset.UtcNow;
+                    await _visitorDetailsRepository.CreateVisitorDetailAsync(visitorEntity);
+                }
+            }
+
             var detailed = await _tableServiceRepository.GetWithDetailsAsync(created.Id);
             var dto = _mapper.MapToDtoWithDetails(detailed!);
 
