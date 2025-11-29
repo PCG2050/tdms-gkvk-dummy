@@ -9,6 +9,8 @@ namespace Application.Mapper
         // Basic Entity ⇆ DTO mappings
         // ----------------------------
         public partial TblServicesDto MapToDto(TblService entity);
+
+        [MapProperty(nameof(TblService.VisitorDetails), nameof(CompleteTblServicesDto.Visitors))]
         public partial CompleteTblServicesDto MapToCompleteDto(TblService entity);
 
         public partial TableHostelDto MapToDto(TableHostel entity);
