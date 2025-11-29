@@ -284,7 +284,9 @@ namespace WebApi
             builder.Services.AddScoped<IRevolvingFundRepository, RevolvingFundRepository>();
             builder.Services.AddScoped<IVisitorDetailsRepository, VisitorDetailRepository>();
 
+            // Report Services
             builder.Services.AddScoped<IAdminReportService, AdminReportService>();
+            builder.Services.AddScoped<IDynamicReportService, DynamicReportService>();
 
             // Success Story Service
             builder.Services.AddScoped<ISuccessStoryService, SuccessStoryService>();
