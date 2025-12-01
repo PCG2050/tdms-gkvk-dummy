@@ -1,5 +1,6 @@
 using Application.Interface.Repository;
-using Application.Interface.Repository.MasterData;
+using Application.Interface.Repository.DataTables;
+using Application.Interface.Repository.DataTables.ConsultSocialMedia;
 using Application.Interface.Services;
 using Application.Interface.Services.Reports;
 using Application.Models;
@@ -12,7 +13,6 @@ namespace Infrastructure.Services.Reports
 {
     public class DynamicReportService : IDynamicReportService
     {
-        private readonly IGenericProgramRepository _programRepository;
         private readonly IPublicationRepository _publicationRepository;
         private readonly INominationRewardRepository _nominationRepository;
         private readonly IConsultingServiceRepository _consultancyRepository;
@@ -22,7 +22,6 @@ namespace Infrastructure.Services.Reports
         private readonly ICurrentUserService _currentUserService;
 
         public DynamicReportService(
-            IGenericProgramRepository programRepository,
             IPublicationRepository publicationRepository,
             INominationRewardRepository nominationRepository,
             IConsultingServiceRepository consultancyRepository,
@@ -31,7 +30,6 @@ namespace Infrastructure.Services.Reports
             IOrganizationUnitRepository organizationUnitRepository,
             ICurrentUserService currentUserService)
         {
-            _programRepository = programRepository;
             _publicationRepository = publicationRepository;
             _nominationRepository = nominationRepository;
             _consultancyRepository = consultancyRepository;
@@ -107,14 +105,13 @@ namespace Infrastructure.Services.Reports
             // Build section based on key
             return sectionRequest.SectionKey switch
             {
-                ReportColumnRegistry.PROGRAMS => await BuildProgramsSectionAsync(sectionRequest, unitLocationId, month, year, sectionDef, maxRows),
                 ReportColumnRegistry.PUBLICATIONS => await BuildPublicationsSectionAsync(sectionRequest, unitLocationId, month, year, sectionDef, maxRows),
                 ReportColumnRegistry.NOMINATIONS => await BuildNominationsSectionAsync(sectionRequest, unitLocationId, month, year, sectionDef, maxRows),
                 ReportColumnRegistry.CONSULTANCIES => await BuildConsultanciesSectionAsync(sectionRequest, unitLocationId, month, year, sectionDef, maxRows),
                 ReportColumnRegistry.SERVICES => await BuildServicesSectionAsync(sectionRequest, unitLocationId, month, year, sectionDef, maxRows),
                 ReportColumnRegistry.OTHER_ACTIVITIES => await BuildOtherActivitiesSectionAsync(sectionRequest, unitLocationId, month, year, sectionDef, maxRows),
-                ReportColumnRegistry.FIU_ACTIVITIES => await BuildFIUActivitiesSectionAsync(sectionRequest, unitLocationId, month, year, sectionDef, maxRows),
-                ReportColumnRegistry.ASM_ACTIVITIES => await BuildASMActivitiesSectionAsync(sectionRequest, unitLocationId, month, year, sectionDef, maxRows),
+                // Programs, FIU Activities, and ASM Activities require specific unit repositories
+                // These will be implemented separately or through unit-specific endpoints
                 _ => null
             };
         }
@@ -122,45 +119,6 @@ namespace Infrastructure.Services.Reports
         // ========================================
         // SECTION BUILDERS
         // ========================================
-
-        private async Task<ReportSection> BuildProgramsSectionAsync(
-            SectionRequest request,
-            int unitLocationId,
-            int month,
-            int year,
-            SectionDefinition sectionDef,
-            int maxRows)
-        {
-            var query = _programRepository.GetQueryable()
-                .Where(p => p.UnitLocationId == unitLocationId
-                    && p.FormStatus == "Approved"
-                    && p.Month == month
-                    && p.Year == year)
-                .Include(p => p.ProgramType);
-
-            var total = await query.CountAsync();
-            var data = await query.Take(maxRows).ToListAsync();
-
-            var rows = data.Select(p => BuildRow(p, request.SelectedColumns, new Dictionary<string, Func<object, object?>>
-            {
-                ["programType"] = (entity) => ((dynamic)entity).ProgramType?.Name,
-                ["title"] = (entity) => ((dynamic)entity).Title,
-                ["dateFrom"] = (entity) => ((dynamic)entity).DateFrom?.ToString("yyyy-MM-dd"),
-                ["dateTo"] = (entity) => ((dynamic)entity).DateTo?.ToString("yyyy-MM-dd"),
-                ["duration"] = (entity) => ((dynamic)entity).Duration,
-                ["participants"] = (entity) => CalculateTotalParticipants((dynamic)entity),
-                ["status"] = (entity) => ((dynamic)entity).FormStatus
-            })).ToList();
-
-            return new ReportSection
-            {
-                SectionKey = request.SectionKey,
-                DisplayName = sectionDef.DisplayName,
-                TotalRecords = total,
-                Columns = BuildColumnMetadata(request.SelectedColumns, sectionDef),
-                Rows = rows
-            };
-        }
 
         private async Task<ReportSection> BuildPublicationsSectionAsync(
             SectionRequest request,
@@ -173,8 +131,8 @@ namespace Infrastructure.Services.Reports
             var query = _publicationRepository.GetQueryable()
                 .Where(p => p.UnitLocationId == unitLocationId
                     && p.FormStatus == "Approved"
-                    && p.Month == month
-                    && p.Year == year)
+                    && p.StartDate.Month == month
+                    && p.StartDate.Year == year)
                 .Include(p => p.Category);
 
             var total = await query.CountAsync();
@@ -209,8 +167,9 @@ namespace Infrastructure.Services.Reports
             var query = _nominationRepository.GetQueryable()
                 .Where(n => n.UnitLocationId == unitLocationId
                     && n.FormStatus == "Approved"
-                    && n.Month == month
-                    && n.Year == year);
+                    && n.StartDate.HasValue
+                    && n.StartDate.Value.Month == month
+                    && n.StartDate.Value.Year == year);
 
             var total = await query.CountAsync();
             var data = await query.Take(maxRows).ToListAsync();
@@ -244,8 +203,8 @@ namespace Infrastructure.Services.Reports
             var query = _consultancyRepository.GetQueryable()
                 .Where(c => c.UnitLocationId == unitLocationId
                     && c.FormStatus == "Approved"
-                    && c.Month == month
-                    && c.Year == year)
+                    && c.Date.Month == month
+                    && c.Date.Year == year)
                 .Include(c => c.Category);
 
             var total = await query.CountAsync();
@@ -321,8 +280,9 @@ namespace Infrastructure.Services.Reports
             var query = _otherActivityRepository.GetQueryable()
                 .Where(a => a.UnitLocationId == unitLocationId
                     && a.FormStatus == "Approved"
-                    && a.Month == month
-                    && a.Year == year);
+                    && a.StartDate.HasValue
+                    && a.StartDate.Value.Month == month
+                    && a.StartDate.Value.Year == year);
 
             var total = await query.CountAsync();
             var data = await query.Take(maxRows).ToListAsync();
@@ -340,93 +300,6 @@ namespace Infrastructure.Services.Reports
                 TotalRecords = total,
                 Columns = BuildColumnMetadata(request.SelectedColumns, sectionDef),
                 Rows = rows
-            };
-        }
-
-        private async Task<ReportSection> BuildFIUActivitiesSectionAsync(
-            SectionRequest request,
-            int unitLocationId,
-            int month,
-            int year,
-            SectionDefinition sectionDef,
-            int maxRows)
-        {
-            // FIU: Aggregate by activity type
-            var query = _programRepository.GetQueryable()
-                .Where(p => p.UnitLocationId == unitLocationId
-                    && p.FormStatus == "Approved"
-                    && p.Month == month
-                    && p.Year == year)
-                .Include(p => p.ProgramType);
-
-            var data = await query.ToListAsync();
-
-            // Group by activity type and count
-            var grouped = data
-                .GroupBy(p => p.ProgramType?.Name ?? "Other")
-                .Select((g, index) => new Dictionary<string, object?>
-                {
-                    ["slNo"] = index + 1,
-                    ["activityName"] = g.Key,
-                    ["count"] = g.Count()
-                })
-                .ToList();
-
-            var totalCount = grouped.Sum(g => Convert.ToInt32(g["count"]));
-
-            return new ReportSection
-            {
-                SectionKey = request.SectionKey,
-                DisplayName = sectionDef.DisplayName,
-                TotalRecords = grouped.Count,
-                CssClass = "fiu-activities",
-                ShowTotal = true,
-                TotalValue = totalCount,
-                Columns = BuildColumnMetadata(request.SelectedColumns, sectionDef),
-                Rows = grouped.Take(maxRows).ToList()
-            };
-        }
-
-        private async Task<ReportSection> BuildASMActivitiesSectionAsync(
-            SectionRequest request,
-            int unitLocationId,
-            int month,
-            int year,
-            SectionDefinition sectionDef,
-            int maxRows)
-        {
-            // ASM: Similar aggregation for visitors
-            // This is a placeholder - adapt based on your ASM data structure
-            var query = _programRepository.GetQueryable()
-                .Where(p => p.UnitLocationId == unitLocationId
-                    && p.FormStatus == "Approved"
-                    && p.Month == month
-                    && p.Year == year);
-
-            var data = await query.ToListAsync();
-
-            var grouped = data
-                .GroupBy(p => "Visitors") // Adjust based on actual ASM categorization
-                .Select((g, index) => new Dictionary<string, object?>
-                {
-                    ["slNo"] = index + 1,
-                    ["particulars"] = g.Key,
-                    ["noOfVisitors"] = g.Sum(x => CalculateTotalParticipants(x))
-                })
-                .ToList();
-
-            var totalVisitors = grouped.Sum(g => Convert.ToInt32(g["noOfVisitors"]));
-
-            return new ReportSection
-            {
-                SectionKey = request.SectionKey,
-                DisplayName = sectionDef.DisplayName,
-                TotalRecords = grouped.Count,
-                CssClass = "asm-activities",
-                ShowTotal = true,
-                TotalValue = totalVisitors,
-                Columns = BuildColumnMetadata(request.SelectedColumns, sectionDef),
-                Rows = grouped.Take(maxRows).ToList()
             };
         }
 
@@ -607,21 +480,6 @@ namespace Infrastructure.Services.Reports
                 "currency" => 10,
                 _ => 10
             };
-        }
-
-        private int CalculateTotalParticipants(dynamic program)
-        {
-            try
-            {
-                return (program.Male_SC ?? 0) + (program.Male_ST ?? 0) +
-                       (program.Male_OBC ?? 0) + (program.Male_GEN ?? 0) +
-                       (program.Female_SC ?? 0) + (program.Female_ST ?? 0) +
-                       (program.Female_OBC ?? 0) + (program.Female_GEN ?? 0);
-            }
-            catch
-            {
-                return 0;
-            }
         }
     }
 }
