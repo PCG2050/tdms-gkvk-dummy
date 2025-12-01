@@ -93,13 +93,16 @@ namespace Application.Services.Reports
                 Group = "Core Activities",
                 AvailableColumns = new List<ColumnDefinition>
                 {
-                    new() { Key = "programType", DisplayName = "Program Type", DataType = "string", DefaultSelected = true, Group = "Basic Info", Width = 15 },
-                    new() { Key = "title", DisplayName = "Title", DataType = "string", DefaultSelected = true, Group = "Basic Info", Width = 30 },
+                    // String fields - width auto-calculated based on field type
+                    new() { Key = "programType", DisplayName = "Program Type", DataType = "string", DefaultSelected = true, Group = "Basic Info" },
+                    new() { Key = "title", DisplayName = "Title", DataType = "string", DefaultSelected = true, Group = "Basic Info" },
+                    new() { Key = "status", DisplayName = "Status", DataType = "string", DefaultSelected = false, Group = "Details" },
+
+                    // Fixed-size fields - keep explicit widths
                     new() { Key = "dateFrom", DisplayName = "Date From", DataType = "date", DefaultSelected = true, Group = "Dates", Width = 12 },
                     new() { Key = "dateTo", DisplayName = "Date To", DataType = "date", DefaultSelected = true, Group = "Dates", Width = 12 },
-                    new() { Key = "duration", DisplayName = "Duration (days)", DataType = "number", DefaultSelected = true, Group = "Details", Width = 10 },
-                    new() { Key = "participants", DisplayName = "Participants", DataType = "number", DefaultSelected = true, Group = "Statistics", Width = 12 },
-                    new() { Key = "status", DisplayName = "Status", DataType = "string", DefaultSelected = false, Group = "Details", Width = 10 }
+                    new() { Key = "duration", DisplayName = "Duration (days)", DataType = "number", DefaultSelected = true, Group = "Details", Width = 8 },
+                    new() { Key = "participants", DisplayName = "Participants", DataType = "number", DefaultSelected = true, Group = "Statistics", Width = 10 }
                 },
                 DefaultColumns = new List<string> { "programType", "title", "dateFrom", "dateTo", "duration", "participants" }
             };
@@ -115,10 +118,13 @@ namespace Application.Services.Reports
                 Group = "Core Activities",
                 AvailableColumns = new List<ColumnDefinition>
                 {
-                    new() { Key = "category", DisplayName = "Category", DataType = "string", DefaultSelected = true, Group = "Basic Info", Width = 25 },
-                    new() { Key = "title", DisplayName = "Title", DataType = "string", DefaultSelected = true, Group = "Basic Info", Width = 50 },
-                    new() { Key = "pages", DisplayName = "Pages", DataType = "number", DefaultSelected = true, Group = "Details", Width = 15 },
-                    new() { Key = "publishedDate", DisplayName = "Published Date", DataType = "date", DefaultSelected = false, Group = "Details", Width = 15 }
+                    // String fields - auto-calculated
+                    new() { Key = "category", DisplayName = "Category", DataType = "string", DefaultSelected = true, Group = "Basic Info" },
+                    new() { Key = "title", DisplayName = "Title", DataType = "string", DefaultSelected = true, Group = "Basic Info" },
+
+                    // Fixed-size fields
+                    new() { Key = "pages", DisplayName = "Pages", DataType = "number", DefaultSelected = true, Group = "Details", Width = 8 },
+                    new() { Key = "publishedDate", DisplayName = "Published Date", DataType = "date", DefaultSelected = false, Group = "Details", Width = 12 }
                 },
                 DefaultColumns = new List<string> { "category", "title", "pages" }
             };
@@ -134,10 +140,13 @@ namespace Application.Services.Reports
                 Group = "Core Activities",
                 AvailableColumns = new List<ColumnDefinition>
                 {
-                    new() { Key = "type", DisplayName = "Type", DataType = "string", DefaultSelected = true, Group = "Basic Info", Width = 20 },
-                    new() { Key = "awardName", DisplayName = "Award Name", DataType = "string", DefaultSelected = true, Group = "Basic Info", Width = 35 },
-                    new() { Key = "category", DisplayName = "Category", DataType = "string", DefaultSelected = true, Group = "Details", Width = 25 },
-                    new() { Key = "date", DisplayName = "Date", DataType = "date", DefaultSelected = true, Group = "Details", Width = 15 }
+                    // String fields - auto-calculated
+                    new() { Key = "type", DisplayName = "Type", DataType = "string", DefaultSelected = true, Group = "Basic Info" },
+                    new() { Key = "awardName", DisplayName = "Award Name", DataType = "string", DefaultSelected = true, Group = "Basic Info" },
+                    new() { Key = "category", DisplayName = "Category", DataType = "string", DefaultSelected = true, Group = "Details" },
+
+                    // Fixed-size fields
+                    new() { Key = "date", DisplayName = "Date", DataType = "date", DefaultSelected = true, Group = "Details", Width = 12 }
                 },
                 DefaultColumns = new List<string> { "type", "awardName", "category", "date" }
             };
@@ -153,10 +162,13 @@ namespace Application.Services.Reports
                 Group = "Services",
                 AvailableColumns = new List<ColumnDefinition>
                 {
-                    new() { Key = "category", DisplayName = "Category", DataType = "string", DefaultSelected = true, Group = "Basic Info", Width = 30 },
-                    new() { Key = "title", DisplayName = "Title", DataType = "string", DefaultSelected = true, Group = "Basic Info", Width = 40 },
-                    new() { Key = "date", DisplayName = "Date", DataType = "date", DefaultSelected = true, Group = "Details", Width = 15 },
-                    new() { Key = "clientName", DisplayName = "Client", DataType = "string", DefaultSelected = false, Group = "Details", Width = 25 }
+                    // String fields - auto-calculated
+                    new() { Key = "category", DisplayName = "Category", DataType = "string", DefaultSelected = true, Group = "Basic Info" },
+                    new() { Key = "title", DisplayName = "Title", DataType = "string", DefaultSelected = true, Group = "Basic Info" },
+                    new() { Key = "clientName", DisplayName = "Client", DataType = "string", DefaultSelected = false, Group = "Details" },
+
+                    // Fixed-size fields
+                    new() { Key = "date", DisplayName = "Date", DataType = "date", DefaultSelected = true, Group = "Details", Width = 12 }
                 },
                 DefaultColumns = new List<string> { "category", "title", "date" }
             };
@@ -172,12 +184,15 @@ namespace Application.Services.Reports
                 Group = "Services",
                 AvailableColumns = new List<ColumnDefinition>
                 {
-                    new() { Key = "category", DisplayName = "Category", DataType = "string", DefaultSelected = true, Group = "Basic Info", Width = 20 },
-                    new() { Key = "theme", DisplayName = "Theme", DataType = "string", DefaultSelected = true, Group = "Basic Info", Width = 20 },
-                    new() { Key = "unit", DisplayName = "Unit", DataType = "string", DefaultSelected = true, Group = "Details", Width = 15 },
-                    new() { Key = "quantity", DisplayName = "Quantity", DataType = "number", DefaultSelected = true, Group = "Statistics", Width = 15 },
-                    new() { Key = "amount", DisplayName = "Amount", DataType = "currency", DefaultSelected = true, Group = "Financial", Width = 15 },
-                    new() { Key = "status", DisplayName = "Status", DataType = "string", DefaultSelected = false, Group = "Details", Width = 10 }
+                    // String fields - auto-calculated
+                    new() { Key = "category", DisplayName = "Category", DataType = "string", DefaultSelected = true, Group = "Basic Info" },
+                    new() { Key = "theme", DisplayName = "Theme", DataType = "string", DefaultSelected = true, Group = "Basic Info" },
+                    new() { Key = "unit", DisplayName = "Unit", DataType = "string", DefaultSelected = true, Group = "Details" },
+                    new() { Key = "status", DisplayName = "Status", DataType = "string", DefaultSelected = false, Group = "Details" },
+
+                    // Fixed-size fields
+                    new() { Key = "quantity", DisplayName = "Quantity", DataType = "number", DefaultSelected = true, Group = "Statistics", Width = 8 },
+                    new() { Key = "amount", DisplayName = "Amount", DataType = "currency", DefaultSelected = true, Group = "Financial", Width = 12 }
                 },
                 DefaultColumns = new List<string> { "category", "theme", "unit", "quantity", "amount" }
             };
@@ -193,8 +208,9 @@ namespace Application.Services.Reports
                 Group = "Other",
                 AvailableColumns = new List<ColumnDefinition>
                 {
-                    new() { Key = "title", DisplayName = "Title", DataType = "string", DefaultSelected = true, Group = "Basic Info", Width = 40 },
-                    new() { Key = "description", DisplayName = "Description", DataType = "string", DefaultSelected = true, Group = "Details", Width = 60 }
+                    // String fields - auto-calculated (description and title will be sized appropriately)
+                    new() { Key = "title", DisplayName = "Title", DataType = "string", DefaultSelected = true, Group = "Basic Info" },
+                    new() { Key = "description", DisplayName = "Description", DataType = "string", DefaultSelected = true, Group = "Details" }
                 },
                 DefaultColumns = new List<string> { "title", "description" }
             };
@@ -210,9 +226,12 @@ namespace Application.Services.Reports
                 Group = "FIU Specific",
                 AvailableColumns = new List<ColumnDefinition>
                 {
-                    new() { Key = "activityName", DisplayName = "Activity", DataType = "string", DefaultSelected = true, Group = "Basic Info", Width = 60 },
-                    new() { Key = "count", DisplayName = "No.", DataType = "number", DefaultSelected = true, Group = "Statistics", Width = 20 },
-                    new() { Key = "date", DisplayName = "Date", DataType = "date", DefaultSelected = false, Group = "Details", Width = 20 }
+                    // String fields - auto-calculated
+                    new() { Key = "activityName", DisplayName = "Activity", DataType = "string", DefaultSelected = true, Group = "Basic Info" },
+
+                    // Fixed-size fields
+                    new() { Key = "count", DisplayName = "No.", DataType = "number", DefaultSelected = true, Group = "Statistics", Width = 8 },
+                    new() { Key = "date", DisplayName = "Date", DataType = "date", DefaultSelected = false, Group = "Details", Width = 12 }
                 },
                 DefaultColumns = new List<string> { "activityName", "count" }
             };
@@ -228,9 +247,12 @@ namespace Application.Services.Reports
                 Group = "ASM Specific",
                 AvailableColumns = new List<ColumnDefinition>
                 {
-                    new() { Key = "particulars", DisplayName = "Particulars", DataType = "string", DefaultSelected = true, Group = "Basic Info", Width = 60 },
-                    new() { Key = "noOfVisitors", DisplayName = "No. of visitors", DataType = "number", DefaultSelected = true, Group = "Statistics", Width = 30 },
-                    new() { Key = "date", DisplayName = "Date", DataType = "date", DefaultSelected = false, Group = "Details", Width = 20 }
+                    // String fields - auto-calculated
+                    new() { Key = "particulars", DisplayName = "Particulars", DataType = "string", DefaultSelected = true, Group = "Basic Info" },
+
+                    // Fixed-size fields
+                    new() { Key = "noOfVisitors", DisplayName = "No. of visitors", DataType = "number", DefaultSelected = true, Group = "Statistics", Width = 10 },
+                    new() { Key = "date", DisplayName = "Date", DataType = "date", DefaultSelected = false, Group = "Details", Width = 12 }
                 },
                 DefaultColumns = new List<string> { "particulars", "noOfVisitors" }
             };

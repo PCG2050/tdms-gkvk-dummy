@@ -460,7 +460,7 @@ namespace Infrastructure.Services.Reports
             List<string> selectedColumns,
             SectionDefinition sectionDef)
         {
-            return selectedColumns
+            var columns = selectedColumns
                 .Select(colKey =>
                 {
                     var colDef = sectionDef.AvailableColumns.FirstOrDefault(c => c.Key == colKey);
@@ -470,11 +470,143 @@ namespace Infrastructure.Services.Reports
                             Key = colDef.Key,
                             DisplayName = colDef.DisplayName,
                             DataType = colDef.DataType,
-                            Width = colDef.Width
+                            Width = CalculateSmartWidth(colDef, selectedColumns.Count)
                         }
-                        : new ColumnMetadata { Key = colKey, DisplayName = colKey };
+                        : new ColumnMetadata { Key = colKey, DisplayName = colKey, Width = 20 };
                 })
                 .ToList();
+
+            // Normalize widths to fit page
+            return NormalizeWidths(columns);
+        }
+
+        /// <summary>
+        /// Calculate smart width based on column type and number of columns
+        /// </summary>
+        private int CalculateSmartWidth(ColumnDefinition col, int totalColumns)
+        {
+            // If width is explicitly set and > 0, use it (for special cases)
+            if (col.Width.HasValue && col.Width.Value > 0)
+                return col.Width.Value;
+
+            // Calculate based on data type and field name
+            return col.DataType switch
+            {
+                // String fields - content-aware widths
+                "string" => CalculateStringFieldWidth(col.Key, col.DisplayName, totalColumns),
+
+                // Fixed-size fields
+                "date" => 12,
+                "number" => 8,
+                "decimal" => 10,
+                "currency" => 12,
+
+                _ => 15
+            };
+        }
+
+        /// <summary>
+        /// Calculate width for string fields based on content type
+        /// </summary>
+        private int CalculateStringFieldWidth(string key, string displayName, int totalColumns)
+        {
+            var keyLower = key.ToLower();
+
+            // Long string fields (descriptions, notes, addresses, remarks)
+            if (keyLower.Contains("description") ||
+                keyLower.Contains("note") ||
+                keyLower.Contains("address") ||
+                keyLower.Contains("remark") ||
+                keyLower.Contains("purpose"))
+            {
+                return totalColumns > 5 ? 30 : 40;  // Reduce if many columns
+            }
+
+            // Medium string fields (titles, names, activities)
+            if (keyLower.Contains("title") ||
+                keyLower.Contains("name") ||
+                keyLower.Contains("activity") ||
+                keyLower.Contains("particulars"))
+            {
+                return totalColumns > 5 ? 25 : 30;
+            }
+
+            // Short string fields (categories, types, status, theme)
+            if (keyLower.Contains("category") ||
+                keyLower.Contains("type") ||
+                keyLower.Contains("status") ||
+                keyLower.Contains("theme") ||
+                keyLower.Contains("unit"))
+            {
+                return 15;
+            }
+
+            // Default for unknown strings
+            return 20;
+        }
+
+        /// <summary>
+        /// Normalize column widths to fit page (target 95% to leave margins)
+        /// </summary>
+        private List<ColumnMetadata> NormalizeWidths(List<ColumnMetadata> columns)
+        {
+            const int TARGET_WIDTH = 95;  // Leave 5% margin
+
+            var totalWidth = columns.Sum(c => c.Width ?? 20);
+
+            if (totalWidth <= TARGET_WIDTH)
+                return columns;  // Already fits!
+
+            // Proportionally scale down all columns
+            var scaleFactor = (double)TARGET_WIDTH / totalWidth;
+
+            foreach (var col in columns)
+            {
+                var originalWidth = col.Width ?? 20;
+                var scaledWidth = (int)Math.Round(originalWidth * scaleFactor);
+
+                // Set minimum widths based on data type
+                var minWidth = GetMinimumWidth(col.DataType);
+                col.Width = Math.Max(scaledWidth, minWidth);
+            }
+
+            // Recalculate total after applying minimums
+            totalWidth = columns.Sum(c => c.Width ?? 20);
+
+            // If still over limit, reduce string columns first (they can wrap)
+            if (totalWidth > TARGET_WIDTH)
+            {
+                var excessWidth = totalWidth - TARGET_WIDTH;
+                var stringColumns = columns.Where(c => c.DataType == "string").ToList();
+
+                foreach (var col in stringColumns)
+                {
+                    if (excessWidth <= 0) break;
+
+                    var reduction = Math.Min(2, excessWidth);  // Reduce by max 2% per column
+                    var newWidth = Math.Max((col.Width ?? 20) - reduction, GetMinimumWidth("string"));
+                    excessWidth -= (col.Width ?? 20) - newWidth;
+                    col.Width = newWidth;
+                }
+            }
+
+            return columns;
+        }
+
+        /// <summary>
+        /// Get minimum acceptable width for a data type
+        /// </summary>
+        private int GetMinimumWidth(string dataType)
+        {
+            return dataType switch
+            {
+                "string" => 12,    // Strings can wrap, so allow smaller
+                "date" => 10,
+                "number" => 6,
+                "decimal" => 8,
+                "currency" => 10,
+                _ => 10
+            };
         }
 
         private int CalculateTotalParticipants(dynamic program)
