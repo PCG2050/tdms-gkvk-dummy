@@ -131,8 +131,8 @@ namespace Infrastructure.Services.Reports
             var query = _publicationRepository.GetQueryable()
                 .Where(p => p.UnitLocationId == unitLocationId
                     && p.FormStatus == "Approved"
-                    && p.StartDate.Month == month
-                    && p.StartDate.Year == year)
+                    && p.CreatedAt.Month == month
+                    && p.CreatedAt.Year == year)
                 .Include(p => p.Category);
 
             var total = await query.CountAsync();
@@ -167,9 +167,8 @@ namespace Infrastructure.Services.Reports
             var query = _nominationRepository.GetQueryable()
                 .Where(n => n.UnitLocationId == unitLocationId
                     && n.FormStatus == "Approved"
-                    && n.StartDate.HasValue
-                    && n.StartDate.Value.Month == month
-                    && n.StartDate.Value.Year == year);
+                    && n.CreatedAt.Month == month
+                    && n.CreatedAt.Year == year);
 
             var total = await query.CountAsync();
             var data = await query.Take(maxRows).ToListAsync();
@@ -203,8 +202,8 @@ namespace Infrastructure.Services.Reports
             var query = _consultancyRepository.GetQueryable()
                 .Where(c => c.UnitLocationId == unitLocationId
                     && c.FormStatus == "Approved"
-                    && c.Date.Month == month
-                    && c.Date.Year == year)
+                    && c.CreatedAt.Month == month
+                    && c.CreatedAt.Year == year)
                 .Include(c => c.Category);
 
             var total = await query.CountAsync();
@@ -239,9 +238,8 @@ namespace Infrastructure.Services.Reports
             var query = _serviceRepository.GetQueryable()
                 .Where(s => s.UnitLocationId == unitLocationId
                     && s.FormStatus == "Approved"
-                    && s.StartDate.HasValue
-                    && s.StartDate.Value.Month == month
-                    && s.StartDate.Value.Year == year)
+                    && s.CreatedAt.Month == month
+                    && s.CreatedAt.Year == year)
                 .Include(s => s.Category)
                 .Include(s => s.Theme)
                 .Include(s => s.QuantityUnit);
@@ -280,9 +278,8 @@ namespace Infrastructure.Services.Reports
             var query = _otherActivityRepository.GetQueryable()
                 .Where(a => a.UnitLocationId == unitLocationId
                     && a.FormStatus == "Approved"
-                    && a.StartDate.HasValue
-                    && a.StartDate.Value.Month == month
-                    && a.StartDate.Value.Year == year);
+                    && a.CreatedAt.Month == month
+                    && a.CreatedAt.Year == year);
 
             var total = await query.CountAsync();
             var data = await query.Take(maxRows).ToListAsync();
