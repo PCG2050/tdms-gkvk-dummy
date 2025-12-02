@@ -346,6 +346,10 @@ namespace Infrastructure.DbContext
         {
             base.OnModelCreating(modelBuilder);
 
+            // CRITICAL: Ignore old FtiProgramDetails entity to prevent table conflict
+            // Child entities reference it, but we're using FtiProgramDetailsGeneric now
+            modelBuilder.Ignore<FtiProgramDetails>();
+
             // Configure FtiProgramDetailsGeneric to use existing FtiProgramDetails table
             modelBuilder.Entity<FtiProgramDetailsGeneric>()
                 .ToTable("FtiProgramDetails");
