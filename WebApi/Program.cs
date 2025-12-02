@@ -152,7 +152,7 @@ namespace WebApi
             #endregion
 
             #region FTI
-            builder.Services.AddScoped<IFtiProgramDetailsRepository, FtiProgramDetailsRepository>();
+            builder.Services.AddScoped<IFtiProgramDetailsRepository, FtiProgramDetailsRepositoryGeneric>();
             builder.Services.AddScoped<IFtiParticipantDemographicsRepository, FtiParticipantDemographicsRepository>();
             builder.Services.AddScoped<IFtiProgramContentRepository, FtiProgramContentRepository>();
             builder.Services.AddScoped<IFtiResourcePersonRepository, FtiResourcePersonRepository>();

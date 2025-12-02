@@ -1,4 +1,5 @@
 ﻿using Application.Interface.Repository;
+using Application.Interface.Repository.DataTables.FTI;
 using Domain.Entities.FTI;
 using Infrastructure.DbContext;
 using Microsoft.EntityFrameworkCore;
@@ -9,17 +10,17 @@ namespace Infrastructure.Repository.DataTables.FTI
     /// FTI Program Details Repository using generic base
     /// Only needs to specify FTI-specific configurations
     /// </summary>
-    public class FtiProgramDetailsRepositoryGeneric : GenericProgramRepository<FtiProgramDetails>
+    public class FtiProgramDetailsRepositoryGeneric : GenericProgramRepository<FtiProgramDetailsGeneric>, IFtiProgramDetailsRepository
     {
         public FtiProgramDetailsRepositoryGeneric(TdmsDbContext context) : base(context)
         {
         }
 
         // Provide the DbSet for FTI programs
-        protected override DbSet<FtiProgramDetails> DbSet => Context.FtiProgramDetails;
+        protected override DbSet<FtiProgramDetailsGeneric> DbSet => Context.FtiProgramDetailsGeneric;
 
         // Include FTI-specific child collections
-        protected override IQueryable<FtiProgramDetails> IncludeChildren(IQueryable<FtiProgramDetails> query)
+        protected override IQueryable<FtiProgramDetailsGeneric> IncludeChildren(IQueryable<FtiProgramDetailsGeneric> query)
         {
             return query
                 .Include(p => p.ProgramContent!)
@@ -35,7 +36,7 @@ namespace Infrastructure.Repository.DataTables.FTI
         }
 
         // Include FTI-specific master data and child entities
-        protected override IQueryable<FtiProgramDetails> IncludeDetails(IQueryable<FtiProgramDetails> query)
+        protected override IQueryable<FtiProgramDetailsGeneric> IncludeDetails(IQueryable<FtiProgramDetailsGeneric> query)
         {
             return base.IncludeDetails(query)
                 .Include(p => p.ProgramType)
@@ -61,7 +62,7 @@ namespace Infrastructure.Repository.DataTables.FTI
         }
 
         // FTI-specific search logic
-        protected override IQueryable<FtiProgramDetails> ApplySearchFilter(IQueryable<FtiProgramDetails> query, string searchTerm)
+        protected override IQueryable<FtiProgramDetailsGeneric> ApplySearchFilter(IQueryable<FtiProgramDetailsGeneric> query, string searchTerm)
         {
             var lowerSearch = searchTerm.ToLower();
             return query.Where(p =>
@@ -70,7 +71,7 @@ namespace Infrastructure.Repository.DataTables.FTI
         }
 
         // FTI-specific program type filtering
-        protected override IQueryable<FtiProgramDetails> ApplyProgramTypeFilter(IQueryable<FtiProgramDetails> query, int programTypeId)
+        protected override IQueryable<FtiProgramDetailsGeneric> ApplyProgramTypeFilter(IQueryable<FtiProgramDetailsGeneric> query, int programTypeId)
         {
             return query.Where(p => p.ProgramTypeId == programTypeId);
         }

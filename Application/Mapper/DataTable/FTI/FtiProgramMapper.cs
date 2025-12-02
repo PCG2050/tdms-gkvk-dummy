@@ -13,23 +13,23 @@ namespace Application.Mapper.DataTable.FTI
         // PROGRAM DETAILS MAPPINGS
         // ============================
 
-        public partial FtiProgramDetailsDto MapToDto(FtiProgramDetails entity);
+        public partial FtiProgramDetailsDto MapToDto(FtiProgramDetailsGeneric entity);
 
-        public partial FtiProgramDetails MapToEntity(FtiProgramCreateDto dto);
+        public partial FtiProgramDetailsGeneric MapToEntity(FtiProgramCreateDto dto);
 
-        [MapperIgnoreTarget(nameof(FtiProgramDetails.Id))]
-        [MapperIgnoreTarget(nameof(FtiProgramDetails.CreatedAt))]
-        [MapperIgnoreTarget(nameof(FtiProgramDetails.CreatedById))]
-        [MapperIgnoreTarget(nameof(FtiProgramDetails.UpdatedAt))]
-        [MapperIgnoreTarget(nameof(FtiProgramDetails.UpdatedById))]
-        [MapperIgnoreTarget(nameof(FtiProgramDetails.FormStatus))]
-        [MapperIgnoreTarget(nameof(FtiProgramDetails.FormStatusRemarks))]
-        [MapperIgnoreTarget(nameof(FtiProgramDetails.ApprovedAt))]
-        [MapperIgnoreTarget(nameof(FtiProgramDetails.ApprovedById))]
-        public partial void MapUpdateDtoToEntity(FtiProgramUpdateDto dto, FtiProgramDetails entity);
+        [MapperIgnoreTarget(nameof(FtiProgramDetailsGeneric.Id))]
+        [MapperIgnoreTarget(nameof(FtiProgramDetailsGeneric.CreatedAt))]
+        [MapperIgnoreTarget(nameof(FtiProgramDetailsGeneric.CreatedById))]
+        [MapperIgnoreTarget(nameof(FtiProgramDetailsGeneric.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(FtiProgramDetailsGeneric.UpdatedById))]
+        [MapperIgnoreTarget(nameof(FtiProgramDetailsGeneric.FormStatus))]
+        [MapperIgnoreTarget(nameof(FtiProgramDetailsGeneric.FormStatusRemarks))]
+        [MapperIgnoreTarget(nameof(FtiProgramDetailsGeneric.ApprovedAt))]
+        [MapperIgnoreTarget(nameof(FtiProgramDetailsGeneric.ApprovedById))]
+        public partial void MapUpdateDtoToEntity(FtiProgramUpdateDto dto, FtiProgramDetailsGeneric entity);
 
         // Custom mapping for complete program
-        public FtiProgramCompleteDto MapToCompleteDto(FtiProgramDetails entity)
+        public FtiProgramCompleteDto MapToCompleteDto(FtiProgramDetailsGeneric entity)
         {
             var dto = new FtiProgramCompleteDto
             {

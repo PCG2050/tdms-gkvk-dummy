@@ -341,7 +341,40 @@ namespace Infrastructure.DbContext
         {
             base.OnModelCreating(modelBuilder);
 
+            // Configure FtiProgramDetailsGeneric to use existing FtiProgramDetails table
+            modelBuilder.Entity<FtiProgramDetailsGeneric>()
+                .ToTable("FtiProgramDetails");
 
+            // Configure relationships for FtiProgramDetailsGeneric
+            modelBuilder.Entity<FtiProgramDetailsGeneric>()
+                .HasMany(p => p.ParticipantDemographics)
+                .WithOne()
+                .HasForeignKey("FtiProgramDetailsId")
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<FtiProgramDetailsGeneric>()
+                .HasMany(p => p.ProgramContent)
+                .WithOne()
+                .HasForeignKey("FtiProgramDetailsId")
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<FtiProgramDetailsGeneric>()
+                .HasOne(p => p.AdvisoryServices)
+                .WithOne()
+                .HasForeignKey<FtiAdvisoryServices>("FtiProgramDetailsId")
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<FtiProgramDetailsGeneric>()
+                .HasOne(p => p.Reports)
+                .WithOne()
+                .HasForeignKey<FtiReport>("FtiProgramDetailsId")
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<FtiProgramDetailsGeneric>()
+                .HasOne(p => p.Recommendations)
+                .WithOne()
+                .HasForeignKey<FtiRecommendation>("FtiProgramDetailsId")
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<TrainerAssignment>()
                 .HasOne(t => t.CreatedBy)
