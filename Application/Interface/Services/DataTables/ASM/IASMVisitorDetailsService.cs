@@ -1,5 +1,6 @@
 ﻿using Application.Models;
 using Application.Models.DataTables.ASM;
+using Application.Services.Common;
 
 namespace Application.Interface.Services.DataTables.ASM
 {
@@ -38,12 +39,12 @@ namespace Application.Interface.Services.DataTables.ASM
         Task<ServiceResult<Dictionary<string, int>>> GetStatusSummaryAsync();
 
         // Extra (Trainer & Approval Dashboards)
-        Task<PaginatedResult<ASMVisitorDetailsDto>> GetTrainerHistoryAsync(
+        Task<PaginatedResult<TrainerHistoryItemDto>> GetTrainerHistoryAsync(
             int pageNumber = 1,
-            int pageSize = 20);
+            int pageSize = 10);
 
         Task<PaginatedResult<ASMVisitorDetailsDto>> GetPendingApprovalsAsync(
             int pageNumber = 1,
-            int pageSize = 20);
+            int pageSize = 10);
     }
 }

@@ -89,10 +89,10 @@ namespace Application.Models
 
     public class CompleteTblServicesDto : TblServicesDto
     {
-        public List<TableHostelDto> TableHostels { get; set; } = new();
-        public List<RevolvingFundStatusDto> RevolvingFundStatuses { get; set; } = new();
+        public List<TableHostelHybridDto> TableHostels { get; set; } = new();
+        public List<RevolvingFundStatusHybridDto> RevolvingFundStatuses { get; set; } = new();
 
-        public List<VisitorDetailDto> Visitors { get; set; } = new();
+        public List<VisitorDetailHybridDto> Visitors { get; set; } = new();
     }
 
     public class TblServiceCreateDto

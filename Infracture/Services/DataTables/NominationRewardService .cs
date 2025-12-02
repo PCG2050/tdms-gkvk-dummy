@@ -99,10 +99,10 @@ namespace Infrastructure.Services.DataTables
                     ServiceErrorStatus.FORBIDDEN);
 
             // Check status - can only edit Draft, Saved, or Rejected
-            if (entity.FormStatus == "Approved")
-                return ServiceResult<NominationRewardDto>.Failure(
-                    $"Cannot edit {entity.FormStatus} entries",
-                    ServiceErrorStatus.INVALIDOPERATION);
+            //if (entity.FormStatus == "Approved")
+            //    return ServiceResult<NominationRewardDto>.Failure(
+            //        $"Cannot edit {entity.FormStatus} entries",
+            //        ServiceErrorStatus.INVALIDOPERATION);
 
             // CRITICAL FIX: Use the mapper's MapUpdateDtoToEntity which handles child entities
             _mapper.MapUpdateDtoToEntity(updateDto, entity);
@@ -184,10 +184,10 @@ namespace Infrastructure.Services.DataTables
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (entity.FormStatus != "Draft")
-                return ServiceResult.Failure(
-                    "Only Draft items can be deleted",
-                    ServiceErrorStatus.INVALIDOPERATION);
+            //if (entity.FormStatus != "Draft")
+            //    return ServiceResult.Failure(
+            //        "Only Draft items can be deleted",
+            //        ServiceErrorStatus.INVALIDOPERATION);
 
             await _repository.DeleteAsync(id);
             return ServiceResult.Success("NominationReward deleted successfully");

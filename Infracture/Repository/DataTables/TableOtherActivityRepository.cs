@@ -19,6 +19,10 @@ namespace Infrastructure.Repository.DataTables
         // ============================
         // CORE CRUD OPERATIONS
         // ============================
+        public IQueryable<TableOtherActivity> GetQueryable()
+        {
+            return _context.OtherActivities.AsQueryable();
+        }
 
         public async Task<TableOtherActivity?> GetByIdAsync(int id)
         {

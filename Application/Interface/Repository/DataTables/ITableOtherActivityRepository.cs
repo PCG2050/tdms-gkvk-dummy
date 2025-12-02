@@ -12,6 +12,8 @@ namespace Application.Interface.Repository.DataTables
         // ============================
         // CORE CRUD OPERATIONS
         // ============================
+
+        IQueryable<TableOtherActivity> GetQueryable();
         Task<List<TableOtherActivity>> GetAllAsync();
         Task<TableOtherActivity?> GetByIdAsync(int id);
 

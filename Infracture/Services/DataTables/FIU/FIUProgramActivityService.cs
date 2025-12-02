@@ -19,7 +19,7 @@ namespace Infrastructure.Services.DataTables.FIU
         private readonly ICurrentUserService _currentUserService;
         private readonly FIUProgramActivityMapper _mapper;
         private readonly GenericTrainerHistoryService<FIUProgramActivity> _historyService;
-        private readonly IUserRepository userRepository;
+        private readonly IUserRepository _userRepository;
 
         public FIUProgramActivityService(
             IFIUProgramActivityRepository activityRepository,
@@ -38,6 +38,7 @@ namespace Infrastructure.Services.DataTables.FIU
             _organizationUnitRepository = organizationUnitRepository;
             _currentUserService = currentUserService;
             _mapper = mapper;
+            _userRepository = userRepository;
             //  generic history service
             _historyService = new GenericTrainerHistoryService<FIUProgramActivity>(currentUserService, trainerAssignmentRepository, organizationUnitRepository,unitHeadAssignmentRepository, userRepository);
         }

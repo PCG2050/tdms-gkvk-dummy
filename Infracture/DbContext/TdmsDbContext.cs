@@ -53,15 +53,16 @@ namespace Infrastructure.DbContext
 
         #endregion
         #region FTI
-        public DbSet<FtiProgramDetails> FtiProgramDetails { get; set; }
-        public DbSet<FtiParticipantDemographics> FtiParticipantDemographics { get; set; }
-        public DbSet<FtiProgramContentAndResources> FtiProgramContentAndResources { get; set; }
-        public DbSet<FtiResourcePerson> FtiResourcePersons { get; set; }
-        public DbSet<FtiTopicsCoveredInClass> FtiTopicsCoveredInClass { get; set; }
-        public DbSet<FtiTeachingAidsDeveloped> FtiTeachingAidsDeveloped { get; set; }
-        public DbSet<FtiAdvisoryServices> FtiAdvisoryServices { get; set; }
-        public DbSet<FtiReport> FtiReports { get; set; }
-        public DbSet<FtiRecommendation> FtiRecommendations { get; set; }
+        public DbSet<FtiProgramDetailsGeneric> FtiProgramDetailsGeneric { get; set; }
+        //public DbSet<FtiProgramDetails> FtiProgramDetails { get; set; }
+        //public DbSet<FtiParticipantDemographics> FtiParticipantDemographics { get; set; }
+        //public DbSet<FtiProgramContentAndResources> FtiProgramContentAndResources { get; set; }
+        //public DbSet<FtiResourcePerson> FtiResourcePersons { get; set; }
+        //public DbSet<FtiTopicsCoveredInClass> FtiTopicsCoveredInClass { get; set; }
+        //public DbSet<FtiTeachingAidsDeveloped> FtiTeachingAidsDeveloped { get; set; }
+        //public DbSet<FtiAdvisoryServices> FtiAdvisoryServices { get; set; }
+        //public DbSet<FtiReport> FtiReports { get; set; }
+        //public DbSet<FtiRecommendation> FtiRecommendations { get; set; }
         #endregion
         #region IBT&VA
 

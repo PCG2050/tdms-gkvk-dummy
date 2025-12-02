@@ -6,8 +6,12 @@ using Application.Interface.Services.DataTables.ASM;
 using Application.Mapper.DataTable.ASM;
 using Application.Models;
 using Application.Models.DataTables.ASM;
+using Application.Services.Common;
 using Domain.Entities.ASM;
 using Domain.Entities.Enum;
+using Domain.Entities.FIU;
+using Infrastructure.Repository;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Infrastructure.Services.DataTables.ASM
 {
@@ -20,6 +24,9 @@ namespace Infrastructure.Services.DataTables.ASM
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
+        private readonly GenericTrainerHistoryService<ASMVisitorDetails> _historyService;
+        private readonly IUserRepository _userRepository;
+
 
         public ASMVisitorDetailsService(
             IASMVisitorDetailsRepository repository,
@@ -28,7 +35,8 @@ namespace Infrastructure.Services.DataTables.ASM
             ASMVisitorDetailsMapper mapper,
             IOrganizationUnitRepository organizationUnitRepository,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
-            ITrainerAssignmentRepository trainerAssignmentRepository)
+            ITrainerAssignmentRepository trainerAssignmentRepository,
+            IUserRepository userRepository)
         {
             _repository = repository;
             _currentUserService = currentUserService;
@@ -37,6 +45,9 @@ namespace Infrastructure.Services.DataTables.ASM
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
+            _userRepository = userRepository;
+            _historyService = new GenericTrainerHistoryService<ASMVisitorDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository, userRepository);
+           
         }
 
         // ==========================================
@@ -187,18 +198,19 @@ namespace Infrastructure.Services.DataTables.ASM
                         result.FailureCount++;
                         continue;
                     }
+                    
 
-                    if (entity.FormStatus == "Approved")
-                    {
-                        result.FailedEntries.Add(new BatchErrorDto
-                        {
-                            Index = i,
-                            ErrorMessage = "Cannot modify approved entries",
-                            OriginalData = updateDto
-                        });
-                        result.FailureCount++;
-                        continue;
-                    }
+                    //if (entity.FormStatus == "Approved")
+                    //{
+                    //    result.FailedEntries.Add(new BatchErrorDto
+                    //    {
+                    //        Index = i,
+                    //        ErrorMessage = "Cannot modify approved entries",
+                    //        OriginalData = updateDto
+                    //    });
+                    //    result.FailureCount++;
+                    //    continue;
+                    //}
 
                     // Update only provided fields
                     if (updateDto.InstituteName != null)
@@ -276,10 +288,10 @@ namespace Infrastructure.Services.DataTables.ASM
                     "Access denied or entry cannot be modified in current status",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (entity.FormStatus == "Approved")
-                return ServiceResult<ASMVisitorDetailsDto>.Failure(
-                    "Cannot modify approved entries",
-                    ServiceErrorStatus.INVALIDOPERATION);
+            //if (entity.FormStatus == "Approved")
+            //    return ServiceResult<ASMVisitorDetailsDto>.Failure(
+            //        "Cannot modify approved entries",
+            //        ServiceErrorStatus.INVALIDOPERATION);
 
             // Update only provided fields
             if (updateDto.InstituteName != null)
@@ -321,10 +333,10 @@ namespace Infrastructure.Services.DataTables.ASM
             if (!await _entityPermissionService.CanDeleteForm(entity))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (entity.FormStatus == "Approved")
-                return ServiceResult.Failure(
-                    "Cannot delete approved entries",
-                    ServiceErrorStatus.INVALIDOPERATION);
+            //if (entity.FormStatus == "Approved")
+            //    return ServiceResult.Failure(
+            //        "Cannot delete approved entries",
+            //        ServiceErrorStatus.INVALIDOPERATION);
 
             await _repository.DeleteAsync(id);
             return ServiceResult.Success();
@@ -525,28 +537,25 @@ namespace Infrastructure.Services.DataTables.ASM
             return ServiceResult<Dictionary<string, int>>.Success(summary);
         }
 
-        public async Task<PaginatedResult<ASMVisitorDetailsDto>> GetTrainerHistoryAsync(
+        public async Task<PaginatedResult<TrainerHistoryItemDto>> GetTrainerHistoryAsync(
             int pageNumber = 1,
-            int pageSize = 20)
+            int pageSize = 10)
         {
-            var currentUserId = _currentUserService.UserId;
+           var query = _repository.GetQueryable()
+                .Include(x=> x.InstituteName);
 
-            var result = await _repository.GetByCreatedByAsync(
-                currentUserId,
+            return await _historyService.GetTrainerHistoryAsync(
+                query,
+                getUnitLocationId: x => x.UnitLocationId,
+                getTitleOrName: x => x.InstituteName ?? "-",
+                getFormStatus: x => x.FormStatus,
+                getRemarks: x => x.FormStatusRemarks ?? "-",
                 pageNumber,
                 pageSize);
 
-            // Map entities to DTOs
-            var dtos = result.Items.Select(_mapper.MapToDto).ToList();
 
-            return new PaginatedResult<ASMVisitorDetailsDto>
-            {
-                Items = dtos,
-                TotalItems = result.TotalItems,
-                PageNumber = result.PageNumber,
-                PageSize = result.PageSize
-            };
         }
+      
 
         public async Task<PaginatedResult<ASMVisitorDetailsDto>> GetPendingApprovalsAsync(
             int pageNumber = 1,

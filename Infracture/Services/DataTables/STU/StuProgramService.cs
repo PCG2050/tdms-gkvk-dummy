@@ -1,4 +1,4 @@
-﻿// Infrastructure/Services/DataTables/STU/StuProgramService.cs
+﻿// Infrastructure/Services/DataTables/STI/StuProgramService.cs
 using Application.Interface.Repository.DataTables.STU;
 using Application.Interface.Services.DataTables.STU;
 using Application.Mapper.DataTable.STU;
@@ -16,7 +16,7 @@ namespace Infrastructure.Services.DataTables.STU
         private readonly IStuResourcePersonRepository _resourcePersonRepository;
         private readonly IStuTopicsCoveredRepository _topicsRepository;
         private readonly IStuTeachingAidsRepository _teachingAidsRepository;
-        private readonly IStuAdvisoryServicesRepository _advisoryRepository;       
+        private readonly IStuAdvisoryServicesRepository _advisoryRepository;
         private readonly IStuReportRepository _reportRepository;
         private readonly IStuRecommendationRepository _recommendationRepository;
         private readonly ICurrentUserService _currentUserService;
@@ -29,7 +29,7 @@ namespace Infrastructure.Services.DataTables.STU
         private readonly GenericTrainerHistoryService<StuProgramDetails> _historyService;
 
 
-        private const int STU_UNIT_ID = 2;
+        private const int STI_UNIT_ID = 9;
 
         public StuProgramService(
             IStuProgramDetailsRepository programRepository,
@@ -38,7 +38,7 @@ namespace Infrastructure.Services.DataTables.STU
             IStuResourcePersonRepository resourcePersonRepository,
             IStuTopicsCoveredRepository topicsRepository,
             IStuTeachingAidsRepository teachingAidsRepository,
-            IStuAdvisoryServicesRepository advisoryRepository,          
+            IStuAdvisoryServicesRepository advisoryRepository,
             IStuReportRepository reportRepository,
             IStuRecommendationRepository recommendationRepository,
             ICurrentUserService currentUserService,
@@ -55,7 +55,7 @@ namespace Infrastructure.Services.DataTables.STU
             _resourcePersonRepository = resourcePersonRepository;
             _topicsRepository = topicsRepository;
             _teachingAidsRepository = teachingAidsRepository;
-            _advisoryRepository = advisoryRepository;         
+            _advisoryRepository = advisoryRepository;
             _reportRepository = reportRepository;
             _recommendationRepository = recommendationRepository;
             _currentUserService = currentUserService;
@@ -138,10 +138,10 @@ namespace Infrastructure.Services.DataTables.STU
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
-                return ServiceResult<StuProgramDetailsDto>.Failure(
-                    "Cannot modify programs that are not in Draft or Rejected status",
-                    ServiceErrorStatus.INVALIDOPERATION);
+            // if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+            //     return ServiceResult<StuProgramDetailsDto>.Failure(
+            //         "Cannot modify programs that are not in Draft or Rejected status",
+            //         ServiceErrorStatus.INVALIDOPERATION);
 
             _mapper.MapUpdateDtoToEntity(dto, program);
             program.UpdatedById = _currentUserService.UserId;
@@ -187,10 +187,10 @@ namespace Infrastructure.Services.DataTables.STU
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
-                return ServiceResult<StuParticipantDemographicsDto>.Failure(
-                    "Cannot add demographics to approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
+            // if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+            //     return ServiceResult<StuParticipantDemographicsDto>.Failure(
+            //         "Cannot add demographics to approved programs",
+            //         ServiceErrorStatus.INVALIDOPERATION);
 
             var entity = _mapper.MapToEntity(dto);
             entity.StuProgramDetailsId = programId;
@@ -220,10 +220,10 @@ namespace Infrastructure.Services.DataTables.STU
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
-                return ServiceResult<StuParticipantDemographicsDto>.Failure(
-                    "Cannot modify demographics for approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
+            // if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+            //     return ServiceResult<StuParticipantDemographicsDto>.Failure(
+            //         "Cannot modify demographics for approved programs",
+            //         ServiceErrorStatus.INVALIDOPERATION);
 
             _mapper.MapUpdateDtoToEntity(dto, demographics);
             demographics.UpdatedById = _currentUserService.UserId;
@@ -246,10 +246,10 @@ namespace Infrastructure.Services.DataTables.STU
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
-                return ServiceResult.Failure(
-                    "Cannot delete demographics from approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
+            // if (program.FormStatus != "Draft")
+            //     return ServiceResult.Failure(
+            //         "Cannot delete demographics from approved programs",
+            //         ServiceErrorStatus.INVALIDOPERATION);
 
             await _demographicsRepository.DeleteAsync(demographicsId);
             return ServiceResult.Success();
@@ -296,10 +296,10 @@ namespace Infrastructure.Services.DataTables.STU
                     ServiceErrorStatus.FORBIDDEN);
 
             // Validate form status
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
-                return ServiceResult<StuProgramContentDto>.Failure(
-                    "Cannot add content to approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
+            // if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+            //     return ServiceResult<StuProgramContentDto>.Failure(
+            //         "Cannot add content to approved programs",
+            //         ServiceErrorStatus.INVALIDOPERATION);
 
             try
             {
@@ -532,10 +532,10 @@ namespace Infrastructure.Services.DataTables.STU
             if (program == null || !await _entityPermissionService.CanModifyForm(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft")
-                return ServiceResult.Failure(
-                    "Cannot delete content from approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
+            // if (program.FormStatus != "Draft")
+            //     return ServiceResult.Failure(
+            //         "Cannot delete content from approved programs",
+            //         ServiceErrorStatus.INVALIDOPERATION);
 
             await _contentRepository.DeleteAsync(contentId);
             return ServiceResult.Success();
@@ -576,10 +576,10 @@ namespace Infrastructure.Services.DataTables.STU
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
-                return ServiceResult<StuAdvisoryServicesDto>.Failure(
-                    "Cannot modify advisory services for approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
+            // if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+            //     return ServiceResult<StuAdvisoryServicesDto>.Failure(
+            //         "Cannot modify advisory services for approved programs",
+            //         ServiceErrorStatus.INVALIDOPERATION);
 
             var existing = await _advisoryRepository.GetByProgramIdAsync(programId);
 
@@ -669,12 +669,12 @@ namespace Infrastructure.Services.DataTables.STU
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-          
 
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
-                return ServiceResult<StuReportDto>.Failure(
-                    "Cannot modify reports for approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
+
+            // if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+            //     return ServiceResult<StuReportDto>.Failure(
+            //         "Cannot modify reports for approved programs",
+            //         ServiceErrorStatus.INVALIDOPERATION);
 
             var existing = await _reportRepository.GetByProgramIdAsync(programId);
 
@@ -765,10 +765,10 @@ namespace Infrastructure.Services.DataTables.STU
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
-                return ServiceResult<StuRecommendationDto>.Failure(
-                    "Cannot modify recommendations for approved programs",
-                    ServiceErrorStatus.INVALIDOPERATION);
+            // if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
+            //     return ServiceResult<StuRecommendationDto>.Failure(
+            //         "Cannot modify recommendations for approved programs",
+            //         ServiceErrorStatus.INVALIDOPERATION);
 
             var existing = await _recommendationRepository.GetByProgramIdAsync(programId);
 
@@ -783,14 +783,14 @@ namespace Infrastructure.Services.DataTables.STU
                 var created = await _recommendationRepository.CreateAsync(entity);
                 var resultDto = _mapper.MapToDto(created);
 
-                // AUTO-SUBMIT: Since Recommendation is the last section, automatically change status to Pending
-                if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
-                {
-                    program.FormStatus = "Pending";
-                    program.UpdatedById = _currentUserService.UserId;
-                    program.UpdatedAt = DateTimeOffset.UtcNow;
-                    await _programRepository.UpdateAsync(program);
-                }
+                // // AUTO-SUBMIT: Since Recommendation is the last section, automatically change status to Pending
+                // if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
+                // {
+                program.FormStatus = "Pending";
+                program.UpdatedById = _currentUserService.UserId;
+                program.UpdatedAt = DateTimeOffset.UtcNow;
+                await _programRepository.UpdateAsync(program);
+                // }
 
                 return ServiceResult<StuRecommendationDto>.Success(resultDto);
             }
@@ -816,13 +816,13 @@ namespace Infrastructure.Services.DataTables.STU
                 var resultDto = _mapper.MapToDto(updated);
 
                 // AUTO-SUBMIT: Since Recommendation is the last section, automatically change status to Pending
-                if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
-                {
-                    program.FormStatus = "Pending";
-                    program.UpdatedById = _currentUserService.UserId;
-                    program.UpdatedAt = DateTimeOffset.UtcNow;
-                    await _programRepository.UpdateAsync(program);
-                }
+                // if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
+                // {
+                program.FormStatus = "Pending";
+                program.UpdatedById = _currentUserService.UserId;
+                program.UpdatedAt = DateTimeOffset.UtcNow;
+                await _programRepository.UpdateAsync(program);
+                //}
 
                 return ServiceResult<StuRecommendationDto>.Success(resultDto);
             }

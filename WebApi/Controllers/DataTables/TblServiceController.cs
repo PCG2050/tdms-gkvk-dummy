@@ -150,134 +150,134 @@ namespace WebApi.Controllers.DataTables
         /// <summary>
         /// Add hostel accommodation entry to a service
         /// </summary>
-        [HttpPost("{serviceId}/hostels")]
+        //[HttpPost("{serviceId}/hostels")]
         
-        public async Task<IActionResult> AddTableHostel(int serviceId, [FromBody] TableHostelCreateDto dto)
-        {
-            var result = await _service.AddTableHostelAsync(serviceId, dto);
-            if (!result.IsSuccess)
-                return BadRequest(new { message = result.ErrorMessage });
+        //public async Task<IActionResult> AddTableHostel(int serviceId, [FromBody] TableHostelCreateDto dto)
+        //{
+        //    var result = await _service.AddTableHostelAsync(serviceId, dto);
+        //    if (!result.IsSuccess)
+        //        return BadRequest(new { message = result.ErrorMessage });
 
-            return Ok(new
-            {
-                message = "Hostel entry added successfully",
-                data = result.Data
-            });
-        }
+        //    return Ok(new
+        //    {
+        //        message = "Hostel entry added successfully",
+        //        data = result.Data
+        //    });
+        //}
 
-        /// <summary>
-        /// Update hostel accommodation entry
-        /// </summary>
-        [HttpPut("hostels/{tableHostelId}")]
+        ///// <summary>
+        ///// Update hostel accommodation entry
+        ///// </summary>
+        //[HttpPut("hostels/{tableHostelId}")]
         
-        public async Task<IActionResult> UpdateTableHostel(int tableHostelId, [FromBody] TableHostelCreateDto dto)
-        {
-            var result = await _service.UpdateTableHostelAsync(tableHostelId, dto);
-            if (!result.IsSuccess)
-                return BadRequest(new { message = result.ErrorMessage });
+        //public async Task<IActionResult> UpdateTableHostel(int tableHostelId, [FromBody] TableHostelCreateDto dto)
+        //{
+        //    var result = await _service.UpdateTableHostelAsync(tableHostelId, dto);
+        //    if (!result.IsSuccess)
+        //        return BadRequest(new { message = result.ErrorMessage });
 
-            return Ok(new
-            {
-                message = "Hostel entry updated successfully",
-                data = result.Data
-            });
-        }
+        //    return Ok(new
+        //    {
+        //        message = "Hostel entry updated successfully",
+        //        data = result.Data
+        //    });
+        //}
 
-        /// <summary>
-        /// Delete hostel accommodation entry
-        /// </summary>
-        [HttpDelete("hostels/{tableHostelId}")]
+        ///// <summary>
+        ///// Delete hostel accommodation entry
+        ///// </summary>
+        //[HttpDelete("hostels/{tableHostelId}")]
     
-        public async Task<IActionResult> DeleteTableHostel(int tableHostelId)
-        {
-            var result = await _service.DeleteTableHostelAsync(tableHostelId);
-            if (!result.IsSuccess)
-                return BadRequest(new { message = result.ErrorMessage });
+        //public async Task<IActionResult> DeleteTableHostel(int tableHostelId)
+        //{
+        //    var result = await _service.DeleteTableHostelAsync(tableHostelId);
+        //    if (!result.IsSuccess)
+        //        return BadRequest(new { message = result.ErrorMessage });
 
-            return Ok(new { message = "Hostel entry deleted successfully" });
-        }
+        //    return Ok(new { message = "Hostel entry deleted successfully" });
+        //}
 
-        /// <summary>
-        /// Get all hostel entries for a service
-        /// </summary>
-        [HttpGet("{serviceId}/hostels")]
+        ///// <summary>
+        ///// Get all hostel entries for a service
+        ///// </summary>
+        //[HttpGet("{serviceId}/hostels")]
        
-        public async Task<IActionResult> GetTableHostels(int serviceId)
-        {
-            var result = await _service.GetTableHostelsAsync(serviceId);
-            if (!result.IsSuccess)
-                return BadRequest(new { message = result.ErrorMessage });
+        //public async Task<IActionResult> GetTableHostels(int serviceId)
+        //{
+        //    var result = await _service.GetTableHostelsAsync(serviceId);
+        //    if (!result.IsSuccess)
+        //        return BadRequest(new { message = result.ErrorMessage });
 
-            return Ok(new { data = result.Data });
-        }
+        //    return Ok(new { data = result.Data });
+        //}
 
-        // ==========================================
-        // CHILD ENTITY: REVOLVING FUND STATUS
-        // ==========================================
+        //// ==========================================
+        //// CHILD ENTITY: REVOLVING FUND STATUS
+        //// ==========================================
 
-        /// <summary>
-        /// Add revolving fund status entry to a service
-        /// </summary>
-        [HttpPost("{serviceId}/revolving-funds")]
+        ///// <summary>
+        ///// Add revolving fund status entry to a service
+        ///// </summary>
+        //[HttpPost("{serviceId}/revolving-funds")]
         
-        public async Task<IActionResult> AddRevolvingFundStatus(int serviceId, [FromBody] RevolvingFundStatusCreateDto dto)
-        {
-            var result = await _service.AddRevolvingFundStatusAsync(serviceId, dto);
-            if (!result.IsSuccess)
-                return BadRequest(new { message = result.ErrorMessage });
+        //public async Task<IActionResult> AddRevolvingFundStatus(int serviceId, [FromBody] RevolvingFundStatusCreateDto dto)
+        //{
+        //    var result = await _service.AddRevolvingFundStatusAsync(serviceId, dto);
+        //    if (!result.IsSuccess)
+        //        return BadRequest(new { message = result.ErrorMessage });
 
-            return Ok(new
-            {
-                message = "Revolving fund status added successfully",
-                data = result.Data
-            });
-        }
+        //    return Ok(new
+        //    {
+        //        message = "Revolving fund status added successfully",
+        //        data = result.Data
+        //    });
+        //}
 
-        /// <summary>
-        /// Update revolving fund status entry
-        /// </summary>
-        [HttpPut("revolving-funds/{fundStatusId}")]
+        ///// <summary>
+        ///// Update revolving fund status entry
+        ///// </summary>
+        //[HttpPut("revolving-funds/{fundStatusId}")]
        
-        public async Task<IActionResult> UpdateRevolvingFundStatus(int fundStatusId, [FromBody] RevolvingFundStatusCreateDto dto)
-        {
-            var result = await _service.UpdateRevolvingFundStatusAsync(fundStatusId, dto);
-            if (!result.IsSuccess)
-                return BadRequest(new { message = result.ErrorMessage });
+        //public async Task<IActionResult> UpdateRevolvingFundStatus(int fundStatusId, [FromBody] RevolvingFundStatusCreateDto dto)
+        //{
+        //    var result = await _service.UpdateRevolvingFundStatusAsync(fundStatusId, dto);
+        //    if (!result.IsSuccess)
+        //        return BadRequest(new { message = result.ErrorMessage });
 
-            return Ok(new
-            {
-                message = "Revolving fund status updated successfully",
-                data = result.Data
-            });
-        }
+        //    return Ok(new
+        //    {
+        //        message = "Revolving fund status updated successfully",
+        //        data = result.Data
+        //    });
+        //}
 
-        /// <summary>
-        /// Delete revolving fund status entry
-        /// </summary>
-        [HttpDelete("revolving-funds/{fundStatusId}")]
+        ///// <summary>
+        ///// Delete revolving fund status entry
+        ///// </summary>
+        //[HttpDelete("revolving-funds/{fundStatusId}")]
         
-        public async Task<IActionResult> DeleteRevolvingFundStatus(int fundStatusId)
-        {
-            var result = await _service.DeleteRevolvingFundStatusAsync(fundStatusId);
-            if (!result.IsSuccess)
-                return BadRequest(new { message = result.ErrorMessage });
+        //public async Task<IActionResult> DeleteRevolvingFundStatus(int fundStatusId)
+        //{
+        //    var result = await _service.DeleteRevolvingFundStatusAsync(fundStatusId);
+        //    if (!result.IsSuccess)
+        //        return BadRequest(new { message = result.ErrorMessage });
 
-            return Ok(new { message = "Revolving fund status deleted successfully" });
-        }
+        //    return Ok(new { message = "Revolving fund status deleted successfully" });
+        //}
 
-        /// <summary>
-        /// Get all revolving fund statuses for a service
-        /// </summary>
-        [HttpGet("{serviceId}/revolving-funds")]
+        ///// <summary>
+        ///// Get all revolving fund statuses for a service
+        ///// </summary>
+        //[HttpGet("{serviceId}/revolving-funds")]
        
-        public async Task<IActionResult> GetRevolvingFundStatuses(int serviceId)
-        {
-            var result = await _service.GetRevolvingFundStatusesAsync(serviceId);
-            if (!result.IsSuccess)
-                return BadRequest(new { message = result.ErrorMessage });
+        //public async Task<IActionResult> GetRevolvingFundStatuses(int serviceId)
+        //{
+        //    var result = await _service.GetRevolvingFundStatusesAsync(serviceId);
+        //    if (!result.IsSuccess)
+        //        return BadRequest(new { message = result.ErrorMessage });
 
-            return Ok(new { data = result.Data });
-        }
+        //    return Ok(new { data = result.Data });
+        //}
 
         // ==========================================
         // CHILD ENTITY: VISITOR DETAILS

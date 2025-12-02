@@ -96,17 +96,17 @@ namespace Infrastructure.Services.DataTables
                     "Access denied or activity cannot be modified in current status",
                     ServiceErrorStatus.FORBIDDEN);
 
-            if (activity.FormStatus != "Draft" && activity.FormStatus != "Rejected" && activity.FormStatus != "Pending")
-                return ServiceResult<TableOtherActivityDto>.Failure(
-                    "Cannot modify activities in Approved status",
-                    ServiceErrorStatus.INVALIDOPERATION);
+            //if (activity.FormStatus != "Draft" && activity.FormStatus != "Rejected" && activity.FormStatus != "Pending")
+            //    return ServiceResult<TableOtherActivityDto>.Failure(
+            //        "Cannot modify activities in Approved status",
+            //        ServiceErrorStatus.INVALIDOPERATION);
 
             _mapper.MapToExistingEntity(updateDto, activity);
             activity.UpdatedById = _currentUserService.UserId;
             activity.UpdatedAt = DateTimeOffset.UtcNow;
 
             // AUTO-SUBMIT: Automatically change status to Pending when updated
-            if (activity.FormStatus == "Draft" || activity.FormStatus == "Rejected")
+            if (activity.FormStatus == "Draft" || activity.FormStatus == "Rejected" || activity.FormStatus == "Approved")
             {
                 activity.FormStatus = "Pending";
             }
@@ -129,10 +129,10 @@ namespace Infrastructure.Services.DataTables
             if (!await _entityPermissionService.CanDeleteForm(activity))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (activity.FormStatus != "Draft" && activity.FormStatus != "Rejected" && activity.FormStatus != "Pending")
-                return ServiceResult.Failure(
-                    "Cannot delete Approved activities",
-                    ServiceErrorStatus.INVALIDOPERATION);
+            //if (activity.FormStatus != "Draft" && activity.FormStatus != "Rejected" && activity.FormStatus != "Pending")
+            //    return ServiceResult.Failure(
+            //        "Cannot delete Approved activities",
+            //        ServiceErrorStatus.INVALIDOPERATION);
 
             await _repository.DeleteAsync(activity);
             await _repository.SaveChangesAsync();

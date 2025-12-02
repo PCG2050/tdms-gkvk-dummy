@@ -184,13 +184,13 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
                     }
 
                     // AUTO-SUBMIT: Since ModeAndOutreach is saved, automatically change status to Pending
-                    if (createdService.FormStatus == "Draft" || createdService.FormStatus == "Rejected")
-                    {
+                    //if (createdService.FormStatus == "Draft" || createdService.FormStatus == "Rejected")
+                    //{
                         createdService.FormStatus = "Pending";
                         createdService.UpdatedById = _currentUserService.UserId;
                         createdService.UpdatedAt = DateTimeOffset.UtcNow;
                         await _consultingServiceRepository.UpdateAsync(createdService);
-                    }
+                    //}
                 }
 
                 // Step 4: Get complete entity with all children and return
@@ -221,10 +221,10 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
                     ServiceErrorStatus.FORBIDDEN);
 
             // Step 3: Validate form status
-            if (existingService.FormStatus != "Draft" && existingService.FormStatus != "Rejected" && existingService.FormStatus != "Pending")
-                return ServiceResult<ConsultingServiceDto>.Failure(
-                    "Cannot modify approved consulting services",
-                    ServiceErrorStatus.INVALIDOPERATION);
+            //if (existingService.FormStatus != "Draft" && existingService.FormStatus != "Rejected" && existingService.FormStatus != "Pending")
+            //    return ServiceResult<ConsultingServiceDto>.Failure(
+            //        "Cannot modify approved consulting services",
+            //        ServiceErrorStatus.INVALIDOPERATION);
 
             try
             {
@@ -288,8 +288,8 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
 
                 // AUTO-SUBMIT: If ModeAndOutreach children exist, automatically change status to Pending
                 var updatedModeAndOutreaches = await _modeAndOutreachRepository.GetByConsultingServiceIdAsync(consultingServiceId);
-                if (updatedModeAndOutreaches.Any() &&
-                    (existingService.FormStatus == "Draft" || existingService.FormStatus == "Rejected"))
+                if (updatedModeAndOutreaches.Any() 
+                    )
                 {
                     existingService.FormStatus = "Pending";
                     existingService.UpdatedById = _currentUserService.UserId;
@@ -323,10 +323,10 @@ namespace Infrastructure.Services.DataTables.ConsultSocialMedia
             if (!await _entityPermissionService.CanModifyForm(consultingService))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
-            if (consultingService.FormStatus != "Draft" && consultingService.FormStatus != "Rejected" && consultingService.FormStatus != "Pending")
-                return ServiceResult.Failure(
-                    "Only draft consulting services can be submitted",
-                    ServiceErrorStatus.INVALIDOPERATION);
+            //if (consultingService.FormStatus != "Draft" && consultingService.FormStatus != "Rejected" && consultingService.FormStatus != "Pending")
+            //    return ServiceResult.Failure(
+            //        "Only draft consulting services can be submitted",
+            //        ServiceErrorStatus.INVALIDOPERATION);
 
             consultingService.FormStatus = "Pending";
             consultingService.UpdatedById = _currentUserService.UserId;

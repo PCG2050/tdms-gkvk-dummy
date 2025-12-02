@@ -137,10 +137,10 @@ namespace Infrastructure.Services.DataTables
                     ServiceErrorStatus.FORBIDDEN);
 
             // ✅ Only block Approved publications
-            if (publication.FormStatus == "Approved")
-                return ServiceResult<PublicationDto>.Failure(
-                    "Cannot edit approved publications. Approved publications are final and cannot be modified.",
-                    ServiceErrorStatus.INVALIDOPERATION);
+            //if (publication.FormStatus == "Approved")
+            //    return ServiceResult<PublicationDto>.Failure(
+            //        "Cannot edit approved publications. Approved publications are final and cannot be modified.",
+            //        ServiceErrorStatus.INVALIDOPERATION);
 
             // ✅ Map the update data first
             PublicationMapper.MapUpdateDtoToEntity(updateDto, publication);
@@ -148,7 +148,7 @@ namespace Infrastructure.Services.DataTables
             publication.UpdatedAt = DateTimeOffset.UtcNow;
 
             // ✅ AUTO-RESET: If editing Pending or Rejected, reset to Draft
-            if (publication.FormStatus == "Pending" || publication.FormStatus == "Rejected")
+            if (publication.FormStatus == "Pending" || publication.FormStatus == "Rejected" || publication.FormStatus == "Approved")
             {
                 string originalStatus = publication.FormStatus;
                 publication.FormStatus = "Draft";
@@ -205,13 +205,13 @@ namespace Infrastructure.Services.DataTables
                     ServiceErrorStatus.FORBIDDEN);
 
             // ✅ ADD: Block editing Approved publications
-            if (publication.FormStatus == "Approved")
-                return ServiceResult<PublisherDetailsDto>.Failure(
-                    "Cannot modify approved publications",
-                    ServiceErrorStatus.INVALIDOPERATION);
+            //if (publication.FormStatus == "Approved")
+            //    return ServiceResult<PublisherDetailsDto>.Failure(
+            //        "Cannot modify approved publications",
+            //        ServiceErrorStatus.INVALIDOPERATION);
 
             // ✅ ADD: Auto-reset to Draft if Pending or Rejected
-            if (publication.FormStatus == "Pending" || publication.FormStatus == "Rejected")
+            if (publication.FormStatus == "Pending" || publication.FormStatus == "Rejected" || publication.FormStatus == "Approved")
             {
                 publication.FormStatus = "Draft";
                 publication.FormStatusRemarks = "Edited by trainer (Phase 2). Reset to Draft.";
@@ -252,13 +252,13 @@ namespace Infrastructure.Services.DataTables
                     ServiceErrorStatus.FORBIDDEN);
 
             // ✅ ADD: Block editing Approved publications
-            if (publication.FormStatus == "Approved")
-                return ServiceResult<PublisherDetailsDto>.Failure(
-                    "Cannot modify approved publications",
-                    ServiceErrorStatus.INVALIDOPERATION);
+            //if (publication.FormStatus == "Approved")
+            //    return ServiceResult<PublisherDetailsDto>.Failure(
+            //        "Cannot modify approved publications",
+            //        ServiceErrorStatus.INVALIDOPERATION);
 
             // ✅ ADD: Auto-reset to Draft if Pending or Rejected
-            if (publication.FormStatus == "Pending" || publication.FormStatus == "Rejected")
+            if (publication.FormStatus == "Pending" || publication.FormStatus == "Rejected" || publication.FormStatus == "Approved")
             {
                 publication.FormStatus = "Draft";
                 publication.FormStatusRemarks = "Edited by trainer (Phase 2 update). Reset to Draft.";
@@ -300,13 +300,13 @@ namespace Infrastructure.Services.DataTables
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
             // ✅ ADD: Block editing Approved publications
-            if (publication.FormStatus == "Approved")
-                return ServiceResult<ExtensionLiteratureDto>.Failure(
-                    "Cannot modify approved publications",
-                    ServiceErrorStatus.INVALIDOPERATION);
+            //if (publication.FormStatus == "Approved")
+            //    return ServiceResult<ExtensionLiteratureDto>.Failure(
+            //        "Cannot modify approved publications",
+            //        ServiceErrorStatus.INVALIDOPERATION);
 
             // ✅ ADD: Auto-reset to Draft if Pending or Rejected
-            if (publication.FormStatus == "Pending" || publication.FormStatus == "Rejected")
+            if (publication.FormStatus == "Pending" || publication.FormStatus == "Rejected" || publication.FormStatus == "Approved")
             {
                 publication.FormStatus = "Draft";
                 publication.FormStatusRemarks = "Edited by trainer (Phase 3). Reset to Draft.";
@@ -347,13 +347,13 @@ namespace Infrastructure.Services.DataTables
 
 
             // ✅ ADD: Block editing Approved publications
-            if (publication.FormStatus == "Approved")
-                return ServiceResult<ExtensionLiteratureDto>.Failure(
-                    "Cannot modify approved publications",
-                    ServiceErrorStatus.INVALIDOPERATION);
+            //if (publication.FormStatus == "Approved")
+            //    return ServiceResult<ExtensionLiteratureDto>.Failure(
+            //        "Cannot modify approved publications",
+            //        ServiceErrorStatus.INVALIDOPERATION);
 
             // ✅ ADD: Auto-reset to Draft if Pending or Rejected
-            if (publication.FormStatus == "Pending" || publication.FormStatus == "Rejected")
+            if (publication.FormStatus == "Pending" || publication.FormStatus == "Rejected" || publication.FormStatus == "Approved")
             {
                 publication.FormStatus = "Draft";
                 publication.FormStatusRemarks = "Edited by trainer (Phase 3 update). Reset to Draft.";
@@ -394,13 +394,13 @@ namespace Infrastructure.Services.DataTables
                     ServiceErrorStatus.FORBIDDEN);
 
             // ✅ ADD: Block editing Approved publications
-            if (publication.FormStatus == "Approved")
-                return ServiceResult.Failure(
-                    "Cannot modify approved publications",
-                    ServiceErrorStatus.INVALIDOPERATION);
+            //if (publication.FormStatus == "Approved")
+            //    return ServiceResult.Failure(
+            //        "Cannot modify approved publications",
+            //        ServiceErrorStatus.INVALIDOPERATION);
 
             // ✅ ADD: Auto-reset to Draft if Pending or Rejected
-            if (publication.FormStatus == "Pending" || publication.FormStatus == "Rejected")
+            if (publication.FormStatus == "Pending" || publication.FormStatus == "Rejected" || publication.FormStatus =="Approved")
             {
                 publication.FormStatus = "Draft";
                 publication.FormStatusRemarks = "Edited by trainer (Phase 3 delete). Reset to Draft.";
