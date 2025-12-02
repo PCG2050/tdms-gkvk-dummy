@@ -53,16 +53,21 @@ namespace Infrastructure.DbContext
 
         #endregion
         #region FTI
+        // Using generic implementation for main entity
         public DbSet<FtiProgramDetailsGeneric> FtiProgramDetailsGeneric { get; set; }
+
+        // Old non-generic entity - KEEP COMMENTED, replaced by FtiProgramDetailsGeneric
         //public DbSet<FtiProgramDetails> FtiProgramDetails { get; set; }
-        //public DbSet<FtiParticipantDemographics> FtiParticipantDemographics { get; set; }
-        //public DbSet<FtiProgramContentAndResources> FtiProgramContentAndResources { get; set; }
-        //public DbSet<FtiResourcePerson> FtiResourcePersons { get; set; }
-        //public DbSet<FtiTopicsCoveredInClass> FtiTopicsCoveredInClass { get; set; }
-        //public DbSet<FtiTeachingAidsDeveloped> FtiTeachingAidsDeveloped { get; set; }
-        //public DbSet<FtiAdvisoryServices> FtiAdvisoryServices { get; set; }
-        //public DbSet<FtiReport> FtiReports { get; set; }
-        //public DbSet<FtiRecommendation> FtiRecommendations { get; set; }
+
+        // Child entities - MUST remain active for repositories and EF Core
+        public DbSet<FtiParticipantDemographics> FtiParticipantDemographics { get; set; }
+        public DbSet<FtiProgramContentAndResources> FtiProgramContentAndResources { get; set; }
+        public DbSet<FtiResourcePerson> FtiResourcePersons { get; set; }
+        public DbSet<FtiTopicsCoveredInClass> FtiTopicsCoveredInClass { get; set; }
+        public DbSet<FtiTeachingAidsDeveloped> FtiTeachingAidsDeveloped { get; set; }
+        public DbSet<FtiAdvisoryServices> FtiAdvisoryServices { get; set; }
+        public DbSet<FtiReport> FtiReports { get; set; }
+        public DbSet<FtiRecommendation> FtiRecommendations { get; set; }
         #endregion
         #region IBT&VA
 
@@ -346,35 +351,36 @@ namespace Infrastructure.DbContext
                 .ToTable("FtiProgramDetails");
 
             // Configure relationships for FtiProgramDetailsGeneric
+            // Using Cascade to match the database constraints (manually set)
             modelBuilder.Entity<FtiProgramDetailsGeneric>()
                 .HasMany(p => p.ParticipantDemographics)
                 .WithOne()
                 .HasForeignKey("FtiProgramDetailsId")
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<FtiProgramDetailsGeneric>()
                 .HasMany(p => p.ProgramContent)
                 .WithOne()
                 .HasForeignKey("FtiProgramDetailsId")
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<FtiProgramDetailsGeneric>()
                 .HasOne(p => p.AdvisoryServices)
                 .WithOne()
                 .HasForeignKey<FtiAdvisoryServices>("FtiProgramDetailsId")
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<FtiProgramDetailsGeneric>()
                 .HasOne(p => p.Reports)
                 .WithOne()
                 .HasForeignKey<FtiReport>("FtiProgramDetailsId")
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<FtiProgramDetailsGeneric>()
                 .HasOne(p => p.Recommendations)
                 .WithOne()
                 .HasForeignKey<FtiRecommendation>("FtiProgramDetailsId")
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<TrainerAssignment>()
                 .HasOne(t => t.CreatedBy)
