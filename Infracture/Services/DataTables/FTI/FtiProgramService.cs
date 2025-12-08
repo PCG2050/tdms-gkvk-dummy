@@ -116,7 +116,7 @@ namespace Infrastructure.Services.DataTables.FTI
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
-            if (!await await CanViewFormAsync(program))
+            if (!await CanViewFormAsync(program))
                 return ServiceResult<FtiProgramCompleteDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
@@ -134,7 +134,7 @@ namespace Infrastructure.Services.DataTables.FTI
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
-            if (!await await CanModifyFormAsync(program))
+            if (!await CanModifyFormAsync(program))
                 return ServiceResult<FtiProgramDetailsDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
@@ -161,7 +161,7 @@ namespace Infrastructure.Services.DataTables.FTI
             if (program == null)
                 return ServiceResult.Failure("Program not found", ServiceErrorStatus.NOTFOUND);
 
-            if (!await await CanModifyFormAsync(program))
+            if (!await CanModifyFormAsync(program))
                 return ServiceResult.Failure("Access denied. You can only delete your own forms.", ServiceErrorStatus.FORBIDDEN);
 
             await _programRepository.DeleteAsync(id);
@@ -183,7 +183,7 @@ namespace Infrastructure.Services.DataTables.FTI
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
-            if (!await await CanModifyFormAsync(program))
+            if (!await CanModifyFormAsync(program))
                 return ServiceResult<FtiParticipantDemographicsDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
@@ -216,7 +216,7 @@ namespace Infrastructure.Services.DataTables.FTI
                     ServiceErrorStatus.NOTFOUND);
 
             var program = await _programRepository.GetByIdAsync(demographics.FtiProgramDetailsId ?? 0);
-            if (program == null || !await await CanModifyFormAsync(program))
+            if (program == null || !await CanModifyFormAsync(program))
                 return ServiceResult<FtiParticipantDemographicsDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
@@ -244,7 +244,7 @@ namespace Infrastructure.Services.DataTables.FTI
                 return ServiceResult.Failure("Demographics not found", ServiceErrorStatus.NOTFOUND);
 
             var program = await _programRepository.GetByIdAsync(demographics.FtiProgramDetailsId ?? 0);
-            if (program == null || !await await CanModifyFormAsync(program))
+            if (program == null || !await CanModifyFormAsync(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
             // if (program.FormStatus != "Draft")
@@ -291,7 +291,7 @@ namespace Infrastructure.Services.DataTables.FTI
                     ServiceErrorStatus.NOTFOUND);
 
             // Check permissions
-            if (!await await CanModifyFormAsync(program))
+            if (!await CanModifyFormAsync(program))
                 return ServiceResult<FtiProgramContentDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
@@ -389,7 +389,7 @@ namespace Infrastructure.Services.DataTables.FTI
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
-            if (!await await CanModifyFormAsync(program))
+            if (!await CanModifyFormAsync(program))
                 return ServiceResult<FtiProgramContentDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
@@ -530,7 +530,7 @@ namespace Infrastructure.Services.DataTables.FTI
                 return ServiceResult.Failure("Content not found", ServiceErrorStatus.NOTFOUND);
 
             var program = await _programRepository.GetByIdAsync(content.FtiProgramDetailsId ?? 0);
-            if (program == null || !await await CanModifyFormAsync(program))
+            if (program == null || !await CanModifyFormAsync(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
             // if (program.FormStatus != "Draft")
@@ -572,7 +572,7 @@ namespace Infrastructure.Services.DataTables.FTI
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
-            if (!await await CanModifyFormAsync(program))
+            if (!await CanModifyFormAsync(program))
                 return ServiceResult<FtiAdvisoryServicesDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
@@ -665,7 +665,7 @@ namespace Infrastructure.Services.DataTables.FTI
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
-            if (!await await CanModifyFormAsync(program))
+            if (!await CanModifyFormAsync(program))
                 return ServiceResult<FtiReportDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
@@ -761,7 +761,7 @@ namespace Infrastructure.Services.DataTables.FTI
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
-            if (!await await CanModifyFormAsync(program))
+            if (!await CanModifyFormAsync(program))
                 return ServiceResult<FtiRecommendationDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
