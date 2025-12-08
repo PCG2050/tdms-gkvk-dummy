@@ -180,28 +180,6 @@ namespace Application.Services.Common
             entity.UpdatedAt = DateTimeOffset.UtcNow;
         }
 
-        /// <summary>
-        /// Set audit fields for child entity (create)
-        /// </summary>
-        protected void SetChildCreateAuditFields<TChild>(TChild entity, int unitLocationId, int organizationId)
-            where TChild : AuditableBaseEntity
-        {
-            entity.UnitLocationId = unitLocationId;
-            entity.OrganizationId = organizationId;
-            entity.CreatedById = CurrentUserService.UserId;
-            entity.CreatedAt = DateTimeOffset.UtcNow;
-        }
-
-        /// <summary>
-        /// Set audit fields for child entity (update)
-        /// </summary>
-        protected void SetChildUpdateAuditFields<TChild>(TChild entity)
-            where TChild : AuditableBaseEntity
-        {
-            entity.UpdatedById = CurrentUserService.UserId;
-            entity.UpdatedAt = DateTimeOffset.UtcNow;
-        }
-
         // ============================
         // STATUS SUMMARY (Common query)
         // ============================
