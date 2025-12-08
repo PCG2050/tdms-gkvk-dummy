@@ -72,6 +72,33 @@ namespace WebApi.Controllers.GenericTables
         // ===== PAGINATION =====
 
         /// <summary>
+        /// Get trainer's submission history with pagination and optional status filter
+        /// </summary>
+        [HttpGet("history")]
+        [Authorize(Roles = "Trainer")]
+        public async Task<IActionResult> GetHistory(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 20,
+            [FromQuery] string? status = null)
+        {
+            var result = !string.IsNullOrWhiteSpace(status)
+                ? await _service.GetByStatusAsync(status, pageNumber, pageSize)
+                : await _service.GetPaginatedAsync(pageNumber, pageSize);
+
+            return Ok(new
+            {
+                data = result.Items,
+                pagination = new
+                {
+                    currentPage = result.PageNumber,
+                    pageSize = result.PageSize,
+                    totalItems = result.TotalItems,
+                    totalPages = (int)Math.Ceiling(result.TotalItems / (double)result.PageSize)
+                }
+            });
+        }
+
+        /// <summary>
         /// Get paginated financial budgets
         /// </summary>
         [HttpGet]
@@ -99,16 +126,7 @@ namespace WebApi.Controllers.GenericTables
         }
 
         // ===== STATUS MANAGEMENT =====
-
-        /// <summary>
-        /// Submit financial budget for approval
-        /// </summary>
-        [HttpPost("{id}/submit")]
-        public async Task<IActionResult> Submit(int id)
-        {
-            var result = await _service.SubmitForApprovalAsync(id);
-            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
-        }
+        // Note: No submit endpoint - Create/Update automatically sets to Pending
 
         /// <summary>
         /// Approve financial budget

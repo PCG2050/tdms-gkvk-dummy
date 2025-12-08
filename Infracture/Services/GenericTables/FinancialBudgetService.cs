@@ -34,7 +34,7 @@ namespace Infrastructure.Services.GenericTables
                 StartDate = dto.StartDate,
                 EndDate = dto.EndDate,
                 OrganizationId = _currentUserService.OrganizationId,
-                FormStatus = "Draft",
+                FormStatus = "Pending",  // Set to Pending on create
                 CreatedById = _currentUserService.UserId,
                 CreatedAt = DateTimeOffset.UtcNow
             };
@@ -81,6 +81,7 @@ namespace Infrastructure.Services.GenericTables
 
             entity.StartDate = dto.StartDate;
             entity.EndDate = dto.EndDate;
+            entity.FormStatus = "Pending";  // Set to Pending on update (even if approved)
             entity.UpdatedById = _currentUserService.UserId;
             entity.UpdatedAt = DateTimeOffset.UtcNow;
 
@@ -110,7 +111,7 @@ namespace Infrastructure.Services.GenericTables
             DateOnly? startDate = null,
             DateOnly? endDate = null)
         {
-            var unitLocationIds = _currentUserService.UnitLocationIds;
+            var unitLocationIds = (await _currentUserService.MappedUnitLocationIds()).ToList();
             var result = await _repository.GetPaginatedAsync(unitLocationIds, pageNumber, pageSize, startDate, endDate);
 
             return new PaginatedResult<FinancialBudgetDto>
@@ -127,7 +128,7 @@ namespace Infrastructure.Services.GenericTables
             int pageNumber = 1,
             int pageSize = 10)
         {
-            var unitLocationIds = _currentUserService.UnitLocationIds;
+            var unitLocationIds = (await _currentUserService.MappedUnitLocationIds()).ToList();
             var result = await _repository.GetByStatusAsync(unitLocationIds, status, pageNumber, pageSize);
 
             return new PaginatedResult<FinancialBudgetDto>
@@ -140,26 +141,7 @@ namespace Infrastructure.Services.GenericTables
         }
 
         // ===== STATUS MANAGEMENT =====
-
-        public async Task<ServiceResult> SubmitForApprovalAsync(int id)
-        {
-            var entity = await _repository.GetByIdAsync(id);
-            if (entity == null)
-                return ServiceResult.Failure("Financial budget not found", ServiceErrorStatus.NOTFOUND);
-
-            if (!await _entityPermissionService.CanModifyForm(entity))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (entity.FormStatus != "Draft" && entity.FormStatus != "Rejected")
-                return ServiceResult.Failure("Only draft or rejected entries can be submitted", ServiceErrorStatus.INVALIDOPERATION);
-
-            entity.FormStatus = "Pending";
-            entity.UpdatedById = _currentUserService.UserId;
-            entity.UpdatedAt = DateTimeOffset.UtcNow;
-
-            await _repository.UpdateAsync(entity);
-            return ServiceResult.Success();
-        }
+        // Note: No SubmitForApproval needed - Create/Update sets to Pending
 
         public async Task<ServiceResult> ApproveAsync(int id, string? remarks = null)
         {
@@ -337,7 +319,7 @@ namespace Infrastructure.Services.GenericTables
                 StartDate = dto.StartDate,
                 EndDate = dto.EndDate,
                 OrganizationId = _currentUserService.OrganizationId,
-                FormStatus = "Draft",
+                FormStatus = "Pending",  // Set to Pending on hybrid create
                 CreatedById = _currentUserService.UserId,
                 CreatedAt = DateTimeOffset.UtcNow
             };
