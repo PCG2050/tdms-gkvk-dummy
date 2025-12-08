@@ -72,30 +72,16 @@ namespace WebApi.Controllers.GenericTables
         // ===== PAGINATION =====
 
         /// <summary>
-        /// Get trainer's submission history with pagination and optional status filter
+        /// Get trainer's submission history with pagination
         /// </summary>
-        [HttpGet("history")]
-        [Authorize(Roles = "Trainer")]
-        public async Task<IActionResult> GetHistory(
+        [HttpGet("my-history")]
+        [Authorize(Roles = "Trainer,UnitHead")]
+        public async Task<IActionResult> GetMyHistory(
             [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 20,
-            [FromQuery] string? status = null)
+            [FromQuery] int pageSize = 10)
         {
-            var result = !string.IsNullOrWhiteSpace(status)
-                ? await _service.GetByStatusAsync(status, pageNumber, pageSize)
-                : await _service.GetPaginatedAsync(pageNumber, pageSize);
-
-            return Ok(new
-            {
-                data = result.Items,
-                pagination = new
-                {
-                    currentPage = result.PageNumber,
-                    pageSize = result.PageSize,
-                    totalItems = result.TotalItems,
-                    totalPages = (int)Math.Ceiling(result.TotalItems / (double)result.PageSize)
-                }
-            });
+            var result = await _service.GetTrainerHistoryAsync(pageNumber, pageSize);
+            return Ok(result);
         }
 
         /// <summary>
@@ -177,6 +163,36 @@ namespace WebApi.Controllers.GenericTables
         public async Task<IActionResult> AddBankAccount(int id, [FromBody] BankAccountCreateDto dto)
         {
             var result = await _service.AddBankAccountAsync(id, dto);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
+        /// <summary>
+        /// Update budget
+        /// </summary>
+        [HttpPut("budgets/{id}")]
+        public async Task<IActionResult> UpdateBudget(int id, [FromBody] BudgetCreateDto dto)
+        {
+            var result = await _service.UpdateBudgetAsync(id, dto);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
+        /// <summary>
+        /// Update revolving fund
+        /// </summary>
+        [HttpPut("revolving-funds/{id}")]
+        public async Task<IActionResult> UpdateRevolvingFund(int id, [FromBody] RevolvingFundCreateDto dto)
+        {
+            var result = await _service.UpdateRevolvingFundAsync(id, dto);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
+        /// <summary>
+        /// Update bank account
+        /// </summary>
+        [HttpPut("bank-accounts/{id}")]
+        public async Task<IActionResult> UpdateBankAccount(int id, [FromBody] BankAccountCreateDto dto)
+        {
+            var result = await _service.UpdateBankAccountAsync(id, dto);
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 

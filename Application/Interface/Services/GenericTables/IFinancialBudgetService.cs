@@ -25,6 +25,11 @@ namespace Application.Interface.Services.GenericTables
             int pageNumber = 1,
             int pageSize = 10);
 
+        // Trainer History
+        Task<PaginatedResult<TrainerHistoryItemDto>> GetTrainerHistoryAsync(
+            int pageNumber = 1,
+            int pageSize = 10);
+
         // Status management (no submit needed - Create/Update sets to Pending)
         Task<ServiceResult> ApproveAsync(int id, string? remarks = null);
         Task<ServiceResult> RejectAsync(int id, string remarks);

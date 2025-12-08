@@ -15,6 +15,11 @@ namespace Infrastructure.Repository.GenericTables
             _context = context;
         }
 
+        public IQueryable<FinancialBudget> GetQueryable()
+        {
+            return _context.FinancialBudgets.AsQueryable();
+        }
+
         public async Task<FinancialBudget?> GetByIdAsync(int id)
         {
             return await _context.FinancialBudgets.FindAsync(id);
@@ -122,6 +127,21 @@ namespace Infrastructure.Repository.GenericTables
         }
 
         // ===== CHILD ENTITY OPERATIONS =====
+
+        public async Task<Budget?> GetBudgetByIdAsync(int id)
+        {
+            return await _context.Budgets.FindAsync(id);
+        }
+
+        public async Task<RevolvingFund?> GetRevolvingFundByIdAsync(int id)
+        {
+            return await _context.RevolvingFunds.FindAsync(id);
+        }
+
+        public async Task<DetailsOfBankAccount?> GetBankAccountByIdAsync(int id)
+        {
+            return await _context.DetailsOfBankAccounts.FindAsync(id);
+        }
 
         public async Task<Budget> AddBudgetAsync(Budget budget)
         {

@@ -5,6 +5,7 @@ namespace Application.Interface.Repository.GenericTables
 {
     public interface IFinancialBudgetRepository
     {
+        IQueryable<FinancialBudget> GetQueryable();
         Task<FinancialBudget?> GetByIdAsync(int id);
         Task<FinancialBudget?> GetWithDetailsAsync(int id);
         Task<FinancialBudget> CreateAsync(FinancialBudget entity);
@@ -25,6 +26,10 @@ namespace Application.Interface.Repository.GenericTables
             int pageSize = 10);
 
         // Child entity operations
+        Task<Budget?> GetBudgetByIdAsync(int id);
+        Task<RevolvingFund?> GetRevolvingFundByIdAsync(int id);
+        Task<DetailsOfBankAccount?> GetBankAccountByIdAsync(int id);
+
         Task<Budget> AddBudgetAsync(Budget budget);
         Task<RevolvingFund> AddRevolvingFundAsync(RevolvingFund fund);
         Task<DetailsOfBankAccount> AddBankAccountAsync(DetailsOfBankAccount account);

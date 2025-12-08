@@ -1,3 +1,4 @@
+using Application.Interface.Repository;
 using Application.Interface.Repository.GenericTables;
 using Application.Interface.Services;
 using Application.Interface.Services.GenericTables;
@@ -5,6 +6,7 @@ using Application.Models;
 using Application.Models.GenericTables;
 using Application.Services.Common;
 using Domain.Entities.GenericTables;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Services.GenericTables
 {
@@ -13,15 +15,34 @@ namespace Infrastructure.Services.GenericTables
         private readonly IFinancialBudgetRepository _repository;
         private readonly ICurrentUserService _currentUserService;
         private readonly IEntityPermissionService _entityPermissionService;
+        private readonly IOrganizationUnitRepository _organizationUnitRepository;
+        private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
+        private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly GenericTrainerHistoryService<FinancialBudget> _historyService;
 
         public FinancialBudgetService(
             IFinancialBudgetRepository repository,
             ICurrentUserService currentUserService,
-            IEntityPermissionService entityPermissionService)
+            IEntityPermissionService entityPermissionService,
+            IOrganizationUnitRepository organizationUnitRepository,
+            IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
+            IUserRepository userRepository,
+            ITrainerAssignmentRepository trainerAssignmentRepository)
         {
             _repository = repository;
             _currentUserService = currentUserService;
             _entityPermissionService = entityPermissionService;
+            _organizationUnitRepository = organizationUnitRepository;
+            _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
+            _trainerAssignmentRepository = trainerAssignmentRepository;
+            _userRepository = userRepository;
+            _historyService = new GenericTrainerHistoryService<FinancialBudget>(
+                currentUserService,
+                trainerAssignmentRepository,
+                organizationUnitRepository,
+                unitHeadAssignmentRepository,
+                userRepository);
         }
 
         // ===== PARENT ENTITY OPERATIONS =====
@@ -138,6 +159,28 @@ namespace Infrastructure.Services.GenericTables
                 PageNumber = result.PageNumber,
                 PageSize = result.PageSize
             };
+        }
+
+        // ===== TRAINER HISTORY =====
+
+        public async Task<PaginatedResult<TrainerHistoryItemDto>> GetTrainerHistoryAsync(
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            var query = _repository.GetQueryable()
+                .Include(x => x.UnitLocation)
+                    .ThenInclude(ul => ul.Unit);
+
+            return await _historyService.GetTrainerHistoryAsync(
+                query,
+                getUnitLocationId: x => x.UnitLocationId,
+                getTitleOrName: x => x.StartDate.HasValue && x.EndDate.HasValue
+                    ? $"Financial Budget ({x.StartDate:yyyy-MM-dd} to {x.EndDate:yyyy-MM-dd})"
+                    : "Financial Budget",
+                getFormStatus: x => x.FormStatus,
+                getRemarks: x => x.FormStatusRemarks ?? "-",
+                pageNumber,
+                pageSize);
         }
 
         // ===== STATUS MANAGEMENT =====
@@ -276,18 +319,78 @@ namespace Infrastructure.Services.GenericTables
 
         public async Task<ServiceResult<BudgetDto>> UpdateBudgetAsync(int id, BudgetCreateDto dto)
         {
-            // Implementation similar to Add but with Update logic
-            throw new NotImplementedException();
+            var entity = await _repository.GetBudgetByIdAsync(id);
+            if (entity == null)
+                return ServiceResult<BudgetDto>.Failure("Budget not found", ServiceErrorStatus.NOTFOUND);
+
+            // Check permissions on parent entity
+            var parent = await _repository.GetByIdAsync(entity.FinancialBudgetId);
+            if (parent == null || !await _entityPermissionService.CanModifyForm(parent))
+                return ServiceResult<BudgetDto>.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
+
+            // Update entity
+            entity.Particulars = dto.Particulars;
+            entity.ABAC = dto.ABAC;
+            entity.DAC = dto.DAC;
+            entity.Sanctioned = dto.Sanctioned;
+            entity.Released = dto.Released;
+            entity.Expenditure = dto.Expenditure;
+            entity.Balance = dto.Balance;
+            entity.UpdatedById = _currentUserService.UserId;
+            entity.UpdatedAt = DateTimeOffset.UtcNow;
+
+            var updated = await _repository.UpdateBudgetAsync(entity);
+            return ServiceResult<BudgetDto>.Success(MapToBudgetDto(updated));
         }
 
         public async Task<ServiceResult<RevolvingFundDto>> UpdateRevolvingFundAsync(int id, RevolvingFundCreateDto dto)
         {
-            throw new NotImplementedException();
+            var entity = await _repository.GetRevolvingFundByIdAsync(id);
+            if (entity == null)
+                return ServiceResult<RevolvingFundDto>.Failure("Revolving fund not found", ServiceErrorStatus.NOTFOUND);
+
+            // Check permissions on parent entity
+            var parent = await _repository.GetByIdAsync(entity.FinancialBudgetId);
+            if (parent == null || !await _entityPermissionService.CanModifyForm(parent))
+                return ServiceResult<RevolvingFundDto>.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
+
+            // Update entity
+            entity.YearMonth = dto.YearMonth;
+            entity.OpeningBalance = dto.OpeningBalance;
+            entity.Expenditure = dto.Expenditure;
+            entity.Receipt = dto.Receipt;
+            entity.ClosingBalance = dto.ClosingBalance;
+            entity.UpdatedById = _currentUserService.UserId;
+            entity.UpdatedAt = DateTimeOffset.UtcNow;
+
+            var updated = await _repository.UpdateRevolvingFundAsync(entity);
+            return ServiceResult<RevolvingFundDto>.Success(MapToRevolvingFundDto(updated));
         }
 
         public async Task<ServiceResult<BankAccountDto>> UpdateBankAccountAsync(int id, BankAccountCreateDto dto)
         {
-            throw new NotImplementedException();
+            var entity = await _repository.GetBankAccountByIdAsync(id);
+            if (entity == null)
+                return ServiceResult<BankAccountDto>.Failure("Bank account not found", ServiceErrorStatus.NOTFOUND);
+
+            // Check permissions on parent entity
+            var parent = await _repository.GetByIdAsync(entity.FinancialBudgetId);
+            if (parent == null || !await _entityPermissionService.CanModifyForm(parent))
+                return ServiceResult<BankAccountDto>.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
+
+            // Update entity
+            entity.NameOfBank = dto.NameOfBank;
+            entity.LocationBranch = dto.LocationBranch;
+            entity.BranchCode = dto.BranchCode;
+            entity.AccountName = dto.AccountName;
+            entity.AccountNumber = dto.AccountNumber;
+            entity.MICRNumber = dto.MICRNumber;
+            entity.IFSCCode = dto.IFSCCode;
+            entity.UpdatedById = _currentUserService.UserId;
+            entity.UpdatedAt = DateTimeOffset.UtcNow;
+
+            var updated = await _repository.UpdateBankAccountAsync(entity);
+            return ServiceResult<BankAccountDto>.Success(MapToBankAccountDto(updated));
         }
 
         public async Task<ServiceResult> DeleteBudgetAsync(int id)
