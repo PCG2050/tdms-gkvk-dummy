@@ -52,6 +52,171 @@ namespace Infrastructure.Repository.GenericTables
             return entity;
         }
 
+        public async Task<FinancialBudget> UpdateWithChildrenAsync(
+            FinancialBudget parent,
+            List<Budget>? budgets,
+            List<RevolvingFund>? revolvingFunds,
+            List<DetailsOfBankAccount>? bankAccounts)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var financialBudgetId = parent.Id;
+
+                // Load existing entity with all children
+                var existing = await GetWithDetailsAsync(financialBudgetId);
+                if (existing == null)
+                    throw new InvalidOperationException($"Financial budget with ID {financialBudgetId} not found");
+
+                // 1. Update parent entity
+                existing.StartDate = parent.StartDate;
+                existing.EndDate = parent.EndDate;
+                existing.FormStatus = parent.FormStatus;
+                existing.UpdatedById = parent.UpdatedById;
+                existing.UpdatedAt = parent.UpdatedAt;
+                _context.FinancialBudgets.Update(existing);
+
+                // 2. Process Budgets (Hybrid Pattern: Create/Update/Delete)
+                if (budgets != null)
+                {
+                    var existingBudgets = existing.Budgets?.ToList() ?? new List<Budget>();
+                    var incomingIds = budgets.Where(b => b.Id > 0).Select(b => b.Id).ToList();
+
+                    // DELETE: Items in DB but not in incoming array
+                    var budgetsToDelete = existingBudgets.Where(b => !incomingIds.Contains(b.Id)).ToList();
+                    foreach (var budget in budgetsToDelete)
+                    {
+                        _context.Budgets.Remove(budget);
+                    }
+
+                    // CREATE or UPDATE
+                    foreach (var budget in budgets)
+                    {
+                        if (budget.Id > 0)
+                        {
+                            // UPDATE existing
+                            var existingBudget = existingBudgets.FirstOrDefault(b => b.Id == budget.Id);
+                            if (existingBudget != null)
+                            {
+                                existingBudget.Particulars = budget.Particulars;
+                                existingBudget.ABAC = budget.ABAC;
+                                existingBudget.DAC = budget.DAC;
+                                existingBudget.Sanctioned = budget.Sanctioned;
+                                existingBudget.Released = budget.Released;
+                                existingBudget.Expenditure = budget.Expenditure;
+                                existingBudget.Balance = budget.Balance;
+                                existingBudget.UpdatedById = budget.UpdatedById;
+                                existingBudget.UpdatedAt = budget.UpdatedAt;
+                                _context.Budgets.Update(existingBudget);
+                            }
+                        }
+                        else
+                        {
+                            // CREATE new
+                            budget.FinancialBudgetId = financialBudgetId;
+                            _context.Budgets.Add(budget);
+                        }
+                    }
+                }
+
+                // 3. Process Revolving Funds (Hybrid Pattern)
+                if (revolvingFunds != null)
+                {
+                    var existingFunds = existing.RevolvingFunds?.ToList() ?? new List<RevolvingFund>();
+                    var incomingIds = revolvingFunds.Where(f => f.Id > 0).Select(f => f.Id).ToList();
+
+                    // DELETE: Items in DB but not in incoming array
+                    var fundsToDelete = existingFunds.Where(f => !incomingIds.Contains(f.Id)).ToList();
+                    foreach (var fund in fundsToDelete)
+                    {
+                        _context.RevolvingFunds.Remove(fund);
+                    }
+
+                    // CREATE or UPDATE
+                    foreach (var fund in revolvingFunds)
+                    {
+                        if (fund.Id > 0)
+                        {
+                            // UPDATE existing
+                            var existingFund = existingFunds.FirstOrDefault(f => f.Id == fund.Id);
+                            if (existingFund != null)
+                            {
+                                existingFund.YearMonth = fund.YearMonth;
+                                existingFund.OpeningBalance = fund.OpeningBalance;
+                                existingFund.Expenditure = fund.Expenditure;
+                                existingFund.Receipt = fund.Receipt;
+                                existingFund.ClosingBalance = fund.ClosingBalance;
+                                existingFund.UpdatedById = fund.UpdatedById;
+                                existingFund.UpdatedAt = fund.UpdatedAt;
+                                _context.RevolvingFunds.Update(existingFund);
+                            }
+                        }
+                        else
+                        {
+                            // CREATE new
+                            fund.FinancialBudgetId = financialBudgetId;
+                            _context.RevolvingFunds.Add(fund);
+                        }
+                    }
+                }
+
+                // 4. Process Bank Accounts (Hybrid Pattern)
+                if (bankAccounts != null)
+                {
+                    var existingAccounts = existing.DetailsOfBankAccounts?.ToList() ?? new List<DetailsOfBankAccount>();
+                    var incomingIds = bankAccounts.Where(a => a.Id > 0).Select(a => a.Id).ToList();
+
+                    // DELETE: Items in DB but not in incoming array
+                    var accountsToDelete = existingAccounts.Where(a => !incomingIds.Contains(a.Id)).ToList();
+                    foreach (var account in accountsToDelete)
+                    {
+                        _context.DetailsOfBankAccounts.Remove(account);
+                    }
+
+                    // CREATE or UPDATE
+                    foreach (var account in bankAccounts)
+                    {
+                        if (account.Id > 0)
+                        {
+                            // UPDATE existing
+                            var existingAccount = existingAccounts.FirstOrDefault(a => a.Id == account.Id);
+                            if (existingAccount != null)
+                            {
+                                existingAccount.NameOfBank = account.NameOfBank;
+                                existingAccount.LocationBranch = account.LocationBranch;
+                                existingAccount.BranchCode = account.BranchCode;
+                                existingAccount.AccountName = account.AccountName;
+                                existingAccount.AccountNumber = account.AccountNumber;
+                                existingAccount.MICRNumber = account.MICRNumber;
+                                existingAccount.IFSCCode = account.IFSCCode;
+                                existingAccount.UpdatedById = account.UpdatedById;
+                                existingAccount.UpdatedAt = account.UpdatedAt;
+                                _context.DetailsOfBankAccounts.Update(existingAccount);
+                            }
+                        }
+                        else
+                        {
+                            // CREATE new
+                            account.FinancialBudgetId = financialBudgetId;
+                            _context.DetailsOfBankAccounts.Add(account);
+                        }
+                    }
+                }
+
+                // Save all changes
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                // Return updated entity with all children
+                return await GetWithDetailsAsync(financialBudgetId) ?? existing;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
         public async Task DeleteAsync(int id)
         {
             var entity = await _context.FinancialBudgets.FindAsync(id);

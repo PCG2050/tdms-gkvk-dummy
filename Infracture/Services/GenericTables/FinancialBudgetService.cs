@@ -493,6 +493,132 @@ namespace Infrastructure.Services.GenericTables
             return ServiceResult<FinancialBudgetCompleteDto>.Success(completeDto);
         }
 
+        public async Task<ServiceResult<FinancialBudgetCompleteDto>> UpdateHybridAsync(int id, FinancialBudgetHybridUpdateDto dto)
+        {
+            // Validate entity exists and check permissions
+            var entity = await _repository.GetByIdAsync(id);
+            if (entity == null)
+                return ServiceResult<FinancialBudgetCompleteDto>.Failure("Financial budget not found", ServiceErrorStatus.NOTFOUND);
+
+            if (!await _entityPermissionService.CanModifyForm(entity))
+                return ServiceResult<FinancialBudgetCompleteDto>.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
+
+            try
+            {
+                // Prepare parent entity for update
+                var parentEntity = new FinancialBudget
+                {
+                    Id = id,
+                    StartDate = dto.StartDate,
+                    EndDate = dto.EndDate,
+                    FormStatus = "Pending",  // Set to Pending on update
+                    UpdatedById = _currentUserService.UserId,
+                    UpdatedAt = DateTimeOffset.UtcNow
+                };
+
+                // Prepare child budgets (hybrid: mix of new and existing)
+                var budgets = dto.Budgets?.Select(b =>
+                {
+                    var budget = new Budget
+                    {
+                        Id = b.Id ?? 0,  // 0 means new
+                        Particulars = b.Particulars,
+                        ABAC = b.ABAC,
+                        DAC = b.DAC,
+                        Sanctioned = b.Sanctioned,
+                        Released = b.Released,
+                        Expenditure = b.Expenditure,
+                        Balance = b.Balance
+                    };
+
+                    if (budget.Id == 0)
+                    {
+                        budget.CreatedById = _currentUserService.UserId;
+                        budget.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        budget.UpdatedById = _currentUserService.UserId;
+                        budget.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
+
+                    return budget;
+                }).ToList();
+
+                // Prepare revolving funds
+                var revolvingFunds = dto.RevolvingFunds?.Select(f =>
+                {
+                    var fund = new RevolvingFund
+                    {
+                        Id = f.Id ?? 0,
+                        YearMonth = f.YearMonth,
+                        OpeningBalance = f.OpeningBalance,
+                        Expenditure = f.Expenditure,
+                        Receipt = f.Receipt,
+                        ClosingBalance = f.ClosingBalance
+                    };
+
+                    if (fund.Id == 0)
+                    {
+                        fund.CreatedById = _currentUserService.UserId;
+                        fund.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        fund.UpdatedById = _currentUserService.UserId;
+                        fund.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
+
+                    return fund;
+                }).ToList();
+
+                // Prepare bank accounts
+                var bankAccounts = dto.BankAccounts?.Select(a =>
+                {
+                    var account = new DetailsOfBankAccount
+                    {
+                        Id = a.Id ?? 0,
+                        NameOfBank = a.NameOfBank,
+                        LocationBranch = a.LocationBranch,
+                        BranchCode = a.BranchCode,
+                        AccountName = a.AccountName,
+                        AccountNumber = a.AccountNumber,
+                        MICRNumber = a.MICRNumber,
+                        IFSCCode = a.IFSCCode
+                    };
+
+                    if (account.Id == 0)
+                    {
+                        account.CreatedById = _currentUserService.UserId;
+                        account.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        account.UpdatedById = _currentUserService.UserId;
+                        account.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
+
+                    return account;
+                }).ToList();
+
+                // Repository handles transaction internally
+                var updated = await _repository.UpdateWithChildrenAsync(
+                    parentEntity,
+                    budgets,
+                    revolvingFunds,
+                    bankAccounts);
+
+                var resultDto = MapToCompleteDto(updated);
+                return ServiceResult<FinancialBudgetCompleteDto>.Success(resultDto);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<FinancialBudgetCompleteDto>.Failure(
+                    $"Failed to update financial budget with children: {ex.Message}",
+                    ServiceErrorStatus.INVALIDOPERATION);
+            }
+        }
+
         // ===== MAPPING HELPERS =====
 
         private FinancialBudgetDto MapToDto(FinancialBudget entity)

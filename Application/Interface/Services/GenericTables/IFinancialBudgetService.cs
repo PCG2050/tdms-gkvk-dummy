@@ -47,7 +47,8 @@ namespace Application.Interface.Services.GenericTables
         Task<ServiceResult> DeleteRevolvingFundAsync(int id);
         Task<ServiceResult> DeleteBankAccountAsync(int id);
 
-        // HYBRID CREATE - Insert all data at once
+        // Hybrid endpoints
         Task<ServiceResult<FinancialBudgetCompleteDto>> CreateHybridAsync(FinancialBudgetHybridCreateDto dto);
+        Task<ServiceResult<FinancialBudgetCompleteDto>> UpdateHybridAsync(int id, FinancialBudgetHybridUpdateDto dto);
     }
 }

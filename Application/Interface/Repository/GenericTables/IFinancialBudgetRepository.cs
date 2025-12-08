@@ -10,6 +10,11 @@ namespace Application.Interface.Repository.GenericTables
         Task<FinancialBudget?> GetWithDetailsAsync(int id);
         Task<FinancialBudget> CreateAsync(FinancialBudget entity);
         Task<FinancialBudget> UpdateAsync(FinancialBudget entity);
+        Task<FinancialBudget> UpdateWithChildrenAsync(
+            FinancialBudget parent,
+            List<Budget>? budgets,
+            List<RevolvingFund>? revolvingFunds,
+            List<DetailsOfBankAccount>? bankAccounts);
         Task DeleteAsync(int id);
 
         Task<PaginatedResult<FinancialBudget>> GetPaginatedAsync(

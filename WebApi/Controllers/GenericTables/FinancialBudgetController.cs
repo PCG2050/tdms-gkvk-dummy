@@ -281,6 +281,43 @@ namespace WebApi.Controllers.GenericTables
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
+        /// <summary>
+        /// HYBRID UPDATE: Update financial budget with all child entities in one request
+        /// This endpoint allows you to update parent + manage all children (create/update/delete) at once
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     PUT /api/financial-budget/1/hybrid
+        ///     {
+        ///       "startDate": "2024-01-01",
+        ///       "endDate": "2024-12-31",
+        ///       "budgets": [
+        ///         {
+        ///           "id": 5,  // Existing budget to update
+        ///           "particulars": "Staff Salary - Updated",
+        ///           "abac": 120000.00,
+        ///           "dac": 60000.00
+        ///         },
+        ///         {
+        ///           "id": null,  // New budget to create
+        ///           "particulars": "New Budget Item",
+        ///           "abac": 50000.00
+        ///         }
+        ///       ],
+        ///       "revolvingFunds": [...],
+        ///       "bankAccounts": [...]
+        ///     }
+        ///
+        /// Note: Child items not included in the request will be deleted
+        /// </remarks>
+        [HttpPut("{id}/hybrid")]
+        public async Task<IActionResult> UpdateHybrid(int id, [FromBody] FinancialBudgetHybridUpdateDto dto)
+        {
+            var result = await _service.UpdateHybridAsync(id, dto);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
         // ===== HELPER =====
 
         private int GetStatusCode(ServiceErrorStatus? status)

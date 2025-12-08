@@ -27,6 +27,18 @@ namespace Application.Models.GenericTables
         public decimal? Balance { get; set; }
     }
 
+    public class BudgetUpdateDto
+    {
+        public int? Id { get; set; }  // Nullable: 0 or null = new, > 0 = update existing
+        public string? Particulars { get; set; }
+        public decimal? ABAC { get; set; }
+        public decimal? DAC { get; set; }
+        public decimal? Sanctioned { get; set; }
+        public decimal? Released { get; set; }
+        public decimal? Expenditure { get; set; }
+        public decimal? Balance { get; set; }
+    }
+
     // ===== REVOLVING FUND DTOs =====
     public class RevolvingFundDto
     {
@@ -40,6 +52,16 @@ namespace Application.Models.GenericTables
 
     public class RevolvingFundCreateDto
     {
+        public string? YearMonth { get; set; }
+        public decimal? OpeningBalance { get; set; }
+        public decimal? Expenditure { get; set; }
+        public decimal? Receipt { get; set; }
+        public decimal? ClosingBalance { get; set; }
+    }
+
+    public class RevolvingFundUpdateDto
+    {
+        public int? Id { get; set; }  // Nullable: 0 or null = new, > 0 = update existing
         public string? YearMonth { get; set; }
         public decimal? OpeningBalance { get; set; }
         public decimal? Expenditure { get; set; }
@@ -62,6 +84,18 @@ namespace Application.Models.GenericTables
 
     public class BankAccountCreateDto
     {
+        public string? NameOfBank { get; set; }
+        public string? LocationBranch { get; set; }
+        public string? BranchCode { get; set; }
+        public string? AccountName { get; set; }
+        public string? AccountNumber { get; set; }
+        public string? MICRNumber { get; set; }
+        public string? IFSCCode { get; set; }
+    }
+
+    public class BankAccountUpdateDto
+    {
+        public int? Id { get; set; }  // Nullable: 0 or null = new, > 0 = update existing
         public string? NameOfBank { get; set; }
         public string? LocationBranch { get; set; }
         public string? BranchCode { get; set; }
@@ -123,5 +157,21 @@ namespace Application.Models.GenericTables
         public List<BudgetCreateDto>? Budgets { get; set; }
         public List<RevolvingFundCreateDto>? RevolvingFunds { get; set; }
         public List<BankAccountCreateDto>? BankAccounts { get; set; }
+    }
+
+    /// <summary>
+    /// Hybrid update DTO - updates parent and manages all children (create/update/delete) in one request
+    /// Child items with Id = 0 or null will be created
+    /// Child items with Id > 0 will be updated
+    /// Child items not in the lists will be deleted (cascade)
+    /// </summary>
+    public class FinancialBudgetHybridUpdateDto
+    {
+        public DateOnly? StartDate { get; set; }
+        public DateOnly? EndDate { get; set; }
+
+        public List<BudgetUpdateDto>? Budgets { get; set; }
+        public List<RevolvingFundUpdateDto>? RevolvingFunds { get; set; }
+        public List<BankAccountUpdateDto>? BankAccounts { get; set; }
     }
 }
