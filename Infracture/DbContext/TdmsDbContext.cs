@@ -155,6 +155,13 @@ namespace Infrastructure.DbContext
 
         #endregion
 
+        #region Generic Tables (Financial Status, etc.)
+        public DbSet<FinancialBudget> FinancialBudgets { get; set; }
+        public DbSet<Budget> Budgets { get; set; }
+        public DbSet<RevolvingFund> RevolvingFunds { get; set; }
+        public DbSet<DetailsOfBankAccount> DetailsOfBankAccounts { get; set; }
+        #endregion
+
         #region Juntions
         public DbSet<OrganizationUnitLocation> OrganizationUnitLocations { get; set; }
         public DbSet<TrainerAssignment> UnitTrainers { get; set; }

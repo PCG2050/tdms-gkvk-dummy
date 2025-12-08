@@ -265,6 +265,11 @@ namespace WebApi
             #endregion
 
             //Generic Tables
+            // Financial Budget (Financial Status)
+            builder.Services.AddScoped<IFinancialBudgetRepository, FinancialBudgetRepository>();
+            builder.Services.AddScoped<IFinancialBudgetService, FinancialBudgetService>();
+
+            // Publications
             builder.Services.AddScoped<IPublicationRepository, PublicationRepository>();
             builder.Services.AddScoped<IPublisherDetailsRepository, PublisherDetailsRepository>();
             builder.Services.AddScoped<IExtensionLiteratureRepository, ExtensionLiteratureRepository>();

@@ -1,0 +1,49 @@
+using Application.Models;
+using Application.Models.GenericTables;
+using Application.Services.Common;
+
+namespace Application.Interface.Services.GenericTables
+{
+    public interface IFinancialBudgetService
+    {
+        // Parent entity operations
+        Task<ServiceResult<FinancialBudgetDto>> CreateAsync(FinancialBudgetCreateDto dto);
+        Task<ServiceResult<FinancialBudgetDto>> GetByIdAsync(int id);
+        Task<ServiceResult<FinancialBudgetCompleteDto>> GetCompleteByIdAsync(int id);
+        Task<ServiceResult<FinancialBudgetDto>> UpdateAsync(int id, FinancialBudgetUpdateDto dto);
+        Task<ServiceResult> DeleteAsync(int id);
+
+        // Pagination
+        Task<PaginatedResult<FinancialBudgetDto>> GetPaginatedAsync(
+            int pageNumber = 1,
+            int pageSize = 10,
+            DateOnly? startDate = null,
+            DateOnly? endDate = null);
+
+        Task<PaginatedResult<FinancialBudgetDto>> GetByStatusAsync(
+            string status,
+            int pageNumber = 1,
+            int pageSize = 10);
+
+        // Status management
+        Task<ServiceResult> SubmitForApprovalAsync(int id);
+        Task<ServiceResult> ApproveAsync(int id, string? remarks = null);
+        Task<ServiceResult> RejectAsync(int id, string remarks);
+
+        // Child entity operations
+        Task<ServiceResult<BudgetDto>> AddBudgetAsync(int financialBudgetId, BudgetCreateDto dto);
+        Task<ServiceResult<RevolvingFundDto>> AddRevolvingFundAsync(int financialBudgetId, RevolvingFundCreateDto dto);
+        Task<ServiceResult<BankAccountDto>> AddBankAccountAsync(int financialBudgetId, BankAccountCreateDto dto);
+
+        Task<ServiceResult<BudgetDto>> UpdateBudgetAsync(int id, BudgetCreateDto dto);
+        Task<ServiceResult<RevolvingFundDto>> UpdateRevolvingFundAsync(int id, RevolvingFundCreateDto dto);
+        Task<ServiceResult<BankAccountDto>> UpdateBankAccountAsync(int id, BankAccountCreateDto dto);
+
+        Task<ServiceResult> DeleteBudgetAsync(int id);
+        Task<ServiceResult> DeleteRevolvingFundAsync(int id);
+        Task<ServiceResult> DeleteBankAccountAsync(int id);
+
+        // HYBRID CREATE - Insert all data at once
+        Task<ServiceResult<FinancialBudgetCompleteDto>> CreateHybridAsync(FinancialBudgetHybridCreateDto dto);
+    }
+}
