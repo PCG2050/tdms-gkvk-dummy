@@ -136,7 +136,7 @@ namespace WebApi
 
             builder.Services.AddSingleton<ConsultingServiceMapper>();
             builder.Services.AddSingleton<PublicationMapper>();
-            builder.Services.AddSingleton<TblServiceMapper>();
+            builder.Services.AddSingleton<TblServiceMapper>();  
 
 
             #region FIU
@@ -152,7 +152,7 @@ namespace WebApi
             #endregion
 
             #region FTI
-            builder.Services.AddScoped<IFtiProgramDetailsRepository, FtiProgramDetailsRepository>();
+            builder.Services.AddScoped<IFtiProgramDetailsRepository, FtiProgramDetailsRepositoryGeneric>();
             builder.Services.AddScoped<IFtiParticipantDemographicsRepository, FtiParticipantDemographicsRepository>();
             builder.Services.AddScoped<IFtiProgramContentRepository, FtiProgramContentRepository>();
             builder.Services.AddScoped<IFtiResourcePersonRepository, FtiResourcePersonRepository>();
@@ -283,6 +283,8 @@ namespace WebApi
             builder.Services.AddScoped<ITableHostelRepository, TableHostelRepository>();
             builder.Services.AddScoped<IRevolvingFundRepository, RevolvingFundRepository>();
             builder.Services.AddScoped<IVisitorDetailsRepository, VisitorDetailRepository>();
+            builder.Services.AddScoped<IFinancialBudgetRepository, FinancialBudgetRepository>();
+            builder.Services.AddScoped<IFinancialBudgetService, FinancialBudgetService>();
 
             builder.Services.AddScoped<IAdminReportService, AdminReportService>();
             builder.Services.AddScoped<IDynamicReportService, DynamicReportService>();

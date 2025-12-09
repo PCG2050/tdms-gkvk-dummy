@@ -88,7 +88,7 @@ namespace Application.Services.Common
 
             // Get paginated items
             var paginatedData = filteredData
-                .OrderByDescending(x => x.CreatedAt)
+                .OrderByDescending(x => x.UpdatedAt.HasValue? x.UpdatedAt : x.CreatedAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
@@ -192,7 +192,7 @@ namespace Application.Services.Common
 
             // Get paginated data
             var paginatedData = filteredData
-                .OrderByDescending(x => x.CreatedAt)
+                .OrderByDescending(x => x.UpdatedAt.HasValue? x.UpdatedAt : x.CreatedAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)                
                 .ToList();

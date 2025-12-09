@@ -159,7 +159,7 @@ namespace Infrastructure.Services.DataTables.KVK
 
             var updated = await _programRepository.UpdateAsync(program);
             var resultDto = _mapper.MapToDto(updated);
-
+                
             return ServiceResult<KvkProgramDetailsDto>.Success(resultDto);
         }
 
@@ -601,7 +601,7 @@ namespace Infrastructure.Services.DataTables.KVK
             {
                 // Create new
                 var entity = _mapper.MapToEntity(dto);
-                entity.KvkProgramDetailsId = programId;
+                entity.KvkProgramDetailsId = programId;                
                 entity.UnitLocationId = program.UnitLocationId;
                 entity.OrganizationId = program.OrganizationId;
                 entity.CreatedById = _currentUserService.UserId;
@@ -1077,7 +1077,7 @@ namespace Infrastructure.Services.DataTables.KVK
                 var resultDto = _mapper.MapToDto(created);
 
                 // AUTO-SUBMIT: Since Recommendation is the last section, automatically change status to Pending
-                if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
+                if (program.FormStatus == "Draft" || program.FormStatus == "Rejected" || program.FormStatus == "Approved")
                 {
                     program.FormStatus = "Pending";
                     program.UpdatedById = _currentUserService.UserId;

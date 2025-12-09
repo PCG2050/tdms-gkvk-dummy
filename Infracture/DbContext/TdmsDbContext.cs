@@ -14,12 +14,12 @@ namespace Infrastructure.DbContext
 {
     public class TdmsDbContext : Microsoft.EntityFrameworkCore.DbContext
     {
-      
+
 
         public TdmsDbContext(DbContextOptions<TdmsDbContext> options) : base(options)
         {
-            
-          
+
+
         }
         public DbSet<State> States { get; set; }
         public DbSet<District> Districts { get; set; }
@@ -27,10 +27,10 @@ namespace Infrastructure.DbContext
         public DbSet<User> Users { get; set; }
         public DbSet<UserSession> UserSessions { get; set; }
         public DbSet<Unit> Units { get; set; }
-     
+
         #region STU
-       
-      
+
+
         public DbSet<StuProgramDetails> StuProgramDetails { get; set; }
         public DbSet<StuParticipantDemographics> StuParticipantDemographics { get; set; }
         public DbSet<StuProgramContentAndResources> StuProgramContentAndResources { get; set; }
@@ -43,7 +43,7 @@ namespace Infrastructure.DbContext
 
         #endregion
         #region FIU
-      
+
 
         public DbSet<FIUProgramActivity> FIUProgramActivities { get; set; }
 
@@ -53,16 +53,17 @@ namespace Infrastructure.DbContext
 
         #endregion
         #region FTI
+        // Using generic implementation for main entity
         public DbSet<FtiProgramDetailsGeneric> FtiProgramDetailsGeneric { get; set; }
-        //public DbSet<FtiProgramDetails> FtiProgramDetails { get; set; }
-        //public DbSet<FtiParticipantDemographics> FtiParticipantDemographics { get; set; }
-        //public DbSet<FtiProgramContentAndResources> FtiProgramContentAndResources { get; set; }
-        //public DbSet<FtiResourcePerson> FtiResourcePersons { get; set; }
-        //public DbSet<FtiTopicsCoveredInClass> FtiTopicsCoveredInClass { get; set; }
-        //public DbSet<FtiTeachingAidsDeveloped> FtiTeachingAidsDeveloped { get; set; }
-        //public DbSet<FtiAdvisoryServices> FtiAdvisoryServices { get; set; }
-        //public DbSet<FtiReport> FtiReports { get; set; }
-        //public DbSet<FtiRecommendation> FtiRecommendations { get; set; }
+
+        public DbSet<FtiParticipantDemographics> FtiParticipantDemographics { get; set; }
+        public DbSet<FtiProgramContentAndResources> FtiProgramContentAndResources { get; set; }
+        public DbSet<FtiResourcePerson> FtiResourcePersons { get; set; }
+        public DbSet<FtiTopicsCoveredInClass> FtiTopicsCoveredInClass { get; set; }
+        public DbSet<FtiTeachingAidsDeveloped> FtiTeachingAidsDeveloped { get; set; }
+        public DbSet<FtiAdvisoryServices> FtiAdvisoryServices { get; set; }
+        public DbSet<FtiReport> FtiReports { get; set; }
+        public DbSet<FtiRecommendation> FtiRecommendations { get; set; }
         #endregion
         #region IBT&VA
 
@@ -160,7 +161,7 @@ namespace Infrastructure.DbContext
         public DbSet<ProgramCategory> ProgramCategories { get; set; }
         public DbSet<ProjectCategory> ProjectCategories { get; set; }
         public DbSet<EventName> EventNames { get; set; }
-        public DbSet<InfoType>InfoTypes { get; set; }
+        public DbSet<InfoType> InfoTypes { get; set; }
 
         public DbSet<Collaborator> Collaborators { get; set; }
 
@@ -174,7 +175,7 @@ namespace Infrastructure.DbContext
         public DbSet<Mode> Modes { get; set; }
         public DbSet<Region> Regions { get; set; }
         public DbSet<SourceOfFund> SourcesOfFunds { get; set; }
-        public DbSet<Status> Statuses { get; set; }       
+        public DbSet<Status> Statuses { get; set; }
         public DbSet<Participant> Participants { get; set; }
         public DbSet<ParticipatedSource> ParticipatedSources { get; set; }
 
@@ -195,7 +196,7 @@ namespace Infrastructure.DbContext
 
         public DbSet<EnglishMagazine> EnglishMagazines { get; set; }
         public DbSet<KannadaNewsPaper> KannadaNewsPapers { get; set; }
-        public  DbSet<EnglishNewsPaper> EnglishNewsPapers { get; set; }
+        public DbSet<EnglishNewsPaper> EnglishNewsPapers { get; set; }
 
         public DbSet<ExtensionWork> ExtensionWorks { get; set; }
         public DbSet<NominationType> NominationTypes { get; set; }
@@ -215,7 +216,7 @@ namespace Infrastructure.DbContext
         public DbSet<ServiceTheme> ServiceThemes { get; set; }
 
         public DbSet<QuantityUnit> QuantityUnits { get; set; }
-        public  DbSet<Visitor> Visitors { get; set; }
+        public DbSet<Visitor> Visitors { get; set; }
 
         public DbSet<FIUActivity> FIUActivities { get; set; }
 
@@ -225,7 +226,7 @@ namespace Infrastructure.DbContext
         public DbSet<Publication> Publications { get; set; }
         public DbSet<PublisherDetails> PublisherDetails { get; set; }
         public DbSet<ExtensionLiterature> ExtensionLiteratures { get; set; }
-        
+
         #endregion
 
         #region NominationRewards
@@ -255,6 +256,15 @@ namespace Infrastructure.DbContext
 
         #region OtherActivity
         public DbSet<TableOtherActivity> OtherActivities { get; set; }
+        #endregion
+
+        #region FinancialBudget
+        public DbSet<FinancialBudget> FinancialBudgets { get; set; }
+        public DbSet<Budget> Budgets { get; set; }
+
+        public DbSet<RevolvingFund> RevolvingFunds { get; set; }
+
+        public DbSet<DetailsOfBankAccount> DetailsOfBankAccounts { get; set; }
         #endregion
 
         #endregion
@@ -341,7 +351,43 @@ namespace Infrastructure.DbContext
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Ignore<FtiProgramDetails>();
 
+
+            // Configure FtiProgramDetailsGeneric to use existing FtiProgramDetails table
+            modelBuilder.Entity<FtiProgramDetailsGeneric>()
+                .ToTable("FtiProgramDetails");
+
+          
+            modelBuilder.Entity<FtiProgramDetailsGeneric>()
+                .HasMany(p => p.ParticipantDemographics)
+                .WithOne()
+                .HasForeignKey("FtiProgramDetailsId")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<FtiProgramDetailsGeneric>()
+                .HasMany(p => p.ProgramContent)
+                .WithOne()
+                .HasForeignKey("FtiProgramDetailsId")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<FtiProgramDetailsGeneric>()
+                .HasOne(p => p.AdvisoryServices)
+                .WithOne()
+                .HasForeignKey<FtiAdvisoryServices>("FtiProgramDetailsId")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<FtiProgramDetailsGeneric>()
+                .HasOne(p => p.Reports)
+                .WithOne()
+                .HasForeignKey<FtiReport>("FtiProgramDetailsId")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<FtiProgramDetailsGeneric>()
+                .HasOne(p => p.Recommendations)
+                .WithOne()
+                .HasForeignKey<FtiRecommendation>("FtiProgramDetailsId")
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<TrainerAssignment>()
                 .HasOne(t => t.CreatedBy)
@@ -367,7 +413,7 @@ namespace Infrastructure.DbContext
                 .HasForeignKey(u => u.UpdatedById)
                 .OnDelete(DeleteBehavior.Restrict);
 
-          
+
 
 
 

@@ -51,6 +51,7 @@ namespace Infrastructure.Services.DataTables
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
             _userRepository = userRepository;
+
             //  generic history service
             _historyService = new GenericTrainerHistoryService<Publication>(currentUserService, trainerAssignmentRepository, organizationUnitRepository,unitHeadAssignmentRepository, userRepository);
         }

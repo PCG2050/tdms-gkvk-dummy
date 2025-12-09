@@ -9,7 +9,11 @@ using Infrastructure.Repository;
 
 namespace Infrastructure.Services.DataTables.FTI
 {
-    public class FtiProgramService : IFtiProgramService
+    /// <summary>
+    /// FTI Program Service - Inherits common operations from GenericProgramServiceBase
+    /// Contains FTI-specific CRUD and business logic
+    /// </summary>
+    public class FtiProgramService : GenericProgramServiceBase<FtiProgramDetailsGeneric>, IFtiProgramService
     {
         private readonly IFtiProgramDetailsRepository _programRepository;
         private readonly IFtiParticipantDemographicsRepository _demographicsRepository;
@@ -20,14 +24,13 @@ namespace Infrastructure.Services.DataTables.FTI
         private readonly IFtiAdvisoryServicesRepository _advisoryRepository;
         private readonly IFtiReportRepository _reportRepository;
         private readonly IFtiRecommendationRepository _recommendationRepository;
-        private readonly ICurrentUserService _currentUserService;
-        private readonly IEntityPermissionService _entityPermissionService;
+        // _currentUserService and _entityPermissionService are in base class (CurrentUserService, EntityPermissionService)
         private readonly FtiProgramMapper _mapper;
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly IUserRepository _userRepository;
-        private readonly GenericTrainerHistoryService<FtiProgramDetails> _historyService;
+        private readonly GenericTrainerHistoryService<FtiProgramDetailsGeneric> _historyService;
 
 
 
@@ -48,6 +51,7 @@ namespace Infrastructure.Services.DataTables.FTI
             IUserRepository userRepository,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
             FtiProgramMapper mapper)
+            : base(currentUserService, entityPermissionService)  // Call base constructor
         {
             _programRepository = programRepository;
             _demographicsRepository = demographicsRepository;
@@ -58,8 +62,7 @@ namespace Infrastructure.Services.DataTables.FTI
             _advisoryRepository = advisoryRepository;
             _reportRepository = reportRepository;
             _recommendationRepository = recommendationRepository;
-            _currentUserService = currentUserService;
-            _entityPermissionService = entityPermissionService;
+            // currentUserService and entityPermissionService passed to base class
             _trainerAssignmentRepository = trainerAssignmentRepository;
             _organizationUnitRepository = organizationUnitRepository;
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
@@ -67,7 +70,7 @@ namespace Infrastructure.Services.DataTables.FTI
             _mapper = mapper;
 
             //  generic history service
-            _historyService = new GenericTrainerHistoryService<FtiProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository, userRepository);
+            _historyService = new GenericTrainerHistoryService<FtiProgramDetailsGeneric>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository, userRepository);
         }
 
         // ============================
@@ -77,10 +80,8 @@ namespace Infrastructure.Services.DataTables.FTI
         public async Task<ServiceResult<FtiProgramDetailsDto>> CreateProgramAsync(FtiProgramCreateDto dto)
         {
             var entity = _mapper.MapToEntity(dto);
-            entity.OrganizationId = _currentUserService.OrganizationId;
+            SetCreateAuditFields(entity);  // Use base class helper
             entity.FormStatus = "Draft";
-            entity.CreatedById = _currentUserService.UserId;
-            entity.CreatedAt = DateTimeOffset.UtcNow;
 
             var created = await _programRepository.CreateAsync(entity);
             var resultDto = _mapper.MapToDto(created);
@@ -97,7 +98,7 @@ namespace Infrastructure.Services.DataTables.FTI
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
-            if (!await _entityPermissionService.CanViewForm(program))
+            if (!await CanViewFormAsync(program))  // Use base class helper
                 return ServiceResult<FtiProgramDetailsDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
@@ -115,7 +116,7 @@ namespace Infrastructure.Services.DataTables.FTI
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
-            if (!await _entityPermissionService.CanViewForm(program))
+            if (!await CanViewFormAsync(program))
                 return ServiceResult<FtiProgramCompleteDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
@@ -133,7 +134,7 @@ namespace Infrastructure.Services.DataTables.FTI
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
-            if (!await _entityPermissionService.CanModifyForm(program))
+            if (!await CanModifyFormAsync(program))
                 return ServiceResult<FtiProgramDetailsDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
@@ -144,7 +145,7 @@ namespace Infrastructure.Services.DataTables.FTI
             //         ServiceErrorStatus.INVALIDOPERATION);
 
             _mapper.MapUpdateDtoToEntity(dto, program);
-            program.UpdatedById = _currentUserService.UserId;
+            program.UpdatedById = CurrentUserService.UserId;
             program.UpdatedAt = DateTimeOffset.UtcNow;
 
             var updated = await _programRepository.UpdateAsync(program);
@@ -160,7 +161,7 @@ namespace Infrastructure.Services.DataTables.FTI
             if (program == null)
                 return ServiceResult.Failure("Program not found", ServiceErrorStatus.NOTFOUND);
 
-            if (!await _entityPermissionService.CanModifyForm(program))
+            if (!await CanModifyFormAsync(program))
                 return ServiceResult.Failure("Access denied. You can only delete your own forms.", ServiceErrorStatus.FORBIDDEN);
 
             await _programRepository.DeleteAsync(id);
@@ -182,7 +183,7 @@ namespace Infrastructure.Services.DataTables.FTI
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
-            if (!await _entityPermissionService.CanModifyForm(program))
+            if (!await CanModifyFormAsync(program))
                 return ServiceResult<FtiParticipantDemographicsDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
@@ -194,7 +195,7 @@ namespace Infrastructure.Services.DataTables.FTI
 
             var entity = _mapper.MapToEntity(dto);
             entity.FtiProgramDetailsId = programId;
-            entity.CreatedById = _currentUserService.UserId;
+            entity.CreatedById = CurrentUserService.UserId;
             entity.CreatedAt = DateTimeOffset.UtcNow;
 
             var created = await _demographicsRepository.CreateAsync(entity);
@@ -215,7 +216,7 @@ namespace Infrastructure.Services.DataTables.FTI
                     ServiceErrorStatus.NOTFOUND);
 
             var program = await _programRepository.GetByIdAsync(demographics.FtiProgramDetailsId ?? 0);
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
+            if (program == null || !await CanModifyFormAsync(program))
                 return ServiceResult<FtiParticipantDemographicsDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
@@ -226,7 +227,7 @@ namespace Infrastructure.Services.DataTables.FTI
             //         ServiceErrorStatus.INVALIDOPERATION);
 
             _mapper.MapUpdateDtoToEntity(dto, demographics);
-            demographics.UpdatedById = _currentUserService.UserId;
+            demographics.UpdatedById = CurrentUserService.UserId;
             demographics.UpdatedAt = DateTimeOffset.UtcNow;
 
             var updated = await _demographicsRepository.UpdateAsync(demographics);
@@ -243,7 +244,7 @@ namespace Infrastructure.Services.DataTables.FTI
                 return ServiceResult.Failure("Demographics not found", ServiceErrorStatus.NOTFOUND);
 
             var program = await _programRepository.GetByIdAsync(demographics.FtiProgramDetailsId ?? 0);
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
+            if (program == null || !await CanModifyFormAsync(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
             // if (program.FormStatus != "Draft")
@@ -290,7 +291,7 @@ namespace Infrastructure.Services.DataTables.FTI
                     ServiceErrorStatus.NOTFOUND);
 
             // Check permissions
-            if (!await _entityPermissionService.CanModifyForm(program))
+            if (!await CanModifyFormAsync(program))
                 return ServiceResult<FtiProgramContentDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
@@ -312,7 +313,7 @@ namespace Infrastructure.Services.DataTables.FTI
                 parentEntity.FtiProgramDetailsId = programId;
                 parentEntity.UnitLocationId = program.UnitLocationId;
                 parentEntity.OrganizationId = program.OrganizationId;
-                parentEntity.CreatedById = _currentUserService.UserId;
+                parentEntity.CreatedById = CurrentUserService.UserId;
                 parentEntity.CreatedAt = DateTimeOffset.UtcNow;
 
                 // Prepare child entities
@@ -321,7 +322,7 @@ namespace Infrastructure.Services.DataTables.FTI
                     var entity = _mapper.MapToEntity(rp);
                     entity.UnitLocationId = program.UnitLocationId;
                     entity.OrganizationId = program.OrganizationId;
-                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedById = CurrentUserService.UserId;
                     entity.CreatedAt = DateTimeOffset.UtcNow;
                     return entity;
                 }).ToList();
@@ -331,7 +332,7 @@ namespace Infrastructure.Services.DataTables.FTI
                     var entity = _mapper.MapToEntity(tc);
                     entity.UnitLocationId = program.UnitLocationId;
                     entity.OrganizationId = program.OrganizationId;
-                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedById = CurrentUserService.UserId;
                     entity.CreatedAt = DateTimeOffset.UtcNow;
                     return entity;
                 }).ToList();
@@ -341,7 +342,7 @@ namespace Infrastructure.Services.DataTables.FTI
                     var entity = _mapper.MapToEntity(ta);
                     entity.UnitLocationId = program.UnitLocationId;
                     entity.OrganizationId = program.OrganizationId;
-                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedById = CurrentUserService.UserId;
                     entity.CreatedAt = DateTimeOffset.UtcNow;
                     return entity;
                 }).ToList();
@@ -388,7 +389,7 @@ namespace Infrastructure.Services.DataTables.FTI
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
-            if (!await _entityPermissionService.CanModifyForm(program))
+            if (!await CanModifyFormAsync(program))
                 return ServiceResult<FtiProgramContentDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
@@ -404,7 +405,7 @@ namespace Infrastructure.Services.DataTables.FTI
                 var parentEntity = new FtiProgramContentAndResources
                 {
                     Id = contentId,
-                    UpdatedById = _currentUserService.UserId,
+                    UpdatedById = CurrentUserService.UserId,
                     UpdatedAt = DateTimeOffset.UtcNow
                 };
 
@@ -425,12 +426,12 @@ namespace Infrastructure.Services.DataTables.FTI
 
                     if (entity.Id == 0)
                     {
-                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedById = CurrentUserService.UserId;
                         entity.CreatedAt = DateTimeOffset.UtcNow;
                     }
                     else
                     {
-                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedById = CurrentUserService.UserId;
                         entity.UpdatedAt = DateTimeOffset.UtcNow;
                     }
 
@@ -451,12 +452,12 @@ namespace Infrastructure.Services.DataTables.FTI
 
                     if (entity.Id == 0)
                     {
-                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedById = CurrentUserService.UserId;
                         entity.CreatedAt = DateTimeOffset.UtcNow;
                     }
                     else
                     {
-                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedById = CurrentUserService.UserId;
                         entity.UpdatedAt = DateTimeOffset.UtcNow;
                     }
 
@@ -478,12 +479,12 @@ namespace Infrastructure.Services.DataTables.FTI
 
                     if (entity.Id == 0)
                     {
-                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedById = CurrentUserService.UserId;
                         entity.CreatedAt = DateTimeOffset.UtcNow;
                     }
                     else
                     {
-                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedById = CurrentUserService.UserId;
                         entity.UpdatedAt = DateTimeOffset.UtcNow;
                     }
 
@@ -529,7 +530,7 @@ namespace Infrastructure.Services.DataTables.FTI
                 return ServiceResult.Failure("Content not found", ServiceErrorStatus.NOTFOUND);
 
             var program = await _programRepository.GetByIdAsync(content.FtiProgramDetailsId ?? 0);
-            if (program == null || !await _entityPermissionService.CanModifyForm(program))
+            if (program == null || !await CanModifyFormAsync(program))
                 return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
 
             // if (program.FormStatus != "Draft")
@@ -571,7 +572,7 @@ namespace Infrastructure.Services.DataTables.FTI
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
-            if (!await _entityPermissionService.CanModifyForm(program))
+            if (!await CanModifyFormAsync(program))
                 return ServiceResult<FtiAdvisoryServicesDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
@@ -588,7 +589,7 @@ namespace Infrastructure.Services.DataTables.FTI
                 // Create new
                 var entity = _mapper.MapToEntity(dto);
                 entity.FtiProgramDetailsId = programId;
-                entity.CreatedById = _currentUserService.UserId;
+                entity.CreatedById = CurrentUserService.UserId;
                 entity.CreatedAt = DateTimeOffset.UtcNow;
 
                 var created = await _advisoryRepository.CreateAsync(entity);
@@ -616,7 +617,7 @@ namespace Infrastructure.Services.DataTables.FTI
                 };
 
                 _mapper.MapUpdateDtoToEntity(updateDto, existing);
-                existing.UpdatedById = _currentUserService.UserId;
+                existing.UpdatedById = CurrentUserService.UserId;
                 existing.UpdatedAt = DateTimeOffset.UtcNow;
 
                 var updated = await _advisoryRepository.UpdateAsync(existing);
@@ -664,7 +665,7 @@ namespace Infrastructure.Services.DataTables.FTI
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
-            if (!await _entityPermissionService.CanModifyForm(program))
+            if (!await CanModifyFormAsync(program))
                 return ServiceResult<FtiReportDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
@@ -683,7 +684,7 @@ namespace Infrastructure.Services.DataTables.FTI
                 // Create new
                 var entity = _mapper.MapToEntity(dto);
                 entity.FtiProgramDetailsId = programId;
-                entity.CreatedById = _currentUserService.UserId;
+                entity.CreatedById = CurrentUserService.UserId;
                 entity.CreatedAt = DateTimeOffset.UtcNow;
 
                 var created = await _reportRepository.CreateAsync(entity);
@@ -715,7 +716,7 @@ namespace Infrastructure.Services.DataTables.FTI
 
 
                 _mapper.MapUpdateDtoToEntity(updateDto, existing);
-                existing.UpdatedById = _currentUserService.UserId;
+                existing.UpdatedById = CurrentUserService.UserId;
                 existing.UpdatedAt = DateTimeOffset.UtcNow;
 
                 var updated = await _reportRepository.UpdateAsync(existing);
@@ -760,7 +761,7 @@ namespace Infrastructure.Services.DataTables.FTI
                     "Program not found",
                     ServiceErrorStatus.NOTFOUND);
 
-            if (!await _entityPermissionService.CanModifyForm(program))
+            if (!await CanModifyFormAsync(program))
                 return ServiceResult<FtiRecommendationDto>.Failure(
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
@@ -777,7 +778,7 @@ namespace Infrastructure.Services.DataTables.FTI
                 // Create new
                 var entity = _mapper.MapToEntity(dto);
                 entity.FtiProgramDetailsId = programId;
-                entity.CreatedById = _currentUserService.UserId;
+                entity.CreatedById = CurrentUserService.UserId;
                 entity.CreatedAt = DateTimeOffset.UtcNow;
 
                 var created = await _recommendationRepository.CreateAsync(entity);
@@ -787,7 +788,7 @@ namespace Infrastructure.Services.DataTables.FTI
                 // if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
                 // {
                 program.FormStatus = "Pending";
-                program.UpdatedById = _currentUserService.UserId;
+                program.UpdatedById = CurrentUserService.UserId;
                 program.UpdatedAt = DateTimeOffset.UtcNow;
                 await _programRepository.UpdateAsync(program);
                 // }
@@ -809,7 +810,7 @@ namespace Infrastructure.Services.DataTables.FTI
                 };
 
                 _mapper.MapUpdateDtoToEntity(updateDto, existing);
-                existing.UpdatedById = _currentUserService.UserId;
+                existing.UpdatedById = CurrentUserService.UserId;
                 existing.UpdatedAt = DateTimeOffset.UtcNow;
 
                 var updated = await _recommendationRepository.UpdateAsync(existing);
@@ -819,7 +820,7 @@ namespace Infrastructure.Services.DataTables.FTI
                 // if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
                 // {
                 program.FormStatus = "Pending";
-                program.UpdatedById = _currentUserService.UserId;
+                program.UpdatedById = CurrentUserService.UserId;
                 program.UpdatedAt = DateTimeOffset.UtcNow;
                 await _programRepository.UpdateAsync(program);
                 //}
@@ -855,91 +856,19 @@ namespace Infrastructure.Services.DataTables.FTI
         public async Task<ServiceResult> SubmitForApprovalAsync(int programId)
         {
             var program = await _programRepository.GetByIdAsync(programId);
-
-            if (program == null)
-                return ServiceResult.Failure("Program not found", ServiceErrorStatus.NOTFOUND);
-
-            if (!await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
-                return ServiceResult.Failure(
-                    "Only draft or rejected programs can be submitted",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            program.FormStatus = "Pending";
-            program.UpdatedById = _currentUserService.UserId;
-            program.UpdatedAt = DateTimeOffset.UtcNow;
-
-            await _programRepository.UpdateAsync(program);
-            return ServiceResult.Success();
+            return await SubmitForApprovalAsync(program, _programRepository);  // Use base class method
         }
 
         public async Task<ServiceResult> ApproveAsync(int programId, string? remarks = null)
         {
             var program = await _programRepository.GetByIdAsync(programId);
-
-            if (program == null)
-                return ServiceResult.Failure("Program not found", ServiceErrorStatus.NOTFOUND);
-
-            // Only UnitHead or Admin can approve
-            if (_currentUserService.Role != Role.UNITHEAD && _currentUserService.Role != Role.ADMIN)
-                return ServiceResult.Failure(
-                    "Only Unit Heads and Admins can approve programs",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (!await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Pending")
-                return ServiceResult.Failure(
-                    "Only pending programs can be approved",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            program.FormStatus = "Approved";
-            program.FormStatusRemarks = remarks;
-            program.ApprovedById = _currentUserService.UserId;
-            program.ApprovedAt = DateTimeOffset.UtcNow;
-            program.UpdatedById = _currentUserService.UserId;
-            program.UpdatedAt = DateTimeOffset.UtcNow;
-
-            await _programRepository.UpdateAsync(program);
-            return ServiceResult.Success();
+            return await ApproveAsync(program, _programRepository, remarks);  // Use base class method
         }
 
         public async Task<ServiceResult> RejectAsync(int programId, string remarks)
         {
             var program = await _programRepository.GetByIdAsync(programId);
-
-            if (program == null)
-                return ServiceResult.Failure("Program not found", ServiceErrorStatus.NOTFOUND);
-
-            // Only UnitHead or Admin can reject
-            if (_currentUserService.Role != Role.UNITHEAD && _currentUserService.Role != Role.ADMIN)
-                return ServiceResult.Failure(
-                    "Only Unit Heads and Admins can reject programs",
-                    ServiceErrorStatus.FORBIDDEN);
-
-            if (!await _entityPermissionService.CanModifyForm(program))
-                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
-
-            if (program.FormStatus != "Pending")
-                return ServiceResult.Failure(
-                    "Only pending programs can be rejected",
-                    ServiceErrorStatus.INVALIDOPERATION);
-
-            if (string.IsNullOrWhiteSpace(remarks))
-                return ServiceResult.Failure(
-                    "Remarks are required for rejection",
-                    ServiceErrorStatus.BADREQUEST);
-
-            program.FormStatus = "Rejected";
-            program.FormStatusRemarks = remarks;
-            program.UpdatedById = _currentUserService.UserId;
-            program.UpdatedAt = DateTimeOffset.UtcNow;
-
-            await _programRepository.UpdateAsync(program);
-            return ServiceResult.Success();
+            return await RejectAsync(program, _programRepository, remarks);  // Use base class method
         }
 
         // ============================
