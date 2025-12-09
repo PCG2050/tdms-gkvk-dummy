@@ -52,6 +52,20 @@ namespace Application.Interface.Services.DataTables.KVK
         Task<ServiceResult<KvkAdvisoryServicesDto>> AddOrUpdateAdvisoryServicesAsync(int programId, KvkAdvisoryServicesCreateDto dto);
         Task<ServiceResult<KvkAdvisoryServicesDto>> GetAdvisoryServicesByProgramIdAsync(int programId);
 
+        /// <summary>
+        /// Create KvkAdvisoryServices along with all child entities (CriticalInputsDistributed) in a single transaction
+        /// </summary>
+        Task<ServiceResult<KvkAdvisoryServicesDto>> AddAdvisoryServicesWithChildrenAsync(int programId, KvkAdvisoryServicesHybridCreateDto dto);
+
+        /// <summary>
+        /// Update KvkAdvisoryServices with all child entities using Hybrid Pattern in a single transaction
+        /// - Items WITH Id: UPDATE existing
+        /// - Items WITHOUT Id (null or 0): CREATE new
+        /// - Items in DB but NOT in arrays: DELETE
+        /// Perfect for "Save & Next" button with inline editing capabilities
+        /// </summary>
+        Task<ServiceResult<KvkAdvisoryServicesDto>> UpdateAdvisoryServicesWithChildrenAsync(int advisoryServicesId, KvkAdvisoryServicesHybridUpdateDto dto);
+
         // ============================
         // SECTION E: RESULTS (FLD/OFT - CategoryId 18 or 24)
         // ============================

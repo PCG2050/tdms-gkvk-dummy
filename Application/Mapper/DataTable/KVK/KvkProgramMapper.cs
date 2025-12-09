@@ -202,7 +202,25 @@ namespace Application.Mapper.DataTable.KVK
         // ADVISORY SERVICES MAPPINGS
         // ============================
 
-        public partial KvkAdvisoryServicesDto MapToDto(KvkAdvisoryServices entity);
+        public KvkAdvisoryServicesDto MapToDto(KvkAdvisoryServices entity)
+        {
+            return new KvkAdvisoryServicesDto
+            {
+                Id = entity.Id,
+                NoOfFacebookSMS = entity.NoOfFacebookSMS,
+                NoOfSMSSentToRegisteredFarmers = entity.NoOfSMSSentToRegisteredFarmers,
+                NoOfWhatsappGroups = entity.NoOfWhatsappGroups,
+                NoOfWhatsappSMS = entity.NoOfWhatsappSMS,
+                NoOfAnsweredWhatsappQueries = entity.NoOfAnsweredWhatsappQueries,
+                NoOfPhoneCalls = entity.NoOfPhoneCalls,
+                NoOfFaceToFaceDiscussions = entity.NoOfFaceToFaceDiscussions,
+                NoOfGroupDiscussions = entity.NoOfGroupDiscussions,
+                NoOfEmailsSent = entity.NoOfEmailsSent,
+                NoOfNewspaperCoverage = entity.NoOfNewspaperCoverage,
+                NoOfBeneficiaries = entity.NoOfBeneficiaries,
+                CriticalInputsDistributed = entity.CriticalInputsDistributed?.Select(MapToDto).ToList()
+            };
+        }
 
         public partial KvkAdvisoryServices MapToEntity(KvkAdvisoryServicesCreateDto dto);
 
@@ -213,6 +231,22 @@ namespace Application.Mapper.DataTable.KVK
         [MapperIgnoreTarget(nameof(KvkAdvisoryServices.UpdatedAt))]
         [MapperIgnoreTarget(nameof(KvkAdvisoryServices.UpdatedById))]
         public partial void MapUpdateDtoToEntity(KvkAdvisoryServicesUpdateDto dto, KvkAdvisoryServices entity);
+
+        // ============================
+        // CRITICAL INPUTS DISTRIBUTED MAPPINGS
+        // ============================
+
+        public partial KvkCriticalInputsDistributedDto MapToDto(KvkCriticalInputsDistributed entity);
+
+        public partial KvkCriticalInputsDistributed MapToEntity(KvkCriticalInputsDistributedCreateDto dto);
+
+        [MapperIgnoreTarget(nameof(KvkCriticalInputsDistributed.Id))]
+        [MapperIgnoreTarget(nameof(KvkCriticalInputsDistributed.KvkAdvisoryServicesId))]
+        [MapperIgnoreTarget(nameof(KvkCriticalInputsDistributed.CreatedAt))]
+        [MapperIgnoreTarget(nameof(KvkCriticalInputsDistributed.CreatedById))]
+        [MapperIgnoreTarget(nameof(KvkCriticalInputsDistributed.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(KvkCriticalInputsDistributed.UpdatedById))]
+        public partial void MapUpdateDtoToEntity(KvkCriticalInputsDistributedUpdateDto dto, KvkCriticalInputsDistributed entity);
 
         // ============================
         // RESULT MAPPINGS (FLD/OFT)

@@ -742,6 +742,160 @@ namespace Infrastructure.Services.DataTables.KVK
             return ServiceResult<KvkAdvisoryServicesDto>.Success(dto);
         }
 
+        public async Task<ServiceResult<KvkAdvisoryServicesDto>> AddAdvisoryServicesWithChildrenAsync(
+            int programId,
+            KvkAdvisoryServicesHybridCreateDto dto)
+        {
+            // Validate program exists
+            var program = await _programRepository.GetByIdAsync(programId);
+            if (program == null)
+                return ServiceResult<KvkAdvisoryServicesDto>.Failure(
+                    "Program not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            // Check permissions
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult<KvkAdvisoryServicesDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            try
+            {
+                // Prepare parent entity
+                var parentEntity = new KvkAdvisoryServices
+                {
+                    KvkProgramDetailsId = programId,
+                    NoOfFacebookSMS = dto.NoOfFacebookSMS,
+                    NoOfSMSSentToRegisteredFarmers = dto.NoOfSMSSentToRegisteredFarmers,
+                    NoOfWhatsappGroups = dto.NoOfWhatsappGroups,
+                    NoOfWhatsappSMS = dto.NoOfWhatsappSMS,
+                    NoOfAnsweredWhatsappQueries = dto.NoOfAnsweredWhatsappQueries,
+                    NoOfPhoneCalls = dto.NoOfPhoneCalls,
+                    NoOfFaceToFaceDiscussions = dto.NoOfFaceToFaceDiscussions,
+                    NoOfGroupDiscussions = dto.NoOfGroupDiscussions,
+                    NoOfEmailsSent = dto.NoOfEmailsSent,
+                    NoOfNewspaperCoverage = dto.NoOfNewspaperCoverage,
+                    NoOfBeneficiaries = dto.NoOfBeneficiaries,
+                    UnitLocationId = program.UnitLocationId,
+                    OrganizationId = program.OrganizationId,
+                    CreatedById = _currentUserService.UserId,
+                    CreatedAt = DateTimeOffset.UtcNow
+                };
+
+                // Prepare child entities
+                var criticalInputs = dto.CriticalInputsDistributed?.Select(ci =>
+                {
+                    var entity = _mapper.MapToEntity(ci);
+                    entity.UnitLocationId = program.UnitLocationId;
+                    entity.OrganizationId = program.OrganizationId;
+                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedAt = DateTimeOffset.UtcNow;
+                    return entity;
+                }).ToList();
+
+                // Repository handles transaction internally
+                var createdAdvisory = await _advisoryRepository.CreateWithChildrenAsync(
+                    parentEntity,
+                    criticalInputs);
+
+                var resultDto = _mapper.MapToDto(createdAdvisory);
+                return ServiceResult<KvkAdvisoryServicesDto>.Success(resultDto);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<KvkAdvisoryServicesDto>.Failure(
+                    $"Error creating advisory services: {ex.Message}",
+                    ServiceErrorStatus.INTERNALERROR);
+            }
+        }
+
+        public async Task<ServiceResult<KvkAdvisoryServicesDto>> UpdateAdvisoryServicesWithChildrenAsync(
+            int advisoryServicesId,
+            KvkAdvisoryServicesHybridUpdateDto dto)
+        {
+            // Validate advisory services exists
+            var advisory = await _advisoryRepository.GetWithDetailsAsync(advisoryServicesId);
+            if (advisory == null)
+                return ServiceResult<KvkAdvisoryServicesDto>.Failure(
+                    "Advisory services not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            // Validate program and permissions
+            var program = await _programRepository.GetByIdAsync(advisory.KvkProgramDetailsId ?? 0);
+            if (program == null)
+                return ServiceResult<KvkAdvisoryServicesDto>.Failure(
+                    "Program not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult<KvkAdvisoryServicesDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            try
+            {
+                // Prepare parent entity for update
+                var parentEntity = new KvkAdvisoryServices
+                {
+                    Id = advisoryServicesId,
+                    NoOfFacebookSMS = dto.NoOfFacebookSMS,
+                    NoOfSMSSentToRegisteredFarmers = dto.NoOfSMSSentToRegisteredFarmers,
+                    NoOfWhatsappGroups = dto.NoOfWhatsappGroups,
+                    NoOfWhatsappSMS = dto.NoOfWhatsappSMS,
+                    NoOfAnsweredWhatsappQueries = dto.NoOfAnsweredWhatsappQueries,
+                    NoOfPhoneCalls = dto.NoOfPhoneCalls,
+                    NoOfFaceToFaceDiscussions = dto.NoOfFaceToFaceDiscussions,
+                    NoOfGroupDiscussions = dto.NoOfGroupDiscussions,
+                    NoOfEmailsSent = dto.NoOfEmailsSent,
+                    NoOfNewspaperCoverage = dto.NoOfNewspaperCoverage,
+                    NoOfBeneficiaries = dto.NoOfBeneficiaries,
+                    UpdatedById = _currentUserService.UserId,
+                    UpdatedAt = DateTimeOffset.UtcNow
+                };
+
+                // Prepare child entities (hybrid: mix of new and existing)
+                var criticalInputs = dto.CriticalInputsDistributed?.Select(ci =>
+                {
+                    var entity = new KvkCriticalInputsDistributed
+                    {
+                        Id = ci.Id ?? 0, // 0 means new
+                        InputName = ci.InputName,
+                        QuantityDistributed = ci.QuantityDistributed,
+                        NoOfRecipients = ci.NoOfRecipients,
+                        UnitLocationId = program.UnitLocationId,
+                        OrganizationId = program.OrganizationId
+                    };
+
+                    if (entity.Id == 0)
+                    {
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
+
+                    return entity;
+                }).ToList();
+
+                // Repository handles transaction and hybrid pattern internally
+                var updatedAdvisory = await _advisoryRepository.UpdateWithChildrenAsync(
+                    parentEntity,
+                    criticalInputs);
+
+                var resultDto = _mapper.MapToDto(updatedAdvisory);
+                return ServiceResult<KvkAdvisoryServicesDto>.Success(resultDto);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<KvkAdvisoryServicesDto>.Failure(
+                    $"Error updating advisory services: {ex.Message}",
+                    ServiceErrorStatus.INTERNALERROR);
+            }
+        }
+
         // ============================
         // SECTION E: RESULTS (FLD/OFT - CategoryId 18 or 24 ONLY)
         // ============================

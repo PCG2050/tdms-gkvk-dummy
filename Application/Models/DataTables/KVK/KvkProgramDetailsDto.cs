@@ -629,6 +629,7 @@ namespace Application.Models.DataTables.KVK
         public int? NoOfEmailsSent { get; set; }
         public int? NoOfNewspaperCoverage { get; set; }
         public int? NoOfBeneficiaries { get; set; }
+        public List<KvkCriticalInputsDistributedDto>? CriticalInputsDistributed { get; set; }
     }
 
     public class KvkAdvisoryServicesCreateDto
@@ -661,6 +662,84 @@ namespace Application.Models.DataTables.KVK
         public int? NoOfNewspaperCoverage { get; set; }
         public int? NoOfBeneficiaries { get; set; }
     }
+
+    /// <summary>
+    /// Hybrid create DTO - creates advisory services with all critical inputs in one request
+    /// </summary>
+    public class KvkAdvisoryServicesHybridCreateDto
+    {
+        public int? NoOfFacebookSMS { get; set; }
+        public int? NoOfSMSSentToRegisteredFarmers { get; set; }
+        public int? NoOfWhatsappGroups { get; set; }
+        public int? NoOfWhatsappSMS { get; set; }
+        public int? NoOfAnsweredWhatsappQueries { get; set; }
+        public int? NoOfPhoneCalls { get; set; }
+        public int? NoOfFaceToFaceDiscussions { get; set; }
+        public int? NoOfGroupDiscussions { get; set; }
+        public int? NoOfEmailsSent { get; set; }
+        public int? NoOfNewspaperCoverage { get; set; }
+        public int? NoOfBeneficiaries { get; set; }
+
+        public List<KvkCriticalInputsDistributedCreateDto>? CriticalInputsDistributed { get; set; }
+    }
+
+    /// <summary>
+    /// Hybrid update DTO - updates advisory services and manages all critical inputs (create/update/delete) in one request
+    /// </summary>
+    public class KvkAdvisoryServicesHybridUpdateDto
+    {
+        public int? NoOfFacebookSMS { get; set; }
+        public int? NoOfSMSSentToRegisteredFarmers { get; set; }
+        public int? NoOfWhatsappGroups { get; set; }
+        public int? NoOfWhatsappSMS { get; set; }
+        public int? NoOfAnsweredWhatsappQueries { get; set; }
+        public int? NoOfPhoneCalls { get; set; }
+        public int? NoOfFaceToFaceDiscussions { get; set; }
+        public int? NoOfGroupDiscussions { get; set; }
+        public int? NoOfEmailsSent { get; set; }
+        public int? NoOfNewspaperCoverage { get; set; }
+        public int? NoOfBeneficiaries { get; set; }
+
+        public List<KvkCriticalInputsDistributedHybridDto>? CriticalInputsDistributed { get; set; }
+    }
+
+    // ============================
+    // CRITICAL INPUTS DISTRIBUTED DTOs
+    // ============================
+    public class KvkCriticalInputsDistributedDto
+    {
+        public int Id { get; set; }
+        public string? InputName { get; set; }
+        public int? QuantityDistributed { get; set; }
+        public int? NoOfRecipients { get; set; }
+    }
+
+    public class KvkCriticalInputsDistributedCreateDto
+    {
+        public string? InputName { get; set; }
+        public int? QuantityDistributed { get; set; }
+        public int? NoOfRecipients { get; set; }
+    }
+
+    public class KvkCriticalInputsDistributedUpdateDto : IUpdateDto
+    {
+        public int Id { get; set; }
+        public string? InputName { get; set; }
+        public int? QuantityDistributed { get; set; }
+        public int? NoOfRecipients { get; set; }
+    }
+
+    /// <summary>
+    /// Hybrid item for Critical Inputs Distributed
+    /// </summary>
+    public class KvkCriticalInputsDistributedHybridDto
+    {
+        public int? Id { get; set; }  // null = create new, has value = update existing
+        public string? InputName { get; set; }
+        public int? QuantityDistributed { get; set; }
+        public int? NoOfRecipients { get; set; }
+    }
+
 
     // ============================
     // RESULT DTOs (FLD/OFT)
