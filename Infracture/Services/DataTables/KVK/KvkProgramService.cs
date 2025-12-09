@@ -504,12 +504,90 @@ namespace Infrastructure.Services.DataTables.KVK
                     return entity;
                 }).ToList();
 
+                var fieldVisits = dto.FieldVisits?.Select(fv =>
+                {
+                    var entity = new KvkFieldVisit
+                    {
+                        Id = fv.Id ?? 0,
+                        Date = fv.Date,
+                        ScientistOfficerVisitedName = fv.ScientistOfficerVisitedName,
+                        Purpose = fv.Purpose,
+                        NoOfFieldsCovered = fv.NoOfFieldsCovered,
+                        NoOfFarmerCovered = fv.NoOfFarmerCovered,
+                        PhotoUpload = fv.PhotoUpload
+                    };
+
+                    if (entity.Id == 0)
+                    {
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
+
+                    return entity;
+                }).ToList();
+
+                var fieldDays = dto.FieldDays?.Select(fd =>
+                {
+                    var entity = new KvkFieldDay
+                    {
+                        Id = fd.Id ?? 0
+                        // Add other KvkFieldDay fields here based on your DTO
+                    };
+
+                    if (entity.Id == 0)
+                    {
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
+
+                    return entity;
+                }).ToList();
+
+                var farmerScientistInteractions = dto.FarmerScientistInteractions?.Select(fsi =>
+                {
+                    var entity = new KvkFarmerScientistInteraction
+                    {
+                        Id = fsi.Id ?? 0,
+                        Date = fsi.Date,
+                        ScientistOfficerName = fsi.ScientistOfficerName,
+                        TopicDiscussed = fsi.TopicDiscussed,
+                        NoOfFarmersParticipated = fsi.NoOfFarmersParticipated,
+                        PhotoUpload = fsi.PhotoUpload
+                    };
+
+                    if (entity.Id == 0)
+                    {
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
+
+                    return entity;
+                }).ToList();
+
                 // Repository handles transaction internally
                 var updatedContent = await _contentRepository.UpdateWithChildrenAsync(
                     parentEntity,
                     resourcePersons,
                     topicsCovered,
-                    teachingAids);
+                    teachingAids,
+                    fieldVisits,
+                    fieldDays,
+                    farmerScientistInteractions);
 
                 var resultDto = _mapper.MapToDto(updatedContent);
                 return ServiceResult<KvkProgramContentDto>.Success(resultDto);
