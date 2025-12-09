@@ -316,6 +316,9 @@ namespace Application.Models.DataTables.KVK
         public List<KvkResourcePersonDto>? ResourcePersons { get; set; }
         public List<KvkTopicsCoveredDto>? TopicsCovered { get; set; }
         public List<KvkTeachingAidsDto>? TeachingAids { get; set; }
+        public List<KvkFieldVisitDto>? FieldVisits { get; set; }
+        public List<KvkFieldDayDto>? FieldDays { get; set; }
+        public List<KvkFarmerScientistInteractionDto>? FarmerScientistInteractions { get; set; }
     }
 
     public class KvkProgramContentCreateDto
@@ -337,6 +340,9 @@ namespace Application.Models.DataTables.KVK
         public List<KvkResourcePersonCreateDto>? ResourcePersons { get; set; }
         public List<KvkTopicsCoveredCreateDto>? TopicsCovered { get; set; }
         public List<KvkTeachingAidsCreateDto>? TeachingAids { get; set; }
+        public List<KvkFieldVisitCreateDto>? FieldVisits { get; set; }
+        public List<KvkFieldDayCreateDto>? FieldDays { get; set; }
+        public List<KvkFarmerScientistInteractionCreateDto>? FarmerScientistInteractions { get; set; }
     }
 
     /// <summary>
@@ -396,6 +402,9 @@ namespace Application.Models.DataTables.KVK
         public List<KvkResourcePersonHybridDto>? ResourcePersons { get; set; }
         public List<KvkTopicsCoveredHybridDto>? TopicsCovered { get; set; }
         public List<KvkTeachingAidsHybridDto>? TeachingAids { get; set; }
+        public List<KvkFieldVisitHybridDto>? FieldVisits { get; set; }
+        public List<KvkFieldDayHybridDto>? FieldDays { get; set; }
+        public List<KvkFarmerScientistInteractionHybridDto>? FarmerScientistInteractions { get; set; }
     }
 
     // Resource Person DTOs
@@ -478,6 +487,129 @@ namespace Application.Models.DataTables.KVK
         public string? OtherTypeOfAid { get; set; }
         public string? Purpose { get; set; }
         public int? Number { get; set; }
+    }
+
+    // ============================
+    // FIELD VISIT DTOs
+    // ============================
+    public class KvkFieldVisitDto
+    {
+        public int Id { get; set; }
+        public DateOnly? Date { get; set; }
+        public string? ScientistOfficerVisitedName { get; set; }
+        public string? Purpose { get; set; }
+        public int? NoOfFieldsCovered { get; set; }
+        public int? NoOfFarmerCovered { get; set; }
+        public string? PhotoUpload { get; set; }
+    }
+
+    public class KvkFieldVisitCreateDto
+    {
+        public DateOnly? Date { get; set; }
+        public string? ScientistOfficerVisitedName { get; set; }
+        public string? Purpose { get; set; }
+        public int? NoOfFieldsCovered { get; set; }
+        public int? NoOfFarmerCovered { get; set; }
+        public string? PhotoUpload { get; set; }
+    }
+
+    public class KvkFieldVisitUpdateDto : IUpdateDto
+    {
+        public int Id { get; set; }
+        public DateOnly? Date { get; set; }
+        public string? ScientistOfficerVisitedName { get; set; }
+        public string? Purpose { get; set; }
+        public int? NoOfFieldsCovered { get; set; }
+        public int? NoOfFarmerCovered { get; set; }
+        public string? PhotoUpload { get; set; }
+    }
+
+    /// <summary>
+    /// Hybrid item for Field Visits
+    /// </summary>
+    public class KvkFieldVisitHybridDto
+    {
+        public int? Id { get; set; }  // null = create new, has value = update existing
+        public DateOnly? Date { get; set; }
+        public string? ScientistOfficerVisitedName { get; set; }
+        public string? Purpose { get; set; }
+        public int? NoOfFieldsCovered { get; set; }
+        public int? NoOfFarmerCovered { get; set; }
+        public string? PhotoUpload { get; set; }
+    }
+
+    // ============================
+    // FIELD DAY DTOs
+    // ============================
+    public class KvkFieldDayDto
+    {
+        public int Id { get; set; }
+        // Add KvkFieldDay fields based on your entity
+    }
+
+    public class KvkFieldDayCreateDto
+    {
+        // Add KvkFieldDay fields based on your entity
+    }
+
+    public class KvkFieldDayUpdateDto : IUpdateDto
+    {
+        public int Id { get; set; }
+        // Add KvkFieldDay fields based on your entity
+    }
+
+    /// <summary>
+    /// Hybrid item for Field Days
+    /// </summary>
+    public class KvkFieldDayHybridDto
+    {
+        public int? Id { get; set; }  // null = create new, has value = update existing
+        // Add KvkFieldDay fields based on your entity
+    }
+
+    // ============================
+    // FARMER SCIENTIST INTERACTION DTOs
+    // ============================
+    public class KvkFarmerScientistInteractionDto
+    {
+        public int Id { get; set; }
+        public DateOnly? Date { get; set; }
+        public string? ScientistOfficerName { get; set; }
+        public string? TopicDiscussed { get; set; }
+        public int? NoOfFarmersParticipated { get; set; }
+        public string? PhotoUpload { get; set; }
+    }
+
+    public class KvkFarmerScientistInteractionCreateDto
+    {
+        public DateOnly? Date { get; set; }
+        public string? ScientistOfficerName { get; set; }
+        public string? TopicDiscussed { get; set; }
+        public int? NoOfFarmersParticipated { get; set; }
+        public string? PhotoUpload { get; set; }
+    }
+
+    public class KvkFarmerScientistInteractionUpdateDto : IUpdateDto
+    {
+        public int Id { get; set; }
+        public DateOnly? Date { get; set; }
+        public string? ScientistOfficerName { get; set; }
+        public string? TopicDiscussed { get; set; }
+        public int? NoOfFarmersParticipated { get; set; }
+        public string? PhotoUpload { get; set; }
+    }
+
+    /// <summary>
+    /// Hybrid item for Farmer Scientist Interactions
+    /// </summary>
+    public class KvkFarmerScientistInteractionHybridDto
+    {
+        public int? Id { get; set; }  // null = create new, has value = update existing
+        public DateOnly? Date { get; set; }
+        public string? ScientistOfficerName { get; set; }
+        public string? TopicDiscussed { get; set; }
+        public int? NoOfFarmersParticipated { get; set; }
+        public string? PhotoUpload { get; set; }
     }
 
     // ============================

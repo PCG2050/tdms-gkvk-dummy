@@ -92,7 +92,10 @@ namespace Application.Mapper.DataTable.KVK
                 KvkProgramDetailsId = entity.KvkProgramDetailsId ?? 0,
                 ResourcePersons = entity.ResourcePersons?.Select(MapToDto).ToList(),
                 TopicsCovered = entity.TopicsCovered?.Select(MapToDto).ToList(),
-                TeachingAids = entity.TeachingAids?.Select(MapToDto).ToList()
+                TeachingAids = entity.TeachingAids?.Select(MapToDto).ToList(),
+                FieldVisits = entity.FieldVisits?.Select(MapToDto).ToList(),
+                FieldDays = entity.FieldDays?.Select(MapToDto).ToList(),
+                FarmerScientistInteractions = entity.FarmerScientistInteractions?.Select(MapToDto).ToList()
             };
         }
 
@@ -146,6 +149,54 @@ namespace Application.Mapper.DataTable.KVK
         [MapperIgnoreTarget(nameof(KvkTeachingAidsDeveloped.UpdatedAt))]
         [MapperIgnoreTarget(nameof(KvkTeachingAidsDeveloped.UpdatedById))]
         public partial void MapUpdateDtoToEntity(KvkTeachingAidsUpdateDto dto, KvkTeachingAidsDeveloped entity);
+
+        // ============================
+        // FIELD VISIT MAPPINGS
+        // ============================
+
+        public partial KvkFieldVisitDto MapToDto(KvkFieldVisit entity);
+
+        public partial KvkFieldVisit MapToEntity(KvkFieldVisitCreateDto dto);
+
+        [MapperIgnoreTarget(nameof(KvkFieldVisit.Id))]
+        [MapperIgnoreTarget(nameof(KvkFieldVisit.KvkProgramContentAndResourcesId))]
+        [MapperIgnoreTarget(nameof(KvkFieldVisit.CreatedAt))]
+        [MapperIgnoreTarget(nameof(KvkFieldVisit.CreatedById))]
+        [MapperIgnoreTarget(nameof(KvkFieldVisit.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(KvkFieldVisit.UpdatedById))]
+        public partial void MapUpdateDtoToEntity(KvkFieldVisitUpdateDto dto, KvkFieldVisit entity);
+
+        // ============================
+        // FIELD DAY MAPPINGS
+        // ============================
+
+        public partial KvkFieldDayDto MapToDto(KvkFieldDay entity);
+
+        public partial KvkFieldDay MapToEntity(KvkFieldDayCreateDto dto);
+
+        [MapperIgnoreTarget(nameof(KvkFieldDay.Id))]
+        [MapperIgnoreTarget(nameof(KvkFieldDay.KvkProgramContentAndResourcesId))]
+        [MapperIgnoreTarget(nameof(KvkFieldDay.CreatedAt))]
+        [MapperIgnoreTarget(nameof(KvkFieldDay.CreatedById))]
+        [MapperIgnoreTarget(nameof(KvkFieldDay.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(KvkFieldDay.UpdatedById))]
+        public partial void MapUpdateDtoToEntity(KvkFieldDayUpdateDto dto, KvkFieldDay entity);
+
+        // ============================
+        // FARMER SCIENTIST INTERACTION MAPPINGS
+        // ============================
+
+        public partial KvkFarmerScientistInteractionDto MapToDto(KvkFarmerScientistInteraction entity);
+
+        public partial KvkFarmerScientistInteraction MapToEntity(KvkFarmerScientistInteractionCreateDto dto);
+
+        [MapperIgnoreTarget(nameof(KvkFarmerScientistInteraction.Id))]
+        [MapperIgnoreTarget(nameof(KvkFarmerScientistInteraction.KvkProgramContentAndResourcesId))]
+        [MapperIgnoreTarget(nameof(KvkFarmerScientistInteraction.CreatedAt))]
+        [MapperIgnoreTarget(nameof(KvkFarmerScientistInteraction.CreatedById))]
+        [MapperIgnoreTarget(nameof(KvkFarmerScientistInteraction.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(KvkFarmerScientistInteraction.UpdatedById))]
+        public partial void MapUpdateDtoToEntity(KvkFarmerScientistInteractionUpdateDto dto, KvkFarmerScientistInteraction entity);
 
         // ============================
         // ADVISORY SERVICES MAPPINGS
