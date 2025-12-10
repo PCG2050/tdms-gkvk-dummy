@@ -23,7 +23,6 @@ namespace Domain.Entities.GenericTables
         public DateOnly? EndDate { get; set; }
 
 
-
         // Master Data References
         public int? CategoryId { get; set; }
 

@@ -148,6 +148,37 @@ namespace Domain.Entities.KVK
         [MaxLength(500)]
         public string? ReportingVideo { get; set; }
 
+
+        //New Fields
+        [MaxLength(50)]
+        public string? T01 { get; set; }
+        [MaxLength(50)]
+        public string? T02 { get; set; }
+        [MaxLength(50)]
+        public string? T03 { get; set; }
+        [MaxLength(50)]
+        public string? T04 { get; set; }
+        [MaxLength(50)]
+        public string? T05 { get; set; }
+
+        public string? StageOfCrop { get; set; }
+
+        public int? NoOfDemos { get; set; }
+
+        public int? NoOfTrails { get; set; }
+
+        public int? NoOfChecks { get; set; }
+
+        public int? NoOfVisits{get; set; }
+
+
+        public int? ParticipatedAsId { get; set; }
+        [JsonIgnore]
+        public Participant? ParticipatedAs { get; set; }
+
+        public string? ParticipantFileUpload { get; set; }
+
+
         public ICollection<KvkParticipantDemographics>? ParticipantDemographics { get; set; }
 
         public ICollection<KvkProgramContentAndResources>? ProgramContent { get; set; }

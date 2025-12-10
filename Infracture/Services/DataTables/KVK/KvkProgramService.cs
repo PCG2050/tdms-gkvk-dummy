@@ -77,7 +77,7 @@ namespace Infrastructure.Services.DataTables.KVK
             _mapper = mapper;
 
             //  generic history service
-            _historyService = new GenericTrainerHistoryService<KvkProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository,userRepository);
+            _historyService = new GenericTrainerHistoryService<KvkProgramDetails>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository, userRepository);
         }
 
         // ============================
@@ -159,7 +159,7 @@ namespace Infrastructure.Services.DataTables.KVK
 
             var updated = await _programRepository.UpdateAsync(program);
             var resultDto = _mapper.MapToDto(updated);
-                
+
             return ServiceResult<KvkProgramDetailsDto>.Success(resultDto);
         }
 
@@ -360,12 +360,45 @@ namespace Infrastructure.Services.DataTables.KVK
                     return entity;
                 }).ToList();
 
+                var fieldDays = dto.FieldDays?.Select(fd =>
+                {
+                    var entity = _mapper.MapToEntity(fd);
+                    entity.UnitLocationId = program.UnitLocationId;
+                    entity.OrganizationId = program.OrganizationId;
+                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedAt = DateTimeOffset.UtcNow;
+                    return entity;
+                }).ToList();
+
+                var fieldVisits = dto.FieldVisits?.Select(fv =>
+                {
+                    var entity = _mapper.MapToEntity(fv);
+                    entity.UnitLocationId = program.UnitLocationId;
+                    entity.OrganizationId = program.OrganizationId;
+                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedAt = DateTimeOffset.UtcNow;
+                    return entity;
+                }).ToList();
+
+                var farmerScientistInteractions = dto.FarmerScientistInteractions?.Select(fsi =>
+                {
+                    var entity = _mapper.MapToEntity(fsi);
+                    entity.UnitLocationId = program.UnitLocationId;
+                    entity.OrganizationId = program.OrganizationId;
+                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedAt = DateTimeOffset.UtcNow;
+                    return entity;
+                }).ToList();
+
                 // Repository handles transaction internally
                 var createdContent = await _contentRepository.CreateWithChildrenAsync(
                     parentEntity,
                     resourcePersons,
                     topicsCovered,
-                    teachingAids);
+                    teachingAids,
+                    fieldVisits,
+                    fieldDays,
+                    farmerScientistInteractions);
 
                 var resultDto = _mapper.MapToDto(createdContent);
                 return ServiceResult<KvkProgramContentDto>.Success(resultDto);
@@ -504,12 +537,90 @@ namespace Infrastructure.Services.DataTables.KVK
                     return entity;
                 }).ToList();
 
+                var fieldVisits = dto.FieldVisits?.Select(fv =>
+                {
+                    var entity = new KvkFieldVisit
+                    {
+                        Id = fv.Id ?? 0,
+                        Date = fv.Date,
+                        ScientistOfficerVisitedName = fv.ScientistOfficerVisitedName,
+                        Purpose = fv.Purpose,
+                        NoOfFieldsCovered = fv.NoOfFieldsCovered,
+                        NoOfFarmerCovered = fv.NoOfFarmerCovered,
+                        PhotoUpload = fv.PhotoUpload
+                    };
+
+                    if (entity.Id == 0)
+                    {
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
+
+                    return entity;
+                }).ToList();
+
+                var fieldDays = dto.FieldDays?.Select(fd =>
+                {
+                    var entity = new KvkFieldDay
+                    {
+                        Id = fd.Id ?? 0
+                        // Add other KvkFieldDay fields here based on your DTO
+                    };
+
+                    if (entity.Id == 0)
+                    {
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
+
+                    return entity;
+                }).ToList();
+
+                var farmerScientistInteractions = dto.FarmerScientistInteractions?.Select(fsi =>
+                {
+                    var entity = new KvkFarmerScientistInteraction
+                    {
+                        Id = fsi.Id ?? 0,
+                        Date = fsi.Date,
+                        ScientistOfficerName = fsi.ScientistOfficerName,
+                        TopicDiscussed = fsi.TopicDiscussed,
+                        NoOfFarmersParticipated = fsi.NoOfFarmersParticipated,
+                        PhotoUpload = fsi.PhotoUpload
+                    };
+
+                    if (entity.Id == 0)
+                    {
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
+
+                    return entity;
+                }).ToList();
+
                 // Repository handles transaction internally
                 var updatedContent = await _contentRepository.UpdateWithChildrenAsync(
                     parentEntity,
                     resourcePersons,
                     topicsCovered,
-                    teachingAids);
+                    teachingAids,
+                    fieldVisits,
+                    fieldDays,
+                    farmerScientistInteractions);
 
                 var resultDto = _mapper.MapToDto(updatedContent);
                 return ServiceResult<KvkProgramContentDto>.Success(resultDto);
@@ -601,7 +712,7 @@ namespace Infrastructure.Services.DataTables.KVK
             {
                 // Create new
                 var entity = _mapper.MapToEntity(dto);
-                entity.KvkProgramDetailsId = programId;                
+                entity.KvkProgramDetailsId = programId;
                 entity.UnitLocationId = program.UnitLocationId;
                 entity.OrganizationId = program.OrganizationId;
                 entity.CreatedById = _currentUserService.UserId;
@@ -662,6 +773,159 @@ namespace Infrastructure.Services.DataTables.KVK
 
             var dto = _mapper.MapToDto(advisory);
             return ServiceResult<KvkAdvisoryServicesDto>.Success(dto);
+        }
+        public async Task<ServiceResult<KvkAdvisoryServicesDto>> AddAdvisoryServicesWithChildrenAsync(
+           int programId,
+           KvkAdvisoryServicesHybridCreateDto dto)
+        {
+            // Validate program exists
+            var program = await _programRepository.GetByIdAsync(programId);
+            if (program == null)
+                return ServiceResult<KvkAdvisoryServicesDto>.Failure(
+                    "Program not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            // Check permissions
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult<KvkAdvisoryServicesDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            try
+            {
+                // Prepare parent entity
+                var parentEntity = new KvkAdvisoryServices
+                {
+                    KvkProgramDetailsId = programId,
+                     NoOfFacebookSMS = dto.NoOfFacebookSMS ?? 0,
+    NoOfSMSSentToRegisteredFarmers = dto.NoOfSMSSentToRegisteredFarmers ?? 0,
+    NoOfWhatsappGroups = dto.NoOfWhatsappGroups ?? 0,
+    NoOfWhatsappSMS = dto.NoOfWhatsappSMS ?? 0,
+    NoOfAnsweredWhatsappQueries = dto.NoOfAnsweredWhatsappQueries ?? 0,
+    NoOfPhoneCalls = dto.NoOfPhoneCalls ?? 0,
+    NoOfFaceToFaceDiscussions = dto.NoOfFaceToFaceDiscussions ?? 0,
+    NoOfGroupDiscussions = dto.NoOfGroupDiscussions ?? 0,
+    NoOfEmailsSent = dto.NoOfEmailsSent ?? 0,
+    NoOfNewspaperCoverage = dto.NoOfNewspaperCoverage ?? 0,
+    NoOfBeneficiaries = dto.NoOfBeneficiaries ?? 0,
+                    UnitLocationId = program.UnitLocationId,
+                    OrganizationId = program.OrganizationId,
+                    CreatedById = _currentUserService.UserId,
+                    CreatedAt = DateTimeOffset.UtcNow
+                };
+
+                // Prepare child entities
+                var criticalInputs = dto.CriticalInputsDistributed?.Select(ci =>
+                {
+                    var entity = _mapper.MapToEntity(ci);
+                    entity.UnitLocationId = program.UnitLocationId;
+                    entity.OrganizationId = program.OrganizationId;
+                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedAt = DateTimeOffset.UtcNow;
+                    return entity;
+                }).ToList();
+
+                // Repository handles transaction internally
+                var createdAdvisory = await _advisoryRepository.CreateWithChildrenAsync(
+                    parentEntity,
+                    criticalInputs);
+
+                var resultDto = _mapper.MapToDto(createdAdvisory);
+                return ServiceResult<KvkAdvisoryServicesDto>.Success(resultDto);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<KvkAdvisoryServicesDto>.Failure(
+                    $"Error creating advisory services: {ex.Message}",
+                    ServiceErrorStatus.INTERNALERROR);
+            }
+        }
+
+        public async Task<ServiceResult<KvkAdvisoryServicesDto>> UpdateAdvisoryServicesWithChildrenAsync(
+            int advisoryServicesId,
+            KvkAdvisoryServicesHybridUpdateDto dto)
+        {
+            // Validate advisory services exists
+            var advisory = await _advisoryRepository.GetWithDetailsAsync(advisoryServicesId);
+            if (advisory == null)
+                return ServiceResult<KvkAdvisoryServicesDto>.Failure(
+                    "Advisory services not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            // Validate program and permissions
+            var program = await _programRepository.GetByIdAsync(advisory.KvkProgramDetailsId ?? 0);
+            if (program == null)
+                return ServiceResult<KvkAdvisoryServicesDto>.Failure(
+                    "Program not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult<KvkAdvisoryServicesDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            try
+            {
+                // Prepare parent entity for update
+                var parentEntity = new KvkAdvisoryServices
+                {
+                    Id = advisoryServicesId,
+                    NoOfFacebookSMS = dto.NoOfFacebookSMS ?? 0,
+                    NoOfSMSSentToRegisteredFarmers = dto.NoOfSMSSentToRegisteredFarmers ?? 0,
+                    NoOfWhatsappGroups = dto.NoOfWhatsappGroups ?? 0,
+                    NoOfWhatsappSMS = dto.NoOfWhatsappSMS ?? 0,
+                    NoOfAnsweredWhatsappQueries = dto.NoOfAnsweredWhatsappQueries ?? 0,
+                    NoOfPhoneCalls = dto.NoOfPhoneCalls ?? 0,
+                    NoOfFaceToFaceDiscussions = dto.NoOfFaceToFaceDiscussions ?? 0,
+                    NoOfGroupDiscussions = dto.NoOfGroupDiscussions ?? 0,
+                    NoOfEmailsSent = dto.NoOfEmailsSent ?? 0,
+                    NoOfNewspaperCoverage = dto.NoOfNewspaperCoverage ?? 0,
+                    NoOfBeneficiaries = dto.NoOfBeneficiaries ?? 0,
+                    UpdatedById = _currentUserService.UserId,
+                    UpdatedAt = DateTimeOffset.UtcNow
+                };
+
+                // Prepare child entities (hybrid: mix of new and existing)
+                var criticalInputs = dto.CriticalInputsDistributed?.Select(ci =>
+                {
+                    var entity = new KvkCriticalInputsDistributed
+                    {
+                        Id = ci.Id ?? 0, // 0 means new
+                        InputName = ci.InputName,
+                        QuantityDistributed = ci.QuantityDistributed,
+                        NoOfRecipients = ci.NoOfRecipients,
+                        UnitLocationId = program.UnitLocationId,
+                        OrganizationId = program.OrganizationId
+                    };
+
+                    if (entity.Id == 0)
+                    {
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        entity.UpdatedById = _currentUserService.UserId;
+                        entity.UpdatedAt = DateTimeOffset.UtcNow;
+                    }
+
+                    return entity;
+                }).ToList();
+
+                // Repository handles transaction and hybrid pattern internally
+                var updatedAdvisory = await _advisoryRepository.UpdateWithChildrenAsync(
+                    parentEntity,
+                    criticalInputs);
+
+                var resultDto = _mapper.MapToDto(updatedAdvisory);
+                return ServiceResult<KvkAdvisoryServicesDto>.Success(resultDto);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<KvkAdvisoryServicesDto>.Failure(
+                    $"Error updating advisory services: {ex.Message}",
+                    ServiceErrorStatus.INTERNALERROR);
+            }
         }
 
         // ============================
@@ -1002,10 +1266,10 @@ namespace Infrastructure.Services.DataTables.KVK
                     ProjectCompletionLetter = dto.ProjectCompletionLetter,
                     TypeOfReport = dto.TypeOfReport,
                     SpclReport = dto.SpclReport
-                };     
+                };
 
-      
-            
+
+
 
                 _mapper.MapUpdateDtoToEntity(updateDto, existing);
                 existing.UpdatedById = _currentUserService.UserId;
@@ -1077,7 +1341,7 @@ namespace Infrastructure.Services.DataTables.KVK
                 var resultDto = _mapper.MapToDto(created);
 
                 // AUTO-SUBMIT: Since Recommendation is the last section, automatically change status to Pending
-                if (program.FormStatus == "Draft" || program.FormStatus == "Rejected" || program.FormStatus == "Approved")
+                if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
                 {
                     program.FormStatus = "Pending";
                     program.UpdatedById = _currentUserService.UserId;
@@ -1111,10 +1375,10 @@ namespace Infrastructure.Services.DataTables.KVK
                 // AUTO-SUBMIT: Since Recommendation is the last section, automatically change status to Pending
                 //if (program.FormStatus == "Draft" || program.FormStatus == "Rejected")
                 //{
-                    program.FormStatus = "Pending";
-                    program.UpdatedById = _currentUserService.UserId;
-                    program.UpdatedAt = DateTimeOffset.UtcNow;
-                    await _programRepository.UpdateAsync(program);
+                program.FormStatus = "Pending";
+                program.UpdatedById = _currentUserService.UserId;
+                program.UpdatedAt = DateTimeOffset.UtcNow;
+                await _programRepository.UpdateAsync(program);
                 //}
 
                 return ServiceResult<KvkRecommendationDto>.Success(resultDto);

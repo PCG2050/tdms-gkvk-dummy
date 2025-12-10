@@ -75,7 +75,10 @@ namespace Infrastructure.Repository.DataTables.KVK
             KvkProgramContentAndResources parent,
             List<KvkResourcePerson>? resourcePersons,
             List<KvkTopicsCoveredInClass>? topicsCovered,
-            List<KvkTeachingAidsDeveloped>? teachingAids)
+            List<KvkTeachingAidsDeveloped>? teachingAids,
+            List<KvkFieldVisit>? fieldVisits,
+            List<KvkFieldDay>? fieldDays,
+            List<KvkFarmerScientistInteraction>? farmerScientistInteractions)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
@@ -114,6 +117,33 @@ namespace Infrastructure.Repository.DataTables.KVK
                     }
                 }
 
+                if (fieldVisits != null && fieldVisits.Any())
+                {
+                    foreach (var visit in fieldVisits)
+                    {
+                        visit.KvkProgramContentAndResourcesId = contentId;
+                        _context.Set<KvkFieldVisit>().Add(visit);
+                    }
+                }
+
+                if (fieldDays != null && fieldDays.Any())
+                {
+                    foreach (var day in fieldDays)
+                    {
+                        day.KvkProgramContentAndResourcesId = contentId;
+                        _context.Set<KvkFieldDay>().Add(day);
+                    }
+                }
+
+                if (farmerScientistInteractions != null && farmerScientistInteractions.Any())
+                {
+                    foreach (var interaction in farmerScientistInteractions)
+                    {
+                        interaction.KvkProgramContentAndResourcesId = contentId;
+                        _context.Set<KvkFarmerScientistInteraction>().Add(interaction);
+                    }
+                }
+
                 // Save all children
                 await _context.SaveChangesAsync();
 
@@ -140,7 +170,10 @@ namespace Infrastructure.Repository.DataTables.KVK
             KvkProgramContentAndResources parent,
             List<KvkResourcePerson>? resourcePersons,
             List<KvkTopicsCoveredInClass>? topicsCovered,
-            List<KvkTeachingAidsDeveloped>? teachingAids)
+            List<KvkTeachingAidsDeveloped>? teachingAids,
+            List<KvkFieldVisit>? fieldVisits,
+            List<KvkFieldDay>? fieldDays,
+            List<KvkFarmerScientistInteraction>? farmerScientistInteractions)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
@@ -273,6 +306,127 @@ namespace Infrastructure.Repository.DataTables.KVK
                             // CREATE new
                             aid.KvkProgramContentAndResourcesId = contentId;
                             _context.KvkTeachingAidsDeveloped.Add(aid);
+                        }
+                    }
+                }
+
+                // 5. Process Field Visits (Hybrid Pattern)
+                if (fieldVisits != null)
+                {
+                    var existingVisits = existing.FieldVisits?.ToList() ?? new List<KvkFieldVisit>();
+                    var incomingIds = fieldVisits.Where(v => v.Id > 0).Select(v => v.Id).ToList();
+
+                    // DELETE: Items in DB but not in incoming array
+                    var visitsToDelete = existingVisits.Where(v => !incomingIds.Contains(v.Id)).ToList();
+                    foreach (var visit in visitsToDelete)
+                    {
+                        _context.Set<KvkFieldVisit>().Remove(visit);
+                    }
+
+                    // CREATE or UPDATE
+                    foreach (var visit in fieldVisits)
+                    {
+                        if (visit.Id > 0)
+                        {
+                            // UPDATE existing
+                            var existingVisit = existingVisits.FirstOrDefault(v => v.Id == visit.Id);
+                            if (existingVisit != null)
+                            {
+                                existingVisit.Date = visit.Date;
+                                existingVisit.ScientistOfficerVisitedName = visit.ScientistOfficerVisitedName;
+                                existingVisit.Purpose = visit.Purpose;
+                                existingVisit.NoOfFieldsCovered = visit.NoOfFieldsCovered;
+                                existingVisit.NoOfFarmerCovered = visit.NoOfFarmerCovered;
+                                existingVisit.PhotoUpload = visit.PhotoUpload;
+                                existingVisit.UpdatedById = visit.UpdatedById;
+                                existingVisit.UpdatedAt = visit.UpdatedAt;
+                                _context.Set<KvkFieldVisit>().Update(existingVisit);
+                            }
+                        }
+                        else
+                        {
+                            // CREATE new
+                            visit.KvkProgramContentAndResourcesId = contentId;
+                            _context.Set<KvkFieldVisit>().Add(visit);
+                        }
+                    }
+                }
+
+                // 6. Process Field Days (Hybrid Pattern)
+                if (fieldDays != null)
+                {
+                    var existingDays = existing.FieldDays?.ToList() ?? new List<KvkFieldDay>();
+                    var incomingIds = fieldDays.Where(d => d.Id > 0).Select(d => d.Id).ToList();
+
+                    // DELETE: Items in DB but not in incoming array
+                    var daysToDelete = existingDays.Where(d => !incomingIds.Contains(d.Id)).ToList();
+                    foreach (var day in daysToDelete)
+                    {
+                        _context.Set<KvkFieldDay>().Remove(day);
+                    }
+
+                    // CREATE or UPDATE
+                    foreach (var day in fieldDays)
+                    {
+                        if (day.Id > 0)
+                        {
+                            // UPDATE existing
+                            var existingDay = existingDays.FirstOrDefault(d => d.Id == day.Id);
+                            if (existingDay != null)
+                            {
+                                // Update all fields from KvkFieldDay entity
+                                // Note: Add the actual fields from your KvkFieldDay entity here
+                                existingDay.UpdatedById = day.UpdatedById;
+                                existingDay.UpdatedAt = day.UpdatedAt;
+                                _context.Set<KvkFieldDay>().Update(existingDay);
+                            }
+                        }
+                        else
+                        {
+                            // CREATE new
+                            day.KvkProgramContentAndResourcesId = contentId;
+                            _context.Set<KvkFieldDay>().Add(day);
+                        }
+                    }
+                }
+
+                // 7. Process Farmer Scientist Interactions (Hybrid Pattern)
+                if (farmerScientistInteractions != null)
+                {
+                    var existingInteractions = existing.FarmerScientistInteractions?.ToList() ?? new List<KvkFarmerScientistInteraction>();
+                    var incomingIds = farmerScientistInteractions.Where(i => i.Id > 0).Select(i => i.Id).ToList();
+
+                    // DELETE: Items in DB but not in incoming array
+                    var interactionsToDelete = existingInteractions.Where(i => !incomingIds.Contains(i.Id)).ToList();
+                    foreach (var interaction in interactionsToDelete)
+                    {
+                        _context.Set<KvkFarmerScientistInteraction>().Remove(interaction);
+                    }
+
+                    // CREATE or UPDATE
+                    foreach (var interaction in farmerScientistInteractions)
+                    {
+                        if (interaction.Id > 0)
+                        {
+                            // UPDATE existing
+                            var existingInteraction = existingInteractions.FirstOrDefault(i => i.Id == interaction.Id);
+                            if (existingInteraction != null)
+                            {
+                                existingInteraction.Date = interaction.Date;
+                                existingInteraction.ScientistOfficerName = interaction.ScientistOfficerName;
+                                existingInteraction.TopicDiscussed = interaction.TopicDiscussed;
+                                existingInteraction.NoOfFarmersParticipated = interaction.NoOfFarmersParticipated;
+                                existingInteraction.PhotoUpload = interaction.PhotoUpload;
+                                existingInteraction.UpdatedById = interaction.UpdatedById;
+                                existingInteraction.UpdatedAt = interaction.UpdatedAt;
+                                _context.Set<KvkFarmerScientistInteraction>().Update(existingInteraction);
+                            }
+                        }
+                        else
+                        {
+                            // CREATE new
+                            interaction.KvkProgramContentAndResourcesId = contentId;
+                            _context.Set<KvkFarmerScientistInteraction>().Add(interaction);
                         }
                     }
                 }

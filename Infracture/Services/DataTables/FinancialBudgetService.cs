@@ -415,6 +415,11 @@ namespace Infrastructure.Services.DataTables
 
         public async Task<ServiceResult<FinancialBudgetCompleteDto>> CreateHybridAsync(FinancialBudgetHybridCreateDto dto)
         {
+            if (!await CanUserAccessUnitLocationAsync(dto.UnitLocationId))
+                return ServiceResult<FinancialBudgetCompleteDto>.Failure(
+                    "Access denied to unit location",
+                    ServiceErrorStatus.FORBIDDEN);
+
             // Create parent entity
             var parent = new FinancialBudget
             {
@@ -495,6 +500,7 @@ namespace Infrastructure.Services.DataTables
 
         public async Task<ServiceResult<FinancialBudgetCompleteDto>> UpdateHybridAsync(int id, FinancialBudgetHybridUpdateDto dto)
         {
+
             // Validate entity exists and check permissions
             var entity = await _repository.GetByIdAsync(id);
             if (entity == null)
@@ -691,6 +697,27 @@ namespace Infrastructure.Services.DataTables
                 MICRNumber = entity.MICRNumber,
                 IFSCCode = entity.IFSCCode
             };
+        }
+        // ===== HELPER METHODS FOR PERMISSION CHECKS =====
+
+        private async Task<bool> CanUserAccessUnitLocationAsync(int unitLocationId)
+        {
+            var accessibleIds = await GetAccessibleUnitLocationIdsAsync();
+            return accessibleIds.Contains(unitLocationId);
+        }
+
+        private async Task<List<int>> GetAccessibleUnitLocationIdsAsync()
+        {
+            if (_currentUserService.Role == Role.TRAINER)
+                return await _trainerAssignmentRepository.GetUnitLocationIdsByTrainerIdAsync(_currentUserService.UserId);
+
+            if (_currentUserService.Role == Role.UNITHEAD)
+                return await _unitHeadAssignmentRepository.GetUnitLocationIdsByUnitHeadIdAsync(_currentUserService.UserId);
+
+            if (_currentUserService.Role == Role.ADMIN)
+                return await _organizationUnitRepository.GetUnitLocationIdsByOrganizationIdAsync(_currentUserService.OrganizationId);
+
+            return new List<int>();
         }
     }
 }

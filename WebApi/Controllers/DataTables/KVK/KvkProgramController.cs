@@ -199,6 +199,31 @@ namespace WebApi.Controllers.DataTables.KVK
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
+        /// <summary>
+        /// Add advisory services with all child entities (CriticalInputsDistributed) in one request
+        /// This endpoint solves the problem of needing parent ID before creating children by handling everything in a single transaction
+        /// </summary>
+        [HttpPost("{programId}/advisory-services-with-children")]
+        public async Task<IActionResult> AddAdvisoryServicesWithChildren(int programId, [FromBody] KvkAdvisoryServicesHybridCreateDto dto)
+        {
+            var result = await _service.AddAdvisoryServicesWithChildrenAsync(programId, dto);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
+        /// <summary>
+        /// Update advisory services with all child entities using Hybrid Pattern (perfect for "Save & Next" button)
+        /// - Items WITH Id: UPDATE existing
+        /// - Items WITHOUT Id: CREATE new
+        /// - Items in DB but NOT in request: DELETE
+        /// All changes happen in a single transaction with automatic rollback on failure
+        /// </summary>
+        [HttpPut("advisory-services/{advisoryServicesId}/with-children")]
+        public async Task<IActionResult> UpdateAdvisoryServicesWithChildren(int advisoryServicesId, [FromBody] KvkAdvisoryServicesHybridUpdateDto dto)
+        {
+            var result = await _service.UpdateAdvisoryServicesWithChildrenAsync(advisoryServicesId, dto);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
         // ============================
         // SECTION E: RESULTS (FLD/OFT - CategoryId 18 or 24 ONLY)
         // ============================

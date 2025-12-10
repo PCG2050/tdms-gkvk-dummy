@@ -17,13 +17,19 @@ namespace Application.Interface.Repository.DataTables.KVK
             KvkProgramContentAndResources parent,
             List<KvkResourcePerson>? resourcePersons,
             List<KvkTopicsCoveredInClass>? topicsCovered,
-            List<KvkTeachingAidsDeveloped>? teachingAids);
+            List<KvkTeachingAidsDeveloped>? teachingAids,
+            List<KvkFieldVisit>? fieldVisits,
+            List<KvkFieldDay>? fieldDays,
+            List<KvkFarmerScientistInteraction>? farmerScientistInteractions);
 
         Task<KvkProgramContentAndResources> UpdateWithChildrenAsync(
             KvkProgramContentAndResources parent,
             List<KvkResourcePerson>? resourcePersons,
             List<KvkTopicsCoveredInClass>? topicsCovered,
-            List<KvkTeachingAidsDeveloped>? teachingAids);
+            List<KvkTeachingAidsDeveloped>? teachingAids,
+            List<KvkFieldVisit>? fieldVisits,
+            List<KvkFieldDay>? fieldDays,
+            List<KvkFarmerScientistInteraction>? farmerScientistInteractions);
 
     }
 }

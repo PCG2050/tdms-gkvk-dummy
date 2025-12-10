@@ -12,8 +12,8 @@ namespace Domain.Entities.KVK
         [ForeignKey(nameof(KvkProgramDetailsId))]
         public KvkProgramDetails? ProgramDetails { get; set; }
 
-        [MaxLength(4)]
-        public string? ReportingYear { get; set; }
+        //[MaxLength(4)]
+        //public string? ReportingYear { get; set; }
 
         public DateOnly? ReportDate { get; set; }
 
@@ -26,8 +26,8 @@ namespace Domain.Entities.KVK
         public string? GeoTaggedPhoto { get; set; }
 
         // Video path or URL
-        [MaxLength(500)]
-        public string? ReportingVideo { get; set; }
+        //[MaxLength(500)]
+        //public string? ReportingVideo { get; set; }
 
         // Text explanation, can be long
         [MaxLength(2000)]

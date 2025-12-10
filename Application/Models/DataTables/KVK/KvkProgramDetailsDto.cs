@@ -1,6 +1,8 @@
 ﻿
 using Application.Interface;
+using Domain.Entities.MasterData;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Application.Models.DataTables.KVK
 {
@@ -122,6 +124,28 @@ namespace Application.Models.DataTables.KVK
         public string? Copi { get; set; }
         public string? PiAddress { get; set; }
         public int? BatchNo { get; set; }
+
+        //newly added 
+        public string? T01 { get; set; }
+        public string? T02 { get; set; }
+        public string? T03 { get; set; }
+        public string? T04 { get; set; }
+        public string? T05 { get; set; }
+
+        public string? StageOfCrop { get; set; }
+
+        public int? NoOfDemos { get; set; }
+
+        public int? NoOfTrails { get; set; }
+
+        public int? NoOfChecks { get; set; }
+
+        public int? NoOfVisits { get; set; }
+
+
+        public int? ParticipatedAsId { get; set; }
+
+        public string? ParticipantFileUpload { get; set; }
         public decimal? Area { get; set; }
         public string? OrganizerBroucherFile { get; set; }
         public string? OrganizerInstitutionName { get; set; }
@@ -145,6 +169,8 @@ namespace Application.Models.DataTables.KVK
         public string? FundsSanctionLetterUploadFile { get; set; }
         public string? ReportingVideo { get; set; }
         public string? Attachements { get; set; }
+
+     
     }
 
     public class KvkProgramUpdateDto : IUpdateDto
@@ -178,6 +204,31 @@ namespace Application.Models.DataTables.KVK
         public string? PiAddress { get; set; }
         public int? BatchNo { get; set; }
         public int? Area { get; set; }
+
+        public string? T01 { get; set; }
+
+        public string? T02 { get; set; }
+
+        public string? T03 { get; set; }
+
+        public string? T04 { get; set; }
+
+        public string? T05 { get; set; }
+
+        public string? StageOfCrop { get; set; }
+
+        public int? NoOfDemos { get; set; }
+
+        public int? NoOfTrails { get; set; }
+
+        public int? NoOfChecks { get; set; }
+
+        public int? NoOfVisits { get; set; }
+
+
+        public int? ParticipatedAsId { get; set; }
+
+        public string? ParticipantFileUpload { get; set; }
         public string? OrganizerBroucherFile { get; set; }
         public string? OrganizerInstitutionName { get; set; }
         public string? OrganizerInstitutionAddress { get; set; }
@@ -316,6 +367,9 @@ namespace Application.Models.DataTables.KVK
         public List<KvkResourcePersonDto>? ResourcePersons { get; set; }
         public List<KvkTopicsCoveredDto>? TopicsCovered { get; set; }
         public List<KvkTeachingAidsDto>? TeachingAids { get; set; }
+        public List<KvkFieldVisitDto>? FieldVisits { get; set; }
+        public List<KvkFieldDayDto>? FieldDays { get; set; }
+        public List<KvkFarmerScientistInteractionDto>? FarmerScientistInteractions { get; set; }
     }
 
     public class KvkProgramContentCreateDto
@@ -337,6 +391,9 @@ namespace Application.Models.DataTables.KVK
         public List<KvkResourcePersonCreateDto>? ResourcePersons { get; set; }
         public List<KvkTopicsCoveredCreateDto>? TopicsCovered { get; set; }
         public List<KvkTeachingAidsCreateDto>? TeachingAids { get; set; }
+        public List<KvkFieldVisitCreateDto>? FieldVisits { get; set; }
+        public List<KvkFieldDayCreateDto>? FieldDays { get; set; }
+        public List<KvkFarmerScientistInteractionCreateDto>? FarmerScientistInteractions { get; set; }
     }
 
     /// <summary>
@@ -396,6 +453,9 @@ namespace Application.Models.DataTables.KVK
         public List<KvkResourcePersonHybridDto>? ResourcePersons { get; set; }
         public List<KvkTopicsCoveredHybridDto>? TopicsCovered { get; set; }
         public List<KvkTeachingAidsHybridDto>? TeachingAids { get; set; }
+        public List<KvkFieldVisitHybridDto>? FieldVisits { get; set; }
+        public List<KvkFieldDayHybridDto>? FieldDays { get; set; }
+        public List<KvkFarmerScientistInteractionHybridDto>? FarmerScientistInteractions { get; set; }
     }
 
     // Resource Person DTOs
@@ -481,6 +541,129 @@ namespace Application.Models.DataTables.KVK
     }
 
     // ============================
+    // FIELD VISIT DTOs
+    // ============================
+    public class KvkFieldVisitDto
+    {
+        public int Id { get; set; }
+        public DateOnly? Date { get; set; }
+        public string? ScientistOfficerVisitedName { get; set; }
+        public string? Purpose { get; set; }
+        public int? NoOfFieldsCovered { get; set; }
+        public int? NoOfFarmerCovered { get; set; }
+        public string? PhotoUpload { get; set; }
+    }
+
+    public class KvkFieldVisitCreateDto
+    {
+        public DateOnly? Date { get; set; }
+        public string? ScientistOfficerVisitedName { get; set; }
+        public string? Purpose { get; set; }
+        public int? NoOfFieldsCovered { get; set; }
+        public int? NoOfFarmerCovered { get; set; }
+        public string? PhotoUpload { get; set; }
+    }
+
+    public class KvkFieldVisitUpdateDto : IUpdateDto
+    {
+        public int Id { get; set; }
+        public DateOnly? Date { get; set; }
+        public string? ScientistOfficerVisitedName { get; set; }
+        public string? Purpose { get; set; }
+        public int? NoOfFieldsCovered { get; set; }
+        public int? NoOfFarmerCovered { get; set; }
+        public string? PhotoUpload { get; set; }
+    }
+
+    /// <summary>
+    /// Hybrid item for Field Visits
+    /// </summary>
+    public class KvkFieldVisitHybridDto
+    {
+        public int? Id { get; set; }  // null = create new, has value = update existing
+        public DateOnly? Date { get; set; }
+        public string? ScientistOfficerVisitedName { get; set; }
+        public string? Purpose { get; set; }
+        public int? NoOfFieldsCovered { get; set; }
+        public int? NoOfFarmerCovered { get; set; }
+        public string? PhotoUpload { get; set; }
+    }
+
+    // ============================
+    // FIELD DAY DTOs
+    // ============================
+    public class KvkFieldDayDto
+    {
+        public int Id { get; set; }
+        // Add KvkFieldDay fields based on your entity
+    }
+
+    public class KvkFieldDayCreateDto
+    {
+        // Add KvkFieldDay fields based on your entity
+    }
+
+    public class KvkFieldDayUpdateDto : IUpdateDto
+    {
+        public int Id { get; set; }
+        // Add KvkFieldDay fields based on your entity
+    }
+
+    /// <summary>
+    /// Hybrid item for Field Days
+    /// </summary>
+    public class KvkFieldDayHybridDto
+    {
+        public int? Id { get; set; }  // null = create new, has value = update existing
+        // Add KvkFieldDay fields based on your entity
+    }
+
+    // ============================
+    // FARMER SCIENTIST INTERACTION DTOs
+    // ============================
+    public class KvkFarmerScientistInteractionDto
+    {
+        public int Id { get; set; }
+        public DateOnly? Date { get; set; }
+        public string? ScientistOfficerName { get; set; }
+        public string? TopicDiscussed { get; set; }
+        public int? NoOfFarmersParticipated { get; set; }
+        public string? PhotoUpload { get; set; }
+    }
+
+    public class KvkFarmerScientistInteractionCreateDto
+    {
+        public DateOnly? Date { get; set; }
+        public string? ScientistOfficerName { get; set; }
+        public string? TopicDiscussed { get; set; }
+        public int? NoOfFarmersParticipated { get; set; }
+        public string? PhotoUpload { get; set; }
+    }
+
+    public class KvkFarmerScientistInteractionUpdateDto : IUpdateDto
+    {
+        public int Id { get; set; }
+        public DateOnly? Date { get; set; }
+        public string? ScientistOfficerName { get; set; }
+        public string? TopicDiscussed { get; set; }
+        public int? NoOfFarmersParticipated { get; set; }
+        public string? PhotoUpload { get; set; }
+    }
+
+    /// <summary>
+    /// Hybrid item for Farmer Scientist Interactions
+    /// </summary>
+    public class KvkFarmerScientistInteractionHybridDto
+    {
+        public int? Id { get; set; }  // null = create new, has value = update existing
+        public DateOnly? Date { get; set; }
+        public string? ScientistOfficerName { get; set; }
+        public string? TopicDiscussed { get; set; }
+        public int? NoOfFarmersParticipated { get; set; }
+        public string? PhotoUpload { get; set; }
+    }
+
+    // ============================
     // ADVISORY SERVICES DTOs
     // ============================
     public class KvkAdvisoryServicesDto
@@ -497,6 +680,7 @@ namespace Application.Models.DataTables.KVK
         public int? NoOfEmailsSent { get; set; }
         public int? NoOfNewspaperCoverage { get; set; }
         public int? NoOfBeneficiaries { get; set; }
+        public List<KvkCriticalInputsDistributedDto>? CriticalInputsDistributed { get; set; }
     }
 
     public class KvkAdvisoryServicesCreateDto
@@ -528,6 +712,83 @@ namespace Application.Models.DataTables.KVK
         public int? NoOfEmailsSent { get; set; }
         public int? NoOfNewspaperCoverage { get; set; }
         public int? NoOfBeneficiaries { get; set; }
+    }
+
+    /// <summary>
+    /// Hybrid create DTO - creates advisory services with all critical inputs in one request
+    /// </summary>
+    public class KvkAdvisoryServicesHybridCreateDto
+    {
+        public int? NoOfFacebookSMS { get; set; }
+        public int? NoOfSMSSentToRegisteredFarmers { get; set; }
+        public int? NoOfWhatsappGroups { get; set; }
+        public int? NoOfWhatsappSMS { get; set; }
+        public int? NoOfAnsweredWhatsappQueries { get; set; }
+        public int? NoOfPhoneCalls { get; set; }
+        public int? NoOfFaceToFaceDiscussions { get; set; }
+        public int? NoOfGroupDiscussions { get; set; }
+        public int? NoOfEmailsSent { get; set; }
+        public int? NoOfNewspaperCoverage { get; set; }
+        public int? NoOfBeneficiaries { get; set; }
+
+        public List<KvkCriticalInputsDistributedCreateDto>? CriticalInputsDistributed { get; set; }
+    }
+
+    /// <summary>
+    /// Hybrid update DTO - updates advisory services and manages all critical inputs (create/update/delete) in one request
+    /// </summary>
+    public class KvkAdvisoryServicesHybridUpdateDto
+    {
+        public int? NoOfFacebookSMS { get; set; }
+        public int? NoOfSMSSentToRegisteredFarmers { get; set; }
+        public int? NoOfWhatsappGroups { get; set; }
+        public int? NoOfWhatsappSMS { get; set; }
+        public int? NoOfAnsweredWhatsappQueries { get; set; }
+        public int? NoOfPhoneCalls { get; set; }
+        public int? NoOfFaceToFaceDiscussions { get; set; }
+        public int? NoOfGroupDiscussions { get; set; }
+        public int? NoOfEmailsSent { get; set; }
+        public int? NoOfNewspaperCoverage { get; set; }
+        public int? NoOfBeneficiaries { get; set; }
+
+        public List<KvkCriticalInputsDistributedHybridDto>? CriticalInputsDistributed { get; set; }
+    }
+
+    // ============================
+    // CRITICAL INPUTS DISTRIBUTED DTOs
+    // ============================
+    public class KvkCriticalInputsDistributedDto
+    {
+        public int Id { get; set; }
+        public string? InputName { get; set; }
+        public int? QuantityDistributed { get; set; }
+        public int? NoOfRecipients { get; set; }
+    }
+
+    public class KvkCriticalInputsDistributedCreateDto
+    {
+        public string? InputName { get; set; }
+        public int? QuantityDistributed { get; set; }
+        public int? NoOfRecipients { get; set; }
+    }
+
+    public class KvkCriticalInputsDistributedUpdateDto : IUpdateDto
+    {
+        public int Id { get; set; }
+        public string? InputName { get; set; }
+        public int? QuantityDistributed { get; set; }
+        public int? NoOfRecipients { get; set; }
+    }
+
+    /// <summary>
+    /// Hybrid item for Critical Inputs Distributed
+    /// </summary>
+    public class KvkCriticalInputsDistributedHybridDto
+    {
+        public int? Id { get; set; }  // null = create new, has value = update existing
+        public string? InputName { get; set; }
+        public int? QuantityDistributed { get; set; }
+        public int? NoOfRecipients { get; set; }
     }
 
     // ============================

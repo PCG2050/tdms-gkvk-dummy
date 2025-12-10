@@ -34,5 +34,10 @@ namespace Domain.Entities.KVK
 
         public int? OrganizationId { get; set; }
 
+
+        //new field addded 
+        public string? UploadVideoUrl { get; set; } 
+
+
     }
 }

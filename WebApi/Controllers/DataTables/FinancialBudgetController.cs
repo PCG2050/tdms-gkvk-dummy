@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers.DataTables
 {
-    [Authorize]
-    [Route("api/financial-budget")]
     [ApiController]
+    [Route("api/financial-budget")]   
+    [Authorize]
     public class FinancialBudgetController : ControllerBase
     {
         private readonly IFinancialBudgetService _service;
@@ -275,7 +275,7 @@ namespace WebApi.Controllers.DataTables
         ///
         /// </remarks>
         [HttpPost("hybrid")]
-        [Authorize(Roles = "Trainer,UnitHead")]
+       
         public async Task<IActionResult> CreateHybrid([FromBody] FinancialBudgetHybridCreateDto dto)
         {
             var result = await _service.CreateHybridAsync(dto);
@@ -313,7 +313,7 @@ namespace WebApi.Controllers.DataTables
         /// Note: Child items not included in the request will be deleted
         /// </remarks>
         [HttpPut("{id}/hybrid")]
-        [Authorize(Roles = "Trainer,UnitHead")]
+       
         public async Task<IActionResult> UpdateHybrid(int id, [FromBody] FinancialBudgetHybridUpdateDto dto)
         {
             var result = await _service.UpdateHybridAsync(id, dto);

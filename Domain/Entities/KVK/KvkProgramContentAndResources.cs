@@ -21,5 +21,10 @@ namespace Domain.Entities.KVK
         public ICollection<KvkTopicsCoveredInClass>? TopicsCovered { get; set; }
         public ICollection<KvkTeachingAidsDeveloped>? TeachingAids { get; set; }
 
-    }
+        //new 
+        public ICollection<KvkFieldVisit>? FieldVisits { get; set; }
+        public ICollection<KvkFieldDay>? FieldDays { get; set; }
+        public ICollection<KvkFarmerScientistInteraction>? FarmerScientistInteractions { get; set; } 
+
+        }
 }
