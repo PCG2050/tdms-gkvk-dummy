@@ -177,6 +177,42 @@ var query = _repository.GetQueryable();
 
 The `GenericTrainerHistoryService` only needs access to scalar properties (UnitLocationId, FormStatus, etc.), not loaded navigation properties. Following the pattern used by other working services resolved the issue.
 
+**Additional Fix - Child Delete Endpoints (2025-12-10):**
+
+The child delete endpoints (`DeleteBudgetAsync`, `DeleteRevolvingFundAsync`, `DeleteBankAccountAsync`) were missing permission checks, allowing unauthorized deletion of child entities.
+
+**Fixed by adding permission checks:**
+```csharp
+// BEFORE (No permission checks - security vulnerability)
+public async Task<ServiceResult> DeleteBudgetAsync(int id)
+{
+    await _repository.DeleteBudgetAsync(id);
+    return ServiceResult.Success();
+}
+
+// AFTER (With permission checks - follows KVK pattern)
+public async Task<ServiceResult> DeleteBudgetAsync(int id)
+{
+    var budget = await _repository.GetBudgetByIdAsync(id);
+    if (budget == null)
+        return ServiceResult.Failure("Budget not found", ServiceErrorStatus.NOTFOUND);
+
+    var parent = await _repository.GetByIdAsync(budget.FinancialBudgetId);
+    if (parent == null || !await _entityPermissionService.CanModifyForm(parent))
+        return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
+
+    await _repository.DeleteBudgetAsync(id);
+    return ServiceResult.Success();
+}
+```
+
+This same pattern was applied to:
+- `DeleteBudgetAsync()` - Lines 394-406
+- `DeleteRevolvingFundAsync()` - Lines 408-420
+- `DeleteBankAccountAsync()` - Lines 422-434
+
+The Add and Update child methods already had proper permission checks in place.
+
 ---
 
 ## Notes for Future Development

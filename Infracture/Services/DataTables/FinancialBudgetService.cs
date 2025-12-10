@@ -393,18 +393,42 @@ namespace Infrastructure.Services.DataTables
 
         public async Task<ServiceResult> DeleteBudgetAsync(int id)
         {
+            var budget = await _repository.GetBudgetByIdAsync(id);
+            if (budget == null)
+                return ServiceResult.Failure("Budget not found", ServiceErrorStatus.NOTFOUND);
+
+            var parent = await _repository.GetByIdAsync(budget.FinancialBudgetId);
+            if (parent == null || !await _entityPermissionService.CanModifyForm(parent))
+                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
+
             await _repository.DeleteBudgetAsync(id);
             return ServiceResult.Success();
         }
 
         public async Task<ServiceResult> DeleteRevolvingFundAsync(int id)
         {
+            var revolvingFund = await _repository.GetRevolvingFundByIdAsync(id);
+            if (revolvingFund == null)
+                return ServiceResult.Failure("Revolving fund not found", ServiceErrorStatus.NOTFOUND);
+
+            var parent = await _repository.GetByIdAsync(revolvingFund.FinancialBudgetId);
+            if (parent == null || !await _entityPermissionService.CanModifyForm(parent))
+                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
+
             await _repository.DeleteRevolvingFundAsync(id);
             return ServiceResult.Success();
         }
 
         public async Task<ServiceResult> DeleteBankAccountAsync(int id)
         {
+            var bankAccount = await _repository.GetBankAccountByIdAsync(id);
+            if (bankAccount == null)
+                return ServiceResult.Failure("Bank account not found", ServiceErrorStatus.NOTFOUND);
+
+            var parent = await _repository.GetByIdAsync(bankAccount.FinancialBudgetId);
+            if (parent == null || !await _entityPermissionService.CanModifyForm(parent))
+                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
+
             await _repository.DeleteBankAccountAsync(id);
             return ServiceResult.Success();
         }
