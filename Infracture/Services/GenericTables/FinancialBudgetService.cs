@@ -415,6 +415,36 @@ namespace Infrastructure.Services.GenericTables
 
         public async Task<ServiceResult<FinancialBudgetCompleteDto>> CreateHybridAsync(FinancialBudgetHybridCreateDto dto)
         {
+            // Validate user has permission to create forms for this unit
+            // For trainers, check if they're assigned to the unit
+            var currentRole = _currentUserService.Role;
+
+            if (currentRole == Role.TRAINER)
+            {
+                var assignedUnits = await _trainerAssignmentRepository
+                    .GetUnitLocationIdsByTrainerIdAsync(_currentUserService.UserId);
+
+                if (!assignedUnits.Contains(dto.UnitLocationId))
+                {
+                    return ServiceResult<FinancialBudgetCompleteDto>.Failure(
+                        $"Access denied. You are not assigned to unit location {dto.UnitLocationId}",
+                        ServiceErrorStatus.FORBIDDEN);
+                }
+            }
+            else if (currentRole == Role.UNITHEAD)
+            {
+                var assignedUnits = await _unitHeadAssignmentRepository
+                    .GetUnitLocationIdsByUnitHeadIdAsync(_currentUserService.UserId);
+
+                if (!assignedUnits.Contains(dto.UnitLocationId))
+                {
+                    return ServiceResult<FinancialBudgetCompleteDto>.Failure(
+                        $"Access denied. You are not assigned to unit location {dto.UnitLocationId}",
+                        ServiceErrorStatus.FORBIDDEN);
+                }
+            }
+            // ADMIN can create for any unit
+
             // Create parent entity
             var parent = new FinancialBudget
             {
