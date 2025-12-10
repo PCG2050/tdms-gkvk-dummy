@@ -399,7 +399,7 @@ namespace Infrastructure.Services.DataTables
                     "Access denied to unit location",
                     ServiceErrorStatus.FORBIDDEN);
 
-            // Create parent entity
+            // Create parent entity - only fields from new simplified model
             var parent = new NominationReward
             {
                 UnitLocationId = dto.UnitLocationId,
@@ -407,36 +407,8 @@ namespace Infrastructure.Services.DataTables
                 EndDate = dto.EndDate,
                 TypeId = dto.TypeId,
                 RegionId = dto.RegionId,
-                ContributionId = dto.ContributionId,
-                ModeId = dto.ModeId,
-                NominationCategoryId = dto.NominationCategoryId,
+                OtherType = dto.OtherType,
                 OtherRegion = dto.OtherRegion,
-                AwardName = dto.AwardName,
-                OtherContribution = dto.OtherContribution,
-                AwardingAgency = dto.AwardingAgency,
-                SpecificContributionTitle = dto.SpecificContributionTitle,
-                OrganizerInstitutionName = dto.OrganizerInstitutionName,
-                OrganizerInstituteAddress = dto.OrganizerInstituteAddress,
-                AwardApplicationDate = dto.AwardApplicationDate,
-                AwardFilePath = dto.AwardFilePath,
-                AwardEventTitle = dto.AwardEventTitle,
-                AwardEventDate = dto.AwardEventDate,
-                SanctionLetterDate = dto.SanctionLetterDate,
-                SanctionLetterFilePath = dto.SanctionLetterFilePath,
-                PaperDate = dto.PaperDate,
-                PaperFilePath = dto.PaperFilePath,
-                AwardReceivingPhoto = dto.AwardReceivingPhoto,
-                AwardReceivingCertificate = dto.AwardReceivingCertificate,
-                InstitutionBoardName = dto.InstitutionBoardName,
-                InstitutionName = dto.InstitutionName,
-                InstitutionDesignation = dto.InstitutionDesignation,
-                InstitutionAddress = dto.InstitutionAddress,
-                PositionId = dto.PositionId,
-                PositionFrom = dto.PositionFrom,
-                PositionTo = dto.PositionTo,
-                DurationDays = dto.DurationDays,
-                NominationDate = dto.NominationDate,
-                NominationLetterPath = dto.NominationLetterPath,
                 OrganizationId = _currentUserService.OrganizationId,
                 FormStatus = "Pending",  // Set to Pending on hybrid create
                 CreatedById = _currentUserService.UserId,
@@ -497,6 +469,42 @@ namespace Infrastructure.Services.DataTables
                 }
             }
 
+            // Add child Achievements - NEW
+            if (dto.Achievements != null)
+            {
+                foreach (var childDto in dto.Achievements)
+                {
+                    parent.Achievements.Add(_mapper.MapToEntity(childDto));
+                }
+            }
+
+            // Add child AwardRecognitions - NEW
+            if (dto.AwardRecognitions != null)
+            {
+                foreach (var childDto in dto.AwardRecognitions)
+                {
+                    parent.AwardRecognitions.Add(_mapper.MapToEntity(childDto));
+                }
+            }
+
+            // Add child UniversitySanctionLetterPaperPosters - NEW
+            if (dto.UniversitySanctionLetterPaperPosters != null)
+            {
+                foreach (var childDto in dto.UniversitySanctionLetterPaperPosters)
+                {
+                    parent.UniversitySanctionLetterPaperPosters.Add(_mapper.MapToEntity(childDto));
+                }
+            }
+
+            // Add child AwardPhotos - NEW
+            if (dto.AwardPhotos != null)
+            {
+                foreach (var childDto in dto.AwardPhotos)
+                {
+                    parent.AwardPhotos.Add(_mapper.MapToEntity(childDto));
+                }
+            }
+
             // Save everything in one transaction
             var created = await _repository.AddAsync(parent);
             var result = await _repository.GetWithDetailsAsync(created.Id);
@@ -524,7 +532,7 @@ namespace Infrastructure.Services.DataTables
 
             try
             {
-                // Prepare parent entity for update
+                // Prepare parent entity for update - only fields from new simplified model
                 var parentEntity = new NominationReward
                 {
                     Id = id,
@@ -532,36 +540,8 @@ namespace Infrastructure.Services.DataTables
                     EndDate = dto.EndDate,
                     TypeId = dto.TypeId,
                     RegionId = dto.RegionId,
-                    ContributionId = dto.ContributionId,
-                    ModeId = dto.ModeId,
-                    NominationCategoryId = dto.NominationCategoryId,
+                    OtherType = dto.OtherType,
                     OtherRegion = dto.OtherRegion,
-                    AwardName = dto.AwardName,
-                    OtherContribution = dto.OtherContribution,
-                    AwardingAgency = dto.AwardingAgency,
-                    SpecificContributionTitle = dto.SpecificContributionTitle,
-                    OrganizerInstitutionName = dto.OrganizerInstitutionName,
-                    OrganizerInstituteAddress = dto.OrganizerInstituteAddress,
-                    AwardApplicationDate = dto.AwardApplicationDate,
-                    AwardFilePath = dto.AwardFilePath,
-                    AwardEventTitle = dto.AwardEventTitle,
-                    AwardEventDate = dto.AwardEventDate,
-                    SanctionLetterDate = dto.SanctionLetterDate,
-                    SanctionLetterFilePath = dto.SanctionLetterFilePath,
-                    PaperDate = dto.PaperDate,
-                    PaperFilePath = dto.PaperFilePath,
-                    AwardReceivingPhoto = dto.AwardReceivingPhoto,
-                    AwardReceivingCertificate = dto.AwardReceivingCertificate,
-                    InstitutionBoardName = dto.InstitutionBoardName,
-                    InstitutionName = dto.InstitutionName,
-                    InstitutionDesignation = dto.InstitutionDesignation,
-                    InstitutionAddress = dto.InstitutionAddress,
-                    PositionId = dto.PositionId,
-                    PositionFrom = dto.PositionFrom,
-                    PositionTo = dto.PositionTo,
-                    DurationDays = dto.DurationDays,
-                    NominationDate = dto.NominationDate,
-                    NominationLetterPath = dto.NominationLetterPath,
                     FormStatus = "Pending",  // Set to Pending on update
                     UpdatedById = _currentUserService.UserId,
                     UpdatedAt = DateTimeOffset.UtcNow
@@ -628,7 +608,48 @@ namespace Infrastructure.Services.DataTables
                     return mapped;
                 }).ToList();
 
-                // Call repository hybrid update
+                // Prepare NEW child collections
+                var achievements = dto.Achievements?.Select(c =>
+                {
+                    var mapped = _mapper.MapToEntity(c);
+                    mapped.CreatedById = _currentUserService.UserId;
+                    mapped.CreatedAt = DateTimeOffset.UtcNow;
+                    mapped.UpdatedById = _currentUserService.UserId;
+                    mapped.UpdatedAt = DateTimeOffset.UtcNow;
+                    return mapped;
+                }).ToList();
+
+                var awardRecognitions = dto.AwardRecognitions?.Select(c =>
+                {
+                    var mapped = _mapper.MapToEntity(c);
+                    mapped.CreatedById = _currentUserService.UserId;
+                    mapped.CreatedAt = DateTimeOffset.UtcNow;
+                    mapped.UpdatedById = _currentUserService.UserId;
+                    mapped.UpdatedAt = DateTimeOffset.UtcNow;
+                    return mapped;
+                }).ToList();
+
+                var universitySanctionLetterPaperPosters = dto.UniversitySanctionLetterPaperPosters?.Select(c =>
+                {
+                    var mapped = _mapper.MapToEntity(c);
+                    mapped.CreatedById = _currentUserService.UserId;
+                    mapped.CreatedAt = DateTimeOffset.UtcNow;
+                    mapped.UpdatedById = _currentUserService.UserId;
+                    mapped.UpdatedAt = DateTimeOffset.UtcNow;
+                    return mapped;
+                }).ToList();
+
+                var awardPhotos = dto.AwardPhotos?.Select(c =>
+                {
+                    var mapped = _mapper.MapToEntity(c);
+                    mapped.CreatedById = _currentUserService.UserId;
+                    mapped.CreatedAt = DateTimeOffset.UtcNow;
+                    mapped.UpdatedById = _currentUserService.UserId;
+                    mapped.UpdatedAt = DateTimeOffset.UtcNow;
+                    return mapped;
+                }).ToList();
+
+                // Call repository hybrid update with all 10 child collections
                 var updated = await _repository.UpdateWithChildrenAsync(
                     parentEntity,
                     ifsFarmers,
@@ -636,7 +657,11 @@ namespace Infrastructure.Services.DataTables
                     organicFarmers,
                     ifsEntrepreneurs,
                     entrepreneurInnovations,
-                    organicEntrepreneurs);
+                    organicEntrepreneurs,
+                    achievements,
+                    awardRecognitions,
+                    universitySanctionLetterPaperPosters,
+                    awardPhotos);
 
                 var resultDto = _mapper.MapToDtoWithDetails(updated);
                 return ServiceResult<NominationRewardDto>.Success(resultDto);

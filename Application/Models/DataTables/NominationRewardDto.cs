@@ -1,18 +1,16 @@
-﻿using Domain.Entities.MasterData;
+using Domain.Entities.MasterData;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Application.Models.DataTables
 {
-    // The comprehensive DTO containing all fields, foreign keys, 
-    // derived navigation names, and all child collections.
+    // The comprehensive DTO containing all fields and all 10 child collections
     public class NominationRewardDto
     {
         public int Id { get; set; }
         [Required]
         public int UnitLocationId { get; set; }
-
         public int OrganizationId { get; set; }
 
         public DateOnly? StartDate { get; set; }
@@ -21,45 +19,10 @@ namespace Application.Models.DataTables
         // === Foreign Keys ===
         public int? TypeId { get; set; }
         public int? RegionId { get; set; }
-        public int? ContributionId { get; set; }
-        public int? ModeId { get; set; }
-        public int? NominationCategoryId { get; set; }
-       
 
         // === Other Fields ===
+        public string? OtherType { get; set; }
         public string? OtherRegion { get; set; }
-        public string? AwardName { get; set; }
-        public string? OtherContribution { get; set; }
-        public string? AwardingAgency { get; set; }
-        public string? SpecificContributionTitle { get; set; }
-
-        public string? OrganizerInstitutionName { get; set; }
-        public string? OrganizerInstituteAddress { get; set; }
-
-        public DateOnly? AwardApplicationDate { get; set; }
-        public string? AwardFilePath { get; set; }
-        public string? AwardEventTitle { get; set; }
-        public DateOnly? AwardEventDate { get; set; }
-        public DateOnly? SanctionLetterDate { get; set; }
-        public string? SanctionLetterFilePath { get; set; }
-        public DateOnly? PaperDate { get; set; }
-        public string? PaperFilePath { get; set; }
-        public string? AwardReceivingPhoto { get; set; }
-        public string? AwardReceivingCertificate { get; set; }
-
-        public string? InstitutionBoardName { get; set; }
-        public string? InstitutionName { get; set; }
-        public string? InstitutionDesignation { get; set; }
-        public string? InstitutionAddress { get; set; }
-
-        public int? PositionId { get; set; } 
-
-        public DateOnly? PositionFrom { get; set; }
-        public DateOnly? PositionTo { get; set; }
-        public int? DurationDays { get; set; }
-
-        public DateOnly? NominationDate { get; set; }
-        public string? NominationLetterPath { get; set; }
 
         [MaxLength(50)]
         public string FormStatus { get; set; } = "Draft";
@@ -76,16 +39,20 @@ namespace Application.Models.DataTables
         public string? TypeName { get; set; }
         public string? RegionName { get; set; }
 
-        // Child Collections
+        // All 10 Child Collections
         public List<NominationRewardIFSFarmerDto> IFSFarmers { get; set; } = new();
         public List<NominationRewardIFSEnterpreneurDto> IFSEntrepreneurs { get; set; } = new();
         public List<NominationRewardFarmerInnovationDto> FarmerInnovations { get; set; } = new();
         public List<NominationRewardEntrepreneurInnovationDto> EntrepreneurInnovations { get; set; } = new();
         public List<NominationRewardOrganicFarmerDto> OrganicFarmers { get; set; } = new();
         public List<NominationRewardOrganicEntrepreneurDto> OrganicEntrepreneurs { get; set; } = new();
+        public List<AchievementDto> Achievements { get; set; } = new();
+        public List<AwardRecognitionDto> AwardRecognitions { get; set; } = new();
+        public List<UniversitySanctionLetterPaperPosterDto> UniversitySanctionLetterPaperPosters { get; set; } = new();
+        public List<AwardPhotoDto> AwardPhotos { get; set; } = new();
     }
 
-    // --- Child DTOs ---
+    // --- Original 6 Child DTOs ---
 
     public class NominationRewardIFSFarmerDto
     {
@@ -109,8 +76,6 @@ namespace Application.Models.DataTables
         public string? Type { get; set; }
         public string? NameAddress { get; set; }
         public string? DetailsOfInnovation { get; set; }
-        // Note: PhoneNumber is defined as int? here. 
-        // For actual phone numbers, a string? is usually preferred.
         public int? PhoneNumber { get; set; }
     }
 
@@ -137,6 +102,43 @@ namespace Application.Models.DataTables
         public string? NameAddress { get; set; }
         public string? CropsGrown { get; set; }
         public int? PhoneNumber { get; set; }
+    }
+
+    // --- New 4 Child DTOs ---
+
+    public class AchievementDto
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public string? Phone { get; set; }
+        public string? AchievementDetail { get; set; }
+    }
+
+    public class AwardRecognitionDto
+    {
+        public int Id { get; set; }
+        public string? AwardName { get; set; }
+        public int? ContributionId { get; set; }
+        public string? OtherContribution { get; set; }
+        public string? AwardingAgency { get; set; }
+        public string? InstitutionName { get; set; }
+        public string? InstitutionAddress { get; set; }
+    }
+
+    public class UniversitySanctionLetterPaperPosterDto
+    {
+        public int Id { get; set; }
+        public DateOnly? SanctionLetterDate { get; set; }
+        public string? SanctionLetterFilePath { get; set; }
+        public DateOnly? PaperDate { get; set; }
+        public string? PaperFilePath { get; set; }
+    }
+
+    public class AwardPhotoDto
+    {
+        public int Id { get; set; }
+        public string? AwardReceivingPhoto { get; set; }
+        public string? AwardReceivingCertificate { get; set; }
     }
 
     // --- Create DTOs (for hybrid create - no Id field) ---
@@ -183,6 +185,37 @@ namespace Application.Models.DataTables
         public string? NameAddress { get; set; }
         public string? CropsGrown { get; set; }
         public int? PhoneNumber { get; set; }
+    }
+
+    public class AchievementCreateDto
+    {
+        public string? Name { get; set; }
+        public string? Phone { get; set; }
+        public string? AchievementDetail { get; set; }
+    }
+
+    public class AwardRecognitionCreateDto
+    {
+        public string? AwardName { get; set; }
+        public int? ContributionId { get; set; }
+        public string? OtherContribution { get; set; }
+        public string? AwardingAgency { get; set; }
+        public string? InstitutionName { get; set; }
+        public string? InstitutionAddress { get; set; }
+    }
+
+    public class UniversitySanctionLetterPaperPosterCreateDto
+    {
+        public DateOnly? SanctionLetterDate { get; set; }
+        public string? SanctionLetterFilePath { get; set; }
+        public DateOnly? PaperDate { get; set; }
+        public string? PaperFilePath { get; set; }
+    }
+
+    public class AwardPhotoCreateDto
+    {
+        public string? AwardReceivingPhoto { get; set; }
+        public string? AwardReceivingCertificate { get; set; }
     }
 
     // --- Update DTOs (for hybrid update - with nullable Id) ---
@@ -237,7 +270,42 @@ namespace Application.Models.DataTables
         public int? PhoneNumber { get; set; }
     }
 
-    // --- Summary/List DTO (assuming this serves a distinct purpose) ---
+    public class AchievementUpdateDto
+    {
+        public int? Id { get; set; }  // Nullable: 0 or null = new, > 0 = update existing
+        public string? Name { get; set; }
+        public string? Phone { get; set; }
+        public string? AchievementDetail { get; set; }
+    }
+
+    public class AwardRecognitionUpdateDto
+    {
+        public int? Id { get; set; }  // Nullable: 0 or null = new, > 0 = update existing
+        public string? AwardName { get; set; }
+        public int? ContributionId { get; set; }
+        public string? OtherContribution { get; set; }
+        public string? AwardingAgency { get; set; }
+        public string? InstitutionName { get; set; }
+        public string? InstitutionAddress { get; set; }
+    }
+
+    public class UniversitySanctionLetterPaperPosterUpdateDto
+    {
+        public int? Id { get; set; }  // Nullable: 0 or null = new, > 0 = update existing
+        public DateOnly? SanctionLetterDate { get; set; }
+        public string? SanctionLetterFilePath { get; set; }
+        public DateOnly? PaperDate { get; set; }
+        public string? PaperFilePath { get; set; }
+    }
+
+    public class AwardPhotoUpdateDto
+    {
+        public int? Id { get; set; }  // Nullable: 0 or null = new, > 0 = update existing
+        public string? AwardReceivingPhoto { get; set; }
+        public string? AwardReceivingCertificate { get; set; }
+    }
+
+    // --- Summary/List DTO ---
 
     public class CompleteNominationRewardDto
     {
@@ -245,8 +313,6 @@ namespace Application.Models.DataTables
         public int UnitLocationId { get; set; }
         public int OrganizationId { get; set; }
 
-        public string? AwardName { get; set; }
-        public string? SpecificContributionTitle { get; set; }
         public DateOnly? StartDate { get; set; }
         public DateOnly? EndDate { get; set; }
 
@@ -259,19 +325,23 @@ namespace Application.Models.DataTables
         public string? TypeName { get; set; }
         public string? RegionName { get; set; }
 
-        // All child collections
+        // All 10 child collections
         public List<NominationRewardIFSFarmerDto> IFSFarmers { get; set; } = new();
         public List<NominationRewardIFSEnterpreneurDto> IFSEntrepreneurs { get; set; } = new();
         public List<NominationRewardFarmerInnovationDto> FarmerInnovations { get; set; } = new();
         public List<NominationRewardEntrepreneurInnovationDto> EntrepreneurInnovations { get; set; } = new();
         public List<NominationRewardOrganicFarmerDto> OrganicFarmers { get; set; } = new();
         public List<NominationRewardOrganicEntrepreneurDto> OrganicEntrepreneurs { get; set; } = new();
+        public List<AchievementDto> Achievements { get; set; } = new();
+        public List<AwardRecognitionDto> AwardRecognitions { get; set; } = new();
+        public List<UniversitySanctionLetterPaperPosterDto> UniversitySanctionLetterPaperPosters { get; set; } = new();
+        public List<AwardPhotoDto> AwardPhotos { get; set; } = new();
     }
 
     // ===== HYBRID DTOs =====
 
     /// <summary>
-    /// Hybrid create DTO - creates parent and all children in one request
+    /// Hybrid create DTO - creates parent and all 10 children in one request
     /// </summary>
     public class NominationRewardHybridCreateDto
     {
@@ -282,50 +352,26 @@ namespace Application.Models.DataTables
         // === Foreign Keys ===
         public int? TypeId { get; set; }
         public int? RegionId { get; set; }
-        public int? ContributionId { get; set; }
-        public int? ModeId { get; set; }
-        public int? NominationCategoryId { get; set; }
 
         // === Other Fields ===
+        public string? OtherType { get; set; }
         public string? OtherRegion { get; set; }
-        public string? AwardName { get; set; }
-        public string? OtherContribution { get; set; }
-        public string? AwardingAgency { get; set; }
-        public string? SpecificContributionTitle { get; set; }
-        public string? OrganizerInstitutionName { get; set; }
-        public string? OrganizerInstituteAddress { get; set; }
-        public DateOnly? AwardApplicationDate { get; set; }
-        public string? AwardFilePath { get; set; }
-        public string? AwardEventTitle { get; set; }
-        public DateOnly? AwardEventDate { get; set; }
-        public DateOnly? SanctionLetterDate { get; set; }
-        public string? SanctionLetterFilePath { get; set; }
-        public DateOnly? PaperDate { get; set; }
-        public string? PaperFilePath { get; set; }
-        public string? AwardReceivingPhoto { get; set; }
-        public string? AwardReceivingCertificate { get; set; }
-        public string? InstitutionBoardName { get; set; }
-        public string? InstitutionName { get; set; }
-        public string? InstitutionDesignation { get; set; }
-        public string? InstitutionAddress { get; set; }
-        public int? PositionId { get; set; }
-        public DateOnly? PositionFrom { get; set; }
-        public DateOnly? PositionTo { get; set; }
-        public int? DurationDays { get; set; }
-        public DateOnly? NominationDate { get; set; }
-        public string? NominationLetterPath { get; set; }
 
-        // === Child Collections ===
+        // === All 10 Child Collections ===
         public List<NominationRewardIFSFarmerCreateDto>? IFSFarmers { get; set; }
         public List<NominationRewardFarmerInnovationCreateDto>? FarmerInnovations { get; set; }
         public List<NominationRewardOrganicFarmerCreateDto>? OrganicFarmers { get; set; }
         public List<NominationRewardIFSEnterpreneurCreateDto>? IFSEntrepreneurs { get; set; }
         public List<NominationRewardEntrepreneurInnovationCreateDto>? EntrepreneurInnovations { get; set; }
         public List<NominationRewardOrganicEntrepreneurCreateDto>? OrganicEntrepreneurs { get; set; }
+        public List<AchievementCreateDto>? Achievements { get; set; }
+        public List<AwardRecognitionCreateDto>? AwardRecognitions { get; set; }
+        public List<UniversitySanctionLetterPaperPosterCreateDto>? UniversitySanctionLetterPaperPosters { get; set; }
+        public List<AwardPhotoCreateDto>? AwardPhotos { get; set; }
     }
 
     /// <summary>
-    /// Hybrid update DTO - updates parent and manages all children (create/update/delete) in one request
+    /// Hybrid update DTO - updates parent and manages all 10 children (create/update/delete) in one request
     /// Child items with Id = 0 or null will be created
     /// Child items with Id > 0 will be updated
     /// Child items not in the lists will be deleted (cascade)
@@ -338,47 +384,21 @@ namespace Application.Models.DataTables
         // === Foreign Keys ===
         public int? TypeId { get; set; }
         public int? RegionId { get; set; }
-        public int? ContributionId { get; set; }
-        public int? ModeId { get; set; }
-        public int? NominationCategoryId { get; set; }
 
         // === Other Fields ===
+        public string? OtherType { get; set; }
         public string? OtherRegion { get; set; }
-        public string? AwardName { get; set; }
-        public string? OtherContribution { get; set; }
-        public string? AwardingAgency { get; set; }
-        public string? SpecificContributionTitle { get; set; }
-        public string? OrganizerInstitutionName { get; set; }
-        public string? OrganizerInstituteAddress { get; set; }
-        public DateOnly? AwardApplicationDate { get; set; }
-        public string? AwardFilePath { get; set; }
-        public string? AwardEventTitle { get; set; }
-        public DateOnly? AwardEventDate { get; set; }
-        public DateOnly? SanctionLetterDate { get; set; }
-        public string? SanctionLetterFilePath { get; set; }
-        public DateOnly? PaperDate { get; set; }
-        public string? PaperFilePath { get; set; }
-        public string? AwardReceivingPhoto { get; set; }
-        public string? AwardReceivingCertificate { get; set; }
-        public string? InstitutionBoardName { get; set; }
-        public string? InstitutionName { get; set; }
-        public string? InstitutionDesignation { get; set; }
-        public string? InstitutionAddress { get; set; }
-        public int? PositionId { get; set; }
-        public DateOnly? PositionFrom { get; set; }
-        public DateOnly? PositionTo { get; set; }
-        public int? DurationDays { get; set; }
-        public DateOnly? NominationDate { get; set; }
-        public string? NominationLetterPath { get; set; }
 
-        // === Child Collections ===
+        // === All 10 Child Collections ===
         public List<NominationRewardIFSFarmerUpdateDto>? IFSFarmers { get; set; }
         public List<NominationRewardFarmerInnovationUpdateDto>? FarmerInnovations { get; set; }
         public List<NominationRewardOrganicFarmerUpdateDto>? OrganicFarmers { get; set; }
         public List<NominationRewardIFSEnterpreneurUpdateDto>? IFSEntrepreneurs { get; set; }
         public List<NominationRewardEntrepreneurInnovationUpdateDto>? EntrepreneurInnovations { get; set; }
         public List<NominationRewardOrganicEntrepreneurUpdateDto>? OrganicEntrepreneurs { get; set; }
+        public List<AchievementUpdateDto>? Achievements { get; set; }
+        public List<AwardRecognitionUpdateDto>? AwardRecognitions { get; set; }
+        public List<UniversitySanctionLetterPaperPosterUpdateDto>? UniversitySanctionLetterPaperPosters { get; set; }
+        public List<AwardPhotoUpdateDto>? AwardPhotos { get; set; }
     }
-
-
 }

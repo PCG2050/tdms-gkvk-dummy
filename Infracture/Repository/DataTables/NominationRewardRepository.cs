@@ -38,17 +38,19 @@ namespace Infrastructure.Repository.DataTables
                 .Include(n => n.Organization)
                 .Include(n => n.Type)
                 .Include(n => n.Region)
-                .Include(n => n.Contribution)
-                .Include(n => n.Mode)
-                .Include(n => n.NominationCategory)
-                .Include(n => n.Position)
-                .Include(n => n.ApprovedBy)
+                // Original 6 child collections
                 .Include(n => n.NominationRewardIFSFarmers)
                 .Include(n => n.NominationRewardIFSEntrepreneurs)
                 .Include(n => n.NominationRewardFarmerInnovations)
                 .Include(n => n.NominationRewardEntrepreneurInnovations)
                 .Include(n => n.NominationRewardOrganicFarmers)
                 .Include(n => n.NominationRewardOrganicEntrepreneurs)
+                // NEW 4 child collections
+                .Include(n => n.Achievements)
+                .Include(n => n.AwardRecognitions)
+                    .ThenInclude(a => a.Contribution)
+                .Include(n => n.UniversitySanctionLetterPaperPosters)
+                .Include(n => n.AwardPhotos)
                 .AsSplitQuery()
                 .FirstOrDefaultAsync(n => n.Id == id);
         }
@@ -61,7 +63,7 @@ namespace Infrastructure.Repository.DataTables
         }
         public async Task<NominationReward> UpdateAsync(NominationReward entity)
         {
-            // Explicitly mark old children as deleted
+            // Explicitly mark old children as deleted (all 10 child collections)
             var existingIFSFarmers = _context.NominationRewardIFSFarmers
                 .Where(x => x.NominationRewardId == entity.Id);
             _context.NominationRewardIFSFarmers.RemoveRange(existingIFSFarmers);
@@ -86,6 +88,22 @@ namespace Infrastructure.Repository.DataTables
                 .Where(x => x.NominationRewardId == entity.Id);
             _context.NominationRewardOrganicEntrepreneurs.RemoveRange(existingOrganicEntrepreneurs);
 
+            var existingAchievements = _context.Achievements
+                .Where(x => x.NominationRewardId == entity.Id);
+            _context.Achievements.RemoveRange(existingAchievements);
+
+            var existingAwardRecognitions = _context.AwardRecognitions
+                .Where(x => x.NominationRewardId == entity.Id);
+            _context.AwardRecognitions.RemoveRange(existingAwardRecognitions);
+
+            var existingUniversitySanctionLetterPaperPosters = _context.UniversitySanctionLetterPaperPosters
+                .Where(x => x.NominationRewardId == entity.Id);
+            _context.UniversitySanctionLetterPaperPosters.RemoveRange(existingUniversitySanctionLetterPaperPosters);
+
+            var existingAwardPhotos = _context.AwardPhotos
+                .Where(x => x.NominationRewardId == entity.Id);
+            _context.AwardPhotos.RemoveRange(existingAwardPhotos);
+
             // Now save - will delete old and insert new
             await _context.SaveChangesAsync();
             return entity;
@@ -105,14 +123,20 @@ namespace Infrastructure.Repository.DataTables
         {
             return await _context.NominationRewards
                 .Include(n => n.Type)
-                .Include(n => n.NominationCategory)
+                .Include(n => n.Region)
+                // Original 6 child collections
                 .Include(n => n.NominationRewardIFSFarmers)
                 .Include(n => n.NominationRewardIFSEntrepreneurs)
                 .Include(n => n.NominationRewardFarmerInnovations)
                 .Include(n => n.NominationRewardEntrepreneurInnovations)
                 .Include(n => n.NominationRewardOrganicFarmers)
                 .Include(n => n.NominationRewardOrganicEntrepreneurs)
-                .AsSplitQuery()                
+                // NEW 4 child collections
+                .Include(n => n.Achievements)
+                .Include(n => n.AwardRecognitions)
+                .Include(n => n.UniversitySanctionLetterPaperPosters)
+                .Include(n => n.AwardPhotos)
+                .AsSplitQuery()
                 .ToListAsync();
         }
 
@@ -138,12 +162,8 @@ namespace Infrastructure.Repository.DataTables
             if (typeId.HasValue)
                 query = query.Where(n => n.TypeId == typeId.Value);
 
-            if (!string.IsNullOrWhiteSpace(searchTerm))
-            {
-                query = query.Where(n =>
-                    (n.AwardName != null && n.AwardName.Contains(searchTerm)) ||
-                    (n.SpecificContributionTitle != null && n.SpecificContributionTitle.Contains(searchTerm)));
-            }
+            // Note: searchTerm filter removed as AwardName and SpecificContributionTitle no longer exist in new model
+            // If search is needed, add filter based on new fields (e.g., OtherType, OtherRegion)
 
             var totalCount = await query.CountAsync();
 
@@ -151,12 +171,18 @@ namespace Infrastructure.Repository.DataTables
                 .OrderByDescending(n => n.CreatedAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
+                // Original 6 child collections
                 .Include(n => n.NominationRewardIFSFarmers)
                 .Include(n => n.NominationRewardIFSEntrepreneurs)
                 .Include(n => n.NominationRewardFarmerInnovations)
                 .Include(n => n.NominationRewardEntrepreneurInnovations)
                 .Include(n => n.NominationRewardOrganicFarmers)
                 .Include(n => n.NominationRewardOrganicEntrepreneurs)
+                // NEW 4 child collections
+                .Include(n => n.Achievements)
+                .Include(n => n.AwardRecognitions)
+                .Include(n => n.UniversitySanctionLetterPaperPosters)
+                .Include(n => n.AwardPhotos)
                 .AsSplitQuery()
                 .AsNoTracking()
                 .ToListAsync();
@@ -181,19 +207,25 @@ namespace Infrastructure.Repository.DataTables
                 .OrderByDescending(n => n.CreatedAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
+                // Original 6 child collections
                 .Include(n => n.NominationRewardIFSFarmers)
                 .Include(n => n.NominationRewardIFSEntrepreneurs)
                 .Include(n => n.NominationRewardFarmerInnovations)
                 .Include(n => n.NominationRewardEntrepreneurInnovations)
                 .Include(n => n.NominationRewardOrganicFarmers)
                 .Include(n => n.NominationRewardOrganicEntrepreneurs)
+                // NEW 4 child collections
+                .Include(n => n.Achievements)
+                .Include(n => n.AwardRecognitions)
+                .Include(n => n.UniversitySanctionLetterPaperPosters)
+                .Include(n => n.AwardPhotos)
                 .AsSplitQuery()
                 .ToListAsync();
 
             return new PaginatedResult<NominationReward>(
-                items, 
-                totalCount, 
-                pageNumber, 
+                items,
+                totalCount,
+                pageNumber,
                 pageSize);
         }
 
@@ -210,7 +242,7 @@ namespace Infrastructure.Repository.DataTables
 
         // ===== HYBRID UPDATE METHOD =====
         /// <summary>
-        /// Updates parent and manages all children (create/update/delete) in one transaction
+        /// Updates parent and manages all 10 children (create/update/delete) in one transaction
         /// Follows the same pattern as FinancialBudgetRepository.UpdateWithChildrenAsync
         /// </summary>
         public async Task<NominationReward> UpdateWithChildrenAsync(
@@ -220,7 +252,11 @@ namespace Infrastructure.Repository.DataTables
             List<NominationRewardOrganicFarmer>? organicFarmers,
             List<NominationRewardIFSEnterpreneur>? ifsEntrepreneurs,
             List<NominationRewardEntrepreneurInnovation>? entrepreneurInnovations,
-            List<NominationRewardOrganicEntrepreneur>? organicEntrepreneurs)
+            List<NominationRewardOrganicEntrepreneur>? organicEntrepreneurs,
+            List<Achievement>? achievements,
+            List<AwardRecognition>? awardRecognitions,
+            List<UniversitySanctionLetterPaperPoster>? universitySanctionLetterPaperPosters,
+            List<AwardPhoto>? awardPhotos)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
@@ -232,41 +268,13 @@ namespace Infrastructure.Repository.DataTables
                 if (existing == null)
                     throw new InvalidOperationException($"NominationReward with ID {nominationRewardId} not found");
 
-                // 1. Update parent entity
+                // 1. Update parent entity - only fields from new simplified model
                 existing.StartDate = parent.StartDate;
                 existing.EndDate = parent.EndDate;
                 existing.TypeId = parent.TypeId;
                 existing.RegionId = parent.RegionId;
-                existing.ContributionId = parent.ContributionId;
-                existing.ModeId = parent.ModeId;
-                existing.NominationCategoryId = parent.NominationCategoryId;
+                existing.OtherType = parent.OtherType;
                 existing.OtherRegion = parent.OtherRegion;
-                existing.AwardName = parent.AwardName;
-                existing.OtherContribution = parent.OtherContribution;
-                existing.AwardingAgency = parent.AwardingAgency;
-                existing.SpecificContributionTitle = parent.SpecificContributionTitle;
-                existing.OrganizerInstitutionName = parent.OrganizerInstitutionName;
-                existing.OrganizerInstituteAddress = parent.OrganizerInstituteAddress;
-                existing.AwardApplicationDate = parent.AwardApplicationDate;
-                existing.AwardFilePath = parent.AwardFilePath;
-                existing.AwardEventTitle = parent.AwardEventTitle;
-                existing.AwardEventDate = parent.AwardEventDate;
-                existing.SanctionLetterDate = parent.SanctionLetterDate;
-                existing.SanctionLetterFilePath = parent.SanctionLetterFilePath;
-                existing.PaperDate = parent.PaperDate;
-                existing.PaperFilePath = parent.PaperFilePath;
-                existing.AwardReceivingPhoto = parent.AwardReceivingPhoto;
-                existing.AwardReceivingCertificate = parent.AwardReceivingCertificate;
-                existing.InstitutionBoardName = parent.InstitutionBoardName;
-                existing.InstitutionName = parent.InstitutionName;
-                existing.InstitutionDesignation = parent.InstitutionDesignation;
-                existing.InstitutionAddress = parent.InstitutionAddress;
-                existing.PositionId = parent.PositionId;
-                existing.PositionFrom = parent.PositionFrom;
-                existing.PositionTo = parent.PositionTo;
-                existing.DurationDays = parent.DurationDays;
-                existing.NominationDate = parent.NominationDate;
-                existing.NominationLetterPath = parent.NominationLetterPath;
                 existing.FormStatus = parent.FormStatus;
                 existing.UpdatedById = parent.UpdatedById;
                 existing.UpdatedAt = parent.UpdatedAt;
@@ -504,6 +512,165 @@ namespace Infrastructure.Repository.DataTables
                             // CREATE new
                             organic.NominationRewardId = nominationRewardId;
                             _context.NominationRewardOrganicEntrepreneurs.Add(organic);
+                        }
+                    }
+                }
+
+                // 8. Process Achievements (Hybrid Pattern) - NEW
+                if (achievements != null)
+                {
+                    var existingAchievements = existing.Achievements?.ToList() ?? new List<Achievement>();
+                    var incomingIds = achievements.Where(a => a.Id > 0).Select(a => a.Id).ToList();
+
+                    // DELETE: Items in DB but not in incoming array
+                    var achievementsToDelete = existingAchievements.Where(a => !incomingIds.Contains(a.Id)).ToList();
+                    foreach (var achievement in achievementsToDelete)
+                    {
+                        _context.Achievements.Remove(achievement);
+                    }
+
+                    // CREATE or UPDATE
+                    foreach (var achievement in achievements)
+                    {
+                        if (achievement.Id > 0)
+                        {
+                            // UPDATE existing
+                            var existingAchievement = existingAchievements.FirstOrDefault(a => a.Id == achievement.Id);
+                            if (existingAchievement != null)
+                            {
+                                existingAchievement.Name = achievement.Name;
+                                existingAchievement.Phone = achievement.Phone;
+                                existingAchievement.AchievementDetail = achievement.AchievementDetail;
+                                existingAchievement.UpdatedById = achievement.UpdatedById;
+                                existingAchievement.UpdatedAt = achievement.UpdatedAt;
+                                _context.Achievements.Update(existingAchievement);
+                            }
+                        }
+                        else
+                        {
+                            // CREATE new
+                            achievement.NominationRewardId = nominationRewardId;
+                            _context.Achievements.Add(achievement);
+                        }
+                    }
+                }
+
+                // 9. Process AwardRecognitions (Hybrid Pattern) - NEW
+                if (awardRecognitions != null)
+                {
+                    var existingAwards = existing.AwardRecognitions?.ToList() ?? new List<AwardRecognition>();
+                    var incomingIds = awardRecognitions.Where(a => a.Id > 0).Select(a => a.Id).ToList();
+
+                    // DELETE: Items in DB but not in incoming array
+                    var awardsToDelete = existingAwards.Where(a => !incomingIds.Contains(a.Id)).ToList();
+                    foreach (var award in awardsToDelete)
+                    {
+                        _context.AwardRecognitions.Remove(award);
+                    }
+
+                    // CREATE or UPDATE
+                    foreach (var award in awardRecognitions)
+                    {
+                        if (award.Id > 0)
+                        {
+                            // UPDATE existing
+                            var existingAward = existingAwards.FirstOrDefault(a => a.Id == award.Id);
+                            if (existingAward != null)
+                            {
+                                existingAward.AwardName = award.AwardName;
+                                existingAward.ContributionId = award.ContributionId;
+                                existingAward.OtherContribution = award.OtherContribution;
+                                existingAward.AwardingAgency = award.AwardingAgency;
+                                existingAward.InstitutionName = award.InstitutionName;
+                                existingAward.InstitutionAddress = award.InstitutionAddress;
+                                existingAward.UpdatedById = award.UpdatedById;
+                                existingAward.UpdatedAt = award.UpdatedAt;
+                                _context.AwardRecognitions.Update(existingAward);
+                            }
+                        }
+                        else
+                        {
+                            // CREATE new
+                            award.NominationRewardId = nominationRewardId;
+                            _context.AwardRecognitions.Add(award);
+                        }
+                    }
+                }
+
+                // 10. Process UniversitySanctionLetterPaperPosters (Hybrid Pattern) - NEW
+                if (universitySanctionLetterPaperPosters != null)
+                {
+                    var existingPosters = existing.UniversitySanctionLetterPaperPosters?.ToList() ?? new List<UniversitySanctionLetterPaperPoster>();
+                    var incomingIds = universitySanctionLetterPaperPosters.Where(p => p.Id > 0).Select(p => p.Id).ToList();
+
+                    // DELETE: Items in DB but not in incoming array
+                    var postersToDelete = existingPosters.Where(p => !incomingIds.Contains(p.Id)).ToList();
+                    foreach (var poster in postersToDelete)
+                    {
+                        _context.UniversitySanctionLetterPaperPosters.Remove(poster);
+                    }
+
+                    // CREATE or UPDATE
+                    foreach (var poster in universitySanctionLetterPaperPosters)
+                    {
+                        if (poster.Id > 0)
+                        {
+                            // UPDATE existing
+                            var existingPoster = existingPosters.FirstOrDefault(p => p.Id == poster.Id);
+                            if (existingPoster != null)
+                            {
+                                existingPoster.SanctionLetterDate = poster.SanctionLetterDate;
+                                existingPoster.SanctionLetterFilePath = poster.SanctionLetterFilePath;
+                                existingPoster.PaperDate = poster.PaperDate;
+                                existingPoster.PaperFilePath = poster.PaperFilePath;
+                                existingPoster.UpdatedById = poster.UpdatedById;
+                                existingPoster.UpdatedAt = poster.UpdatedAt;
+                                _context.UniversitySanctionLetterPaperPosters.Update(existingPoster);
+                            }
+                        }
+                        else
+                        {
+                            // CREATE new
+                            poster.NominationRewardId = nominationRewardId;
+                            _context.UniversitySanctionLetterPaperPosters.Add(poster);
+                        }
+                    }
+                }
+
+                // 11. Process AwardPhotos (Hybrid Pattern) - NEW
+                if (awardPhotos != null)
+                {
+                    var existingPhotos = existing.AwardPhotos?.ToList() ?? new List<AwardPhoto>();
+                    var incomingIds = awardPhotos.Where(p => p.Id > 0).Select(p => p.Id).ToList();
+
+                    // DELETE: Items in DB but not in incoming array
+                    var photosToDelete = existingPhotos.Where(p => !incomingIds.Contains(p.Id)).ToList();
+                    foreach (var photo in photosToDelete)
+                    {
+                        _context.AwardPhotos.Remove(photo);
+                    }
+
+                    // CREATE or UPDATE
+                    foreach (var photo in awardPhotos)
+                    {
+                        if (photo.Id > 0)
+                        {
+                            // UPDATE existing
+                            var existingPhoto = existingPhotos.FirstOrDefault(p => p.Id == photo.Id);
+                            if (existingPhoto != null)
+                            {
+                                existingPhoto.AwardReceivingPhoto = photo.AwardReceivingPhoto;
+                                existingPhoto.AwardReceivingCertificate = photo.AwardReceivingCertificate;
+                                existingPhoto.UpdatedById = photo.UpdatedById;
+                                existingPhoto.UpdatedAt = photo.UpdatedAt;
+                                _context.AwardPhotos.Update(existingPhoto);
+                            }
+                        }
+                        else
+                        {
+                            // CREATE new
+                            photo.NominationRewardId = nominationRewardId;
+                            _context.AwardPhotos.Add(photo);
                         }
                     }
                 }

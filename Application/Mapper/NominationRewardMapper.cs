@@ -1,4 +1,4 @@
-﻿using Application.Models.DataTables;
+using Application.Models.DataTables;
 using Domain.Entities.GenericTables;
 using System.Linq;
 
@@ -6,7 +6,7 @@ namespace Application.Mapper
 {
     public class NominationRewardMapper
     {
-        // Parent mappings
+        // ===== PARENT MAPPINGS =====
         public NominationRewardDto MapToDto(NominationReward entity)
         {
             return new NominationRewardDto
@@ -16,38 +16,10 @@ namespace Application.Mapper
                 OrganizationId = entity.OrganizationId,
                 TypeId = entity.TypeId,
                 RegionId = entity.RegionId,
-                ContributionId = entity.ContributionId,
-                ModeId = entity.ModeId,
-                NominationCategoryId = entity.NominationCategoryId,
-                PositionId = entity.PositionId,
                 StartDate = entity.StartDate,
                 EndDate = entity.EndDate,
+                OtherType = entity.OtherType,
                 OtherRegion = entity.OtherRegion,
-                AwardName = entity.AwardName,
-                OtherContribution = entity.OtherContribution,
-                AwardingAgency = entity.AwardingAgency,
-                SpecificContributionTitle = entity.SpecificContributionTitle,
-                OrganizerInstitutionName = entity.OrganizerInstitutionName,
-                OrganizerInstituteAddress = entity.OrganizerInstituteAddress,
-                AwardApplicationDate = entity.AwardApplicationDate,
-                AwardFilePath = entity.AwardFilePath,
-                AwardEventTitle = entity.AwardEventTitle,
-                AwardEventDate = entity.AwardEventDate,
-                SanctionLetterDate = entity.SanctionLetterDate,
-                SanctionLetterFilePath = entity.SanctionLetterFilePath,
-                PaperDate = entity.PaperDate,
-                PaperFilePath = entity.PaperFilePath,
-                AwardReceivingPhoto = entity.AwardReceivingPhoto,
-                AwardReceivingCertificate = entity.AwardReceivingCertificate,
-                InstitutionBoardName = entity.InstitutionBoardName,
-                InstitutionName = entity.InstitutionName,
-                InstitutionDesignation = entity.InstitutionDesignation,
-                InstitutionAddress = entity.InstitutionAddress,
-                PositionFrom = entity.PositionFrom,
-                PositionTo = entity.PositionTo,
-                DurationDays = entity.DurationDays,
-                NominationDate = entity.NominationDate,
-                NominationLetterPath = entity.NominationLetterPath,
                 FormStatus = entity.FormStatus,
                 FormStatusRemarks = entity.FormStatusRemarks,
                 ApprovedAt = entity.ApprovedAt,
@@ -63,38 +35,10 @@ namespace Application.Mapper
                 OrganizationId = dto.OrganizationId,
                 TypeId = dto.TypeId,
                 RegionId = dto.RegionId,
-                ContributionId = dto.ContributionId,
-                ModeId = dto.ModeId,
-                NominationCategoryId = dto.NominationCategoryId,
-                PositionId = dto.PositionId,
                 StartDate = dto.StartDate,
                 EndDate = dto.EndDate,
+                OtherType = dto.OtherType,
                 OtherRegion = dto.OtherRegion,
-                AwardName = dto.AwardName,
-                OtherContribution = dto.OtherContribution,
-                AwardingAgency = dto.AwardingAgency,
-                SpecificContributionTitle = dto.SpecificContributionTitle,
-                OrganizerInstitutionName = dto.OrganizerInstitutionName,
-                OrganizerInstituteAddress = dto.OrganizerInstituteAddress,
-                AwardApplicationDate = dto.AwardApplicationDate,
-                AwardFilePath = dto.AwardFilePath,
-                AwardEventTitle = dto.AwardEventTitle,
-                AwardEventDate = dto.AwardEventDate,
-                SanctionLetterDate = dto.SanctionLetterDate,
-                SanctionLetterFilePath = dto.SanctionLetterFilePath,
-                PaperDate = dto.PaperDate,
-                PaperFilePath = dto.PaperFilePath,
-                AwardReceivingPhoto = dto.AwardReceivingPhoto,
-                AwardReceivingCertificate = dto.AwardReceivingCertificate,
-                InstitutionBoardName = dto.InstitutionBoardName,
-                InstitutionName = dto.InstitutionName,
-                InstitutionDesignation = dto.InstitutionDesignation,
-                InstitutionAddress = dto.InstitutionAddress,
-                PositionFrom = dto.PositionFrom,
-                PositionTo = dto.PositionTo,
-                DurationDays = dto.DurationDays,
-                NominationDate = dto.NominationDate,
-                NominationLetterPath = dto.NominationLetterPath,
                 FormStatus = dto.FormStatus,
                 FormStatusRemarks = dto.FormStatusRemarks,
                 ApprovedAt = dto.ApprovedAt,
@@ -126,10 +70,26 @@ namespace Application.Mapper
                 foreach (var c in dto.OrganicEntrepreneurs)
                     entity.NominationRewardOrganicEntrepreneurs.Add(MapToEntity(c));
 
+            if (dto.Achievements != null)
+                foreach (var c in dto.Achievements)
+                    entity.Achievements.Add(MapToEntity(c));
+
+            if (dto.AwardRecognitions != null)
+                foreach (var c in dto.AwardRecognitions)
+                    entity.AwardRecognitions.Add(MapToEntity(c));
+
+            if (dto.UniversitySanctionLetterPaperPosters != null)
+                foreach (var c in dto.UniversitySanctionLetterPaperPosters)
+                    entity.UniversitySanctionLetterPaperPosters.Add(MapToEntity(c));
+
+            if (dto.AwardPhotos != null)
+                foreach (var c in dto.AwardPhotos)
+                    entity.AwardPhotos.Add(MapToEntity(c));
+
             return entity;
         }
 
-        // Child mappings
+        // ===== CHILD MAPPINGS (Original 6) =====
         public NominationRewardIFSFarmer MapToEntity(NominationRewardIFSFarmerDto dto) =>
             new() { NameAddress = dto.NameAddress, Phone = dto.Phone, ComponentOfIFS = dto.ComponentOfIFS };
 
@@ -166,6 +126,32 @@ namespace Application.Mapper
         public NominationRewardOrganicEntrepreneurDto MapToDto(NominationRewardOrganicEntrepreneur entity) =>
             new() { Id = entity.Id, NameAddress = entity.NameAddress, PhoneNumber = entity.PhoneNumber, CropsGrown = entity.CropsGrown };
 
+        // ===== CHILD MAPPINGS (New 4) =====
+        public Achievement MapToEntity(AchievementDto dto) =>
+            new() { Name = dto.Name, Phone = dto.Phone, AchievementDetail = dto.AchievementDetail };
+
+        public AwardRecognition MapToEntity(AwardRecognitionDto dto) =>
+            new() { AwardName = dto.AwardName, ContributionId = dto.ContributionId, OtherContribution = dto.OtherContribution, AwardingAgency = dto.AwardingAgency, InstitutionName = dto.InstitutionName, InstitutionAddress = dto.InstitutionAddress };
+
+        public UniversitySanctionLetterPaperPoster MapToEntity(UniversitySanctionLetterPaperPosterDto dto) =>
+            new() { SanctionLetterDate = dto.SanctionLetterDate, SanctionLetterFilePath = dto.SanctionLetterFilePath, PaperDate = dto.PaperDate, PaperFilePath = dto.PaperFilePath };
+
+        public AwardPhoto MapToEntity(AwardPhotoDto dto) =>
+            new() { AwardReceivingPhoto = dto.AwardReceivingPhoto, AwardReceivingCertificate = dto.AwardReceivingCertificate };
+
+        public AchievementDto MapToDto(Achievement entity) =>
+            new() { Id = entity.Id, Name = entity.Name, Phone = entity.Phone, AchievementDetail = entity.AchievementDetail };
+
+        public AwardRecognitionDto MapToDto(AwardRecognition entity) =>
+            new() { Id = entity.Id, AwardName = entity.AwardName, ContributionId = entity.ContributionId, OtherContribution = entity.OtherContribution, AwardingAgency = entity.AwardingAgency, InstitutionName = entity.InstitutionName, InstitutionAddress = entity.InstitutionAddress };
+
+        public UniversitySanctionLetterPaperPosterDto MapToDto(UniversitySanctionLetterPaperPoster entity) =>
+            new() { Id = entity.Id, SanctionLetterDate = entity.SanctionLetterDate, SanctionLetterFilePath = entity.SanctionLetterFilePath, PaperDate = entity.PaperDate, PaperFilePath = entity.PaperFilePath };
+
+        public AwardPhotoDto MapToDto(AwardPhoto entity) =>
+            new() { Id = entity.Id, AwardReceivingPhoto = entity.AwardReceivingPhoto, AwardReceivingCertificate = entity.AwardReceivingCertificate };
+
+        // ===== DETAILED DTO WITH NAVIGATION =====
         public NominationRewardDto MapToDtoWithDetails(NominationReward entity)
         {
             var dto = MapToDto(entity);
@@ -179,6 +165,10 @@ namespace Application.Mapper
             dto.EntrepreneurInnovations = entity.NominationRewardEntrepreneurInnovations?.Select(MapToDto).ToList() ?? new();
             dto.OrganicFarmers = entity.NominationRewardOrganicFarmers?.Select(MapToDto).ToList() ?? new();
             dto.OrganicEntrepreneurs = entity.NominationRewardOrganicEntrepreneurs?.Select(MapToDto).ToList() ?? new();
+            dto.Achievements = entity.Achievements?.Select(MapToDto).ToList() ?? new();
+            dto.AwardRecognitions = entity.AwardRecognitions?.Select(MapToDto).ToList() ?? new();
+            dto.UniversitySanctionLetterPaperPosters = entity.UniversitySanctionLetterPaperPosters?.Select(MapToDto).ToList() ?? new();
+            dto.AwardPhotos = entity.AwardPhotos?.Select(MapToDto).ToList() ?? new();
             return dto;
         }
 
@@ -188,8 +178,6 @@ namespace Application.Mapper
                 Id = entity.Id,
                 UnitLocationId = entity.UnitLocationId,
                 OrganizationId = entity.OrganizationId,
-                AwardName = entity.AwardName,
-                SpecificContributionTitle = entity.SpecificContributionTitle,
                 StartDate = entity.StartDate,
                 EndDate = entity.EndDate,
                 FormStatus = entity.FormStatus,
@@ -203,7 +191,11 @@ namespace Application.Mapper
                 FarmerInnovations = entity.NominationRewardFarmerInnovations?.Select(MapToDto).ToList() ?? new(),
                 EntrepreneurInnovations = entity.NominationRewardEntrepreneurInnovations?.Select(MapToDto).ToList() ?? new(),
                 OrganicFarmers = entity.NominationRewardOrganicFarmers?.Select(MapToDto).ToList() ?? new(),
-                OrganicEntrepreneurs = entity.NominationRewardOrganicEntrepreneurs?.Select(MapToDto).ToList() ?? new()
+                OrganicEntrepreneurs = entity.NominationRewardOrganicEntrepreneurs?.Select(MapToDto).ToList() ?? new(),
+                Achievements = entity.Achievements?.Select(MapToDto).ToList() ?? new(),
+                AwardRecognitions = entity.AwardRecognitions?.Select(MapToDto).ToList() ?? new(),
+                UniversitySanctionLetterPaperPosters = entity.UniversitySanctionLetterPaperPosters?.Select(MapToDto).ToList() ?? new(),
+                AwardPhotos = entity.AwardPhotos?.Select(MapToDto).ToList() ?? new()
             };
 
         public void MapUpdateDtoToEntity(NominationRewardDto dto, NominationReward entity)
@@ -211,44 +203,16 @@ namespace Application.Mapper
             // Update all parent fields
             entity.TypeId = dto.TypeId;
             entity.RegionId = dto.RegionId;
-            entity.ContributionId = dto.ContributionId;
-            entity.ModeId = dto.ModeId;
-            entity.NominationCategoryId = dto.NominationCategoryId;
-            entity.PositionId = dto.PositionId;
             entity.StartDate = dto.StartDate;
             entity.EndDate = dto.EndDate;
+            entity.OtherType = dto.OtherType;
             entity.OtherRegion = dto.OtherRegion;
-            entity.AwardName = dto.AwardName;
-            entity.OtherContribution = dto.OtherContribution;
-            entity.AwardingAgency = dto.AwardingAgency;
-            entity.SpecificContributionTitle = dto.SpecificContributionTitle;
-            entity.OrganizerInstitutionName = dto.OrganizerInstitutionName;
-            entity.OrganizerInstituteAddress = dto.OrganizerInstituteAddress;
-            entity.AwardApplicationDate = dto.AwardApplicationDate;
-            entity.AwardFilePath = dto.AwardFilePath;
-            entity.AwardEventTitle = dto.AwardEventTitle;
-            entity.AwardEventDate = dto.AwardEventDate;
-            entity.SanctionLetterDate = dto.SanctionLetterDate;
-            entity.SanctionLetterFilePath = dto.SanctionLetterFilePath;
-            entity.PaperDate = dto.PaperDate;
-            entity.PaperFilePath = dto.PaperFilePath;
-            entity.AwardReceivingPhoto = dto.AwardReceivingPhoto;
-            entity.AwardReceivingCertificate = dto.AwardReceivingCertificate;
-            entity.InstitutionBoardName = dto.InstitutionBoardName;
-            entity.InstitutionName = dto.InstitutionName;
-            entity.InstitutionDesignation = dto.InstitutionDesignation;
-            entity.InstitutionAddress = dto.InstitutionAddress;
-            entity.PositionFrom = dto.PositionFrom;
-            entity.PositionTo = dto.PositionTo;
-            entity.DurationDays = dto.DurationDays;
-            entity.NominationDate = dto.NominationDate;
-            entity.NominationLetterPath = dto.NominationLetterPath;
             entity.FormStatus = dto.FormStatus;
             entity.FormStatusRemarks = dto.FormStatusRemarks;
             entity.ApprovedAt = dto.ApprovedAt;
             entity.ApprovedById = dto.ApprovedById;
 
-            // Update child collections
+            // Update child collections - clear and add new
             entity.NominationRewardIFSFarmers.Clear();
             if (dto.IFSFarmers != null)
                 foreach (var c in dto.IFSFarmers)
@@ -278,11 +242,31 @@ namespace Application.Mapper
             if (dto.OrganicEntrepreneurs != null)
                 foreach (var c in dto.OrganicEntrepreneurs)
                     entity.NominationRewardOrganicEntrepreneurs.Add(MapToEntity(c));
+
+            entity.Achievements.Clear();
+            if (dto.Achievements != null)
+                foreach (var c in dto.Achievements)
+                    entity.Achievements.Add(MapToEntity(c));
+
+            entity.AwardRecognitions.Clear();
+            if (dto.AwardRecognitions != null)
+                foreach (var c in dto.AwardRecognitions)
+                    entity.AwardRecognitions.Add(MapToEntity(c));
+
+            entity.UniversitySanctionLetterPaperPosters.Clear();
+            if (dto.UniversitySanctionLetterPaperPosters != null)
+                foreach (var c in dto.UniversitySanctionLetterPaperPosters)
+                    entity.UniversitySanctionLetterPaperPosters.Add(MapToEntity(c));
+
+            entity.AwardPhotos.Clear();
+            if (dto.AwardPhotos != null)
+                foreach (var c in dto.AwardPhotos)
+                    entity.AwardPhotos.Add(MapToEntity(c));
         }
 
         // ===== HYBRID DTO MAPPERS =====
 
-        // Map Create DTOs to entities (no Id field)
+        // Map Create DTOs to entities (no Id field) - Original 6
         public NominationRewardIFSFarmer MapToEntity(NominationRewardIFSFarmerCreateDto dto) =>
             new() { NameAddress = dto.NameAddress, Phone = dto.Phone, ComponentOfIFS = dto.ComponentOfIFS };
 
@@ -301,7 +285,20 @@ namespace Application.Mapper
         public NominationRewardOrganicEntrepreneur MapToEntity(NominationRewardOrganicEntrepreneurCreateDto dto) =>
             new() { NameAddress = dto.NameAddress, PhoneNumber = dto.PhoneNumber, CropsGrown = dto.CropsGrown };
 
-        // Map Update DTOs to entities (with Id field)
+        // Map Create DTOs to entities (no Id field) - New 4
+        public Achievement MapToEntity(AchievementCreateDto dto) =>
+            new() { Name = dto.Name, Phone = dto.Phone, AchievementDetail = dto.AchievementDetail };
+
+        public AwardRecognition MapToEntity(AwardRecognitionCreateDto dto) =>
+            new() { AwardName = dto.AwardName, ContributionId = dto.ContributionId, OtherContribution = dto.OtherContribution, AwardingAgency = dto.AwardingAgency, InstitutionName = dto.InstitutionName, InstitutionAddress = dto.InstitutionAddress };
+
+        public UniversitySanctionLetterPaperPoster MapToEntity(UniversitySanctionLetterPaperPosterCreateDto dto) =>
+            new() { SanctionLetterDate = dto.SanctionLetterDate, SanctionLetterFilePath = dto.SanctionLetterFilePath, PaperDate = dto.PaperDate, PaperFilePath = dto.PaperFilePath };
+
+        public AwardPhoto MapToEntity(AwardPhotoCreateDto dto) =>
+            new() { AwardReceivingPhoto = dto.AwardReceivingPhoto, AwardReceivingCertificate = dto.AwardReceivingCertificate };
+
+        // Map Update DTOs to entities (with Id field) - Original 6
         public NominationRewardIFSFarmer MapToEntity(NominationRewardIFSFarmerUpdateDto dto) =>
             new() { Id = dto.Id ?? 0, NameAddress = dto.NameAddress, Phone = dto.Phone, ComponentOfIFS = dto.ComponentOfIFS };
 
@@ -319,5 +316,18 @@ namespace Application.Mapper
 
         public NominationRewardOrganicEntrepreneur MapToEntity(NominationRewardOrganicEntrepreneurUpdateDto dto) =>
             new() { Id = dto.Id ?? 0, NameAddress = dto.NameAddress, PhoneNumber = dto.PhoneNumber, CropsGrown = dto.CropsGrown };
+
+        // Map Update DTOs to entities (with Id field) - New 4
+        public Achievement MapToEntity(AchievementUpdateDto dto) =>
+            new() { Id = dto.Id ?? 0, Name = dto.Name, Phone = dto.Phone, AchievementDetail = dto.AchievementDetail };
+
+        public AwardRecognition MapToEntity(AwardRecognitionUpdateDto dto) =>
+            new() { Id = dto.Id ?? 0, AwardName = dto.AwardName, ContributionId = dto.ContributionId, OtherContribution = dto.OtherContribution, AwardingAgency = dto.AwardingAgency, InstitutionName = dto.InstitutionName, InstitutionAddress = dto.InstitutionAddress };
+
+        public UniversitySanctionLetterPaperPoster MapToEntity(UniversitySanctionLetterPaperPosterUpdateDto dto) =>
+            new() { Id = dto.Id ?? 0, SanctionLetterDate = dto.SanctionLetterDate, SanctionLetterFilePath = dto.SanctionLetterFilePath, PaperDate = dto.PaperDate, PaperFilePath = dto.PaperFilePath };
+
+        public AwardPhoto MapToEntity(AwardPhotoUpdateDto dto) =>
+            new() { Id = dto.Id ?? 0, AwardReceivingPhoto = dto.AwardReceivingPhoto, AwardReceivingCertificate = dto.AwardReceivingCertificate };
     }
 }

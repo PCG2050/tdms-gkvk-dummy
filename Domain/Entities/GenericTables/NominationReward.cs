@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Junction;
+using Domain.Entities.Junction;
 using Domain.Entities.MasterData;
 using System;
 using System.Collections.Generic;
@@ -30,62 +30,17 @@ namespace Domain.Entities.GenericTables
 
             // === Foreign Keys & Navigation Properties ===
             public int? TypeId { get; set; }
-           
+
             public NominationType? Type { get; set; }
 
+            public string? OtherType { get; set; }
+
             public int? RegionId { get; set; }
-     
-        public Region? Region { get; set; }
 
-            public int? ContributionId { get; set; }
-     
-        public Contribution? Contribution { get; set; }
+            public Region? Region { get; set; }
 
-            public int? ModeId { get; set; }
-        
-        public Mode? Mode { get; set; }
-
-            public int? NominationCategoryId { get; set; }
-     
-        public NominationCategory? NominationCategory { get; set; }
-      
-
-            // === Other Fields ===
             public string? OtherRegion { get; set; }
-            public string? AwardName { get; set; }
-            public string? OtherContribution { get; set; }
-            public string? AwardingAgency { get; set; }
-            public string? SpecificContributionTitle { get; set; }
 
-            public string? OrganizerInstitutionName { get; set; }
-            public string? OrganizerInstituteAddress { get; set; }
-
-            public DateOnly? AwardApplicationDate { get; set; }
-            public string? AwardFilePath { get; set; }
-            public string? AwardEventTitle { get; set; }
-            public DateOnly? AwardEventDate { get; set; }
-            public DateOnly? SanctionLetterDate { get; set; }
-            public string? SanctionLetterFilePath { get; set; }
-            public DateOnly? PaperDate { get; set; }
-            public string? PaperFilePath { get; set; }
-            public string? AwardReceivingPhoto { get; set; }
-            public string? AwardReceivingCertificate { get; set; }
-
-            public string? InstitutionBoardName { get; set; }
-            public string? InstitutionName { get; set; }
-            public string? InstitutionDesignation { get; set; }
-            public string? InstitutionAddress { get; set; }
-
-            public int? PositionId { get; set; }
-        
-            public Position? Position { get; set; }
-
-            public DateOnly? PositionFrom { get; set; }
-            public DateOnly? PositionTo { get; set; }
-            public int? DurationDays { get; set; }
-
-            public DateOnly? NominationDate { get; set; }
-            public string? NominationLetterPath { get; set; }
             // ===== STATUS TRACKING FIELDS =====
             // Status: "Draft", "Pending", "Approved", "Rejected"
             [MaxLength(50)]
@@ -103,12 +58,17 @@ namespace Domain.Entities.GenericTables
             // ==================================
 
             // === Child Collections ===
-            public ICollection<NominationRewardIFSFarmer> NominationRewardIFSFarmers { get; set; } = [];
-            public ICollection<NominationRewardFarmerInnovation> NominationRewardFarmerInnovations { get; set; } = [];
-            public ICollection<NominationRewardOrganicFarmer> NominationRewardOrganicFarmers { get; set; } = [];
-            public ICollection<NominationRewardIFSEnterpreneur> NominationRewardIFSEntrepreneurs { get; set; } = [];
-            public ICollection<NominationRewardEntrepreneurInnovation> NominationRewardEntrepreneurInnovations { get; set; } = [];
-            public ICollection<NominationRewardOrganicEntrepreneur> NominationRewardOrganicEntrepreneurs { get; set; } = [];
+            public ICollection<NominationRewardIFSFarmer> NominationRewardIFSFarmers { get; set; } = new List<NominationRewardIFSFarmer>();
+            public ICollection<NominationRewardFarmerInnovation> NominationRewardFarmerInnovations { get; set; } = new List<NominationRewardFarmerInnovation>();
+            public ICollection<NominationRewardOrganicFarmer> NominationRewardOrganicFarmers { get; set; } = new List<NominationRewardOrganicFarmer>();
+            public ICollection<NominationRewardIFSEnterpreneur> NominationRewardIFSEntrepreneurs { get; set; } = new List<NominationRewardIFSEnterpreneur>();
+            public ICollection<NominationRewardEntrepreneurInnovation> NominationRewardEntrepreneurInnovations { get; set; } = new List<NominationRewardEntrepreneurInnovation>();
+            public ICollection<NominationRewardOrganicEntrepreneur> NominationRewardOrganicEntrepreneurs { get; set; } = new List<NominationRewardOrganicEntrepreneur>();
+            public ICollection<Achievement> Achievements { get; set; } = new List<Achievement>();
+            public ICollection<AwardRecognition> AwardRecognitions { get; set; } = new List<AwardRecognition>();
+            public ICollection<UniversitySanctionLetterPaperPoster> UniversitySanctionLetterPaperPosters { get; set; } = new List<UniversitySanctionLetterPaperPoster>();
+            public ICollection<AwardPhoto> AwardPhotos { get; set; } = new List<AwardPhoto>();
+
         }
 
         // === Child Entities ===
@@ -117,9 +77,10 @@ namespace Domain.Entities.GenericTables
             public string? NameAddress { get; set; }
             public string? Phone { get; set; }
             public string? ComponentOfIFS { get; set; }
-
+            [Required]
             public int NominationRewardId { get; set; }
-            public NominationReward NominationReward { get; set; } = default!;
+            [JsonIgnore]
+            public NominationReward NominationReward { get; set; } = null!;
         }
 
         public class NominationRewardFarmerInnovation : AuditableBaseEntity
@@ -129,9 +90,11 @@ namespace Domain.Entities.GenericTables
             public int? PhoneNumber { get; set; }
             public string? DetailsOfInnovation { get; set; }
 
+            [Required]
             public int NominationRewardId { get; set; }
-            public NominationReward NominationReward { get; set; } = default!;
-        }
+            [JsonIgnore]
+            public NominationReward NominationReward { get; set; } = null!;
+         }
 
         public class NominationRewardOrganicFarmer : AuditableBaseEntity
         {
@@ -139,8 +102,9 @@ namespace Domain.Entities.GenericTables
             public int? PhoneNumber { get; set; }
             public string? CropsGrown { get; set; }
 
-           
+            [Required]
             public int NominationRewardId { get; set; }
+            [JsonIgnore]
             public NominationReward NominationReward { get; set; } = default!;
         }
 
@@ -150,7 +114,9 @@ namespace Domain.Entities.GenericTables
             public string? Phone { get; set; }
             public string? ComponentOfIFS { get; set; }
 
+            [Required]
             public int NominationRewardId { get; set; }
+            [JsonIgnore]
             public NominationReward NominationReward { get; set; } = default!;
         }
 
@@ -161,10 +127,11 @@ namespace Domain.Entities.GenericTables
             public int? PhoneNumber { get; set; }
             public string? DetailsOfInnovation { get; set; }
 
+            [Required]
             public int NominationRewardId { get; set; }
-
+            [JsonIgnore]
             public NominationReward NominationReward { get; set; } = default!;
-        }
+           }
 
         public class NominationRewardOrganicEntrepreneur : AuditableBaseEntity
         {
@@ -172,10 +139,59 @@ namespace Domain.Entities.GenericTables
             public int? PhoneNumber { get; set; }
             public string? CropsGrown { get; set; }
 
+            [Required]
             public int NominationRewardId { get; set; }
+            [JsonIgnore]
+            public NominationReward NominationReward { get; set; } = default!;
+          }
+
+        public class Achievement : AuditableBaseEntity
+        {
+            public string? Name { get; set; }
+            public string? Phone { get; set; }
+            public string? AchievementDetail { get; set; }
+            [Required]
+            public int NominationRewardId { get; set; }
+            [JsonIgnore]
             public NominationReward NominationReward { get; set; } = default!;
         }
 
-    
-    
+        public class AwardRecognition : AuditableBaseEntity
+        {
+            public string? AwardName { get; set; }
+
+            public int? ContributionId { get; set; }
+
+            public Contribution? Contribution { get; set; }
+            public string? OtherContribution { get; set; }
+            public string? AwardingAgency { get; set; }
+            public string? InstitutionName { get; set; }
+            public string? InstitutionAddress { get; set; }
+            [Required]
+            public int NominationRewardId { get; set; }
+            [JsonIgnore]
+            public NominationReward NominationReward { get; set; } = default!;
+        }
+
+        public class UniversitySanctionLetterPaperPoster : AuditableBaseEntity
+        {
+            public DateOnly? SanctionLetterDate { get; set; }
+            public string? SanctionLetterFilePath { get; set; }
+            public DateOnly? PaperDate { get; set; }
+            public string? PaperFilePath { get; set; }
+            [Required]
+            public int NominationRewardId { get; set; }
+            [JsonIgnore]
+            public NominationReward NominationReward { get; set; } = default!;
+        }
+
+        public class AwardPhoto : AuditableBaseEntity
+        {
+            public string? AwardReceivingPhoto { get; set; }
+            public string? AwardReceivingCertificate { get; set; }
+            [Required]
+            public int NominationRewardId { get; set; }
+            [JsonIgnore]
+            public NominationReward NominationReward { get; set; } = default!;
+        }
 }
