@@ -1,4 +1,4 @@
-﻿using Application.Interface.Repository;
+﻿
 
 namespace Infrastructure.Services
 {
@@ -6,22 +6,11 @@ namespace Infrastructure.Services
     {
         private readonly IHttpContextAccessor _httpcontextAccessor;
         private readonly TdmsDbContext _context;
-        private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
-        private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
-        private readonly IOrganizationUnitRepository _organizationUnitRepository;
 
-        public CurrentUserService(
-            IHttpContextAccessor httpcontextAccessor,
-            TdmsDbContext context,
-            ITrainerAssignmentRepository trainerAssignmentRepository,
-            IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
-            IOrganizationUnitRepository organizationUnitRepository)
+        public CurrentUserService(IHttpContextAccessor httpcontextAccessor, TdmsDbContext context)
         {
             _httpcontextAccessor = httpcontextAccessor;
             _context = context;
-            _trainerAssignmentRepository = trainerAssignmentRepository;
-            _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
-            _organizationUnitRepository = organizationUnitRepository;
         }
 
         public ClaimsPrincipal? User => _httpcontextAccessor.HttpContext.User;
@@ -68,27 +57,8 @@ namespace Infrastructure.Services
             try
             {
                 int userId = this.UserId;
-                Role role = this.Role;
-
-                // Handle different roles
-                if (role == Role.TRAINER)
-                {
-                    var unitLocations = await _trainerAssignmentRepository.GetUnitLocationIdsByTrainerIdAsync(userId);
-                    return unitLocations ?? [];
-                }
-                else if (role == Role.UNITHEAD)
-                {
-                    var unitLocations = await _unitHeadAssignmentRepository.GetUnitLocationIdsByUnitHeadIdAsync(userId);
-                    return unitLocations ?? [];
-                }
-                else if (role == Role.ADMIN)
-                {
-                    var unitLocations = await _organizationUnitRepository.GetUnitLocationIdsByOrganizationIdAsync(this.OrganizationId);
-                    return unitLocations ?? [];
-                }
-
-                // For any other role or undefined
-                return [];
+                var unitLocations = await _context.UnitTrainers.Where(x => x.TrainerId == userId).Select(x => x.UnitLocationId).ToArrayAsync();
+                return unitLocations ?? [];
             }
             catch (Exception ex)
             {
