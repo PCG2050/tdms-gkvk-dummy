@@ -162,6 +162,21 @@ The correct pattern used throughout the application (TblService, PublicationServ
 
 This ensures reliable role-based access control without dependencies on CurrentUserService.
 
+**Additional Fix - History Endpoint (2025-12-10):**
+
+The `/api/financial-budget/my-history` endpoint was failing because it included unnecessary navigation properties in the query:
+```csharp
+// BEFORE (Caused errors)
+var query = _repository.GetQueryable()
+    .Include(x => x.UnitLocation)
+        .ThenInclude(ul => ul.Unit);
+
+// AFTER (Fixed - follows same pattern as TblService, PublicationService)
+var query = _repository.GetQueryable();
+```
+
+The `GenericTrainerHistoryService` only needs access to scalar properties (UnitLocationId, FormStatus, etc.), not loaded navigation properties. Following the pattern used by other working services resolved the issue.
+
 ---
 
 ## Notes for Future Development

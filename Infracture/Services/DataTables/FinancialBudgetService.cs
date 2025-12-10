@@ -167,9 +167,7 @@ namespace Infrastructure.Services.DataTables
             int pageNumber = 1,
             int pageSize = 10)
         {
-            var query = _repository.GetQueryable()
-                .Include(x => x.UnitLocation)
-                    .ThenInclude(ul => ul.Unit);
+            var query = _repository.GetQueryable();
 
             return await _historyService.GetTrainerHistoryAsync(
                 query,
