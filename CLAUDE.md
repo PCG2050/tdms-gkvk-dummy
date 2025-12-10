@@ -10,12 +10,13 @@ This document contains important development notes and bug fixes for the TDMS GK
 Users with UNITHEAD and ADMIN roles were receiving "Forbidden" errors when accessing financial status endpoints in the published website, even though they had proper authorization.
 
 **Root Cause:**
-The financial endpoints were experiencing Forbidden errors due to TWO issues:
+The financial endpoints were experiencing Forbidden errors due to THREE critical issues:
 
-1. **FinancialBudgetService.cs** was using `_currentUserService.MappedUnitLocationIds()` instead of its own `GetAccessibleUnitLocationIdsAsync()` method (lines 135 and 152)
-2. **CurrentUserService.cs** had a broken `MappedUnitLocationIds()` method that only queried the `UnitTrainers` table, which only worked for TRAINER role
+1. **FinancialBudgetController.cs** was missing explicit role-based authorization - it only had `[Authorize]` instead of `[Authorize(Roles = "TRAINER,UNITHEAD,ADMIN")]` at the class level
+2. **FinancialBudgetService.cs** was using `_currentUserService.MappedUnitLocationIds()` instead of its own `GetAccessibleUnitLocationIdsAsync()` method (lines 135 and 152)
+3. **CurrentUserService.cs** had a broken `MappedUnitLocationIds()` method that only queried the `UnitTrainers` table, which only worked for TRAINER role
 
-This combination caused empty unit location arrays for all roles, leading to permission check failures.
+This combination caused 403 Forbidden errors for all roles accessing financial endpoints.
 
 **Affected Endpoints:**
 - `GET /api/financial-budget` - Get paginated financial budgets
@@ -26,7 +27,13 @@ This combination caused empty unit location arrays for all roles, leading to per
 - All other financial budget endpoints that use `MappedUnitLocationIds()`
 
 **Solution:**
-Applied two fixes to resolve the authorization issues:
+Applied three fixes to resolve the authorization issues:
+
+**Fix 0: FinancialBudgetController.cs** (CRITICAL - Root Cause)
+- Added explicit role-based authorization at controller class level
+- Changed from `[Authorize]` to `[Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead},{RoleString.Admin}")]`
+- This matches the pattern used by working controllers (TblServiceController, PublicationsController)
+- Without this, ASP.NET Core allowed ANY authenticated user to access endpoints, but then service-layer permission checks failed
 
 **Fix 1: FinancialBudgetService.cs**
 - Changed `GetPaginatedAsync()` to use `GetAccessibleUnitLocationIdsAsync()` instead of `_currentUserService.MappedUnitLocationIds()`
@@ -41,15 +48,40 @@ Applied two fixes to resolve the authorization issues:
 - Added repository dependencies: `ITrainerAssignmentRepository`, `IUnitHeadAssignmentRepository`, `IOrganizationUnitRepository`
 
 **Modified Files:**
-1. `Infracture/Services/DataTables/FinancialBudgetService.cs`
+1. `WebApi/Controllers/DataTables/FinancialBudgetController.cs`
+   - Added `using Domain.Entities.Enum;` import
+   - Line 11: Changed from `[Authorize]` to `[Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead},{RoleString.Admin}")]`
+   - Line 79: Updated my-history endpoint to use RoleString constants
+
+2. `Infracture/Services/DataTables/FinancialBudgetService.cs`
    - Line 135: Changed to use `GetAccessibleUnitLocationIdsAsync()`
    - Line 152: Changed to use `GetAccessibleUnitLocationIdsAsync()`
 
-2. `Infracture/Services/CurrentUserService.cs`
+3. `Infracture/Services/CurrentUserService.cs`
    - Added repository dependencies in constructor
    - Refactored `MappedUnitLocationIds()` method to handle all roles
 
 **Code Changes:**
+
+**Change 0: FinancialBudgetController.cs** (CRITICAL FIX)
+
+```csharp
+// BEFORE (Wrong - allows ANY authenticated user)
+[ApiController]
+[Route("api/financial-budget")]
+[Authorize]  // ❌ Missing role specification
+public class FinancialBudgetController : ControllerBase
+
+// AFTER (Correct - matches TblService and Publication pattern)
+using Domain.Entities.Enum;  // Added import
+
+[ApiController]
+[Route("api/financial-budget")]
+[Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead},{RoleString.Admin}")]  // ✅ Explicit roles
+public class FinancialBudgetController : ControllerBase
+```
+
+This is the **root cause** of the 403 errors. Without explicit role authorization, ASP.NET Core authentication allowed the request through, but the service layer permission checks failed because the user didn't have proper role-based unit location access.
 
 **Change 1: FinancialBudgetService.cs**
 

@@ -1,13 +1,14 @@
 ﻿using Application.Interface.Services.DataTables;
 using Application.Models.DataTables;
+using Domain.Entities.Enum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers.DataTables
 {
     [ApiController]
-    [Route("api/financial-budget")]   
-    [Authorize]
+    [Route("api/financial-budget")]
+    [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead},{RoleString.Admin}")]
     public class FinancialBudgetController : ControllerBase
     {
         private readonly IFinancialBudgetService _service;
@@ -75,7 +76,7 @@ namespace WebApi.Controllers.DataTables
         /// Get trainer's submission history with pagination
         /// </summary>
         [HttpGet("my-history")]
-        [Authorize(Roles = "Trainer,UnitHead")]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
         public async Task<IActionResult> GetMyHistory(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10)
