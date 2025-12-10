@@ -416,34 +416,10 @@ namespace Infrastructure.Services.GenericTables
         public async Task<ServiceResult<FinancialBudgetCompleteDto>> CreateHybridAsync(FinancialBudgetHybridCreateDto dto)
         {
             // Validate user has permission to create forms for this unit
-            // For trainers, check if they're assigned to the unit
-            var currentRole = _currentUserService.Role;
-
-            if (currentRole == Role.TRAINER)
-            {
-                var assignedUnits = await _trainerAssignmentRepository
-                    .GetUnitLocationIdsByTrainerIdAsync(_currentUserService.UserId);
-
-                if (!assignedUnits.Contains(dto.UnitLocationId))
-                {
-                    return ServiceResult<FinancialBudgetCompleteDto>.Failure(
-                        $"Access denied. You are not assigned to unit location {dto.UnitLocationId}",
-                        ServiceErrorStatus.FORBIDDEN);
-                }
-            }
-            else if (currentRole == Role.UNITHEAD)
-            {
-                var assignedUnits = await _unitHeadAssignmentRepository
-                    .GetUnitLocationIdsByUnitHeadIdAsync(_currentUserService.UserId);
-
-                if (!assignedUnits.Contains(dto.UnitLocationId))
-                {
-                    return ServiceResult<FinancialBudgetCompleteDto>.Failure(
-                        $"Access denied. You are not assigned to unit location {dto.UnitLocationId}",
-                        ServiceErrorStatus.FORBIDDEN);
-                }
-            }
-            // ADMIN can create for any unit
+            if (!await CanUserAccessUnitLocationAsync(dto.UnitLocationId))
+                return ServiceResult<FinancialBudgetCompleteDto>.Failure(
+                    "Access denied to unit location",
+                    ServiceErrorStatus.FORBIDDEN);
 
             // Create parent entity
             var parent = new FinancialBudget
@@ -721,6 +697,28 @@ namespace Infrastructure.Services.GenericTables
                 MICRNumber = entity.MICRNumber,
                 IFSCCode = entity.IFSCCode
             };
+        }
+
+        // ===== HELPER METHODS FOR PERMISSION CHECKS =====
+
+        private async Task<bool> CanUserAccessUnitLocationAsync(int unitLocationId)
+        {
+            var accessibleIds = await GetAccessibleUnitLocationIdsAsync();
+            return accessibleIds.Contains(unitLocationId);
+        }
+
+        private async Task<List<int>> GetAccessibleUnitLocationIdsAsync()
+        {
+            if (_currentUserService.Role == Role.TRAINER)
+                return await _trainerAssignmentRepository.GetUnitLocationIdsByTrainerIdAsync(_currentUserService.UserId);
+
+            if (_currentUserService.Role == Role.UNITHEAD)
+                return await _unitHeadAssignmentRepository.GetUnitLocationIdsByUnitHeadIdAsync(_currentUserService.UserId);
+
+            if (_currentUserService.Role == Role.ADMIN)
+                return await _organizationUnitRepository.GetUnitLocationIdsByOrganizationIdAsync(_currentUserService.OrganizationId);
+
+            return new List<int>();
         }
     }
 }
