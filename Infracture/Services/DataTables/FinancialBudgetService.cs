@@ -132,7 +132,7 @@ namespace Infrastructure.Services.DataTables
             DateOnly? startDate = null,
             DateOnly? endDate = null)
         {
-            var unitLocationIds = (await _currentUserService.MappedUnitLocationIds()).ToList();
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
             var result = await _repository.GetPaginatedAsync(unitLocationIds, pageNumber, pageSize, startDate, endDate);
 
             return new PaginatedResult<FinancialBudgetDto>
@@ -149,7 +149,7 @@ namespace Infrastructure.Services.DataTables
             int pageNumber = 1,
             int pageSize = 10)
         {
-            var unitLocationIds = (await _currentUserService.MappedUnitLocationIds()).ToList();
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
             var result = await _repository.GetByStatusAsync(unitLocationIds, status, pageNumber, pageSize);
 
             return new PaginatedResult<FinancialBudgetDto>
