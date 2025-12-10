@@ -384,7 +384,269 @@ namespace Infrastructure.Services.DataTables
         {
             var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
             return await _repository.GetStatusSummaryAsync(unitLocationIds);
-           
+
+        }
+
+        // -------------------------------------------------------
+        // HYBRID CREATE - INSERT ALL DATA AT ONCE
+        // -------------------------------------------------------
+        public async Task<ServiceResult<NominationRewardDto>> CreateHybridAsync(NominationRewardHybridCreateDto dto)
+        {
+            // Check permission for unit location
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
+            if (!unitLocationIds.Contains(dto.UnitLocationId))
+                return ServiceResult<NominationRewardDto>.Failure(
+                    "Access denied to unit location",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            // Create parent entity
+            var parent = new NominationReward
+            {
+                UnitLocationId = dto.UnitLocationId,
+                StartDate = dto.StartDate,
+                EndDate = dto.EndDate,
+                TypeId = dto.TypeId,
+                RegionId = dto.RegionId,
+                ContributionId = dto.ContributionId,
+                ModeId = dto.ModeId,
+                NominationCategoryId = dto.NominationCategoryId,
+                OtherRegion = dto.OtherRegion,
+                AwardName = dto.AwardName,
+                OtherContribution = dto.OtherContribution,
+                AwardingAgency = dto.AwardingAgency,
+                SpecificContributionTitle = dto.SpecificContributionTitle,
+                OrganizerInstitutionName = dto.OrganizerInstitutionName,
+                OrganizerInstituteAddress = dto.OrganizerInstituteAddress,
+                AwardApplicationDate = dto.AwardApplicationDate,
+                AwardFilePath = dto.AwardFilePath,
+                AwardEventTitle = dto.AwardEventTitle,
+                AwardEventDate = dto.AwardEventDate,
+                SanctionLetterDate = dto.SanctionLetterDate,
+                SanctionLetterFilePath = dto.SanctionLetterFilePath,
+                PaperDate = dto.PaperDate,
+                PaperFilePath = dto.PaperFilePath,
+                AwardReceivingPhoto = dto.AwardReceivingPhoto,
+                AwardReceivingCertificate = dto.AwardReceivingCertificate,
+                InstitutionBoardName = dto.InstitutionBoardName,
+                InstitutionName = dto.InstitutionName,
+                InstitutionDesignation = dto.InstitutionDesignation,
+                InstitutionAddress = dto.InstitutionAddress,
+                PositionId = dto.PositionId,
+                PositionFrom = dto.PositionFrom,
+                PositionTo = dto.PositionTo,
+                DurationDays = dto.DurationDays,
+                NominationDate = dto.NominationDate,
+                NominationLetterPath = dto.NominationLetterPath,
+                OrganizationId = _currentUserService.OrganizationId,
+                FormStatus = "Pending",  // Set to Pending on hybrid create
+                CreatedById = _currentUserService.UserId,
+                CreatedAt = DateTimeOffset.UtcNow
+            };
+
+            // Add child IFSFarmers
+            if (dto.IFSFarmers != null)
+            {
+                foreach (var childDto in dto.IFSFarmers)
+                {
+                    parent.NominationRewardIFSFarmers.Add(_mapper.MapToEntity(childDto));
+                }
+            }
+
+            // Add child FarmerInnovations
+            if (dto.FarmerInnovations != null)
+            {
+                foreach (var childDto in dto.FarmerInnovations)
+                {
+                    parent.NominationRewardFarmerInnovations.Add(_mapper.MapToEntity(childDto));
+                }
+            }
+
+            // Add child OrganicFarmers
+            if (dto.OrganicFarmers != null)
+            {
+                foreach (var childDto in dto.OrganicFarmers)
+                {
+                    parent.NominationRewardOrganicFarmers.Add(_mapper.MapToEntity(childDto));
+                }
+            }
+
+            // Add child IFSEntrepreneurs
+            if (dto.IFSEntrepreneurs != null)
+            {
+                foreach (var childDto in dto.IFSEntrepreneurs)
+                {
+                    parent.NominationRewardIFSEntrepreneurs.Add(_mapper.MapToEntity(childDto));
+                }
+            }
+
+            // Add child EntrepreneurInnovations
+            if (dto.EntrepreneurInnovations != null)
+            {
+                foreach (var childDto in dto.EntrepreneurInnovations)
+                {
+                    parent.NominationRewardEntrepreneurInnovations.Add(_mapper.MapToEntity(childDto));
+                }
+            }
+
+            // Add child OrganicEntrepreneurs
+            if (dto.OrganicEntrepreneurs != null)
+            {
+                foreach (var childDto in dto.OrganicEntrepreneurs)
+                {
+                    parent.NominationRewardOrganicEntrepreneurs.Add(_mapper.MapToEntity(childDto));
+                }
+            }
+
+            // Save everything in one transaction
+            var created = await _repository.AddAsync(parent);
+            var result = await _repository.GetWithDetailsAsync(created.Id);
+
+            var resultDto = _mapper.MapToDtoWithDetails(result!);
+            return ServiceResult<NominationRewardDto>.Success(resultDto);
+        }
+
+        // -------------------------------------------------------
+        // HYBRID UPDATE - UPDATE ALL DATA AT ONCE
+        // -------------------------------------------------------
+        public async Task<ServiceResult<NominationRewardDto>> UpdateHybridAsync(int id, NominationRewardHybridUpdateDto dto)
+        {
+            // Validate entity exists and check permissions
+            var entity = await _repository.GetByIdAsync(id);
+            if (entity == null)
+                return ServiceResult<NominationRewardDto>.Failure(
+                    "NominationReward not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            if (!await _entityPermissionService.CanModifyForm(entity))
+                return ServiceResult<NominationRewardDto>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            try
+            {
+                // Prepare parent entity for update
+                var parentEntity = new NominationReward
+                {
+                    Id = id,
+                    StartDate = dto.StartDate,
+                    EndDate = dto.EndDate,
+                    TypeId = dto.TypeId,
+                    RegionId = dto.RegionId,
+                    ContributionId = dto.ContributionId,
+                    ModeId = dto.ModeId,
+                    NominationCategoryId = dto.NominationCategoryId,
+                    OtherRegion = dto.OtherRegion,
+                    AwardName = dto.AwardName,
+                    OtherContribution = dto.OtherContribution,
+                    AwardingAgency = dto.AwardingAgency,
+                    SpecificContributionTitle = dto.SpecificContributionTitle,
+                    OrganizerInstitutionName = dto.OrganizerInstitutionName,
+                    OrganizerInstituteAddress = dto.OrganizerInstituteAddress,
+                    AwardApplicationDate = dto.AwardApplicationDate,
+                    AwardFilePath = dto.AwardFilePath,
+                    AwardEventTitle = dto.AwardEventTitle,
+                    AwardEventDate = dto.AwardEventDate,
+                    SanctionLetterDate = dto.SanctionLetterDate,
+                    SanctionLetterFilePath = dto.SanctionLetterFilePath,
+                    PaperDate = dto.PaperDate,
+                    PaperFilePath = dto.PaperFilePath,
+                    AwardReceivingPhoto = dto.AwardReceivingPhoto,
+                    AwardReceivingCertificate = dto.AwardReceivingCertificate,
+                    InstitutionBoardName = dto.InstitutionBoardName,
+                    InstitutionName = dto.InstitutionName,
+                    InstitutionDesignation = dto.InstitutionDesignation,
+                    InstitutionAddress = dto.InstitutionAddress,
+                    PositionId = dto.PositionId,
+                    PositionFrom = dto.PositionFrom,
+                    PositionTo = dto.PositionTo,
+                    DurationDays = dto.DurationDays,
+                    NominationDate = dto.NominationDate,
+                    NominationLetterPath = dto.NominationLetterPath,
+                    FormStatus = "Pending",  // Set to Pending on update
+                    UpdatedById = _currentUserService.UserId,
+                    UpdatedAt = DateTimeOffset.UtcNow
+                };
+
+                // Prepare child collections
+                var ifsFarmers = dto.IFSFarmers?.Select(c =>
+                {
+                    var mapped = _mapper.MapToEntity(c);
+                    mapped.CreatedById = _currentUserService.UserId;
+                    mapped.CreatedAt = DateTimeOffset.UtcNow;
+                    mapped.UpdatedById = _currentUserService.UserId;
+                    mapped.UpdatedAt = DateTimeOffset.UtcNow;
+                    return mapped;
+                }).ToList();
+
+                var farmerInnovations = dto.FarmerInnovations?.Select(c =>
+                {
+                    var mapped = _mapper.MapToEntity(c);
+                    mapped.CreatedById = _currentUserService.UserId;
+                    mapped.CreatedAt = DateTimeOffset.UtcNow;
+                    mapped.UpdatedById = _currentUserService.UserId;
+                    mapped.UpdatedAt = DateTimeOffset.UtcNow;
+                    return mapped;
+                }).ToList();
+
+                var organicFarmers = dto.OrganicFarmers?.Select(c =>
+                {
+                    var mapped = _mapper.MapToEntity(c);
+                    mapped.CreatedById = _currentUserService.UserId;
+                    mapped.CreatedAt = DateTimeOffset.UtcNow;
+                    mapped.UpdatedById = _currentUserService.UserId;
+                    mapped.UpdatedAt = DateTimeOffset.UtcNow;
+                    return mapped;
+                }).ToList();
+
+                var ifsEntrepreneurs = dto.IFSEntrepreneurs?.Select(c =>
+                {
+                    var mapped = _mapper.MapToEntity(c);
+                    mapped.CreatedById = _currentUserService.UserId;
+                    mapped.CreatedAt = DateTimeOffset.UtcNow;
+                    mapped.UpdatedById = _currentUserService.UserId;
+                    mapped.UpdatedAt = DateTimeOffset.UtcNow;
+                    return mapped;
+                }).ToList();
+
+                var entrepreneurInnovations = dto.EntrepreneurInnovations?.Select(c =>
+                {
+                    var mapped = _mapper.MapToEntity(c);
+                    mapped.CreatedById = _currentUserService.UserId;
+                    mapped.CreatedAt = DateTimeOffset.UtcNow;
+                    mapped.UpdatedById = _currentUserService.UserId;
+                    mapped.UpdatedAt = DateTimeOffset.UtcNow;
+                    return mapped;
+                }).ToList();
+
+                var organicEntrepreneurs = dto.OrganicEntrepreneurs?.Select(c =>
+                {
+                    var mapped = _mapper.MapToEntity(c);
+                    mapped.CreatedById = _currentUserService.UserId;
+                    mapped.CreatedAt = DateTimeOffset.UtcNow;
+                    mapped.UpdatedById = _currentUserService.UserId;
+                    mapped.UpdatedAt = DateTimeOffset.UtcNow;
+                    return mapped;
+                }).ToList();
+
+                // Call repository hybrid update
+                var updated = await _repository.UpdateWithChildrenAsync(
+                    parentEntity,
+                    ifsFarmers,
+                    farmerInnovations,
+                    organicFarmers,
+                    ifsEntrepreneurs,
+                    entrepreneurInnovations,
+                    organicEntrepreneurs);
+
+                var resultDto = _mapper.MapToDtoWithDetails(updated);
+                return ServiceResult<NominationRewardDto>.Success(resultDto);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<NominationRewardDto>.Failure(
+                    $"Failed to update: {ex.Message}",
+                    ServiceErrorStatus.INVALIDOPERATION);
+            }
         }
 
         // -------------------------------------------------------

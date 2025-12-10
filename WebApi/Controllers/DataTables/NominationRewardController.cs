@@ -4,7 +4,9 @@ namespace WebApi.Controllers.DataTables.IBTVA
 {
     using Application.Interface.Services.DataTables;
     using Application.Models.DataTables;
+    using Domain.Entities.Enum;
     using Infrastructure.Services.DataTables;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using System.Threading.Tasks;
 
@@ -12,6 +14,7 @@ namespace WebApi.Controllers.DataTables.IBTVA
     {
         [ApiController]
         [Route("api/[controller]")]
+        [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead},{RoleString.Admin}")]
         public class NominationRewardController : ControllerBase
         {
             private readonly INominationRewardService _service;
@@ -202,6 +205,57 @@ namespace WebApi.Controllers.DataTables.IBTVA
                 return Ok(result);
             }
 
+            // -------------------------
+            // HYBRID ENDPOINTS
+            // -------------------------
+
+            /// <summary>
+            /// HYBRID CREATE: Create nomination reward with all child entities in one request
+            /// This endpoint allows you to insert parent + all child collections (IFSFarmers, FarmerInnovations, etc.) at once
+            /// </summary>
+            [HttpPost("hybrid")]
+            [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
+            public async Task<IActionResult> CreateHybrid([FromBody] NominationRewardHybridCreateDto dto)
+            {
+                var result = await _service.CreateHybridAsync(dto);
+                if (!result.IsSuccess)
+                    return StatusCode(GetStatusCode(result.ErrorStatus), result);
+
+                return Ok(result.Data);
+            }
+
+            /// <summary>
+            /// HYBRID UPDATE: Update nomination reward with all child entities in one request
+            /// This endpoint allows you to update parent + manage all children (create/update/delete) at once
+            /// Child items with Id = 0 or null will be created
+            /// Child items with Id > 0 will be updated
+            /// Child items not in the lists will be deleted
+            /// </summary>
+            [HttpPut("{id}/hybrid")]
+            [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead}")]
+            public async Task<IActionResult> UpdateHybrid(int id, [FromBody] NominationRewardHybridUpdateDto dto)
+            {
+                var result = await _service.UpdateHybridAsync(id, dto);
+                if (!result.IsSuccess)
+                    return StatusCode(GetStatusCode(result.ErrorStatus), result);
+
+                return Ok(result.Data);
+            }
+
+            // -------------------------
+            // HELPER
+            // -------------------------
+            private int GetStatusCode(ServiceErrorStatus? status)
+            {
+                return status switch
+                {
+                    ServiceErrorStatus.NOTFOUND => 404,
+                    ServiceErrorStatus.FORBIDDEN => 403,
+                    ServiceErrorStatus.BADREQUEST => 400,
+                    ServiceErrorStatus.INVALIDOPERATION => 400,
+                    _ => 500
+                };
+            }
         }
     }
 

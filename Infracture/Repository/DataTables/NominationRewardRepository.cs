@@ -205,7 +205,321 @@ namespace Infrastructure.Repository.DataTables
                 .Select(g => new { FormStatus = g.Key, Count = g.Count() })
                 .ToListAsync();
             return summary.ToDictionary(x => x.FormStatus, x => x.Count);
-           
+
+        }
+
+        // ===== HYBRID UPDATE METHOD =====
+        /// <summary>
+        /// Updates parent and manages all children (create/update/delete) in one transaction
+        /// Follows the same pattern as FinancialBudgetRepository.UpdateWithChildrenAsync
+        /// </summary>
+        public async Task<NominationReward> UpdateWithChildrenAsync(
+            NominationReward parent,
+            List<NominationRewardIFSFarmer>? ifsFarmers,
+            List<NominationRewardFarmerInnovation>? farmerInnovations,
+            List<NominationRewardOrganicFarmer>? organicFarmers,
+            List<NominationRewardIFSEnterpreneur>? ifsEntrepreneurs,
+            List<NominationRewardEntrepreneurInnovation>? entrepreneurInnovations,
+            List<NominationRewardOrganicEntrepreneur>? organicEntrepreneurs)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var nominationRewardId = parent.Id;
+
+                // Load existing entity with all children
+                var existing = await GetWithDetailsAsync(nominationRewardId);
+                if (existing == null)
+                    throw new InvalidOperationException($"NominationReward with ID {nominationRewardId} not found");
+
+                // 1. Update parent entity
+                existing.StartDate = parent.StartDate;
+                existing.EndDate = parent.EndDate;
+                existing.TypeId = parent.TypeId;
+                existing.RegionId = parent.RegionId;
+                existing.ContributionId = parent.ContributionId;
+                existing.ModeId = parent.ModeId;
+                existing.NominationCategoryId = parent.NominationCategoryId;
+                existing.OtherRegion = parent.OtherRegion;
+                existing.AwardName = parent.AwardName;
+                existing.OtherContribution = parent.OtherContribution;
+                existing.AwardingAgency = parent.AwardingAgency;
+                existing.SpecificContributionTitle = parent.SpecificContributionTitle;
+                existing.OrganizerInstitutionName = parent.OrganizerInstitutionName;
+                existing.OrganizerInstituteAddress = parent.OrganizerInstituteAddress;
+                existing.AwardApplicationDate = parent.AwardApplicationDate;
+                existing.AwardFilePath = parent.AwardFilePath;
+                existing.AwardEventTitle = parent.AwardEventTitle;
+                existing.AwardEventDate = parent.AwardEventDate;
+                existing.SanctionLetterDate = parent.SanctionLetterDate;
+                existing.SanctionLetterFilePath = parent.SanctionLetterFilePath;
+                existing.PaperDate = parent.PaperDate;
+                existing.PaperFilePath = parent.PaperFilePath;
+                existing.AwardReceivingPhoto = parent.AwardReceivingPhoto;
+                existing.AwardReceivingCertificate = parent.AwardReceivingCertificate;
+                existing.InstitutionBoardName = parent.InstitutionBoardName;
+                existing.InstitutionName = parent.InstitutionName;
+                existing.InstitutionDesignation = parent.InstitutionDesignation;
+                existing.InstitutionAddress = parent.InstitutionAddress;
+                existing.PositionId = parent.PositionId;
+                existing.PositionFrom = parent.PositionFrom;
+                existing.PositionTo = parent.PositionTo;
+                existing.DurationDays = parent.DurationDays;
+                existing.NominationDate = parent.NominationDate;
+                existing.NominationLetterPath = parent.NominationLetterPath;
+                existing.FormStatus = parent.FormStatus;
+                existing.UpdatedById = parent.UpdatedById;
+                existing.UpdatedAt = parent.UpdatedAt;
+                _context.NominationRewards.Update(existing);
+
+                // 2. Process IFSFarmers (Hybrid Pattern: Create/Update/Delete)
+                if (ifsFarmers != null)
+                {
+                    var existingFarmers = existing.NominationRewardIFSFarmers?.ToList() ?? new List<NominationRewardIFSFarmer>();
+                    var incomingIds = ifsFarmers.Where(f => f.Id > 0).Select(f => f.Id).ToList();
+
+                    // DELETE: Items in DB but not in incoming array
+                    var farmersToDelete = existingFarmers.Where(f => !incomingIds.Contains(f.Id)).ToList();
+                    foreach (var farmer in farmersToDelete)
+                    {
+                        _context.NominationRewardIFSFarmers.Remove(farmer);
+                    }
+
+                    // CREATE or UPDATE
+                    foreach (var farmer in ifsFarmers)
+                    {
+                        if (farmer.Id > 0)
+                        {
+                            // UPDATE existing
+                            var existingFarmer = existingFarmers.FirstOrDefault(f => f.Id == farmer.Id);
+                            if (existingFarmer != null)
+                            {
+                                existingFarmer.NameAddress = farmer.NameAddress;
+                                existingFarmer.Phone = farmer.Phone;
+                                existingFarmer.ComponentOfIFS = farmer.ComponentOfIFS;
+                                existingFarmer.UpdatedById = farmer.UpdatedById;
+                                existingFarmer.UpdatedAt = farmer.UpdatedAt;
+                                _context.NominationRewardIFSFarmers.Update(existingFarmer);
+                            }
+                        }
+                        else
+                        {
+                            // CREATE new
+                            farmer.NominationRewardId = nominationRewardId;
+                            _context.NominationRewardIFSFarmers.Add(farmer);
+                        }
+                    }
+                }
+
+                // 3. Process FarmerInnovations (Hybrid Pattern)
+                if (farmerInnovations != null)
+                {
+                    var existingInnovations = existing.NominationRewardFarmerInnovations?.ToList() ?? new List<NominationRewardFarmerInnovation>();
+                    var incomingIds = farmerInnovations.Where(i => i.Id > 0).Select(i => i.Id).ToList();
+
+                    // DELETE: Items in DB but not in incoming array
+                    var innovationsToDelete = existingInnovations.Where(i => !incomingIds.Contains(i.Id)).ToList();
+                    foreach (var innovation in innovationsToDelete)
+                    {
+                        _context.NominationRewardFarmerInnovations.Remove(innovation);
+                    }
+
+                    // CREATE or UPDATE
+                    foreach (var innovation in farmerInnovations)
+                    {
+                        if (innovation.Id > 0)
+                        {
+                            // UPDATE existing
+                            var existingInnovation = existingInnovations.FirstOrDefault(i => i.Id == innovation.Id);
+                            if (existingInnovation != null)
+                            {
+                                existingInnovation.Type = innovation.Type;
+                                existingInnovation.NameAddress = innovation.NameAddress;
+                                existingInnovation.PhoneNumber = innovation.PhoneNumber;
+                                existingInnovation.DetailsOfInnovation = innovation.DetailsOfInnovation;
+                                existingInnovation.UpdatedById = innovation.UpdatedById;
+                                existingInnovation.UpdatedAt = innovation.UpdatedAt;
+                                _context.NominationRewardFarmerInnovations.Update(existingInnovation);
+                            }
+                        }
+                        else
+                        {
+                            // CREATE new
+                            innovation.NominationRewardId = nominationRewardId;
+                            _context.NominationRewardFarmerInnovations.Add(innovation);
+                        }
+                    }
+                }
+
+                // 4. Process OrganicFarmers (Hybrid Pattern)
+                if (organicFarmers != null)
+                {
+                    var existingOrganic = existing.NominationRewardOrganicFarmers?.ToList() ?? new List<NominationRewardOrganicFarmer>();
+                    var incomingIds = organicFarmers.Where(o => o.Id > 0).Select(o => o.Id).ToList();
+
+                    // DELETE: Items in DB but not in incoming array
+                    var organicToDelete = existingOrganic.Where(o => !incomingIds.Contains(o.Id)).ToList();
+                    foreach (var organic in organicToDelete)
+                    {
+                        _context.NominationRewardOrganicFarmers.Remove(organic);
+                    }
+
+                    // CREATE or UPDATE
+                    foreach (var organic in organicFarmers)
+                    {
+                        if (organic.Id > 0)
+                        {
+                            // UPDATE existing
+                            var existingOrganicFarmer = existingOrganic.FirstOrDefault(o => o.Id == organic.Id);
+                            if (existingOrganicFarmer != null)
+                            {
+                                existingOrganicFarmer.NameAddress = organic.NameAddress;
+                                existingOrganicFarmer.PhoneNumber = organic.PhoneNumber;
+                                existingOrganicFarmer.CropsGrown = organic.CropsGrown;
+                                existingOrganicFarmer.UpdatedById = organic.UpdatedById;
+                                existingOrganicFarmer.UpdatedAt = organic.UpdatedAt;
+                                _context.NominationRewardOrganicFarmers.Update(existingOrganicFarmer);
+                            }
+                        }
+                        else
+                        {
+                            // CREATE new
+                            organic.NominationRewardId = nominationRewardId;
+                            _context.NominationRewardOrganicFarmers.Add(organic);
+                        }
+                    }
+                }
+
+                // 5. Process IFSEntrepreneurs (Hybrid Pattern)
+                if (ifsEntrepreneurs != null)
+                {
+                    var existingEntrepreneurs = existing.NominationRewardIFSEntrepreneurs?.ToList() ?? new List<NominationRewardIFSEnterpreneur>();
+                    var incomingIds = ifsEntrepreneurs.Where(e => e.Id > 0).Select(e => e.Id).ToList();
+
+                    // DELETE: Items in DB but not in incoming array
+                    var entrepreneursToDelete = existingEntrepreneurs.Where(e => !incomingIds.Contains(e.Id)).ToList();
+                    foreach (var entrepreneur in entrepreneursToDelete)
+                    {
+                        _context.NominationRewardIFSEntrepreneurs.Remove(entrepreneur);
+                    }
+
+                    // CREATE or UPDATE
+                    foreach (var entrepreneur in ifsEntrepreneurs)
+                    {
+                        if (entrepreneur.Id > 0)
+                        {
+                            // UPDATE existing
+                            var existingEntrepreneur = existingEntrepreneurs.FirstOrDefault(e => e.Id == entrepreneur.Id);
+                            if (existingEntrepreneur != null)
+                            {
+                                existingEntrepreneur.NameAddress = entrepreneur.NameAddress;
+                                existingEntrepreneur.Phone = entrepreneur.Phone;
+                                existingEntrepreneur.ComponentOfIFS = entrepreneur.ComponentOfIFS;
+                                existingEntrepreneur.UpdatedById = entrepreneur.UpdatedById;
+                                existingEntrepreneur.UpdatedAt = entrepreneur.UpdatedAt;
+                                _context.NominationRewardIFSEntrepreneurs.Update(existingEntrepreneur);
+                            }
+                        }
+                        else
+                        {
+                            // CREATE new
+                            entrepreneur.NominationRewardId = nominationRewardId;
+                            _context.NominationRewardIFSEntrepreneurs.Add(entrepreneur);
+                        }
+                    }
+                }
+
+                // 6. Process EntrepreneurInnovations (Hybrid Pattern)
+                if (entrepreneurInnovations != null)
+                {
+                    var existingInnovations = existing.NominationRewardEntrepreneurInnovations?.ToList() ?? new List<NominationRewardEntrepreneurInnovation>();
+                    var incomingIds = entrepreneurInnovations.Where(i => i.Id > 0).Select(i => i.Id).ToList();
+
+                    // DELETE: Items in DB but not in incoming array
+                    var innovationsToDelete = existingInnovations.Where(i => !incomingIds.Contains(i.Id)).ToList();
+                    foreach (var innovation in innovationsToDelete)
+                    {
+                        _context.NominationRewardEntrepreneurInnovations.Remove(innovation);
+                    }
+
+                    // CREATE or UPDATE
+                    foreach (var innovation in entrepreneurInnovations)
+                    {
+                        if (innovation.Id > 0)
+                        {
+                            // UPDATE existing
+                            var existingInnovation = existingInnovations.FirstOrDefault(i => i.Id == innovation.Id);
+                            if (existingInnovation != null)
+                            {
+                                existingInnovation.Type = innovation.Type;
+                                existingInnovation.NameAddress = innovation.NameAddress;
+                                existingInnovation.PhoneNumber = innovation.PhoneNumber;
+                                existingInnovation.DetailsOfInnovation = innovation.DetailsOfInnovation;
+                                existingInnovation.UpdatedById = innovation.UpdatedById;
+                                existingInnovation.UpdatedAt = innovation.UpdatedAt;
+                                _context.NominationRewardEntrepreneurInnovations.Update(existingInnovation);
+                            }
+                        }
+                        else
+                        {
+                            // CREATE new
+                            innovation.NominationRewardId = nominationRewardId;
+                            _context.NominationRewardEntrepreneurInnovations.Add(innovation);
+                        }
+                    }
+                }
+
+                // 7. Process OrganicEntrepreneurs (Hybrid Pattern)
+                if (organicEntrepreneurs != null)
+                {
+                    var existingOrganic = existing.NominationRewardOrganicEntrepreneurs?.ToList() ?? new List<NominationRewardOrganicEntrepreneur>();
+                    var incomingIds = organicEntrepreneurs.Where(o => o.Id > 0).Select(o => o.Id).ToList();
+
+                    // DELETE: Items in DB but not in incoming array
+                    var organicToDelete = existingOrganic.Where(o => !incomingIds.Contains(o.Id)).ToList();
+                    foreach (var organic in organicToDelete)
+                    {
+                        _context.NominationRewardOrganicEntrepreneurs.Remove(organic);
+                    }
+
+                    // CREATE or UPDATE
+                    foreach (var organic in organicEntrepreneurs)
+                    {
+                        if (organic.Id > 0)
+                        {
+                            // UPDATE existing
+                            var existingOrganicEntrepreneur = existingOrganic.FirstOrDefault(o => o.Id == organic.Id);
+                            if (existingOrganicEntrepreneur != null)
+                            {
+                                existingOrganicEntrepreneur.NameAddress = organic.NameAddress;
+                                existingOrganicEntrepreneur.PhoneNumber = organic.PhoneNumber;
+                                existingOrganicEntrepreneur.CropsGrown = organic.CropsGrown;
+                                existingOrganicEntrepreneur.UpdatedById = organic.UpdatedById;
+                                existingOrganicEntrepreneur.UpdatedAt = organic.UpdatedAt;
+                                _context.NominationRewardOrganicEntrepreneurs.Update(existingOrganicEntrepreneur);
+                            }
+                        }
+                        else
+                        {
+                            // CREATE new
+                            organic.NominationRewardId = nominationRewardId;
+                            _context.NominationRewardOrganicEntrepreneurs.Add(organic);
+                        }
+                    }
+                }
+
+                // Save all changes
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                // Return updated entity with all children
+                return await GetWithDetailsAsync(nominationRewardId) ?? existing;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
     }
 }

@@ -60,5 +60,9 @@ namespace Application.Interface.Services.DataTables
             int pageNumber = 1,
             int pageSize = 10,
             int? createdByIdFilter = null);
+
+        // Hybrid methods
+        Task<ServiceResult<NominationRewardDto>> CreateHybridAsync(NominationRewardHybridCreateDto dto);
+        Task<ServiceResult<NominationRewardDto>> UpdateHybridAsync(int id, NominationRewardHybridUpdateDto dto);
     }
 }

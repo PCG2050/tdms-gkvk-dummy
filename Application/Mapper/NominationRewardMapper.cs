@@ -279,5 +279,45 @@ namespace Application.Mapper
                 foreach (var c in dto.OrganicEntrepreneurs)
                     entity.NominationRewardOrganicEntrepreneurs.Add(MapToEntity(c));
         }
+
+        // ===== HYBRID DTO MAPPERS =====
+
+        // Map Create DTOs to entities (no Id field)
+        public NominationRewardIFSFarmer MapToEntity(NominationRewardIFSFarmerCreateDto dto) =>
+            new() { NameAddress = dto.NameAddress, Phone = dto.Phone, ComponentOfIFS = dto.ComponentOfIFS };
+
+        public NominationRewardIFSEnterpreneur MapToEntity(NominationRewardIFSEnterpreneurCreateDto dto) =>
+            new() { NameAddress = dto.NameAddress, Phone = dto.Phone, ComponentOfIFS = dto.ComponentOfIFS };
+
+        public NominationRewardFarmerInnovation MapToEntity(NominationRewardFarmerInnovationCreateDto dto) =>
+            new() { Type = dto.Type, NameAddress = dto.NameAddress, PhoneNumber = dto.PhoneNumber, DetailsOfInnovation = dto.DetailsOfInnovation };
+
+        public NominationRewardEntrepreneurInnovation MapToEntity(NominationRewardEntrepreneurInnovationCreateDto dto) =>
+            new() { Type = dto.Type, NameAddress = dto.NameAddress, PhoneNumber = dto.PhoneNumber, DetailsOfInnovation = dto.DetailsOfInnovation };
+
+        public NominationRewardOrganicFarmer MapToEntity(NominationRewardOrganicFarmerCreateDto dto) =>
+            new() { NameAddress = dto.NameAddress, PhoneNumber = dto.PhoneNumber, CropsGrown = dto.CropsGrown };
+
+        public NominationRewardOrganicEntrepreneur MapToEntity(NominationRewardOrganicEntrepreneurCreateDto dto) =>
+            new() { NameAddress = dto.NameAddress, PhoneNumber = dto.PhoneNumber, CropsGrown = dto.CropsGrown };
+
+        // Map Update DTOs to entities (with Id field)
+        public NominationRewardIFSFarmer MapToEntity(NominationRewardIFSFarmerUpdateDto dto) =>
+            new() { Id = dto.Id ?? 0, NameAddress = dto.NameAddress, Phone = dto.Phone, ComponentOfIFS = dto.ComponentOfIFS };
+
+        public NominationRewardIFSEnterpreneur MapToEntity(NominationRewardIFSEnterpreneurUpdateDto dto) =>
+            new() { Id = dto.Id ?? 0, NameAddress = dto.NameAddress, Phone = dto.Phone, ComponentOfIFS = dto.ComponentOfIFS };
+
+        public NominationRewardFarmerInnovation MapToEntity(NominationRewardFarmerInnovationUpdateDto dto) =>
+            new() { Id = dto.Id ?? 0, Type = dto.Type, NameAddress = dto.NameAddress, PhoneNumber = dto.PhoneNumber, DetailsOfInnovation = dto.DetailsOfInnovation };
+
+        public NominationRewardEntrepreneurInnovation MapToEntity(NominationRewardEntrepreneurInnovationUpdateDto dto) =>
+            new() { Id = dto.Id ?? 0, Type = dto.Type, NameAddress = dto.NameAddress, PhoneNumber = dto.PhoneNumber, DetailsOfInnovation = dto.DetailsOfInnovation };
+
+        public NominationRewardOrganicFarmer MapToEntity(NominationRewardOrganicFarmerUpdateDto dto) =>
+            new() { Id = dto.Id ?? 0, NameAddress = dto.NameAddress, PhoneNumber = dto.PhoneNumber, CropsGrown = dto.CropsGrown };
+
+        public NominationRewardOrganicEntrepreneur MapToEntity(NominationRewardOrganicEntrepreneurUpdateDto dto) =>
+            new() { Id = dto.Id ?? 0, NameAddress = dto.NameAddress, PhoneNumber = dto.PhoneNumber, CropsGrown = dto.CropsGrown };
     }
 }
