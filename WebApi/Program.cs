@@ -88,6 +88,7 @@ namespace WebApi
                               
            
             builder.Services.AddScoped<ICurrentUserService,CurrentUserService>();
+            builder.Services.AddSingleton<IIndianTimeService, IndianTimeService>(); // IST Time Service
             builder.Services.AddScoped<IOTPService, OTPService>();
             builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
             builder.Services.AddScoped<ITokenService, AuthTokenService>();

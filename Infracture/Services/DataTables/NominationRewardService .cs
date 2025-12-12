@@ -27,6 +27,7 @@ namespace Infrastructure.Services.DataTables
         private readonly IUnitHeadAssignmentRepository _unitHeadAssignmentRepository;
         private readonly ITrainerAssignmentRepository _trainerAssignmentRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IIndianTimeService _indianTimeService;
         // Generic history service
         private readonly GenericTrainerHistoryService<NominationReward> _historyService;
 
@@ -38,7 +39,8 @@ namespace Infrastructure.Services.DataTables
             IOrganizationUnitRepository organizationUnitRepository,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
             IUserRepository userRepository,
-            ITrainerAssignmentRepository trainerAssignmentRepository)
+            ITrainerAssignmentRepository trainerAssignmentRepository,
+            IIndianTimeService indianTimeService)
         {
             _repository = repository;
             _currentUserService = currentUserService;
@@ -48,6 +50,7 @@ namespace Infrastructure.Services.DataTables
             _unitHeadAssignmentRepository = unitHeadAssignmentRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
             _userRepository = userRepository;
+            _indianTimeService = indianTimeService;
             //  generic history service
             _historyService = new GenericTrainerHistoryService<NominationReward>(currentUserService, trainerAssignmentRepository, organizationUnitRepository, unitHeadAssignmentRepository, userRepository);
 
@@ -63,7 +66,7 @@ namespace Infrastructure.Services.DataTables
 
             // Set audit fields
             entity.CreatedById = _currentUserService.UserId;
-            entity.CreatedAt = DateTimeOffset.UtcNow;
+            entity.CreatedAt = _indianTimeService.Now;
             entity.OrganizationId = _currentUserService.OrganizationId;
             entity.FormStatus = "Draft";
 
@@ -109,7 +112,7 @@ namespace Infrastructure.Services.DataTables
 
             // Update audit fields
             entity.UpdatedById = _currentUserService.UserId;
-            entity.UpdatedAt = DateTimeOffset.UtcNow;
+            entity.UpdatedAt = _indianTimeService.Now;
 
             // Save changes
             await _repository.UpdateAsync(entity);
@@ -210,7 +213,7 @@ namespace Infrastructure.Services.DataTables
 
             entity.FormStatus = "Pending";
             entity.UpdatedById = _currentUserService.UserId;
-            entity.UpdatedAt = DateTimeOffset.UtcNow;
+            entity.UpdatedAt = _indianTimeService.Now;
 
             await _repository.UpdateAsync(entity);
             return ServiceResult.Success("NominationReward submitted for approval");
@@ -234,7 +237,7 @@ namespace Infrastructure.Services.DataTables
             entity.FormStatus = "Approved";
             entity.FormStatusRemarks = remarks;
             entity.ApprovedById = _currentUserService.UserId;
-            entity.ApprovedAt = DateTimeOffset.UtcNow;
+            entity.ApprovedAt = _indianTimeService.Now;
 
             await _repository.UpdateAsync(entity);
             return ServiceResult.Success("NominationReward approved successfully");
@@ -261,7 +264,7 @@ namespace Infrastructure.Services.DataTables
             entity.FormStatus = "Rejected";
             entity.FormStatusRemarks = remarks;
             entity.UpdatedById = _currentUserService.UserId;
-            entity.UpdatedAt = DateTimeOffset.UtcNow;
+            entity.UpdatedAt = _indianTimeService.Now;
 
             await _repository.UpdateAsync(entity);
             return ServiceResult.Success("NominationReward rejected");
@@ -412,7 +415,7 @@ namespace Infrastructure.Services.DataTables
                 OrganizationId = _currentUserService.OrganizationId,
                 FormStatus = "Pending",  // Set to Pending on hybrid create
                 CreatedById = _currentUserService.UserId,
-                CreatedAt = DateTimeOffset.UtcNow
+                CreatedAt = _indianTimeService.Now
             };
 
             // Add child IFSFarmers
@@ -544,7 +547,7 @@ namespace Infrastructure.Services.DataTables
                     OtherRegion = dto.OtherRegion,
                     FormStatus = "Pending",  // Set to Pending on update
                     UpdatedById = _currentUserService.UserId,
-                    UpdatedAt = DateTimeOffset.UtcNow
+                    UpdatedAt = _indianTimeService.Now
                 };
 
                 // Prepare child collections
@@ -552,9 +555,9 @@ namespace Infrastructure.Services.DataTables
                 {
                     var mapped = _mapper.MapToEntity(c);
                     mapped.CreatedById = _currentUserService.UserId;
-                    mapped.CreatedAt = DateTimeOffset.UtcNow;
+                    mapped.CreatedAt = _indianTimeService.Now;
                     mapped.UpdatedById = _currentUserService.UserId;
-                    mapped.UpdatedAt = DateTimeOffset.UtcNow;
+                    mapped.UpdatedAt = _indianTimeService.Now;
                     return mapped;
                 }).ToList();
 
@@ -562,9 +565,9 @@ namespace Infrastructure.Services.DataTables
                 {
                     var mapped = _mapper.MapToEntity(c);
                     mapped.CreatedById = _currentUserService.UserId;
-                    mapped.CreatedAt = DateTimeOffset.UtcNow;
+                    mapped.CreatedAt = _indianTimeService.Now;
                     mapped.UpdatedById = _currentUserService.UserId;
-                    mapped.UpdatedAt = DateTimeOffset.UtcNow;
+                    mapped.UpdatedAt = _indianTimeService.Now;
                     return mapped;
                 }).ToList();
 
@@ -572,9 +575,9 @@ namespace Infrastructure.Services.DataTables
                 {
                     var mapped = _mapper.MapToEntity(c);
                     mapped.CreatedById = _currentUserService.UserId;
-                    mapped.CreatedAt = DateTimeOffset.UtcNow;
+                    mapped.CreatedAt = _indianTimeService.Now;
                     mapped.UpdatedById = _currentUserService.UserId;
-                    mapped.UpdatedAt = DateTimeOffset.UtcNow;
+                    mapped.UpdatedAt = _indianTimeService.Now;
                     return mapped;
                 }).ToList();
 
@@ -582,9 +585,9 @@ namespace Infrastructure.Services.DataTables
                 {
                     var mapped = _mapper.MapToEntity(c);
                     mapped.CreatedById = _currentUserService.UserId;
-                    mapped.CreatedAt = DateTimeOffset.UtcNow;
+                    mapped.CreatedAt = _indianTimeService.Now;
                     mapped.UpdatedById = _currentUserService.UserId;
-                    mapped.UpdatedAt = DateTimeOffset.UtcNow;
+                    mapped.UpdatedAt = _indianTimeService.Now;
                     return mapped;
                 }).ToList();
 
@@ -592,9 +595,9 @@ namespace Infrastructure.Services.DataTables
                 {
                     var mapped = _mapper.MapToEntity(c);
                     mapped.CreatedById = _currentUserService.UserId;
-                    mapped.CreatedAt = DateTimeOffset.UtcNow;
+                    mapped.CreatedAt = _indianTimeService.Now;
                     mapped.UpdatedById = _currentUserService.UserId;
-                    mapped.UpdatedAt = DateTimeOffset.UtcNow;
+                    mapped.UpdatedAt = _indianTimeService.Now;
                     return mapped;
                 }).ToList();
 
@@ -602,9 +605,9 @@ namespace Infrastructure.Services.DataTables
                 {
                     var mapped = _mapper.MapToEntity(c);
                     mapped.CreatedById = _currentUserService.UserId;
-                    mapped.CreatedAt = DateTimeOffset.UtcNow;
+                    mapped.CreatedAt = _indianTimeService.Now;
                     mapped.UpdatedById = _currentUserService.UserId;
-                    mapped.UpdatedAt = DateTimeOffset.UtcNow;
+                    mapped.UpdatedAt = _indianTimeService.Now;
                     return mapped;
                 }).ToList();
 
@@ -613,9 +616,9 @@ namespace Infrastructure.Services.DataTables
                 {
                     var mapped = _mapper.MapToEntity(c);
                     mapped.CreatedById = _currentUserService.UserId;
-                    mapped.CreatedAt = DateTimeOffset.UtcNow;
+                    mapped.CreatedAt = _indianTimeService.Now;
                     mapped.UpdatedById = _currentUserService.UserId;
-                    mapped.UpdatedAt = DateTimeOffset.UtcNow;
+                    mapped.UpdatedAt = _indianTimeService.Now;
                     return mapped;
                 }).ToList();
 
@@ -623,9 +626,9 @@ namespace Infrastructure.Services.DataTables
                 {
                     var mapped = _mapper.MapToEntity(c);
                     mapped.CreatedById = _currentUserService.UserId;
-                    mapped.CreatedAt = DateTimeOffset.UtcNow;
+                    mapped.CreatedAt = _indianTimeService.Now;
                     mapped.UpdatedById = _currentUserService.UserId;
-                    mapped.UpdatedAt = DateTimeOffset.UtcNow;
+                    mapped.UpdatedAt = _indianTimeService.Now;
                     return mapped;
                 }).ToList();
 
@@ -633,9 +636,9 @@ namespace Infrastructure.Services.DataTables
                 {
                     var mapped = _mapper.MapToEntity(c);
                     mapped.CreatedById = _currentUserService.UserId;
-                    mapped.CreatedAt = DateTimeOffset.UtcNow;
+                    mapped.CreatedAt = _indianTimeService.Now;
                     mapped.UpdatedById = _currentUserService.UserId;
-                    mapped.UpdatedAt = DateTimeOffset.UtcNow;
+                    mapped.UpdatedAt = _indianTimeService.Now;
                     return mapped;
                 }).ToList();
 
@@ -643,9 +646,9 @@ namespace Infrastructure.Services.DataTables
                 {
                     var mapped = _mapper.MapToEntity(c);
                     mapped.CreatedById = _currentUserService.UserId;
-                    mapped.CreatedAt = DateTimeOffset.UtcNow;
+                    mapped.CreatedAt = _indianTimeService.Now;
                     mapped.UpdatedById = _currentUserService.UserId;
-                    mapped.UpdatedAt = DateTimeOffset.UtcNow;
+                    mapped.UpdatedAt = _indianTimeService.Now;
                     return mapped;
                 }).ToList();
 
