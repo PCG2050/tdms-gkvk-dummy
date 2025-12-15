@@ -27,6 +27,7 @@ namespace Infrastructure.DbContext
         public DbSet<User> Users { get; set; }
         public DbSet<UserSession> UserSessions { get; set; }
         public DbSet<Unit> Units { get; set; }
+        public DbSet<SasTokenCache> SasTokenCache { get; set; }
 
         #region STU
 
