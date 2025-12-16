@@ -13,12 +13,20 @@ namespace WebApi
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Configure Serilog
+            // Configure Serilog from appsettings.json
             Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(builder.Configuration)
                 .Enrich.FromLogContext()
-                .WriteTo.Console()
+                .Enrich.WithMachineName()
+                .Enrich.WithThreadId()
+                .Enrich.WithEnvironmentName()
                 .CreateLogger();
+
             builder.Host.UseSerilog();
+
+            // Log application startup
+            Log.Information("Starting TDMS GKVK API...");
+            Log.Information("Environment: {Environment}", builder.Environment.EnvironmentName);
 
             //Configure JSON options for better data handlingServer
             builder.Services.AddControllers()
@@ -60,16 +68,52 @@ namespace WebApi
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DatabaseContext")));
             builder.Services.AddScoped<IRouteService, RouteService>();
 
+            // CORS Configuration - Secure with allowed origins from configuration
             var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+            var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()
+                ?? new[] { "http://localhost:3000", "http://localhost:4200" };
+
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy(name: MyAllowSpecificOrigins,
                                   policy =>
                                   {
-                                      policy.AllowAnyOrigin();
-                                      policy.AllowAnyHeader();
-                                      policy.AllowAnyMethod();
+                                      policy.WithOrigins(allowedOrigins)
+                                            .AllowAnyHeader()
+                                            .AllowAnyMethod()
+                                            .AllowCredentials();
                                   });
+            });
+
+            // Add Health Checks
+            builder.Services.AddHealthChecks()
+                .AddDbContextCheck<TdmsDbContext>("database");
+
+            // Add Response Compression
+            builder.Services.AddResponseCompression(options =>
+            {
+                options.EnableForHttps = true;
+            });
+
+            // Add Rate Limiting (ASP.NET Core 9.0 built-in)
+            builder.Services.AddRateLimiter(options =>
+            {
+                options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+                    RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: context.User.Identity?.Name ?? context.Request.Headers.Host.ToString(),
+                        factory: partition => new FixedWindowRateLimiterOptions
+                        {
+                            AutoReplenishment = true,
+                            PermitLimit = 100,
+                            QueueLimit = 0,
+                            Window = TimeSpan.FromMinutes(1)
+                        }));
+
+                options.OnRejected = async (context, token) =>
+                {
+                    context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+                    await context.HttpContext.Response.WriteAsync("Too many requests. Please try again later.", token);
+                };
             });
             //Email Configuration
             builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
@@ -315,8 +359,25 @@ namespace WebApi
                 });
 
             var app = builder.Build();
-            // Configure the HTTP request pipeline.
-            if (true || app.Environment.IsDevelopment())
+
+            // ========================================
+            // HTTP REQUEST PIPELINE CONFIGURATION
+            // ========================================
+
+            // Enable Response Compression
+            app.UseResponseCompression();
+
+            // Enable Rate Limiting
+            app.UseRateLimiter();
+
+            // Add Request Logging Middleware (BEFORE other middleware)
+            app.UseMiddleware<WebApi.Middleware.RequestLoggingMiddleware>();
+
+            // Add Global Exception Handling Middleware
+            app.UseMiddleware<WebApi.Middleware.GlobalExceptionHandlingMiddleware>();
+
+            // Configure the HTTP request pipeline - FIXED: Only enable in Development
+            if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
                 app.MapScalarApiReference((options) =>
@@ -326,14 +387,42 @@ namespace WebApi
                     .WithTheme(ScalarTheme.DeepSpace);
                 });
             }
-        
+            else
+            {
+                // Production: Use exception handler
+                app.UseExceptionHandler("/error");
+                app.UseHsts();
+            }
+
+            // CORS - Must be before authentication/authorization
             app.UseCors(MyAllowSpecificOrigins);
+
             app.UseHttpsRedirection();
+
+            // Authentication & Authorization
             app.UseAuthentication();
             app.UseAuthorization();
+
+            // Map controllers
             app.MapControllers();
 
-            app.Run();
+            // Health check endpoint
+            app.MapHealthChecks("/health");
+
+            Log.Information("TDMS GKVK API started successfully");
+
+            try
+            {
+                app.Run();
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Application terminated unexpectedly");
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
     }
 }
