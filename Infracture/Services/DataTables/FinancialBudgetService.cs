@@ -132,7 +132,7 @@ namespace Infrastructure.Services.DataTables
             DateOnly? startDate = null,
             DateOnly? endDate = null)
         {
-            var unitLocationIds = (await _currentUserService.MappedUnitLocationIds()).ToList();
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
             var result = await _repository.GetPaginatedAsync(unitLocationIds, pageNumber, pageSize, startDate, endDate);
 
             return new PaginatedResult<FinancialBudgetDto>
@@ -149,7 +149,7 @@ namespace Infrastructure.Services.DataTables
             int pageNumber = 1,
             int pageSize = 10)
         {
-            var unitLocationIds = (await _currentUserService.MappedUnitLocationIds()).ToList();
+            var unitLocationIds = await GetAccessibleUnitLocationIdsAsync();
             var result = await _repository.GetByStatusAsync(unitLocationIds, status, pageNumber, pageSize);
 
             return new PaginatedResult<FinancialBudgetDto>
@@ -167,21 +167,50 @@ namespace Infrastructure.Services.DataTables
             int pageNumber = 1,
             int pageSize = 10)
         {
-            var query = _repository.GetQueryable()
-                .Include(x => x.UnitLocation)
-                    .ThenInclude(ul => ul.Unit);
+            var query = _repository.GetQueryable();
 
             return await _historyService.GetTrainerHistoryAsync(
                 query,
                 getUnitLocationId: x => x.UnitLocationId,
-                getTitleOrName: x => x.StartDate.HasValue && x.EndDate.HasValue
-                    ? $"Financial Budget ({x.StartDate:yyyy-MM-dd} to {x.EndDate:yyyy-MM-dd})"
-                    : "Financial Budget",
-                getFormStatus: x => x.FormStatus,
+               getTitleOrName: x => x.DetailsOfBankAccounts.Any()
+                    ? $"Financial Budget - {x.DetailsOfBankAccounts.First().AccountName}"
+                    : "Financial Budget - {x.Id}",
+             getFormStatus: x => x.FormStatus,
                 getRemarks: x => x.FormStatusRemarks ?? "-",
                 pageNumber,
                 pageSize);
         }
+
+
+        /// <summary>
+        /// Get pending approvals for Unit Head with pagination
+        /// </summary>
+        public async Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
+            int pageNumber = 1,
+            int pageSize = 10,
+            int? createdByIdFilter = null)
+
+        {
+            var query = _repository.GetQueryable()
+                  .Include(f => f.Budgets)
+                .Include(f => f.RevolvingFunds)
+                .Include(f => f.DetailsOfBankAccounts);
+
+
+            return await _historyService.GetPendingApprovalsAsync(
+                query,
+                getUnitLocationId: x => x.UnitLocationId,
+                getTitleOrName: x => x.DetailsOfBankAccounts.Any()
+                    ? $"Financial Budget - {x.DetailsOfBankAccounts.First().AccountName}"
+                    : "Financial Budget - {x.Id}",
+                getFormStatus: x => x.FormStatus,
+                getCreatedById: x => x.CreatedById ?? 0,
+                _unitHeadAssignmentRepository,
+                pageNumber,
+                pageSize,
+                createdByIdFilter);
+        }
+
 
         // ===== STATUS MANAGEMENT =====
         // Note: No SubmitForApproval needed - Create/Update sets to Pending
@@ -395,18 +424,42 @@ namespace Infrastructure.Services.DataTables
 
         public async Task<ServiceResult> DeleteBudgetAsync(int id)
         {
+            var budget = await _repository.GetBudgetByIdAsync(id);
+            if (budget == null)
+                return ServiceResult.Failure("Budget not found", ServiceErrorStatus.NOTFOUND);
+
+            var parent = await _repository.GetByIdAsync(budget.FinancialBudgetId);
+            if (parent == null || !await _entityPermissionService.CanModifyForm(parent))
+                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
+
             await _repository.DeleteBudgetAsync(id);
             return ServiceResult.Success();
         }
 
         public async Task<ServiceResult> DeleteRevolvingFundAsync(int id)
         {
+            var revolvingFund = await _repository.GetRevolvingFundByIdAsync(id);
+            if (revolvingFund == null)
+                return ServiceResult.Failure("Revolving fund not found", ServiceErrorStatus.NOTFOUND);
+
+            var parent = await _repository.GetByIdAsync(revolvingFund.FinancialBudgetId);
+            if (parent == null || !await _entityPermissionService.CanModifyForm(parent))
+                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
+
             await _repository.DeleteRevolvingFundAsync(id);
             return ServiceResult.Success();
         }
 
         public async Task<ServiceResult> DeleteBankAccountAsync(int id)
         {
+            var bankAccount = await _repository.GetBankAccountByIdAsync(id);
+            if (bankAccount == null)
+                return ServiceResult.Failure("Bank account not found", ServiceErrorStatus.NOTFOUND);
+
+            var parent = await _repository.GetByIdAsync(bankAccount.FinancialBudgetId);
+            if (parent == null || !await _entityPermissionService.CanModifyForm(parent))
+                return ServiceResult.Failure("Access denied", ServiceErrorStatus.FORBIDDEN);
+
             await _repository.DeleteBankAccountAsync(id);
             return ServiceResult.Success();
         }
@@ -624,6 +677,8 @@ namespace Infrastructure.Services.DataTables
                     ServiceErrorStatus.INVALIDOPERATION);
             }
         }
+
+
 
         // ===== MAPPING HELPERS =====
 

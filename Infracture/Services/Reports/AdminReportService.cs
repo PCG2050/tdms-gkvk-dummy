@@ -23,7 +23,7 @@ namespace Infrastructure.Services.Reports
 
         private readonly IDeuProgramDetailsRepository _deuRepository;
         private readonly IEeuProgramDetailsRepository _eeuRepository;
-        private readonly IKvkProgramDetailsRepository _kvkRepository;
+        private readonly IEeuProgramDetailsRepository _kvkRepository;
         private readonly IIbtvaProgramDetailsRepository _ibtvaRepository;
         private readonly INaepProgramDetailsRepository _naepRepository;
         private readonly IStuProgramDetailsRepository _stuRepository;
@@ -52,7 +52,7 @@ namespace Infrastructure.Services.Reports
             ITableServiceRepository tblServiceRepository,
             INaepProgramDetailsRepository naepRepository,
             IIbtvaProgramDetailsRepository ibtvaRepository,
-            IKvkProgramDetailsRepository kvkRepository,
+            IEeuProgramDetailsRepository kvkRepository,
             IStuProgramDetailsRepository stuRepository,
             IAticProgramDetailsRepository aticRepository,
             IEeuProgramDetailsRepository eeuRepository,
@@ -266,8 +266,8 @@ namespace Infrastructure.Services.Reports
                 .Select(x => new ReportNominationDto
                 {
                     Type = x.Type?.Name ?? "-",
-                    AwardName = x.AwardName ?? "-",
-                    Category = x.NominationCategory?.Name ?? "-",
+                    AwardName = x.AwardRecognitions?.FirstOrDefault()?.AwardName ?? "-",
+                    Category = x.Achievements?.FirstOrDefault()?.AchievementDetail ?? "-",
                     Date = x.StartDate?.ToString("dd/MM/yyyy") ?? "-"
                 })
                 .ToList();

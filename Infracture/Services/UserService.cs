@@ -74,7 +74,8 @@ namespace Infrastructure.Services
                 Qualification = registerDto.Role == Role.TRAINER
                     ? registerDto.Qualification ?? throw new InvalidOperationException("Qualification required for trainers")
                     : registerDto.Qualification,
-                ProfileImageUrl = registerDto.ProfileImageUrl
+                ProfileImageUrl = registerDto.ProfileImageUrl,
+                IsDeactivated = registerDto.IsDeactivated
             };
             user.CreatedById = _currentUser.UserId;
             user.CreatedAt = DateTimeOffset.UtcNow;
@@ -134,6 +135,7 @@ namespace Infrastructure.Services
                 if (updateDto.EmploymentType is not null) user.EmployementType = updateDto.EmploymentType.Value;
                 if (updateDto.Qualification is not null) user.Qualification = updateDto.Qualification;
                 if (updateDto.ProfileImageUrl is not null) user.ProfileImageUrl = updateDto.ProfileImageUrl;
+                if (updateDto.IsDeactivated is not null) user.IsDeactivated = updateDto.IsDeactivated.Value;
 
                 user.UpdatedById = _currentUser.UserId;
                 user.UpdatedAt = DateTimeOffset.Now;

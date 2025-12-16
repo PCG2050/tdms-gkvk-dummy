@@ -26,7 +26,7 @@ namespace Application.Interface.Services.DataTables
         Task<ServiceResult> ApproveAsync(int nominationRewardId, string? remarks = null);
 
         Task<ServiceResult> RejectAsync(int nominationRewardId, string remarks);
-    
+
 
         Task<PaginatedResult<NominationRewardDto>> GetPaginatedAsync(
             int pageNumber = 1,
@@ -42,7 +42,7 @@ namespace Application.Interface.Services.DataTables
             int pageNumber = 1,
             int pageSize = 10);
 
-       
+
 
         Task<Dictionary<string, int>> GetStatusSummaryAsync();
 
@@ -60,5 +60,9 @@ namespace Application.Interface.Services.DataTables
             int pageNumber = 1,
             int pageSize = 10,
             int? createdByIdFilter = null);
+
+        // Hybrid methods
+        Task<ServiceResult<NominationRewardDto>> CreateHybridAsync(NominationRewardHybridCreateDto dto);
+        Task<ServiceResult<NominationRewardDto>> UpdateHybridAsync(int id, NominationRewardHybridUpdateDto dto);
     }
 }

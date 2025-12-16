@@ -26,9 +26,9 @@ namespace WebApi.Controllers.DataTables.IBTVA
             // -------------------------
             [HttpPost]
             [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
-            public async Task<IActionResult> Create([FromBody] NominationRewardDto createDto)
+            public async Task<IActionResult> Create([FromBody] NominationRewardHybridCreateDto createDto)
             {
-                var result = await _service.CreateAsync(createDto);
+                var result = await _service.CreateHybridAsync(createDto);
                 if (!result.IsSuccess)
                     return BadRequest(result.ErrorMessage);
 
@@ -40,9 +40,9 @@ namespace WebApi.Controllers.DataTables.IBTVA
             // -------------------------
             [HttpPut("{id}")]
             [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
-            public async Task<IActionResult> Update(int id, [FromBody] NominationRewardDto updateDto)
+            public async Task<IActionResult> Update(int id, [FromBody] NominationRewardHybridUpdateDto updateDto)
             {
-                var result = await _service.UpdateAsync(id, updateDto);
+                var result = await _service.UpdateHybridAsync(id, updateDto);
                 if (!result.IsSuccess)
                     return BadRequest(result.ErrorMessage);
 
@@ -94,16 +94,16 @@ namespace WebApi.Controllers.DataTables.IBTVA
             // -------------------------
             // SUBMIT FOR APPROVAL
             // -------------------------
-            [HttpPost("{id}/submit")]
-            [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
-            public async Task<IActionResult> SubmitForApproval(int id)
-            {
-                var result = await _service.SubmitForApprovalAsync(id);
-                if (!result.IsSuccess)
-                    return BadRequest(result.ErrorMessage);
+            //[HttpPost("{id}/submit")]
+            //[Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
+            //public async Task<IActionResult> SubmitForApproval(int id)
+            //{
+            //    var result = await _service.SubmitForApprovalAsync(id);
+            //    if (!result.IsSuccess)
+            //        return BadRequest(result.ErrorMessage);
 
-                return Ok(result);
-            }
+            //    return Ok(result);
+            //}
 
             // -------------------------
             // APPROVE

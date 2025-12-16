@@ -696,8 +696,7 @@ namespace Infrastructure.Services.DataTables.ATIC
                 // Update existing using mapper
                 var updateDto = new AticReportUpdateDto
                 {
-                    Id = existing.Id,
-                    ReportingYear = dto.ReportingYear,
+                    Id = existing.Id,                   
                     ReportDate = dto.ReportDate,
                     ProgressReport = dto.ProgressReport,
                     GeoTaggedPhoto = dto.GeoTaggedPhoto,

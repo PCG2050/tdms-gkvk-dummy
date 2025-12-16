@@ -19,5 +19,6 @@ namespace Application.Constants
         public const int NAEP_UNIT_ID = 8;  // National Agriculture Extension Project
         public const int EEU_UNIT_ID = 9;   // Extension Education Units
         public const int KVK_UNIT_ID = 10;  // Krishi Vigyan Kendras
+        public const int SAMETI_UNIT_ID = 11; // State Agricultural Management and Extension Training Institutes
     }
 }

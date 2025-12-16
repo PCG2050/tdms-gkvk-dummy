@@ -22,7 +22,7 @@ namespace Infrastructure.Services
         private readonly IEeuProgramDetailsRepository _eeuRepository;
         private readonly IAticProgramDetailsRepository _aticRepository;
         private readonly IIbtvaProgramDetailsRepository _ibtvaRepository;
-        private readonly IKvkProgramDetailsRepository _kvkRepository;
+        private readonly IEeuProgramDetailsRepository _kvkRepository;
 
         public SuccessStoryService(
             IStuProgramDetailsRepository stuRepository,
@@ -32,7 +32,7 @@ namespace Infrastructure.Services
             IEeuProgramDetailsRepository eeuRepository,
             IAticProgramDetailsRepository aticRepository,
             IIbtvaProgramDetailsRepository ibtvaRepository,
-            IKvkProgramDetailsRepository kvkRepository)
+            IEeuProgramDetailsRepository kvkRepository)
         {
             _stuRepository = stuRepository;
             _naepRepository = naepRepository;

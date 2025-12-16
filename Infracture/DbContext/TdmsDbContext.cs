@@ -10,6 +10,7 @@ using Domain.Entities.GenericTables;
 using Domain.Entities.GenericTables.ConsultingAndSocialMediaService;
 using Domain.Entities.GenericTables.Service;
 using Domain.Entities.IBTVA;
+using Domain.Entities.SAMETI;
 namespace Infrastructure.DbContext
 {
     public class TdmsDbContext : Microsoft.EntityFrameworkCore.DbContext
@@ -27,6 +28,7 @@ namespace Infrastructure.DbContext
         public DbSet<User> Users { get; set; }
         public DbSet<UserSession> UserSessions { get; set; }
         public DbSet<Unit> Units { get; set; }
+        public DbSet<SasTokenCache> SasTokenCache { get; set; }
 
         #region STU
 
@@ -118,11 +120,6 @@ namespace Infrastructure.DbContext
         public DbSet<NaepRecommendation> NaepRecommendations { get; set; }
         #endregion
         #region EEU
-        public DbSet<EeuOFT> EeuOFTs { get; set; }
-        public DbSet<EeuFLD> EeuFLDs { get; set; }
-        public DbSet<EeuTrainingProgramme> EeuTrainingProgrammes { get; set; }
-        public DbSet<EeuOtherActivity> EeuOtherActivities { get; set; }
-
         public DbSet<EeuProgramDetails> EeuProgramDetails { get; set; }
         public DbSet<EeuParticipantDemographics> EeuParticipantDemographics { get; set; }
         public DbSet<EeuProgramContentAndResources> EeuProgramContentAndResources { get; set; }
@@ -130,6 +127,11 @@ namespace Infrastructure.DbContext
         public DbSet<EeuTopicsCoveredInClass> EeuTopicsCoveredInClass { get; set; }
         public DbSet<EeuTeachingAidsDeveloped> EeuTeachingAidsDeveloped { get; set; }
         public DbSet<EeuAdvisoryServices> EeuAdvisoryServices { get; set; }
+
+        public DbSet<EeuResult> EeuResults { get; set; }
+
+        public DbSet<EeuFldResult> EeuFLDResults { get; set; }
+        public DbSet<EeuOftResult> EeuOFTResults { get; set; }
         public DbSet<EeuReport> EeuReports { get; set; }
         public DbSet<EeuRecommendation> EeuRecommendations { get; set; }
         #endregion
@@ -149,6 +151,17 @@ namespace Infrastructure.DbContext
         public DbSet<KvkReport> KvkReports { get; set; }
         public DbSet<KvkRecommendation> KvkRecommendations { get; set; }
 
+        #endregion
+        #region SAMETI
+        public DbSet<SametiProgramDetails> SametiProgramDetails { get; set; }
+        public DbSet<SametiParticipantDemographics> SametiParticipantDemographics { get; set; }
+        public DbSet<SametiProgramContentAndResources> SametiProgramContentAndResources { get; set; }
+        public DbSet<SametiResourcePerson> SametiResourcePersons { get; set; }
+        public DbSet<SametiTopicsCoveredInClass> SametiTopicsCoveredInClass { get; set; }
+        public DbSet<SametiTeachingAidsDeveloped> SametiTeachingAidsDeveloped { get; set; }
+        public DbSet<SametiAdvisoryServices> SametiAdvisoryServices { get; set; }
+        public DbSet<SametiReport> SametiReports { get; set; }
+        public DbSet<SametiRecommendation> SametiRecommendations { get; set; }
         #endregion
 
         #region Juntions
@@ -228,7 +241,6 @@ namespace Infrastructure.DbContext
         public DbSet<ExtensionLiterature> ExtensionLiteratures { get; set; }
 
         #endregion
-
         #region NominationRewards
         public DbSet<NominationReward> NominationRewards { get; set; }
         public DbSet<NominationRewardIFSFarmer> NominationRewardIFSFarmers { get; set; }
@@ -237,15 +249,19 @@ namespace Infrastructure.DbContext
         public DbSet<NominationRewardIFSEnterpreneur> NominationRewardIFSEntrepreneurs { get; set; }
         public DbSet<NominationRewardEntrepreneurInnovation> NominationRewardEntrepreneurInnovations { get; set; }
         public DbSet<NominationRewardOrganicEntrepreneur> NominationRewardOrganicEntrepreneurs { get; set; }
-        #endregion
 
+        public DbSet<Achievement> Achievements { get; set; }
+        public DbSet<AwardRecognition> AwardRecognitions { get; set; }
+        public DbSet<UniversitySanctionLetterPaperPoster> UniversitySanctionLetterPaperPosters { get; set; }
+        public DbSet<AwardPhoto> AwardPhotos { get; set; }
+
+        #endregion
         #region ConsultingAndSocialMediaService           
 
         public DbSet<ConsultingAndSocialMediaService> TableConsultingAndSocialMediaServices { get; set; }
         public DbSet<TableModeAndOutreach>? TableModeAndOutreaches { get; set; }
 
         #endregion
-
         #region tblService
         public DbSet<TblService> Services { get; set; }
         public DbSet<TableHostel> TableHostels { get; set; }
@@ -253,11 +269,9 @@ namespace Infrastructure.DbContext
         public DbSet<VisitorDetail> VisitorDetails { get; set; }
 
         #endregion
-
         #region OtherActivity
         public DbSet<TableOtherActivity> OtherActivities { get; set; }
         #endregion
-
         #region FinancialBudget
         public DbSet<FinancialBudget> FinancialBudgets { get; set; }
         public DbSet<Budget> Budgets { get; set; }
@@ -266,11 +280,7 @@ namespace Infrastructure.DbContext
 
         public DbSet<DetailsOfBankAccount> DetailsOfBankAccounts { get; set; }
         #endregion
-
         #endregion
-
-
-
 
 
         // Get current user ID directly from HTTP context to avoid circular dependency

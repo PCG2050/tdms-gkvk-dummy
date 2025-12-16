@@ -20,6 +20,8 @@ namespace Application.Models
         public Gender? Gender { get; set; }
         public string? Qualification { get; set; }
 
+        public bool IsDeactivated { get; set; } = false;
+
         public List<int>? OrganizationUnitLocationIds { get; set; } = new();
     }
     public class UserUpdateDto
@@ -39,6 +41,8 @@ namespace Application.Models
         public string? ProfileImageUrl { get; set; }
         public Gender? Gender { get; set; }
         public string? Qualification { get; set; }
+
+        public bool? IsDeactivated { get; set; }
         public List<int>? OrganizationUnitLocationIds { get; set; } = new();
     } 
 

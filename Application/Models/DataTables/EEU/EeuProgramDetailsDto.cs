@@ -1,9 +1,14 @@
-﻿using Application.Interface;
+﻿
+using Application.Interface;
+using Domain.Entities.MasterData;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Application.Models.DataTables.EEU
 {
-    // ==================== PROGRAM DETAILS (Section A) ====================
+    // ============================
+    // PROGRAM DETAILS DTOs
+    // ============================
     public class EeuProgramDetailsDto
     {
         public int Id { get; set; }
@@ -87,6 +92,7 @@ namespace Application.Models.DataTables.EEU
         public string? DistrictName { get; set; }
         public string? StateName { get; set; }
     }
+
     public class EeuProgramCreateDto
     {
         [Required]
@@ -118,6 +124,28 @@ namespace Application.Models.DataTables.EEU
         public string? Copi { get; set; }
         public string? PiAddress { get; set; }
         public int? BatchNo { get; set; }
+
+        //newly added 
+        public string? T01 { get; set; }
+        public string? T02 { get; set; }
+        public string? T03 { get; set; }
+        public string? T04 { get; set; }
+        public string? T05 { get; set; }
+
+        public string? StageOfCrop { get; set; }
+
+        public int? NoOfDemos { get; set; }
+
+        public int? NoOfTrails { get; set; }
+
+        public int? NoOfChecks { get; set; }
+
+        public int? NoOfVisits { get; set; }
+
+
+        public int? ParticipatedAsId { get; set; }
+
+        public string? ParticipantFileUpload { get; set; }
         public decimal? Area { get; set; }
         public string? OrganizerBroucherFile { get; set; }
         public string? OrganizerInstitutionName { get; set; }
@@ -141,6 +169,8 @@ namespace Application.Models.DataTables.EEU
         public string? FundsSanctionLetterUploadFile { get; set; }
         public string? ReportingVideo { get; set; }
         public string? Attachements { get; set; }
+
+
     }
 
     public class EeuProgramUpdateDto : IUpdateDto
@@ -174,6 +204,31 @@ namespace Application.Models.DataTables.EEU
         public string? PiAddress { get; set; }
         public int? BatchNo { get; set; }
         public int? Area { get; set; }
+
+        public string? T01 { get; set; }
+
+        public string? T02 { get; set; }
+
+        public string? T03 { get; set; }
+
+        public string? T04 { get; set; }
+
+        public string? T05 { get; set; }
+
+        public string? StageOfCrop { get; set; }
+
+        public int? NoOfDemos { get; set; }
+
+        public int? NoOfTrails { get; set; }
+
+        public int? NoOfChecks { get; set; }
+
+        public int? NoOfVisits { get; set; }
+
+
+        public int? ParticipatedAsId { get; set; }
+
+        public string? ParticipantFileUpload { get; set; }
         public string? OrganizerBroucherFile { get; set; }
         public string? OrganizerInstitutionName { get; set; }
         public string? OrganizerInstitutionAddress { get; set; }
@@ -198,19 +253,17 @@ namespace Application.Models.DataTables.EEU
         public string? Attachements { get; set; }
     }
 
-
-
-
     public class EeuProgramCompleteDto
     {
         public EeuProgramDetailsDto ProgramDetails { get; set; }
         public List<EeuParticipantDemographicsDto>? Demographics { get; set; }
         public List<EeuProgramContentDto>? ProgramContent { get; set; }
         public EeuAdvisoryServicesDto? AdvisoryServices { get; set; }
-
+        public EeuResultDto? Results { get; set; } // For FLD/OFT categories
         public EeuReportDto? Report { get; set; } // For other categories
         public EeuRecommendationDto? Recommendation { get; set; }
     }
+
     /// <summary>
     /// Lightweight DTO for list/search results
     /// </summary>
@@ -229,8 +282,9 @@ namespace Application.Models.DataTables.EEU
         public string? UnitName { get; set; }
     }
 
-    // ==================== PARTICIPANT DEMOGRAPHICS (Section B) ====================
-
+    // ============================
+    // DEMOGRAPHICS DTOs
+    // ============================
     public class EeuParticipantDemographicsDto
     {
         public int Id { get; set; }
@@ -255,7 +309,6 @@ namespace Application.Models.DataTables.EEU
         public int? GEN_Female_StayedInHostel { get; set; }
         public int? Total { get; set; }
     }
-
 
     public class EeuParticipantDemographicsCreateDto
     {
@@ -302,7 +355,6 @@ namespace Application.Models.DataTables.EEU
         public int? Total { get; set; }
     }
 
-
     // ============================
     // PROGRAM CONTENT DTOs
     // ============================
@@ -315,6 +367,9 @@ namespace Application.Models.DataTables.EEU
         public List<EeuResourcePersonDto>? ResourcePersons { get; set; }
         public List<EeuTopicsCoveredDto>? TopicsCovered { get; set; }
         public List<EeuTeachingAidsDto>? TeachingAids { get; set; }
+        public List<EeuFieldVisitDto>? FieldVisits { get; set; }
+        public List<EeuFieldDayDto>? FieldDays { get; set; }
+        public List<EeuFarmerScientistInteractionDto>? FarmerScientistInteractions { get; set; }
     }
 
     public class EeuProgramContentCreateDto
@@ -336,6 +391,9 @@ namespace Application.Models.DataTables.EEU
         public List<EeuResourcePersonCreateDto>? ResourcePersons { get; set; }
         public List<EeuTopicsCoveredCreateDto>? TopicsCovered { get; set; }
         public List<EeuTeachingAidsCreateDto>? TeachingAids { get; set; }
+        public List<EeuFieldVisitCreateDto>? FieldVisits { get; set; }
+        public List<EeuFieldDayCreateDto>? FieldDays { get; set; }
+        public List<EeuFarmerScientistInteractionCreateDto>? FarmerScientistInteractions { get; set; }
     }
 
     /// <summary>
@@ -395,6 +453,9 @@ namespace Application.Models.DataTables.EEU
         public List<EeuResourcePersonHybridDto>? ResourcePersons { get; set; }
         public List<EeuTopicsCoveredHybridDto>? TopicsCovered { get; set; }
         public List<EeuTeachingAidsHybridDto>? TeachingAids { get; set; }
+        public List<EeuFieldVisitHybridDto>? FieldVisits { get; set; }
+        public List<EeuFieldDayHybridDto>? FieldDays { get; set; }
+        public List<EeuFarmerScientistInteractionHybridDto>? FarmerScientistInteractions { get; set; }
     }
 
     // Resource Person DTOs
@@ -480,6 +541,129 @@ namespace Application.Models.DataTables.EEU
     }
 
     // ============================
+    // FIELD VISIT DTOs
+    // ============================
+    public class EeuFieldVisitDto
+    {
+        public int Id { get; set; }
+        public DateOnly? Date { get; set; }
+        public string? ScientistOfficerVisitedName { get; set; }
+        public string? Purpose { get; set; }
+        public int? NoOfFieldsCovered { get; set; }
+        public int? NoOfFarmerCovered { get; set; }
+        public string? PhotoUpload { get; set; }
+    }
+
+    public class EeuFieldVisitCreateDto
+    {
+        public DateOnly? Date { get; set; }
+        public string? ScientistOfficerVisitedName { get; set; }
+        public string? Purpose { get; set; }
+        public int? NoOfFieldsCovered { get; set; }
+        public int? NoOfFarmerCovered { get; set; }
+        public string? PhotoUpload { get; set; }
+    }
+
+    public class EeuFieldVisitUpdateDto : IUpdateDto
+    {
+        public int Id { get; set; }
+        public DateOnly? Date { get; set; }
+        public string? ScientistOfficerVisitedName { get; set; }
+        public string? Purpose { get; set; }
+        public int? NoOfFieldsCovered { get; set; }
+        public int? NoOfFarmerCovered { get; set; }
+        public string? PhotoUpload { get; set; }
+    }
+
+    /// <summary>
+    /// Hybrid item for Field Visits
+    /// </summary>
+    public class EeuFieldVisitHybridDto
+    {
+        public int? Id { get; set; }  // null = create new, has value = update existing
+        public DateOnly? Date { get; set; }
+        public string? ScientistOfficerVisitedName { get; set; }
+        public string? Purpose { get; set; }
+        public int? NoOfFieldsCovered { get; set; }
+        public int? NoOfFarmerCovered { get; set; }
+        public string? PhotoUpload { get; set; }
+    }
+
+    // ============================
+    // FIELD DAY DTOs
+    // ============================
+    public class EeuFieldDayDto
+    {
+        public int Id { get; set; }
+        // Add EeuFieldDay fields based on your entity
+    }
+
+    public class EeuFieldDayCreateDto
+    {
+        // Add EeuFieldDay fields based on your entity
+    }
+
+    public class EeuFieldDayUpdateDto : IUpdateDto
+    {
+        public int Id { get; set; }
+        // Add EeuFieldDay fields based on your entity
+    }
+
+    /// <summary>
+    /// Hybrid item for Field Days
+    /// </summary>
+    public class EeuFieldDayHybridDto
+    {
+        public int? Id { get; set; }  // null = create new, has value = update existing
+        // Add EeuFieldDay fields based on your entity
+    }
+
+    // ============================
+    // FARMER SCIENTIST INTERACTION DTOs
+    // ============================
+    public class EeuFarmerScientistInteractionDto
+    {
+        public int Id { get; set; }
+        public DateOnly? Date { get; set; }
+        public string? ScientistOfficerName { get; set; }
+        public string? TopicDiscussed { get; set; }
+        public int? NoOfFarmersParticipated { get; set; }
+        public string? PhotoUpload { get; set; }
+    }
+
+    public class EeuFarmerScientistInteractionCreateDto
+    {
+        public DateOnly? Date { get; set; }
+        public string? ScientistOfficerName { get; set; }
+        public string? TopicDiscussed { get; set; }
+        public int? NoOfFarmersParticipated { get; set; }
+        public string? PhotoUpload { get; set; }
+    }
+
+    public class EeuFarmerScientistInteractionUpdateDto : IUpdateDto
+    {
+        public int Id { get; set; }
+        public DateOnly? Date { get; set; }
+        public string? ScientistOfficerName { get; set; }
+        public string? TopicDiscussed { get; set; }
+        public int? NoOfFarmersParticipated { get; set; }
+        public string? PhotoUpload { get; set; }
+    }
+
+    /// <summary>
+    /// Hybrid item for Farmer Scientist Interactions
+    /// </summary>
+    public class EeuFarmerScientistInteractionHybridDto
+    {
+        public int? Id { get; set; }  // null = create new, has value = update existing
+        public DateOnly? Date { get; set; }
+        public string? ScientistOfficerName { get; set; }
+        public string? TopicDiscussed { get; set; }
+        public int? NoOfFarmersParticipated { get; set; }
+        public string? PhotoUpload { get; set; }
+    }
+
+    // ============================
     // ADVISORY SERVICES DTOs
     // ============================
     public class EeuAdvisoryServicesDto
@@ -496,6 +680,7 @@ namespace Application.Models.DataTables.EEU
         public int? NoOfEmailsSent { get; set; }
         public int? NoOfNewspaperCoverage { get; set; }
         public int? NoOfBeneficiaries { get; set; }
+        public List<EeuCriticalInputsDistributedDto>? CriticalInputsDistributed { get; set; }
     }
 
     public class EeuAdvisoryServicesCreateDto
@@ -529,6 +714,312 @@ namespace Application.Models.DataTables.EEU
         public int? NoOfBeneficiaries { get; set; }
     }
 
+    /// <summary>
+    /// Hybrid create DTO - creates advisory services with all critical inputs in one request
+    /// </summary>
+    public class EeuAdvisoryServicesHybridCreateDto
+    {
+        public int? NoOfFacebookSMS { get; set; }
+        public int? NoOfSMSSentToRegisteredFarmers { get; set; }
+        public int? NoOfWhatsappGroups { get; set; }
+        public int? NoOfWhatsappSMS { get; set; }
+        public int? NoOfAnsweredWhatsappQueries { get; set; }
+        public int? NoOfPhoneCalls { get; set; }
+        public int? NoOfFaceToFaceDiscussions { get; set; }
+        public int? NoOfGroupDiscussions { get; set; }
+        public int? NoOfEmailsSent { get; set; }
+        public int? NoOfNewspaperCoverage { get; set; }
+        public int? NoOfBeneficiaries { get; set; }
+
+        public List<EeuCriticalInputsDistributedCreateDto>? CriticalInputsDistributed { get; set; }
+    }
+
+    /// <summary>
+    /// Hybrid update DTO - updates advisory services and manages all critical inputs (create/update/delete) in one request
+    /// </summary>
+    public class EeuAdvisoryServicesHybridUpdateDto
+    {
+        public int? NoOfFacebookSMS { get; set; }
+        public int? NoOfSMSSentToRegisteredFarmers { get; set; }
+        public int? NoOfWhatsappGroups { get; set; }
+        public int? NoOfWhatsappSMS { get; set; }
+        public int? NoOfAnsweredWhatsappQueries { get; set; }
+        public int? NoOfPhoneCalls { get; set; }
+        public int? NoOfFaceToFaceDiscussions { get; set; }
+        public int? NoOfGroupDiscussions { get; set; }
+        public int? NoOfEmailsSent { get; set; }
+        public int? NoOfNewspaperCoverage { get; set; }
+        public int? NoOfBeneficiaries { get; set; }
+
+        public List<EeuCriticalInputsDistributedHybridDto>? CriticalInputsDistributed { get; set; }
+    }
+
+    // ============================
+    // CRITICAL INPUTS DISTRIBUTED DTOs
+    // ============================
+    public class EeuCriticalInputsDistributedDto
+    {
+        public int Id { get; set; }
+        public string? InputName { get; set; }
+        public int? QuantityDistributed { get; set; }
+        public int? NoOfRecipients { get; set; }
+    }
+
+    public class EeuCriticalInputsDistributedCreateDto
+    {
+        public string? InputName { get; set; }
+        public int? QuantityDistributed { get; set; }
+        public int? NoOfRecipients { get; set; }
+    }
+
+    public class EeuCriticalInputsDistributedUpdateDto : IUpdateDto
+    {
+        public int Id { get; set; }
+        public string? InputName { get; set; }
+        public int? QuantityDistributed { get; set; }
+        public int? NoOfRecipients { get; set; }
+    }
+
+    /// <summary>
+    /// Hybrid item for Critical Inputs Distributed
+    /// </summary>
+    public class EeuCriticalInputsDistributedHybridDto
+    {
+        public int? Id { get; set; }  // null = create new, has value = update existing
+        public string? InputName { get; set; }
+        public int? QuantityDistributed { get; set; }
+        public int? NoOfRecipients { get; set; }
+    }
+
+    // ============================
+    // RESULT DTOs (FLD/OFT)
+    // ============================
+    public class EeuResultDto
+    {
+        public int Id { get; set; }
+        public int EeuProgramDetailsId { get; set; }
+        public string? UploadExcelUrl { get; set; }
+        public List<EeuFldResultDto>? FldResults { get; set; }
+        public List<EeuOftResultDto>? OftResults { get; set; }
+    }
+
+    public class EeuFldResultDto
+    {
+        public int Id { get; set; }
+        public int EeuResultId { get; set; }
+        public int DetailsOfDemoId { get; set; }
+        public string? DetailsOfDemoName { get; set; }
+        public int FldNumber { get; set; }
+        public string? Parameter1 { get; set; }
+        public string? Observation1 { get; set; }
+        public string? Parameter2 { get; set; }
+        public string? Observation2 { get; set; }
+        public string? Parameter3 { get; set; }
+        public string? Observation3 { get; set; }
+        public string? Parameter4 { get; set; }
+        public string? Observation4 { get; set; }
+        public string? Parameter5 { get; set; }
+        public string? Observation5 { get; set; }
+        public decimal? Yield { get; set; }
+        public decimal? GrossCost { get; set; }
+        public decimal? GrossReturns { get; set; }
+        public decimal? NetReturns { get; set; }
+        public string? BC { get; set; }
+    }
+
+    public class EeuFldResultCreateDto
+    {
+        public int DetailsOfDemoId { get; set; }
+        public int FldNumber { get; set; }
+        public string? Parameter1 { get; set; }
+        public string? Observation1 { get; set; }
+        public string? Parameter2 { get; set; }
+        public string? Observation2 { get; set; }
+        public string? Parameter3 { get; set; }
+        public string? Observation3 { get; set; }
+        public string? Parameter4 { get; set; }
+        public string? Observation4 { get; set; }
+        public string? Parameter5 { get; set; }
+        public string? Observation5 { get; set; }
+        public decimal? Yield { get; set; }
+        public decimal? GrossCost { get; set; }
+        public decimal? GrossReturns { get; set; }
+        public decimal? NetReturns { get; set; }
+        public string? BC { get; set; }
+    }
+
+    public class EeuFldResultUpdateDto : IUpdateDto
+    {
+        public int Id { get; set; }
+        public int DetailsOfDemoId { get; set; }
+        public int FldNumber { get; set; }
+        public string? Parameter1 { get; set; }
+        public string? Observation1 { get; set; }
+        public string? Parameter2 { get; set; }
+        public string? Observation2 { get; set; }
+        public string? Parameter3 { get; set; }
+        public string? Observation3 { get; set; }
+        public string? Parameter4 { get; set; }
+        public string? Observation4 { get; set; }
+        public string? Parameter5 { get; set; }
+        public string? Observation5 { get; set; }
+        public decimal? Yield { get; set; }
+        public decimal? GrossCost { get; set; }
+        public decimal? GrossReturns { get; set; }
+        public decimal? NetReturns { get; set; }
+        public string? BC { get; set; }
+    }
+
+    public class EeuOftResultDto
+    {
+        public int Id { get; set; }
+        public int EeuResultId { get; set; }
+        public int DetailsOfDemoId { get; set; }
+        public string? DetailsOfDemoName { get; set; }
+        public string? Parameter1 { get; set; }
+        public string? Observation1 { get; set; }
+        public string? Parameter2 { get; set; }
+        public string? Observation2 { get; set; }
+        public string? Parameter3 { get; set; }
+        public string? Observation3 { get; set; }
+        public string? Parameter4 { get; set; }
+        public string? Observation4 { get; set; }
+        public string? Parameter5 { get; set; }
+        public string? Observation5 { get; set; }
+        public decimal? Yield { get; set; }
+        public decimal? GrossCost { get; set; }
+        public decimal? GrossReturns { get; set; }
+        public decimal? NetReturns { get; set; }
+        public string? BC { get; set; }
+    }
+
+    public class EeuOftResultCreateDto
+    {
+        public int DetailsOfDemoId { get; set; }
+        public string? Parameter1 { get; set; }
+        public string? Observation1 { get; set; }
+        public string? Parameter2 { get; set; }
+        public string? Observation2 { get; set; }
+        public string? Parameter3 { get; set; }
+        public string? Observation3 { get; set; }
+        public string? Parameter4 { get; set; }
+        public string? Observation4 { get; set; }
+        public string? Parameter5 { get; set; }
+        public string? Observation5 { get; set; }
+        public decimal? Yield { get; set; }
+        public decimal? GrossCost { get; set; }
+        public decimal? GrossReturns { get; set; }
+        public decimal? NetReturns { get; set; }
+        public string? BC { get; set; }
+    }
+
+    public class EeuOftResultUpdateDto : IUpdateDto
+    {
+        public int Id { get; set; }
+        public int DetailsOfDemoId { get; set; }
+        public string? Parameter1 { get; set; }
+        public string? Observation1 { get; set; }
+        public string? Parameter2 { get; set; }
+        public string? Observation2 { get; set; }
+        public string? Parameter3 { get; set; }
+        public string? Observation3 { get; set; }
+        public string? Parameter4 { get; set; }
+        public string? Observation4 { get; set; }
+        public string? Parameter5 { get; set; }
+        public string? Observation5 { get; set; }
+        public decimal? Yield { get; set; }
+        public decimal? GrossCost { get; set; }
+        public decimal? GrossReturns { get; set; }
+        public decimal? NetReturns { get; set; }
+        public string? BC { get; set; }
+    }
+
+    /// <summary>
+    /// Composite DTO for creating EeuResult along with all child entities (FldResults and OftResults) in a single transaction
+    /// </summary>
+    public class EeuResultWithChildrenCreateDto
+    {
+        // Parent fields
+        public string? UploadExcelUrl { get; set; }
+
+        // Child collections (optional - can be null or empty if UI doesn't have data yet)
+        public List<EeuFldResultCreateDto>? FldResults { get; set; }
+        public List<EeuOftResultCreateDto>? OftResults { get; set; }
+    }
+
+    /// <summary>
+    /// Hybrid item for FLD Result - can be new (no Id) or existing (has Id)
+    /// Used in update operations to support create/update in one call
+    /// </summary>
+    public class EeuFldResultHybridDto
+    {
+        public int? Id { get; set; }  // null or 0 = create new, has value = update existing
+        public int DetailsOfDemoId { get; set; }
+        public int FldNumber { get; set; }
+        public string? Parameter1 { get; set; }
+        public string? Observation1 { get; set; }
+        public string? Parameter2 { get; set; }
+        public string? Observation2 { get; set; }
+        public string? Parameter3 { get; set; }
+        public string? Observation3 { get; set; }
+        public string? Parameter4 { get; set; }
+        public string? Observation4 { get; set; }
+        public string? Parameter5 { get; set; }
+        public string? Observation5 { get; set; }
+        public decimal? Yield { get; set; }
+        public decimal? GrossCost { get; set; }
+        public decimal? GrossReturns { get; set; }
+        public decimal? NetReturns { get; set; }
+        public string? BC { get; set; }
+    }
+
+    /// <summary>
+    /// Hybrid item for OFT Result
+    /// </summary>
+    public class EeuOftResultHybridDto
+    {
+        public int? Id { get; set; }  // null or 0 = create new, has value = update existing
+        public int DetailsOfDemoId { get; set; }
+        public string? Parameter1 { get; set; }
+        public string? Observation1 { get; set; }
+        public string? Parameter2 { get; set; }
+        public string? Observation2 { get; set; }
+        public string? Parameter3 { get; set; }
+        public string? Observation3 { get; set; }
+        public string? Parameter4 { get; set; }
+        public string? Observation4 { get; set; }
+        public string? Parameter5 { get; set; }
+        public string? Observation5 { get; set; }
+        public decimal? Yield { get; set; }
+        public decimal? GrossCost { get; set; }
+        public decimal? GrossReturns { get; set; }
+        public decimal? NetReturns { get; set; }
+        public string? BC { get; set; }
+    }
+
+    /// <summary>
+    /// Composite DTO for updating EeuResult with all child entities in a single transaction
+    /// Uses Hybrid Pattern:
+    /// - Items WITH Id: UPDATE existing
+    /// - Items WITHOUT Id (null or 0): CREATE new
+    /// - Items in DB but NOT in arrays: DELETE
+    /// </summary>
+    public class EeuResultWithChildrenUpdateDto
+    {
+        // Parent fields
+        public string? UploadExcelUrl { get; set; }
+
+        // Child collections - Hybrid Pattern
+        // If item has Id > 0: update it
+        // If item has no Id (null or 0): create it
+        // If existing item not in array: delete it
+        public List<EeuFldResultHybridDto>? FldResults { get; set; }
+        public List<EeuOftResultHybridDto>? OftResults { get; set; }
+    }
+
+    // ============================
+    // REPORT DTOs (Non-FLD/OFT)
+    // ============================
     public class EeuReportDto
     {
         public int Id { get; set; }
@@ -557,7 +1048,7 @@ namespace Application.Models.DataTables.EEU
     {
         public string? ProgressReportReportingYear { get; set; }
 
-        public string? ReportingYear { get; set; }
+        //public string? ReportingYear { get; set; }
         public DateOnly? ReportDate { get; set; }
 
         public string? ProgressReport { get; set; }
@@ -579,7 +1070,7 @@ namespace Application.Models.DataTables.EEU
     public class EeuReportUpdateDto : IUpdateDto
     {
         public int Id { get; set; }
-        public string? ReportingYear { get; set; }
+        //public string? ReportingYear { get; set; }
         public DateOnly? ReportDate { get; set; }
 
         public string? ProgressReport { get; set; }
@@ -598,9 +1089,9 @@ namespace Application.Models.DataTables.EEU
         public string? SpclReport { get; set; }
     }
 
-
-    // ==================== RECOMMENDATIONS (Section F) ====================
-
+    // ============================
+    // RECOMMENDATION DTOs
+    // ============================
     public class EeuRecommendationDto
     {
         public int Id { get; set; }
@@ -610,6 +1101,8 @@ namespace Application.Models.DataTables.EEU
         public string? SignificantAchievement { get; set; }
         public string? SuccessStories { get; set; }
         public string? ImpactOutcome { get; set; }
+
+        public string? UploadVideoUrl { get; set; }
     }
 
     public class EeuRecommendationCreateDto
@@ -620,6 +1113,8 @@ namespace Application.Models.DataTables.EEU
         public string? SignificantAchievement { get; set; }
         public string? SuccessStories { get; set; }
         public string? ImpactOutcome { get; set; }
+
+        public string? UploadVideoUrl { get; set; }
     }
 
     public class EeuRecommendationUpdateDto : IUpdateDto
@@ -631,5 +1126,6 @@ namespace Application.Models.DataTables.EEU
         public string? SignificantAchievement { get; set; }
         public string? SuccessStories { get; set; }
         public string? ImpactOutcome { get; set; }
+        public string? UploadVideoUrl { get; set; }
     }
 }

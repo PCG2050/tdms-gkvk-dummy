@@ -1,7 +1,6 @@
 ﻿
 using Application.Models;
 using Application.Models.DataTables.EEU;
-using Application.Models.DataTables.STU;
 using Application.Services.Common;
 
 namespace Application.Interface.Services.DataTables.EEU
@@ -53,6 +52,43 @@ namespace Application.Interface.Services.DataTables.EEU
         Task<ServiceResult<EeuAdvisoryServicesDto>> AddOrUpdateAdvisoryServicesAsync(int programId, EeuAdvisoryServicesCreateDto dto);
         Task<ServiceResult<EeuAdvisoryServicesDto>> GetAdvisoryServicesByProgramIdAsync(int programId);
 
+        /// <summary>
+        /// Create EeuAdvisoryServices along with all child entities (CriticalInputsDistributed) in a single transaction
+        /// </summary>
+        Task<ServiceResult<EeuAdvisoryServicesDto>> AddAdvisoryServicesWithChildrenAsync(int programId, EeuAdvisoryServicesHybridCreateDto dto);
+
+        /// <summary>
+        /// Update EeuAdvisoryServices with all child entities using Hybrid Pattern in a single transaction
+        /// - Items WITH Id: UPDATE existing
+        /// - Items WITHOUT Id (null or 0): CREATE new
+        /// - Items in DB but NOT in arrays: DELETE
+        /// Perfect for "Save & Next" button with inline editing capabilities
+        /// </summary>
+        Task<ServiceResult<EeuAdvisoryServicesDto>> UpdateAdvisoryServicesWithChildrenAsync(int advisoryServicesId, EeuAdvisoryServicesHybridUpdateDto dto);
+
+
+        // ============================
+        // SECTION E: RESULTS (FLD/OFT - CategoryId 18 or 24)
+        // ============================
+        Task<ServiceResult<EeuResultDto>> GetResultByIdAsync(int resultId);
+        Task<ServiceResult> UpdateResultExcelAsync(int resultId, string excelUrl);
+
+        // E3: Composite Create/Update for Results with Children
+        /// <summary>
+        /// Create EeuResult along with all child entities (FldResults and OftResults) in a single transaction
+        /// Solves the parent-child ID dependency issue by creating parent first, then using its ID for children
+        /// Perfect for "Save & Next" button that needs to save all data at once
+        /// </summary>
+        Task<ServiceResult<EeuResultDto>> CreateResultWithChildrenAsync(int programId, EeuResultWithChildrenCreateDto dto);
+
+        /// <summary>
+        /// Update EeuResult with all child entities using Hybrid Pattern in a single transaction
+        /// - Items WITH Id: UPDATE existing
+        /// - Items WITHOUT Id (null or 0): CREATE new
+        /// - Items in DB but NOT in arrays: DELETE
+        /// Perfect for "Save & Next" button with inline editing capabilities
+        /// </summary>
+        Task<ServiceResult<EeuResultDto>> UpdateResultWithChildrenAsync(int resultId, EeuResultWithChildrenUpdateDto dto);
 
         // ============================
         // SECTION F: REPORTS (Non-FLD/OFT categories)

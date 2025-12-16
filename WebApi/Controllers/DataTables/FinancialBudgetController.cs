@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace WebApi.Controllers.DataTables
 {
     [ApiController]
-    [Route("api/financial-budget")]   
-    [Authorize]
+    [Route("api/financial-budget")]
+    [Authorize(Roles = $"{RoleString.Trainer},{RoleString.UnitHead},{RoleString.Admin}")]
     public class FinancialBudgetController : ControllerBase
     {
         private readonly IFinancialBudgetService _service;
@@ -75,7 +75,7 @@ namespace WebApi.Controllers.DataTables
         /// Get trainer's submission history with pagination
         /// </summary>
         [HttpGet("my-history")]
-        [Authorize(Roles = "Trainer,UnitHead")]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
         public async Task<IActionResult> GetMyHistory(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10)
@@ -118,19 +118,22 @@ namespace WebApi.Controllers.DataTables
         /// Approve financial budget
         /// </summary>
         [HttpPost("{id}/approve")]
-        public async Task<IActionResult> Approve(int id, [FromBody] string? remarks = null)
+        [Authorize(Roles = $"{RoleString.UnitHead}")]
+        public async Task<IActionResult> Approve(int id, [FromBody] ApprovalDto approvalDto)
         {
-            var result = await _service.ApproveAsync(id, remarks);
+            var result = await _service.ApproveAsync(id, approvalDto?.Remarks);
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+
         }
 
         /// <summary>
         /// Reject financial budget
         /// </summary>
         [HttpPost("{id}/reject")]
-        public async Task<IActionResult> Reject(int id, [FromBody] string remarks)
+        [Authorize(Roles = $"{RoleString.UnitHead}")]
+        public async Task<IActionResult> Reject(int id, [FromBody] ApprovalDto approvalDto)
         {
-            var result = await _service.RejectAsync(id, remarks);
+            var result = await _service.RejectAsync(id, approvalDto.Remarks);
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
@@ -275,7 +278,7 @@ namespace WebApi.Controllers.DataTables
         ///
         /// </remarks>
         [HttpPost("hybrid")]
-       
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
         public async Task<IActionResult> CreateHybrid([FromBody] FinancialBudgetHybridCreateDto dto)
         {
             var result = await _service.CreateHybridAsync(dto);
@@ -313,13 +316,26 @@ namespace WebApi.Controllers.DataTables
         /// Note: Child items not included in the request will be deleted
         /// </remarks>
         [HttpPut("{id}/hybrid")]
-       
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Trainer}")]
         public async Task<IActionResult> UpdateHybrid(int id, [FromBody] FinancialBudgetHybridUpdateDto dto)
         {
             var result = await _service.UpdateHybridAsync(id, dto);
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
+        /// <response code="200">Paginated list of pending approvals</response>
+        [HttpGet("pending-approvals")]
+        [Authorize(Roles = $"{RoleString.UnitHead},{RoleString.Admin}")]
+        public async Task<IActionResult> GetPendingApprovals(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 20,
+             int? createdByIdFilter = null)
+        {
+            var result = await _service.GetPendingApprovalsAsync(pageNumber, pageSize, createdByIdFilter);
+            return Ok(result);
+        }
+
+    
         // ===== HELPER =====
 
         private int GetStatusCode(ServiceErrorStatus? status)
@@ -334,4 +350,5 @@ namespace WebApi.Controllers.DataTables
             };
         }
     }
+
 }

@@ -532,9 +532,7 @@ namespace Application.Models.DataTables.FTI
     public class FtiReportDto
     {
         public int Id { get; set; }
-        public string? ProgressReportReportingYear { get; set; }
-
-        public string? ReportingYear { get; set; }
+  
         public DateOnly? ReportDate { get; set; }
 
         public string? ProgressReport { get; set; }
@@ -555,9 +553,7 @@ namespace Application.Models.DataTables.FTI
 
     public class FtiReportCreateDto
     {
-        public string? ProgressReportReportingYear { get; set; }
-
-        public string? ReportingYear { get; set; }
+      
         public DateOnly? ReportDate { get; set; }
 
         public string? ProgressReport { get; set; }
@@ -579,7 +575,7 @@ namespace Application.Models.DataTables.FTI
     public class FtiReportUpdateDto : IUpdateDto
     {
         public int Id { get; set; }
-        public string? ReportingYear { get; set; }
+       
         public DateOnly? ReportDate { get; set; }
 
         public string? ProgressReport { get; set; }
@@ -610,6 +606,7 @@ namespace Application.Models.DataTables.FTI
         public string? SignificantAchievement { get; set; }
         public string? SuccessStories { get; set; }
         public string? ImpactOutcome { get; set; }
+        public string? UploadVideoUrl { get; set; }
     }
 
     public class FtiRecommendationCreateDto
@@ -620,6 +617,7 @@ namespace Application.Models.DataTables.FTI
         public string? SignificantAchievement { get; set; }
         public string? SuccessStories { get; set; }
         public string? ImpactOutcome { get; set; }
+        public string? UploadVideoUrl { get; set; }
     }
 
     public class FtiRecommendationUpdateDto : IUpdateDto
@@ -631,5 +629,6 @@ namespace Application.Models.DataTables.FTI
         public string? SignificantAchievement { get; set; }
         public string? SuccessStories { get; set; }
         public string? ImpactOutcome { get; set; }
+        public string? UploadVideoUrl { get; set; }
     }
 }

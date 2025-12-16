@@ -1,12 +1,12 @@
 ﻿// Application/Mapper/DataTable/EEU/EeuProgramMapper.cs
 using Application.Models.DataTables.EEU;
-using Application.Models.DataTables.STU;
 using Domain.Entities.EEU;
 using Riok.Mapperly.Abstractions;
 
 namespace Application.Mapper.DataTable.EEU
 {
-    [Mapper]
+
+    [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target, AllowNullPropertyAssignment = true)]
     public partial class EeuProgramMapper
     {
         // ============================
@@ -37,7 +37,7 @@ namespace Application.Mapper.DataTable.EEU
                 Demographics = entity.ParticipantDemographics?.Select(MapToDto).ToList(),
                 ProgramContent = entity.ProgramContent?.Select(MapToDto).ToList(),
                 AdvisoryServices = entity.AdvisoryServices != null ? MapToDto(entity.AdvisoryServices) : null,
-
+                Results = entity.Results != null ? MapToDto(entity.Results) : null,
                 Report = entity.Reports != null ? MapToDto(entity.Reports) : null,
                 Recommendation = entity.Recommendations != null ? MapToDto(entity.Recommendations) : null
             };
@@ -49,8 +49,22 @@ namespace Application.Mapper.DataTable.EEU
         // DEMOGRAPHICS MAPPINGS
         // ============================
 
-        public partial EeuParticipantDemographicsDto MapToDto(EeuParticipantDemographics entity);
+        //public partial EeuParticipantDemographicsDto MapToDto(EeuParticipantDemographics entity);
 
+        //public partial EeuParticipantDemographics MapToEntity(EeuParticipantDemographicsCreateDto dto);
+
+        //[MapperIgnoreTarget(nameof(EeuParticipantDemographics.Id))]
+        //[MapperIgnoreTarget(nameof(EeuParticipantDemographics.EeuProgramDetailsId))]
+        //[MapperIgnoreTarget(nameof(EeuParticipantDemographics.CreatedAt))]
+        //[MapperIgnoreTarget(nameof(EeuParticipantDemographics.CreatedById))]
+        //[MapperIgnoreTarget(nameof(EeuParticipantDemographics.UpdatedAt))]
+        //[MapperIgnoreTarget(nameof(EeuParticipantDemographics.UpdatedById))]
+        //public partial void MapUpdateDtoToEntity(EeuParticipantDemographicsUpdateDto dto, EeuParticipantDemographics entity);
+
+
+        //public partial class EeuProgramMapper
+        //{
+        public partial EeuParticipantDemographicsDto MapToDto(EeuParticipantDemographics entity);
         public partial EeuParticipantDemographics MapToEntity(EeuParticipantDemographicsCreateDto dto);
 
         [MapperIgnoreTarget(nameof(EeuParticipantDemographics.Id))]
@@ -60,6 +74,11 @@ namespace Application.Mapper.DataTable.EEU
         [MapperIgnoreTarget(nameof(EeuParticipantDemographics.UpdatedAt))]
         [MapperIgnoreTarget(nameof(EeuParticipantDemographics.UpdatedById))]
         public partial void MapUpdateDtoToEntity(EeuParticipantDemographicsUpdateDto dto, EeuParticipantDemographics entity);
+
+
+
+
+
 
         // ============================
         // PROGRAM CONTENT MAPPINGS
@@ -73,7 +92,10 @@ namespace Application.Mapper.DataTable.EEU
                 EeuProgramDetailsId = entity.EeuProgramDetailsId ?? 0,
                 ResourcePersons = entity.ResourcePersons?.Select(MapToDto).ToList(),
                 TopicsCovered = entity.TopicsCovered?.Select(MapToDto).ToList(),
-                TeachingAids = entity.TeachingAids?.Select(MapToDto).ToList()
+                TeachingAids = entity.TeachingAids?.Select(MapToDto).ToList(),
+                FieldVisits = entity.FieldVisits?.Select(MapToDto).ToList(),
+                FieldDays = entity.FieldDays?.Select(MapToDto).ToList(),
+                FarmerScientistInteractions = entity.FarmerScientistInteractions?.Select(MapToDto).ToList()
             };
         }
 
@@ -129,10 +151,76 @@ namespace Application.Mapper.DataTable.EEU
         public partial void MapUpdateDtoToEntity(EeuTeachingAidsUpdateDto dto, EeuTeachingAidsDeveloped entity);
 
         // ============================
+        // FIELD VISIT MAPPINGS
+        // ============================
+
+        public partial EeuFieldVisitDto MapToDto(EeuFieldVisit entity);
+
+        public partial EeuFieldVisit MapToEntity(EeuFieldVisitCreateDto dto);
+
+        [MapperIgnoreTarget(nameof(EeuFieldVisit.Id))]
+        [MapperIgnoreTarget(nameof(EeuFieldVisit.EeuProgramContentAndResourcesId))]
+        [MapperIgnoreTarget(nameof(EeuFieldVisit.CreatedAt))]
+        [MapperIgnoreTarget(nameof(EeuFieldVisit.CreatedById))]
+        [MapperIgnoreTarget(nameof(EeuFieldVisit.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(EeuFieldVisit.UpdatedById))]
+        public partial void MapUpdateDtoToEntity(EeuFieldVisitUpdateDto dto, EeuFieldVisit entity);
+
+        // ============================
+        // FIELD DAY MAPPINGS
+        // ============================
+
+        public partial EeuFieldDayDto MapToDto(EeuFieldDay entity);
+
+        public partial EeuFieldDay MapToEntity(EeuFieldDayCreateDto dto);
+
+        [MapperIgnoreTarget(nameof(EeuFieldDay.Id))]
+        [MapperIgnoreTarget(nameof(EeuFieldDay.EeuProgramContentAndResourcesId))]
+        [MapperIgnoreTarget(nameof(EeuFieldDay.CreatedAt))]
+        [MapperIgnoreTarget(nameof(EeuFieldDay.CreatedById))]
+        [MapperIgnoreTarget(nameof(EeuFieldDay.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(EeuFieldDay.UpdatedById))]
+        public partial void MapUpdateDtoToEntity(EeuFieldDayUpdateDto dto, EeuFieldDay entity);
+
+        // ============================
+        // FARMER SCIENTIST INTERACTION MAPPINGS
+        // ============================
+
+        public partial EeuFarmerScientistInteractionDto MapToDto(EeuFarmerScientistInteraction entity);
+
+        public partial EeuFarmerScientistInteraction MapToEntity(EeuFarmerScientistInteractionCreateDto dto);
+
+        [MapperIgnoreTarget(nameof(EeuFarmerScientistInteraction.Id))]
+        [MapperIgnoreTarget(nameof(EeuFarmerScientistInteraction.EeuProgramContentAndResourcesId))]
+        [MapperIgnoreTarget(nameof(EeuFarmerScientistInteraction.CreatedAt))]
+        [MapperIgnoreTarget(nameof(EeuFarmerScientistInteraction.CreatedById))]
+        [MapperIgnoreTarget(nameof(EeuFarmerScientistInteraction.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(EeuFarmerScientistInteraction.UpdatedById))]
+        public partial void MapUpdateDtoToEntity(EeuFarmerScientistInteractionUpdateDto dto, EeuFarmerScientistInteraction entity);
+
+        // ============================
         // ADVISORY SERVICES MAPPINGS
         // ============================
 
-        public partial EeuAdvisoryServicesDto MapToDto(EeuAdvisoryServices entity);
+        public EeuAdvisoryServicesDto MapToDto(EeuAdvisoryServices entity)
+        {
+            return new EeuAdvisoryServicesDto
+            {
+                Id = entity.Id,
+                NoOfFacebookSMS = entity.NoOfFacebookSMS,
+                NoOfSMSSentToRegisteredFarmers = entity.NoOfSMSSentToRegisteredFarmers,
+                NoOfWhatsappGroups = entity.NoOfWhatsappGroups,
+                NoOfWhatsappSMS = entity.NoOfWhatsappSMS,
+                NoOfAnsweredWhatsappQueries = entity.NoOfAnsweredWhatsappQueries,
+                NoOfPhoneCalls = entity.NoOfPhoneCalls,
+                NoOfFaceToFaceDiscussions = entity.NoOfFaceToFaceDiscussions,
+                NoOfGroupDiscussions = entity.NoOfGroupDiscussions,
+                NoOfEmailsSent = entity.NoOfEmailsSent,
+                NoOfNewspaperCoverage = entity.NoOfNewspaperCoverage,
+                NoOfBeneficiaries = entity.NoOfBeneficiaries,
+                CriticalInputsDistributed = entity.CriticalInputsDistributed?.Select(MapToDto).ToList()
+            };
+        }
 
         public partial EeuAdvisoryServices MapToEntity(EeuAdvisoryServicesCreateDto dto);
 
@@ -144,6 +232,63 @@ namespace Application.Mapper.DataTable.EEU
         [MapperIgnoreTarget(nameof(EeuAdvisoryServices.UpdatedById))]
         public partial void MapUpdateDtoToEntity(EeuAdvisoryServicesUpdateDto dto, EeuAdvisoryServices entity);
 
+        // ============================
+        // CRITICAL INPUTS DISTRIBUTED MAPPINGS
+        // ============================
+
+        public partial EeuCriticalInputsDistributedDto MapToDto(EeuCriticalInputsDistributed entity);
+
+        public partial EeuCriticalInputsDistributed MapToEntity(EeuCriticalInputsDistributedCreateDto dto);
+
+        [MapperIgnoreTarget(nameof(EeuCriticalInputsDistributed.Id))]
+        [MapperIgnoreTarget(nameof(EeuCriticalInputsDistributed.EeuAdvisoryServicesId))]
+        [MapperIgnoreTarget(nameof(EeuCriticalInputsDistributed.CreatedAt))]
+        [MapperIgnoreTarget(nameof(EeuCriticalInputsDistributed.CreatedById))]
+        [MapperIgnoreTarget(nameof(EeuCriticalInputsDistributed.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(EeuCriticalInputsDistributed.UpdatedById))]
+        public partial void MapUpdateDtoToEntity(EeuCriticalInputsDistributedUpdateDto dto, EeuCriticalInputsDistributed entity);
+
+        // ============================
+        // RESULT MAPPINGS (FLD/OFT)
+        // ============================
+
+        public EeuResultDto MapToDto(EeuResult entity)
+        {
+            return new EeuResultDto
+            {
+                Id = entity.Id,
+                EeuProgramDetailsId = entity.EeuProgramDetailsId,
+                UploadExcelUrl = entity.UploadExcelUrl,
+                FldResults = entity.FldResults?.Select(MapToDto).ToList(),
+                OftResults = entity.OftResults?.Select(MapToDto).ToList()
+            };
+        }
+
+        public partial EeuFldResultDto MapToDto(EeuFldResult entity);
+
+        public partial EeuFldResult MapToEntity(EeuFldResultCreateDto dto);
+
+        [MapperIgnoreTarget(nameof(EeuFldResult.Id))]
+        [MapperIgnoreTarget(nameof(EeuFldResult.EeuResultId))]
+        [MapperIgnoreTarget(nameof(EeuFldResult.UnitLocationId))]
+        [MapperIgnoreTarget(nameof(EeuFldResult.OrganizationId))]
+        [MapperIgnoreTarget(nameof(EeuFldResult.CreatedAt))]
+        [MapperIgnoreTarget(nameof(EeuFldResult.CreatedById))]
+        [MapperIgnoreTarget(nameof(EeuFldResult.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(EeuFldResult.UpdatedById))]
+        public partial void MapUpdateDtoToEntity(EeuFldResultUpdateDto dto, EeuFldResult entity);
+
+        public partial EeuOftResultDto MapToDto(EeuOftResult entity);
+
+        public partial EeuOftResult MapToEntity(EeuOftResultCreateDto dto);
+
+        [MapperIgnoreTarget(nameof(EeuOftResult.Id))]
+        [MapperIgnoreTarget(nameof(EeuOftResult.EeuResultId))]
+        [MapperIgnoreTarget(nameof(EeuOftResult.CreatedAt))]
+        [MapperIgnoreTarget(nameof(EeuOftResult.CreatedById))]
+        [MapperIgnoreTarget(nameof(EeuOftResult.UpdatedAt))]
+        [MapperIgnoreTarget(nameof(EeuOftResult.UpdatedById))]
+        public partial void MapUpdateDtoToEntity(EeuOftResultUpdateDto dto, EeuOftResult entity);
 
         // ============================
         // REPORT MAPPINGS

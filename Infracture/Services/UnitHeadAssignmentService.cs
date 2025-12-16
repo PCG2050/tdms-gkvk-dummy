@@ -29,6 +29,7 @@ namespace Infrastructure.Services
         private readonly ITableOtherActivityRepository _tableOtherActivityRepository;
         private readonly IAticProgramDetailsRepository _aticProgramDetailsRepository;
         private readonly IDeuProgramDetailsRepository _deuProgramDetailsRepository;
+        private readonly IKvkProgramDetailsRepository _kvkProgramDetailsRepository;
         private readonly IEeuProgramDetailsRepository _eeuProgramDetailsRepository;
         private readonly IFtiProgramDetailsRepository _ftiProgramDetailsRepository;
         private readonly IIbtvaProgramDetailsRepository _ibtvaProgramDetailsRepository;
@@ -51,6 +52,7 @@ namespace Infrastructure.Services
             IEeuProgramDetailsRepository eeuProgramDetailsRepository,
             IFtiProgramDetailsRepository ftiProgramDetailsRepository,
             IIbtvaProgramDetailsRepository ibtvaProgramDetailsRepository,
+            IKvkProgramDetailsRepository kvkProgramDetailsRepository,
             INaepProgramDetailsRepository naepProgramDetailsRepository,
             IStuProgramDetailsRepository stuProgramDetailsRepository,
             IASMVisitorDetailsRepository asmVisitorDetailsRepository,
@@ -73,6 +75,7 @@ namespace Infrastructure.Services
             _stuProgramDetailsRepository = stuProgramDetailsRepository;
             _asmVisitorDetailsRepository = asmVisitorDetailsRepository;
             _trainerAssignmentRepository = trainerAssignmentRepository;
+            _kvkProgramDetailsRepository = kvkProgramDetailsRepository;
         }
 
         //public async Task<ServiceResult<List<UnitHeadFlatDto>> GetAllUnitHeadsDetails()
@@ -169,6 +172,12 @@ namespace Infrastructure.Services
             var stuSummary = await _stuProgramDetailsRepository.GetStatusSummaryAsync(unitLocationIds);
             pendingCount += stuSummary.GetValueOrDefault("Pending", 0);
             approvedCount += stuSummary.GetValueOrDefault("Approved", 0);
+
+            // KVK Program Details
+            var kvkSummary = await _kvkProgramDetailsRepository.GetStatusSummaryAsync(unitLocationIds);
+            pendingCount += kvkSummary.GetValueOrDefault("Pending", 0);
+            approvedCount += kvkSummary.GetValueOrDefault("Approved", 0);
+
 
             // ASM Visitor Details (uses trainer IDs instead of unit location IDs)
             // Get all trainers assigned to the unit head's unit locations

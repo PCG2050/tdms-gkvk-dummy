@@ -698,7 +698,7 @@ namespace Infrastructure.Services.DataTables.FTI
                 var updateDto = new FtiReportUpdateDto
                 {
                     Id = existing.Id,
-                    ReportingYear = dto.ReportingYear,
+                    
                     ReportDate = dto.ReportDate,
                     ProgressReport = dto.ProgressReport,
                     GeoTaggedPhoto = dto.GeoTaggedPhoto,

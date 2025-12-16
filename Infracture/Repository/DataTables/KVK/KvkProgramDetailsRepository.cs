@@ -164,6 +164,15 @@ namespace Infrastructure.Repository.DataTables.KVK
                 .OrderByDescending(p => p.CreatedAt)
                 .ToListAsync();
         }
+
+        public async Task<Dictionary<string, int>> GetStatusSummaryAsync(List<int> unitLocationIds)
+        {
+            return await _context.DeuProgramDetails
+                .Where(p => unitLocationIds.Contains(p.UnitLocationId))
+                .GroupBy(p => p.FormStatus)
+                .Select(g => new { Status = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.Status, x => x.Count);
+        }
     }
 
 }

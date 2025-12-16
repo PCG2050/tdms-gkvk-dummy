@@ -697,7 +697,7 @@ namespace Infrastructure.Services.DataTables.NAEP
                 var updateDto = new NaepReportUpdateDto
                 {
                     Id = existing.Id,
-                    ReportingYear = dto.ReportingYear,
+                   
                     ReportDate = dto.ReportDate,
                     ProgressReport = dto.ProgressReport,
                     GeoTaggedPhoto = dto.GeoTaggedPhoto,

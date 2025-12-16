@@ -1,8 +1,13 @@
 using Application.Interface.Repository.DataTables.FTI;
+using Application.Interface.Repository.DataTables.SAMETI;
 using Application.Interface.Services.DataTables.FTI;
+using Application.Interface.Services.DataTables.SAMETI;
 using Application.Mapper.DataTable.FTI;
+using Application.Mapper.DataTable.SAMETI;
 using Infrastructure.Repository.DataTables.FTI;
+using Infrastructure.Repository.DataTables.SAMETI;
 using Infrastructure.Services.DataTables.FTI;
+using Infrastructure.Services.DataTables.SAMETI;
 using Infrastructure.Services.DataTables.STU;
 
 namespace WebApi
@@ -13,22 +18,26 @@ namespace WebApi
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Configure Serilog
+            // Configure Serilog from appsettings.json
             Log.Logger = new LoggerConfiguration()
-                .Enrich.FromLogContext()
-                .WriteTo.Console()
+                .ReadFrom.Configuration(builder.Configuration)               
                 .CreateLogger();
+
             builder.Host.UseSerilog();
+
+            // Log application startup
+            Log.Information("Starting TDMS GKVK API...");
+            Log.Information("Environment: {Environment}", builder.Environment.EnvironmentName);
 
             //Configure JSON options for better data handlingServer
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
-                 {
-                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                     //options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-                     options.JsonSerializerOptions.Converters.Add(new WebApi.JsonConverters.NullableIntConverter());
-                 });
+                {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                    //options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                    options.JsonSerializerOptions.Converters.Add(new WebApi.JsonConverters.NullableIntConverter());
+                });
 
             //API Versioning Configuration
             //builder.Services.AddApiVersioning(options =>
@@ -60,16 +69,51 @@ namespace WebApi
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DatabaseContext")));
             builder.Services.AddScoped<IRouteService, RouteService>();
 
+            // CORS Configuration - Secure with allowed origins from configuration
             var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+            var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()
+                ?? new[] { "http://localhost:3000", "http://localhost:4200" };
+
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy(name: MyAllowSpecificOrigins,
                                   policy =>
                                   {
-                                      policy.AllowAnyOrigin();
-                                      policy.AllowAnyHeader();
-                                      policy.AllowAnyMethod();
+                                      policy.WithOrigins(allowedOrigins)
+                                            .AllowAnyHeader()
+                                            .AllowAnyMethod()
+                                            .AllowCredentials();
                                   });
+            });
+            // Add Health Checks
+            builder.Services.AddHealthChecks()
+                .AddDbContextCheck<TdmsDbContext>("database");
+
+            // Add Response Compression
+            builder.Services.AddResponseCompression(options =>
+            {
+                options.EnableForHttps = true;
+            });
+
+            // Add Rate Limiting (ASP.NET Core 9.0 built-in)
+            builder.Services.AddRateLimiter(options =>
+            {
+                options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+                    RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: context.User.Identity?.Name ?? context.Request.Headers.Host.ToString(),
+                        factory: partition => new FixedWindowRateLimiterOptions
+                        {
+                            AutoReplenishment = true,
+                            PermitLimit = 100,
+                            QueueLimit = 0,
+                            Window = TimeSpan.FromMinutes(1)
+                        }));
+
+                options.OnRejected = async (context, token) =>
+                {
+                    context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+                    await context.HttpContext.Response.WriteAsync("Too many requests. Please try again later.", token);
+                };
             });
             //Email Configuration
             builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
@@ -84,23 +128,23 @@ namespace WebApi
                 return ResendClient.Create(apiKey);
             });
             builder.Services.AddTransient<IEmailService, ResendEmailService>();
-          
-                              
-           
-            builder.Services.AddScoped<ICurrentUserService,CurrentUserService>();
+
+
+
+            builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
             builder.Services.AddScoped<IOTPService, OTPService>();
             builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
             builder.Services.AddScoped<ITokenService, AuthTokenService>();
-            builder.Services.AddScoped<IAuthService, AuthService>();           
+            builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IAzureStorageService, AzureStorageService>();
 
             //Repository Layer
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserSessionRepository, UserSessionRepository>();
-            builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>(); 
+            builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
             builder.Services.AddScoped<IStateRepository, StateRepository>();
-            builder.Services.AddScoped<IDistrictRepository, DistrictRepository>();           
-            builder.Services.AddScoped<IUnitRepository, UnitRepository>();           
+            builder.Services.AddScoped<IDistrictRepository, DistrictRepository>();
+            builder.Services.AddScoped<IUnitRepository, UnitRepository>();
             builder.Services.AddScoped<IOrganizationUnitRepository, OrganizationUnitRepository>();
             builder.Services.AddScoped<IUnitHeadAssignmentRepository, UnitHeadAssignmentRepository>();
             builder.Services.AddScoped<ITrainerAssignmentRepository, TrainerAssignmentRepository>();
@@ -116,11 +160,11 @@ namespace WebApi
             builder.Services.AddScoped<IEntityPermissionService, EntityPermissionService>();
 
             //Tables
-       
-                        
+
+
             //builder.Services.AddScoped<IAticSalesRepository, AticSalesRepository>();         
             //builder.Services.AddScoped<IAsmVisitRepository, AsmVisitRepository>();
-                    
+
 
             // Mappers
             builder.Services.AddSingleton<IbtvaProgramMapper>();
@@ -133,14 +177,15 @@ namespace WebApi
             builder.Services.AddSingleton<FIUProgramActivityMapper>();
             builder.Services.AddSingleton<ASMVisitorDetailsMapper>();
             builder.Services.AddSingleton<FtiProgramMapper>();
+            builder.Services.AddSingleton<SametiProgramMapper>();
 
             builder.Services.AddSingleton<ConsultingServiceMapper>();
             builder.Services.AddSingleton<PublicationMapper>();
-            builder.Services.AddSingleton<TblServiceMapper>();  
+            builder.Services.AddSingleton<TblServiceMapper>();
 
 
             #region FIU
-           
+
             builder.Services.AddScoped<IFIUActivityRepository, FIUActivityRepository>();
             builder.Services.AddScoped<IFIUProgramActivityRepository, FIUProgramActivityRepository>();
             builder.Services.AddScoped<IFIUProgramActivityService, FIUProgramActivityService>();
@@ -175,7 +220,6 @@ namespace WebApi
             builder.Services.AddScoped<IStuAdvisoryServicesRepository, StuAdvisoryServicesRepository>();
             builder.Services.AddScoped<IStuReportRepository, StuReportRepository>();
             builder.Services.AddScoped<IStuRecommendationRepository, StuRecommendationRepository>();
-
             builder.Services.AddScoped<IStuProgramService, StuProgramService>();
             #endregion
             #region IBTVA
@@ -224,7 +268,7 @@ namespace WebApi
             builder.Services.AddScoped<INaepParticipantDemographicsRepository, NaepParticipantDemographicsRepository>();
             builder.Services.AddScoped<INaepProgramContentRepository, NaepProgramContentRepository>();
             builder.Services.AddScoped<INaepResourcePersonRepository, NaepResourcePersonRepository>();
-            builder.Services.AddScoped<INaepTopicsCoveredRepository,NaepTopicsCoveredRepository>();
+            builder.Services.AddScoped<INaepTopicsCoveredRepository, NaepTopicsCoveredRepository>();
             builder.Services.AddScoped<INaepTeachingAidsRepository, NaepTeachingAidsRepository>();
             builder.Services.AddScoped<INaepAdvisoryServicesRepository, NaepAdvisoryServicesRepository>();
             builder.Services.AddScoped<INaepReportRepository, NaepReportRepository>();
@@ -240,6 +284,9 @@ namespace WebApi
             builder.Services.AddScoped<IEeuTopicsCoveredRepository, EeuTopicsCoveredRepository>();
             builder.Services.AddScoped<IEeuTeachingAidsRepository, EeuTeachingAidsRepository>();
             builder.Services.AddScoped<IEeuAdvisoryServicesRepository, EeuAdvisoryServicesRepository>();
+            builder.Services.AddScoped<IEeuResultRepository, EeuResultRepository>();
+            builder.Services.AddScoped<IEeuFldResultRepository, EeuFldResultRepository>();
+            builder.Services.AddScoped<IEeuOftResultRepository, EeuOftResultRepository>();
             builder.Services.AddScoped<IEeuReportRepository, EeuReportRepository>();
             builder.Services.AddScoped<IEeuRecommendationRepository, EeuRecommendationRepository>();
 
@@ -261,7 +308,19 @@ namespace WebApi
             builder.Services.AddScoped<IKvkRecommendationRepository, KvkRecommendationRepository>();
 
             // KVK Services
-            builder.Services.AddScoped<IKvkProgramService, KvkProgramService>();         
+            builder.Services.AddScoped<IKvkProgramService, KvkProgramService>();
+            #endregion
+            #region SAMETI
+            builder.Services.AddScoped<ISametiProgramDetailsRepository, SametiProgramDetailsRepository>();
+            builder.Services.AddScoped<ISametiParticipantDemographicsRepository, SametiParticipantDemographicsRepository>();
+            builder.Services.AddScoped<ISametiProgramContentRepository, SametiProgramContentRepository>();
+            builder.Services.AddScoped<ISametiResourcePersonRepository, SametiResourcePersonRepository>();
+            builder.Services.AddScoped<ISametiTopicsCoveredRepository, SametiTopicsCoveredRepository>();
+            builder.Services.AddScoped<ISametiTeachingAidsRepository, SametiTeachingAidsRepository>();
+            builder.Services.AddScoped<ISametiAdvisoryServicesRepository, SametiAdvisoryServicesRepository>();
+            builder.Services.AddScoped<ISametiReportRepository, SametiReportRepository>();
+            builder.Services.AddScoped<ISametiRecommendationRepository, SametiRecommendationRepository>();
+            builder.Services.AddScoped<ISametiProgramService, SametiProgramService>();
             #endregion
 
             //Generic Tables
@@ -272,8 +331,8 @@ namespace WebApi
 
             builder.Services.AddScoped<IConsultingServiceRepository, ConsultingServiceRepository>();
             builder.Services.AddScoped<IModeAndOutreachRepository, ModeAndOutreachRepository>();
-            builder.Services.AddScoped<IConsultingServiceService,ConsultingServiceService>();
-            builder.Services.AddScoped<INominationRewardRepository,NominationRewardRepository>();
+            builder.Services.AddScoped<IConsultingServiceService, ConsultingServiceService>();
+            builder.Services.AddScoped<INominationRewardRepository, NominationRewardRepository>();
             builder.Services.AddScoped<INominationRewardService, NominationRewardService>();
             builder.Services.AddScoped<ITableOtherActivityRepository, TableOtherActivityRepository>();
             builder.Services.AddScoped<ITableOtherActivityService, TableOtherActivityService>();
@@ -295,7 +354,7 @@ namespace WebApi
 
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(o=>
+                .AddJwtBearer(o =>
                 {
                     o.TokenValidationParameters = new TokenValidationParameters
                     {
@@ -314,8 +373,24 @@ namespace WebApi
                 });
 
             var app = builder.Build();
-            // Configure the HTTP request pipeline.
-            if (true || app.Environment.IsDevelopment())
+            // ========================================
+            // HTTP REQUEST PIPELINE CONFIGURATION
+            // ========================================
+
+            // Enable Response Compression
+            app.UseResponseCompression();
+
+            // Enable Rate Limiting
+            app.UseRateLimiter();
+
+            // Add Request Logging Middleware (BEFORE other middleware)
+            app.UseMiddleware<WebApi.Middleware.RequestLoggingMiddleware>();
+
+            // Add Global Exception Handling Middleware
+            app.UseMiddleware<WebApi.Middleware.GlobalExceptionHandlingMiddleware>();
+
+            // Configure the HTTP request pipeline - FIXED: Only enable in Development
+            if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
                 app.MapScalarApiReference((options) =>
@@ -325,14 +400,37 @@ namespace WebApi
                     .WithTheme(ScalarTheme.DeepSpace);
                 });
             }
-        
+            else
+            {
+                // Production: Use exception handler
+                app.UseExceptionHandler("/error");
+                app.UseHsts();
+            }
+            //CORS Before authentication/authorization
             app.UseCors(MyAllowSpecificOrigins);
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();
+            //Map Controllers
             app.MapControllers();
+            // Health check endpoint
+            app.MapHealthChecks("/health");
 
-            app.Run();
+            Log.Information("TDMS GKVK API started successfully");
+
+            try
+            {
+
+                app.Run();
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Application terminated unexpectedly");
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
     }
 }

@@ -91,4 +91,8 @@ global using Infrastructure.Repository.DataTables.ASM;
 global using Application.Interface.Services.DataTables.ASM;
 global using Infrastructure.Services.DataTables.ASM;
 global using Application.Mapper.DataTable.ASM;
-global using Application.Interface;
+global using System.Threading.RateLimiting;
+global using Microsoft.AspNetCore.RateLimiting;
+global using Microsoft.Extensions.Diagnostics.HealthChecks;
+global using Microsoft.AspNetCore.ResponseCompression;
+

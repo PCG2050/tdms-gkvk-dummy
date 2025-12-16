@@ -697,7 +697,6 @@ namespace Infrastructure.Services.DataTables.DEU
                 var updateDto = new DeuReportUpdateDto
                 {
                     Id = existing.Id,
-                    ReportingYear = dto.ReportingYear,
                     ReportDate = dto.ReportDate,
                     ProgressReport = dto.ProgressReport,
                     GeoTaggedPhoto = dto.GeoTaggedPhoto,

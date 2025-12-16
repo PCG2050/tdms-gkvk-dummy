@@ -154,9 +154,10 @@ namespace Infrastructure.Services.DataTables.KVK
             //        ServiceErrorStatus.INVALIDOPERATION);
 
             _mapper.MapUpdateDtoToEntity(dto, program);
+
             program.UpdatedById = _currentUserService.UserId;
             program.UpdatedAt = DateTimeOffset.UtcNow;
-
+            program.FormStatus = "Draft"; // Reset to Draft on update
             var updated = await _programRepository.UpdateAsync(program);
             var resultDto = _mapper.MapToDto(updated);
 
@@ -1254,7 +1255,7 @@ namespace Infrastructure.Services.DataTables.KVK
                 var updateDto = new KvkReportUpdateDto
                 {
                     Id = existing.Id,
-                    ReportingYear = dto.ReportingYear,
+                    //ReportingYear = dto.ReportingYear,
                     ReportDate = dto.ReportDate,
                     ProgressReport = dto.ProgressReport,
                     GeoTaggedPhoto = dto.GeoTaggedPhoto,
@@ -1362,7 +1363,8 @@ namespace Infrastructure.Services.DataTables.KVK
                     ActionTaken = dto.ActionTaken,
                     SignificantAchievement = dto.SignificantAchievement,
                     SuccessStories = dto.SuccessStories,
-                    ImpactOutcome = dto.ImpactOutcome
+                    ImpactOutcome = dto.ImpactOutcome,
+                    UploadVideoUrl = dto.UploadVideoUrl
                 };
 
                 _mapper.MapUpdateDtoToEntity(updateDto, existing);

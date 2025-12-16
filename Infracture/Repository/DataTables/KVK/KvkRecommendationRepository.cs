@@ -4,7 +4,7 @@ using Domain.Entities.DEU;
 using Infrastructure.DbContext;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Repository.DataTables.NAEP
+namespace Infrastructure.Repository.DataTables.KVK
 {
     public class KvkRecommendationRepository : IKvkRecommendationRepository
     {

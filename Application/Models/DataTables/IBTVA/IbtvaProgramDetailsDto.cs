@@ -536,9 +536,7 @@ namespace Application.Models.DataTables.IBTVA
     public class IbtvaReportDto
     {
         public int Id { get; set; }
-        public string? ProgressReportReportingYear { get; set; }
 
-        public string? ReportingYear { get; set; }
         public DateOnly? ReportDate { get; set; }
 
         public string? ProgressReport { get; set; }
@@ -559,9 +557,7 @@ namespace Application.Models.DataTables.IBTVA
 
     public class IbtvaReportCreateDto
     {
-        public string? ProgressReportReportingYear { get; set; }
-
-        public string? ReportingYear { get; set; }
+       
         public DateOnly? ReportDate { get; set; }
 
         public string? ProgressReport { get; set; }
@@ -583,7 +579,7 @@ namespace Application.Models.DataTables.IBTVA
     public class IbtvaReportUpdateDto : IUpdateDto
     {
         public int Id { get; set; }
-        public string? ReportingYear { get; set; }
+      
         public DateOnly? ReportDate { get; set; }
 
         public string? ProgressReport { get; set; }
@@ -614,6 +610,7 @@ namespace Application.Models.DataTables.IBTVA
         public string? SignificantAchievement { get; set; }
         public string? SuccessStories { get; set; }
         public string? ImpactOutcome { get; set; }
+        public string? UploadVideoUrl { get; set; }
     }
 
     public class IbtvaRecommendationCreateDto
@@ -624,6 +621,7 @@ namespace Application.Models.DataTables.IBTVA
         public string? SignificantAchievement { get; set; }
         public string? SuccessStories { get; set; }
         public string? ImpactOutcome { get; set; }
+        public string? UploadVideoUrl { get; set; }
     }
 
     public class IbtvaRecommendationUpdateDto : IUpdateDto
@@ -635,5 +633,7 @@ namespace Application.Models.DataTables.IBTVA
         public string? SignificantAchievement { get; set; }
         public string? SuccessStories { get; set; }
         public string? ImpactOutcome { get; set; }
+
+        public string? UploadVideoUrl { get; set; }
     }
 }

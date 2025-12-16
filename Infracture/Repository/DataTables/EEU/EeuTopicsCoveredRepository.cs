@@ -15,25 +15,27 @@ namespace Infrastructure.Repository.DataTables.EEU
             _context = context;
         }
 
+        public async Task<EeuTopicsCoveredInClass> CreateAsync(EeuTopicsCoveredInClass entity)
+        {
+            _context.EeuTopicsCoveredInClass.Add(entity);
+            await _context.SaveChangesAsync();
+            return entity;
+        }
+
         public async Task<EeuTopicsCoveredInClass?> GetByIdAsync(int id)
         {
-            return await _context.EeuTopicsCoveredInClass.FindAsync(id);
+            return await _context.EeuTopicsCoveredInClass
+                .Include(t => t.ProgramContentAndResources)
+                    .ThenInclude(pc => pc.ProgramDetails)
+                .FirstOrDefaultAsync(t => t.Id == id);
         }
 
         public async Task<List<EeuTopicsCoveredInClass>> GetByContentIdAsync(int contentId)
         {
             return await _context.EeuTopicsCoveredInClass
                 .Where(t => t.EeuProgramContentAndResourcesId == contentId)
-                .OrderBy(t => t.Date)
-                .ThenBy(t => t.CreatedAt)
+                .OrderByDescending(t => t.CreatedAt)
                 .ToListAsync();
-        }
-
-        public async Task<EeuTopicsCoveredInClass> CreateAsync(EeuTopicsCoveredInClass entity)
-        {
-            _context.EeuTopicsCoveredInClass.Add(entity);
-            await _context.SaveChangesAsync();
-            return entity;
         }
 
         public async Task<EeuTopicsCoveredInClass> UpdateAsync(EeuTopicsCoveredInClass entity)

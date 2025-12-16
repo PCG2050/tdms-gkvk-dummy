@@ -30,5 +30,18 @@ namespace Application.Interface.Repository.DataTables
 
         Task<Dictionary<string, int>> GetStatusSummaryAsync(List<int> unitLocationIds);
 
+        // Hybrid update method - all 10 child entities
+        Task<NominationReward> UpdateWithChildrenAsync(
+            NominationReward parent,
+            List<NominationRewardIFSFarmer>? ifsFarmers,
+            List<NominationRewardFarmerInnovation>? farmerInnovations,
+            List<NominationRewardOrganicFarmer>? organicFarmers,
+            List<NominationRewardIFSEnterpreneur>? ifsEntrepreneurs,
+            List<NominationRewardEntrepreneurInnovation>? entrepreneurInnovations,
+            List<NominationRewardOrganicEntrepreneur>? organicEntrepreneurs,
+            List<Achievement>? achievements,
+            List<AwardRecognition>? awardRecognitions,
+            List<UniversitySanctionLetterPaperPoster>? universitySanctionLetterPaperPosters,
+            List<AwardPhoto>? awardPhotos);
     }
 }

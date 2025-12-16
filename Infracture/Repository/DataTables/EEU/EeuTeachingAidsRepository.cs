@@ -15,27 +15,29 @@ namespace Infrastructure.Repository.DataTables.EEU
             _context = context;
         }
 
-        public async Task<EeuTeachingAidsDeveloped?> GetByIdAsync(int id)
-        {
-            return await _context.EeuTeachingAidsDeveloped
-                .Include(ta => ta.TypeOfAid)
-                .FirstOrDefaultAsync(ta => ta.Id == id);
-        }
-
-        public async Task<List<EeuTeachingAidsDeveloped>> GetByContentIdAsync(int contentId)
-        {
-            return await _context.EeuTeachingAidsDeveloped
-                .Include(ta => ta.TypeOfAid)
-                .Where(ta => ta.EeuProgramContentAndResourcesId == contentId)
-                .OrderBy(ta => ta.CreatedAt)
-                .ToListAsync();
-        }
-
         public async Task<EeuTeachingAidsDeveloped> CreateAsync(EeuTeachingAidsDeveloped entity)
         {
             _context.EeuTeachingAidsDeveloped.Add(entity);
             await _context.SaveChangesAsync();
             return entity;
+        }
+
+        public async Task<EeuTeachingAidsDeveloped?> GetByIdAsync(int id)
+        {
+            return await _context.EeuTeachingAidsDeveloped
+                .Include(t => t.TypeOfAid)
+                .Include(t => t.ProgramContentAndResources)
+                    .ThenInclude(pc => pc.ProgramDetails)
+                .FirstOrDefaultAsync(t => t.Id == id);
+        }
+
+        public async Task<List<EeuTeachingAidsDeveloped>> GetByContentIdAsync(int contentId)
+        {
+            return await _context.EeuTeachingAidsDeveloped
+                .Include(t => t.TypeOfAid)
+                .Where(t => t.EeuProgramContentAndResourcesId == contentId)
+                .OrderByDescending(t => t.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<EeuTeachingAidsDeveloped> UpdateAsync(EeuTeachingAidsDeveloped entity)

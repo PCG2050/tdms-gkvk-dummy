@@ -532,9 +532,9 @@ namespace Application.Models.DataTables.DEU
     public class DeuReportDto
     {
         public int Id { get; set; }
-        public string? ProgressReportReportingYear { get; set; }
+       
 
-        public string? ReportingYear { get; set; }
+        //public string? ReportingYear { get; set; }
         public DateOnly? ReportDate { get; set; }
 
         public string? ProgressReport { get; set; }
@@ -555,9 +555,7 @@ namespace Application.Models.DataTables.DEU
 
     public class DeuReportCreateDto
     {
-        public string? ProgressReportReportingYear { get; set; }
-
-        public string? ReportingYear { get; set; }
+       
         public DateOnly? ReportDate { get; set; }
 
         public string? ProgressReport { get; set; }
@@ -579,7 +577,7 @@ namespace Application.Models.DataTables.DEU
     public class DeuReportUpdateDto : IUpdateDto
     {
         public int Id { get; set; }
-        public string? ReportingYear { get; set; }
+       
         public DateOnly? ReportDate { get; set; }
 
         public string? ProgressReport { get; set; }
@@ -610,6 +608,8 @@ namespace Application.Models.DataTables.DEU
         public string? SignificantAchievement { get; set; }
         public string? SuccessStories { get; set; }
         public string? ImpactOutcome { get; set; }
+
+        public string? UploadVideoUrl { get; set; }
     }
 
     public class DeuRecommendationCreateDto
@@ -620,6 +620,8 @@ namespace Application.Models.DataTables.DEU
         public string? SignificantAchievement { get; set; }
         public string? SuccessStories { get; set; }
         public string? ImpactOutcome { get; set; }
+
+        public string? UploadVideoUrl { get; set; }
     }
 
     public class DeuRecommendationUpdateDto : IUpdateDto
@@ -631,5 +633,7 @@ namespace Application.Models.DataTables.DEU
         public string? SignificantAchievement { get; set; }
         public string? SuccessStories { get; set; }
         public string? ImpactOutcome { get; set; }
+
+        public string? UploadVideoUrl { get; set; }
     }
 }

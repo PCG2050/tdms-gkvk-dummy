@@ -1,8 +1,12 @@
-﻿
+﻿using System;
+using System.Collections.Generic;
+
+
 namespace Domain.Entities.EEU
 {
     public class EeuProgramDetails : ReportEntryBaseEntity
     {
+
         public int? ProgramTypeId { get; set; }
         [JsonIgnore]
         public ProgramType? ProgramType { get; set; }
@@ -45,7 +49,6 @@ namespace Domain.Entities.EEU
 
         [MaxLength(200)]
         public string? SponsoredOrganizationName { get; set; }
-
 
         [MaxLength(250)]
         public string? Title { get; set; }
@@ -90,8 +93,6 @@ namespace Domain.Entities.EEU
         //this is for project dropdown it has to be linked to masterdata table
         public string? Copi { get; set; }
 
-
-
         [MaxLength(500)]
         public string? PiAddress { get; set; }
 
@@ -99,8 +100,6 @@ namespace Domain.Entities.EEU
         public int? BatchNo { get; set; }
 
         public decimal? Area { get; set; }
-
-
         public string? OrganizerBroucherFile { get; set; }
 
         public string? OrganizerInstitutionName { get; set; }
@@ -149,11 +148,44 @@ namespace Domain.Entities.EEU
         [MaxLength(500)]
         public string? ReportingVideo { get; set; }
 
+
+        //New Fields
+        [MaxLength(50)]
+        public string? T01 { get; set; }
+        [MaxLength(50)]
+        public string? T02 { get; set; }
+        [MaxLength(50)]
+        public string? T03 { get; set; }
+        [MaxLength(50)]
+        public string? T04 { get; set; }
+        [MaxLength(50)]
+        public string? T05 { get; set; }
+
+        public string? StageOfCrop { get; set; }
+
+        public int? NoOfDemos { get; set; }
+
+        public int? NoOfTrails { get; set; }
+
+        public int? NoOfChecks { get; set; }
+
+        public int? NoOfVisits { get; set; }
+
+
+        public int? ParticipatedAsId { get; set; }
+        [JsonIgnore]
+        public Participant? ParticipatedAs { get; set; }
+
+        public string? ParticipantFileUpload { get; set; }
+
+
         public ICollection<EeuParticipantDemographics>? ParticipantDemographics { get; set; }
 
         public ICollection<EeuProgramContentAndResources>? ProgramContent { get; set; }
         public EeuAdvisoryServices? AdvisoryServices { get; set; }
         public EeuRecommendation? Recommendations { get; set; }
+
+        public EeuResult? Results { get; set; }
         public EeuReport? Reports { get; set; }
 
 

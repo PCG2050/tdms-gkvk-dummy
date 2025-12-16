@@ -1,10 +1,10 @@
 ﻿// KvkReportRepository.cs
-using Application.Interface.Repository.DataTables.DEU;
-using Domain.Entities.DEU;
+using Application.Interface.Repository.DataTables.KVK;
+using Domain.Entities.KVK;
 using Infrastructure.DbContext;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Repository.DataTables.NAEP
+namespace Infrastructure.Repository.DataTables.KVK
 {
     public class KvkReportRepository : IKvkReportRepository
     {

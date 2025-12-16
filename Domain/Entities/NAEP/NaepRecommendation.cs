@@ -39,5 +39,8 @@ namespace Domain.Entities.NAEP
         public int? UnitLocationId { get; set; }
 
         public int? OrganizationId { get; set; }
+        //new field addded 
+        [MaxLength(1000)]
+        public string? UploadVideoUrl { get; set; }
     }
 }

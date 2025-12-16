@@ -16,5 +16,7 @@ namespace Application.Interface.Repository.DataTables.KVK
         Task DeleteAsync(int id);
         Task<List<KvkProgramDetails>> GetByCreatedByIdAsync(int createdById);
         Task<List<KvkProgramDetails>> GetByUnitLocationIdsAsync(List<int> unitLocationIds);
+
+        Task<Dictionary<string, int>> GetStatusSummaryAsync(List<int> unitLocationIds);
     }
 }

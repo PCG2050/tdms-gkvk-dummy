@@ -697,7 +697,6 @@ namespace Infrastructure.Services.DataTables.STU
                 var updateDto = new StuReportUpdateDto
                 {
                     Id = existing.Id,
-                    ReportingYear = dto.ReportingYear,
                     ReportDate = dto.ReportDate,
                     ProgressReport = dto.ProgressReport,
                     GeoTaggedPhoto = dto.GeoTaggedPhoto,

@@ -36,6 +36,7 @@ namespace Domain.Entities.KVK
 
 
         //new field addded 
+        [MaxLength(1000)]
         public string? UploadVideoUrl { get; set; } 
 
 

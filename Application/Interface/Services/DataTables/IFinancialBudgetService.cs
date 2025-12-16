@@ -30,6 +30,14 @@ namespace Application.Interface.Services.DataTables
             int pageNumber = 1,
             int pageSize = 10);
 
+        /// <summary>
+        /// Get pending approvals for Unit Head and Admin with pagination
+        /// </summary>
+        Task<PaginatedResult<PendingApprovalItemDto>> GetPendingApprovalsAsync(
+            int pageNumber = 1,
+            int pageSize = 10,
+            int? createdByIdFilter = null);
+
         // Status management (no submit needed - Create/Update sets to Pending)
         Task<ServiceResult> ApproveAsync(int id, string? remarks = null);
         Task<ServiceResult> RejectAsync(int id, string remarks);

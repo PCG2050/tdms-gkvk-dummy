@@ -1048,7 +1048,7 @@ namespace Application.Models.DataTables.KVK
     {
         public string? ProgressReportReportingYear { get; set; }
 
-        public string? ReportingYear { get; set; }
+        //public string? ReportingYear { get; set; }
         public DateOnly? ReportDate { get; set; }
 
         public string? ProgressReport { get; set; }
@@ -1070,7 +1070,7 @@ namespace Application.Models.DataTables.KVK
     public class KvkReportUpdateDto : IUpdateDto
     {
         public int Id { get; set; }
-        public string? ReportingYear { get; set; }
+        //public string? ReportingYear { get; set; }
         public DateOnly? ReportDate { get; set; }
 
         public string? ProgressReport { get; set; }
@@ -1101,6 +1101,8 @@ namespace Application.Models.DataTables.KVK
         public string? SignificantAchievement { get; set; }
         public string? SuccessStories { get; set; }
         public string? ImpactOutcome { get; set; }
+
+        public string? UploadVideoUrl { get; set; }
     }
 
     public class KvkRecommendationCreateDto
@@ -1111,6 +1113,8 @@ namespace Application.Models.DataTables.KVK
         public string? SignificantAchievement { get; set; }
         public string? SuccessStories { get; set; }
         public string? ImpactOutcome { get; set; }
+
+        public string? UploadVideoUrl { get; set; }
     }
 
     public class KvkRecommendationUpdateDto : IUpdateDto
@@ -1122,5 +1126,6 @@ namespace Application.Models.DataTables.KVK
         public string? SignificantAchievement { get; set; }
         public string? SuccessStories { get; set; }
         public string? ImpactOutcome { get; set; }
+        public string? UploadVideoUrl { get; set; }
     }
 }

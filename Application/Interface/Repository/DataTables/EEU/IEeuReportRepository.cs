@@ -1,5 +1,6 @@
 ﻿// IEeuReportRepository.cs
 using Domain.Entities.EEU;
+using Domain.Entities.EEU;
 
 namespace Application.Interface.Repository.DataTables.EEU
 {

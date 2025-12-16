@@ -15,26 +15,28 @@ namespace Infrastructure.Repository.DataTables.EEU
             _context = context;
         }
 
-        public async Task<EeuParticipantDemographics?> GetByIdAsync(int id)
-        {
-            return await _context.EeuParticipantDemographics
-                .Include(p => p.Participant)
-                .FirstOrDefaultAsync(p => p.Id == id);
-        }
-
-        public async Task<List<EeuParticipantDemographics>> GetByProgramIdAsync(int programId)
-        {
-            return await _context.EeuParticipantDemographics
-                .Include(p => p.Participant)
-                .Where(p => p.EeuProgramDetailsId == programId)
-                .ToListAsync();
-        }
-
         public async Task<EeuParticipantDemographics> CreateAsync(EeuParticipantDemographics entity)
         {
             _context.EeuParticipantDemographics.Add(entity);
             await _context.SaveChangesAsync();
             return entity;
+        }
+
+        public async Task<EeuParticipantDemographics?> GetByIdAsync(int id)
+        {
+            return await _context.EeuParticipantDemographics
+                .Include(d => d.Participant)
+                .Include(d => d.ProgramDetails)
+                .FirstOrDefaultAsync(d => d.Id == id);
+        }
+
+        public async Task<List<EeuParticipantDemographics>> GetByProgramIdAsync(int programId)
+        {
+            return await _context.EeuParticipantDemographics
+                .Include(d => d.Participant)
+                .Where(d => d.EeuProgramDetailsId == programId)
+                .OrderByDescending(d => d.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<EeuParticipantDemographics> UpdateAsync(EeuParticipantDemographics entity)
@@ -53,5 +55,6 @@ namespace Infrastructure.Repository.DataTables.EEU
                 await _context.SaveChangesAsync();
             }
         }
+
     }
 }

@@ -696,8 +696,7 @@ namespace Infrastructure.Services.DataTables.IBTVA
                 // Update existing using mapper
                 var updateDto = new IbtvaReportUpdateDto
                 {
-                    Id = existing.Id,
-                    ReportingYear = dto.ReportingYear,
+                    Id = existing.Id,                  
                     ReportDate = dto.ReportDate,
                     ProgressReport = dto.ProgressReport,
                     GeoTaggedPhoto = dto.GeoTaggedPhoto,
