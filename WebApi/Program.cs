@@ -14,12 +14,9 @@ namespace WebApi
             var builder = WebApplication.CreateBuilder(args);
 
             // Configure Serilog from appsettings.json
+            // All enrichers (MachineName, ThreadId, EnvironmentName) are configured in appsettings.json
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(builder.Configuration)
-                .Enrich.FromLogContext()
-                .Enrich.WithMachineName()
-                .Enrich.WithThreadId()
-                .Enrich.WithEnvironmentName()
                 .CreateLogger();
 
             builder.Host.UseSerilog();
