@@ -13,17 +13,20 @@ namespace WebApi.Controllers
         private readonly IAzureStorageService _azureStorageService;
         private readonly ICurrentUserService _currentUserService;
         private readonly ILogger<StorageController> _logger;
+        private readonly IConfiguration _configuration;
 
         public StorageController(
             IOrganizationService organizationService,
             IAzureStorageService azureStorageService,
             ICurrentUserService currentUserService,
-            ILogger<StorageController> logger)
+            ILogger<StorageController> logger,
+            IConfiguration configuration)
         {
             _organizationService = organizationService;
             _azureStorageService = azureStorageService;
             _currentUserService = currentUserService;
             _logger = logger;
+            _configuration = configuration;
         }
 
         [Authorize]
@@ -147,7 +150,7 @@ namespace WebApi.Controllers
                 {
                     sasToken = sasToken,
                     containerName = containerName,
-                    accountName = "tdms", // TODO: Get from configuration
+                    accountName = _configuration["AzureStorage:AccountName"],
                     expiresInHours = 24,
                     note = "Token is cached and auto-renewed. Valid for 24 hours."
                 });
