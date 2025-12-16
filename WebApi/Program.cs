@@ -374,8 +374,10 @@ namespace WebApi
             app.UseMiddleware<WebApi.Middleware.GlobalExceptionHandlingMiddleware>();
 
             // Configure the HTTP request pipeline
-            // Enable OpenAPI/Scalar in Development and Staging (QA) environments
-            if (!app.Environment.IsProduction())
+            // Enable OpenAPI/Scalar based on configuration (easier for Azure App Service)
+            var enableScalar = builder.Configuration.GetValue<bool>("EnableScalar", true); // Default: enabled
+
+            if (app.Environment.IsDevelopment() || enableScalar)
             {
                 app.MapOpenApi();
                 app.MapScalarApiReference((options) =>
