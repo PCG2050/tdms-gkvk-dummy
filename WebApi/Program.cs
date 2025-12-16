@@ -373,8 +373,9 @@ namespace WebApi
             // Add Global Exception Handling Middleware
             app.UseMiddleware<WebApi.Middleware.GlobalExceptionHandlingMiddleware>();
 
-            // Configure the HTTP request pipeline - FIXED: Only enable in Development
-            if (app.Environment.IsDevelopment())
+            // Configure the HTTP request pipeline
+            // Enable OpenAPI/Scalar in Development and Staging (QA) environments
+            if (!app.Environment.IsProduction())
             {
                 app.MapOpenApi();
                 app.MapScalarApiReference((options) =>
@@ -384,9 +385,10 @@ namespace WebApi
                     .WithTheme(ScalarTheme.DeepSpace);
                 });
             }
-            else
+
+            // Production settings
+            if (app.Environment.IsProduction())
             {
-                // Production: Use exception handler
                 app.UseExceptionHandler("/error");
                 app.UseHsts();
             }
