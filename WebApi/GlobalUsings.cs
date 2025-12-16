@@ -36,8 +36,6 @@ global using Microsoft.OpenApi.Models;
 global using Scalar.AspNetCore;
 global using Serilog;
 global using Serilog.Sinks.File;
-global using Serilog.Enrichers.Environment;
-global using Serilog.Enrichers.Thread;
 global using System.Reflection;
 global using System.Text;
 global using System.Text.Json;
