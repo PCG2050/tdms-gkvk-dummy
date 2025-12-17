@@ -75,12 +75,15 @@ namespace Application.Models.DataTables
         public DateTimeOffset CreatedAt { get; set; }
         public int CreatedById { get; set; }
         public string? CreatedByName { get; set; }
+
+        // Child entities - populated when using GetWithDetails or with-children endpoints
+        public List<ModeAndOutreachDto> ModeAndOutreaches { get; set; } = new();
     }
 
     // Complete DTO with all related entities
+    // Note: This class is kept for backward compatibility, but now just inherits from base
     public class CompleteConsultingServiceDto : ConsultingServiceDto
     {
-        public List<ModeAndOutreachDto> ModeAndOutreaches { get; set; } = new();
     }
 
     // Create DTO
