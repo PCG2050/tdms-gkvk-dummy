@@ -29,7 +29,6 @@ namespace Application.Mapper
         [MapProperty(nameof(TblServiceCreateDto.AmountGenerated), nameof(TblService.AmountGenerated), Use = nameof(GetDecimalOrDefault))]
         [MapProperty(nameof(TblServiceCreateDto.AmountReleased), nameof(TblService.AmountReleased), Use = nameof(GetDecimalOrDefault))]
         public partial TblService MapToEntity(TblServiceCreateDto dto);
-        public partial TableHostel MapToEntity(TableHostelCreateDto dto);
 
         [MapProperty(nameof(RevolvingFundStatusCreateDto.OpeningBalance), nameof(RevolvingFundStatus.OpeningBalance), Use = nameof(GetDecimalOrDefault))]
         [MapProperty(nameof(RevolvingFundStatusCreateDto.Receipt), nameof(RevolvingFundStatus.Receipt), Use = nameof(GetIntOrDefault))]
@@ -37,6 +36,28 @@ namespace Application.Mapper
         [MapProperty(nameof(RevolvingFundStatusCreateDto.ClosingBalance), nameof(RevolvingFundStatus.ClosingBalance), Use = nameof(GetDoubleOrDefault))]
         public partial RevolvingFundStatus MapToEntity(RevolvingFundStatusCreateDto dto);
         public partial VisitorDetail MapToEntity(VisitorDetailCreateDto dto);
+
+        // Manual mapping for TableHostelCreateDto to handle SubmittedDate default
+        public TableHostel MapToEntity(TableHostelCreateDto dto)
+        {
+            return new TableHostel
+            {
+                Date = dto.Date,
+                Male_SC = dto.Male_SC,
+                Male_ST = dto.Male_ST,
+                Male_OBC = dto.Male_OBC,
+                Male_GEN = dto.Male_GEN,
+                Female_SC = dto.Female_SC,
+                Female_ST = dto.Female_ST,
+                Female_OBC = dto.Female_OBC,
+                Female_GEN = dto.Female_GEN,
+                NumberOfDaysStayed = dto.NumberOfDaysStayed,
+                VillageOrTaluk = dto.VillageOrTaluk,
+                Purpose = dto.Purpose,
+                AmountGenerated = dto.AmountGenerated,
+                SubmittedDate = dto.SubmittedDate ?? DateOnly.FromDateTime(DateTime.UtcNow)
+            };
+        }
 
         // ----------------------------
         // Navigation-based mappings

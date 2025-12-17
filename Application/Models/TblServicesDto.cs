@@ -266,7 +266,6 @@ namespace Application.Models
     {
         public int Id { get; set; }
         public int ServiceId { get; set; }
-        public int VisitorId { get; set; }
         public string? Name { get; set; }
         public int? MobileNo { get; set; }
         public DateOnly? Date { get; set; }
@@ -293,7 +292,6 @@ namespace Application.Models
 
     public class VisitorDetailCreateDto
     {
-        public int VisitorId { get; set; }
         public string? Name { get; set; }
         public int? MobileNo { get; set; }
         public DateOnly? Date { get; set; }
@@ -363,7 +361,6 @@ namespace Application.Models
     public class VisitorDetailHybridDto
     {
         public int? Id { get; set; }  // null or 0 = create new, > 0 = update existing
-        public int VisitorId { get; set; }
         public string? Name { get; set; }
         public int? MobileNo { get; set; }
         public DateOnly? Date { get; set; }
