@@ -5,6 +5,7 @@ namespace Application.Mapper
     public partial class ConsultingServiceMapper
     {
 
+        [MapProperty(nameof(ConsultingAndSocialMediaService.TableModeAndOutreaches), nameof(ConsultingServiceDto.ModeAndOutreaches))]
         public partial ConsultingServiceDto MapToDto(ConsultingAndSocialMediaService entity);
         public partial CompleteConsultingServiceDto MapToCompleteDto(ConsultingAndSocialMediaService entity);
         public partial ModeAndOutreachDto MapToDto(TableModeAndOutreach entity);
