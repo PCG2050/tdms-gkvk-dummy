@@ -85,14 +85,17 @@ namespace Application.Models
 
         public string? SourceOfFundName { get; set; }
         public string? CreatedByName { get; set; }
-    }
 
-    public class CompleteTblServicesDto : TblServicesDto
-    {
+        // Child entities - populated when using GetWithDetails or with-children endpoints
         public List<TableHostelHybridDto> TableHostels { get; set; } = new();
         public List<RevolvingFundStatusHybridDto> RevolvingFundStatuses { get; set; } = new();
-
         public List<VisitorDetailHybridDto> Visitors { get; set; } = new();
+    }
+
+    // Complete DTO with all related entities
+    // Note: This class is kept for backward compatibility, but now just inherits from base
+    public class CompleteTblServicesDto : TblServicesDto
+    {
     }
 
     public class TblServiceCreateDto

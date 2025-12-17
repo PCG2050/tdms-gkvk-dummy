@@ -44,7 +44,9 @@ namespace Application.Mapper
         [MapProperty(nameof(TblService.QuantityUnit.Name), nameof(TblServicesDto.QuantityUnitName))]
         [MapProperty(nameof(TblService.ApprovedBy.FirstName), nameof(TblServicesDto.ApprovedByName))]
         [MapProperty(nameof(TblService.CreatedBy.FirstName), nameof(TblServicesDto.CreatedByName))]
-
+        [MapProperty(nameof(TblService.RevolvingFundStatuses), nameof(TblServicesDto.RevolvingFundStatuses))]
+        [MapProperty(nameof(TblService.Hostels), nameof(TblServicesDto.TableHostels))]
+        [MapProperty(nameof(TblService.VisitorDetails), nameof(TblServicesDto.Visitors))]
         public partial TblServicesDto MapToDtoWithDetails(TblService entity);
 
         // ----------------------------
