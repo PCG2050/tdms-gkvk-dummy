@@ -9,9 +9,9 @@ namespace Application.Mapper
         // Basic Entity ⇆ DTO mappings
         // ----------------------------
         public partial TblServicesDto MapToDto(TblService entity);
-        [MapProperty(nameof(TblService.RevolvingFundStatuses), nameof(CompleteTblServicesDto.RevolvingFundStatuses))]
-        [MapProperty(nameof(TblService.Hostels), nameof (CompleteTblServicesDto.TableHostels))]
-        [MapProperty(nameof(TblService.VisitorDetails), nameof(CompleteTblServicesDto.VisitorDetails))]
+        [MapProperty(nameof(TblService.RevolvingFundStatuses), nameof(CompleteTblServicesDto.RevolvingFundStatuses), Use = nameof(MapRevolvingFundStatusToHybridDto))]
+        [MapProperty(nameof(TblService.Hostels), nameof(CompleteTblServicesDto.TableHostels), Use = nameof(MapTableHostelToHybridDto))]
+        [MapProperty(nameof(TblService.VisitorDetails), nameof(CompleteTblServicesDto.VisitorDetails), Use = nameof(MapVisitorDetailToHybridDto))]
         public partial CompleteTblServicesDto MapToCompleteDto(TblService entity);
 
         // Child entity mappings (standard DTOs)
