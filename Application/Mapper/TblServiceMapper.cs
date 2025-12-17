@@ -14,9 +14,15 @@ namespace Application.Mapper
         [MapProperty(nameof(TblService.VisitorDetails), nameof(CompleteTblServicesDto.Visitors))]
         public partial CompleteTblServicesDto MapToCompleteDto(TblService entity);
 
+        // Child entity mappings (standard DTOs)
         public partial TableHostelDto MapToDto(TableHostel entity);
         public partial RevolvingFundStatusDto MapToDto(RevolvingFundStatus entity);
         public partial VisitorDetailDto MapToDto(VisitorDetail entity);
+
+        // Child entity mappings (Hybrid DTOs for with-children endpoints)
+        public partial TableHostelHybridDto MapToHybridDto(TableHostel entity);
+        public partial RevolvingFundStatusHybridDto MapToHybridDto(RevolvingFundStatus entity);
+        public partial VisitorDetailHybridDto MapToHybridDto(VisitorDetail entity);
 
         [MapProperty(nameof(TblServiceCreateDto.Number), nameof(TblService.Number), Use = nameof(GetIntOrDefault))]
         [MapProperty(nameof(TblServiceCreateDto.AmountGenerated), nameof(TblService.AmountGenerated), Use = nameof(GetDecimalOrDefault))]
@@ -44,9 +50,9 @@ namespace Application.Mapper
         [MapProperty(nameof(TblService.QuantityUnit.Name), nameof(TblServicesDto.QuantityUnitName))]
         [MapProperty(nameof(TblService.ApprovedBy.FirstName), nameof(TblServicesDto.ApprovedByName))]
         [MapProperty(nameof(TblService.CreatedBy.FirstName), nameof(TblServicesDto.CreatedByName))]
-        [MapProperty(nameof(TblService.RevolvingFundStatuses), nameof(TblServicesDto.RevolvingFundStatuses))]
-        [MapProperty(nameof(TblService.Hostels), nameof(TblServicesDto.TableHostels))]
-        [MapProperty(nameof(TblService.VisitorDetails), nameof(TblServicesDto.Visitors))]
+        [MapProperty(nameof(TblService.RevolvingFundStatuses), nameof(TblServicesDto.RevolvingFundStatuses), Use = nameof(MapToHybridDto))]
+        [MapProperty(nameof(TblService.Hostels), nameof(TblServicesDto.TableHostels), Use = nameof(MapToHybridDto))]
+        [MapProperty(nameof(TblService.VisitorDetails), nameof(TblServicesDto.Visitors), Use = nameof(MapToHybridDto))]
         public partial TblServicesDto MapToDtoWithDetails(TblService entity);
 
         // ----------------------------
