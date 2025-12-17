@@ -139,7 +139,6 @@ namespace Application.Mapper
         // ----------------------------
         public void MapUpdateDtoToEntity(VisitorDetailCreateDto dto, VisitorDetail entity)
         {
-            entity.VisitorId = dto.VisitorId;
             entity.Name = dto.Name;
             entity.MobileNo = dto.MobileNo;
             entity.Date = dto.Date;
@@ -154,6 +153,8 @@ namespace Application.Mapper
             entity.Female_ST = dto.Female_ST;
             entity.Female_OBC = dto.Female_OBC;
             entity.Female_GEN = dto.Female_GEN;
+            entity.Male_Total = dto.Male_Total;
+            entity.Female_Total = dto.Female_Total;
             entity.Total = dto.Total;
         }
 
@@ -245,7 +246,6 @@ namespace Application.Mapper
 
         public void MapUpdateDtoToEntity(VisitorDetailHybridDto dto, VisitorDetail entity)
         {
-            entity.VisitorId = dto.VisitorId;
             entity.Name = dto.Name;
             entity.MobileNo = dto.MobileNo;
             entity.Date = dto.Date;
@@ -269,7 +269,6 @@ namespace Application.Mapper
         {
             return new VisitorDetail
             {
-                VisitorId = dto.VisitorId,
                 Name = dto.Name,
                 MobileNo = dto.MobileNo,
                 Date = dto.Date,

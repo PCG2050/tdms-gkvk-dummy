@@ -15,10 +15,7 @@ namespace Domain.Entities.GenericTables.Service
         public int ServiceId { get; set; }
         [JsonIgnore]
         public TblService? TblService { get; set; }
-        [ForeignKey(nameof(VisitorId))]
-        public int VisitorId {  get; set; }
-      
-        public Visitor? Visitor { get; set; }
+
         public string? Name { get; set; }
         public int? MobileNo { get; set; }
         public DateOnly? Date { get; set; }

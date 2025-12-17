@@ -218,5 +218,10 @@ namespace Domain.Entities.MasterData
             public string Name { get; set; } = default!;
         }
 
-      
+        public class ParticipationType : BaseEntity
+        {
+            public string Name { get; set; } = default!;
+        }
+
+
 }

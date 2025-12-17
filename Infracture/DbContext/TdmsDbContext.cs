@@ -218,6 +218,7 @@ namespace Infrastructure.DbContext
 
         public DbSet<QuantityUnit> QuantityUnits { get; set; }
         public DbSet<Visitor> Visitors { get; set; }
+        public DbSet<ParticipationType> ParticipationTypes { get; set; }
 
         public DbSet<FIUActivity> FIUActivities { get; set; }
 
