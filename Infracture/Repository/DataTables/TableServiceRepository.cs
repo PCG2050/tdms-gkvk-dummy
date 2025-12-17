@@ -74,6 +74,32 @@ namespace Infrastructure.Repository.DataTables
                 .FirstOrDefaultAsync(s => s.Id == id);
         }
 
+        public async Task<TblService?> GetWithDetailsNoTrackingAsync(int id)
+        {
+            return await _context.Services
+                .AsNoTracking()
+                .Include(s => s.Category)
+                .Include(s => s.Theme)
+                .Include(s => s.SourceOfFund)
+                .Include(s => s.QuantityUnit)
+                .Include(s => s.Visitor)
+                .Include(s => s.ParticipationType)
+                .Include(s => s.UnitLocation)
+                    .ThenInclude(ul => ul.Unit)
+                .Include(s => s.UnitLocation)
+                    .ThenInclude(ul => ul.District)
+                        .ThenInclude(d => d.State)
+                .Include(s => s.Organization)
+                .Include(s => s.CreatedBy)
+                .Include(s => s.UpdatedBy)
+                .Include(s => s.ApprovedBy)
+                .Include(s => s.Hostels)
+                .Include(s => s.RevolvingFundStatuses)
+                .Include(s => s.VisitorDetails)
+                .AsSplitQuery()
+                .FirstOrDefaultAsync(s => s.Id == id);
+        }
+
         public async Task<TblService> CreateAsync(TblService entity)
         {
             _context.Services.Add(entity);

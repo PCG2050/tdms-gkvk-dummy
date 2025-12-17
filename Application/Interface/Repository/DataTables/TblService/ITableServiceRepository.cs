@@ -12,6 +12,7 @@ namespace Application.Interface.Repository.DataTables.TblService
         Task<List<Domain.Entities.GenericTables.Service.TblService>> GetAllAsync();
         Task<Domain.Entities.GenericTables.Service.TblService?> GetByIdAsync(int id);
         Task<Domain.Entities.GenericTables.Service.TblService?> GetWithDetailsAsync(int id);
+        Task<Domain.Entities.GenericTables.Service.TblService?> GetWithDetailsNoTrackingAsync(int id);
         Task<Domain.Entities.GenericTables.Service.TblService> CreateAsync(Domain.Entities.GenericTables.Service.TblService entity);
         Task<Domain.Entities.GenericTables.Service.TblService> UpdateAsync(Domain.Entities.GenericTables.Service.TblService entity);
         Task DeleteAsync(int id);

@@ -456,7 +456,8 @@ namespace Infrastructure.Services.DataTables
                 }
 
                 // Step 6: Get complete entity with all children and return
-                var completeEntity = await _tableServiceRepository.GetWithDetailsAsync(serviceId);
+                // Use NoTracking to force fresh query from DB (avoid EF Core caching issue)
+                var completeEntity = await _tableServiceRepository.GetWithDetailsNoTrackingAsync(serviceId);
                 return ServiceResult<TblServicesDto>.Success(_mapper.MapToDtoWithDetails(completeEntity!));
             }
             catch (Exception ex)
@@ -655,7 +656,8 @@ namespace Infrastructure.Services.DataTables
                 }
 
                 // Step 8: Get complete entity with all children and return
-                var completeEntity = await _tableServiceRepository.GetWithDetailsAsync(serviceId);
+                // Use NoTracking to force fresh query from DB (avoid EF Core caching issue)
+                var completeEntity = await _tableServiceRepository.GetWithDetailsNoTrackingAsync(serviceId);
                 return ServiceResult<TblServicesDto>.Success(_mapper.MapToDtoWithDetails(completeEntity!));
             }
             catch (Exception ex)
