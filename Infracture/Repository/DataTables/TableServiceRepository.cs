@@ -28,19 +28,21 @@ namespace Infrastructure.Repository.DataTables
 
         public async Task<List<TblService>> GetAllAsync()
         {
-            
-        
+
+
             return await _context.Services
-                .Include(n => n.Category)                
+                .Include(n => n.Category)
                 .Include(n=> n.Theme)
                 .Include(n => n.SourceOfFund)
                 .Include(n => n.QuantityUnit)
+                .Include(n => n.Visitor)
+                .Include(n => n.ParticipationType)
                 .Include(n => n.Hostels)
                 .Include(n => n.RevolvingFundStatuses)
-                .Include(n => n.VisitorDetails)   
+                .Include(n => n.VisitorDetails)
                 .AsSplitQuery()
                 .ToListAsync();
-        
+
         }
         public async Task<TblService?> GetByIdAsync(int id)
         {
@@ -54,6 +56,8 @@ namespace Infrastructure.Repository.DataTables
                 .Include(s => s.Theme)
                 .Include(s => s.SourceOfFund)
                 .Include(s => s.QuantityUnit)
+                .Include(s => s.Visitor)
+                .Include(s => s.ParticipationType)
                 .Include(s => s.UnitLocation)
                     .ThenInclude(ul => ul.Unit)
                 .Include(s => s.UnitLocation)
@@ -111,6 +115,8 @@ namespace Infrastructure.Repository.DataTables
                 .Include(s => s.Theme)
                 .Include(s => s.SourceOfFund)
                 .Include(s => s.QuantityUnit)
+                .Include(s => s.Visitor)
+                .Include(s => s.ParticipationType)
                 .Include(s => s.UnitLocation)
                     .ThenInclude(ul => ul.Unit)
                 .Include(s => s.UnitLocation)
@@ -167,13 +173,15 @@ namespace Infrastructure.Repository.DataTables
                 .Include(s => s.Theme)
                 .Include(s => s.SourceOfFund)
                 .Include(s => s.QuantityUnit)
+                .Include(s => s.Visitor)
+                .Include(s => s.ParticipationType)
                 .Include(s => s.UnitLocation)
                     .ThenInclude(ul => ul.Unit)
                 .Include(s => s.UnitLocation)
                     .ThenInclude(ul => ul.District)
                 .Include(s => s.Organization)
                 .Include(s => s.CreatedBy)
-                .Include(s => s.ApprovedBy)              
+                .Include(s => s.ApprovedBy)
                 .Where(s => unitLocationIds.Contains(s.UnitLocationId) &&
                            s.FormStatus.ToLower() == status.ToLower());
 

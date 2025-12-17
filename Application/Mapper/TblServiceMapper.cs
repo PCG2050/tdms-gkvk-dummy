@@ -20,9 +20,10 @@ namespace Application.Mapper
         public partial VisitorDetailDto MapToDto(VisitorDetail entity);
 
         // Child entity mappings (Hybrid DTOs for with-children endpoints)
-        public partial TableHostelHybridDto MapToHybridDto(TableHostel entity);
-        public partial RevolvingFundStatusHybridDto MapToHybridDto(RevolvingFundStatus entity);
-        public partial VisitorDetailHybridDto MapToHybridDto(VisitorDetail entity);
+        // Note: Mapperly auto-generates these, so we use private partial
+        private partial TableHostelHybridDto MapToHybridDto(TableHostel entity);
+        private partial RevolvingFundStatusHybridDto MapToHybridDto(RevolvingFundStatus entity);
+        private partial VisitorDetailHybridDto MapToHybridDto(VisitorDetail entity);
 
         [MapProperty(nameof(TblServiceCreateDto.Number), nameof(TblService.Number), Use = nameof(GetIntOrDefault))]
         [MapProperty(nameof(TblServiceCreateDto.AmountGenerated), nameof(TblService.AmountGenerated), Use = nameof(GetDecimalOrDefault))]
@@ -48,11 +49,13 @@ namespace Application.Mapper
         [MapProperty(nameof(TblService.Theme.Name), nameof(TblServicesDto.ThemeName))]
         [MapProperty(nameof(TblService.SourceOfFund.Name), nameof(TblServicesDto.SourceOfFundName))]
         [MapProperty(nameof(TblService.QuantityUnit.Name), nameof(TblServicesDto.QuantityUnitName))]
+        [MapProperty(nameof(TblService.Visitor.Name), nameof(TblServicesDto.VisitorName))]
+        [MapProperty(nameof(TblService.ParticipationType.Name), nameof(TblServicesDto.ParticipationTypeName))]
         [MapProperty(nameof(TblService.ApprovedBy.FirstName), nameof(TblServicesDto.ApprovedByName))]
         [MapProperty(nameof(TblService.CreatedBy.FirstName), nameof(TblServicesDto.CreatedByName))]
         [MapProperty(nameof(TblService.RevolvingFundStatuses), nameof(TblServicesDto.RevolvingFundStatuses), Use = nameof(MapToHybridDto))]
         [MapProperty(nameof(TblService.Hostels), nameof(TblServicesDto.TableHostels), Use = nameof(MapToHybridDto))]
-        [MapProperty(nameof(TblService.VisitorDetails), nameof(TblServicesDto.Visitors), Use = nameof(MapToHybridDto))]
+        [MapProperty(nameof(TblService.VisitorDetails), nameof(TblServicesDto.VisitorDetails), Use = nameof(MapToHybridDto))]
         public partial TblServicesDto MapToDtoWithDetails(TblService entity);
 
         // ----------------------------
@@ -95,6 +98,8 @@ namespace Application.Mapper
             if (dto.Date.HasValue) entity.Date = dto.Date.Value;
             if (dto.RentedTo != null) entity.RentedTo = dto.RentedTo;
             if (dto.TitleOfActivityConducted != null) entity.TitleOfActivityConducted = dto.TitleOfActivityConducted;
+            if (dto.VisitorId.HasValue) entity.VisitorId = dto.VisitorId.Value;
+            if (dto.ParticipationTypeId.HasValue) entity.ParticipationTypeId = dto.ParticipationTypeId.Value;
             if (dto.FormStatus != null) entity.FormStatus = dto.FormStatus;
             if (dto.FormStatusRemarks != null) entity.FormStatusRemarks = dto.FormStatusRemarks;
         }
@@ -175,6 +180,8 @@ namespace Application.Mapper
             if (dto.Date.HasValue) entity.Date = dto.Date.Value;
             if (dto.RentedTo != null) entity.RentedTo = dto.RentedTo;
             if (dto.TitleOfActivityConducted != null) entity.TitleOfActivityConducted = dto.TitleOfActivityConducted;
+            if (dto.VisitorId.HasValue) entity.VisitorId = dto.VisitorId.Value;
+            if (dto.ParticipationTypeId.HasValue) entity.ParticipationTypeId = dto.ParticipationTypeId.Value;
         }
 
         public void MapUpdateDtoToEntity(TableHostelHybridDto dto, TableHostel entity)

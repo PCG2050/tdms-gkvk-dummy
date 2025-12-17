@@ -64,7 +64,8 @@ namespace Domain.Entities.GenericTables.Service
         [Column(TypeName = "decimal(18, 2)")]
         public decimal AmountGenerated { get; set; }
 
-      
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal AmountReleased { get; set; }
 
         //Training Hall category
         public DateOnly? Date { get; set; }
@@ -75,7 +76,14 @@ namespace Domain.Entities.GenericTables.Service
         [MaxLength(250)]
         public string? TitleOfActivityConducted { get; set; }
 
-        public decimal AmountReleased { get; set; }
+        // New visitor and participation fields
+        public int VisitorId { get; set; }
+        [ForeignKey(nameof(VisitorId))]
+        public Visitor? Visitor { get; set; }
+
+        public int ParticipationTypeId { get; set; }
+        [ForeignKey(nameof(ParticipationTypeId))]
+        public ParticipationType? ParticipationType { get; set; }
 
         // ===== STATUS TRACKING FIELDS =====
         // Status: "Draft", "Pending", "Approved", "Rejected"
