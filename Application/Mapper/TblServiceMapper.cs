@@ -11,7 +11,7 @@ namespace Application.Mapper
         public partial TblServicesDto MapToDto(TblService entity);
         [MapProperty(nameof(TblService.RevolvingFundStatuses), nameof(CompleteTblServicesDto.RevolvingFundStatuses))]
         [MapProperty(nameof(TblService.Hostels), nameof (CompleteTblServicesDto.TableHostels))]
-        [MapProperty(nameof(TblService.VisitorDetails), nameof(CompleteTblServicesDto.Visitors))]
+        [MapProperty(nameof(TblService.VisitorDetails), nameof(CompleteTblServicesDto.VisitorDetails))]
         public partial CompleteTblServicesDto MapToCompleteDto(TblService entity);
 
         // Child entity mappings (standard DTOs)
@@ -21,9 +21,9 @@ namespace Application.Mapper
 
         // Child entity mappings (Hybrid DTOs for with-children endpoints)
         // Note: Mapperly auto-generates these, so we use private partial
-        private partial TableHostelHybridDto MapToHybridDto(TableHostel entity);
-        private partial RevolvingFundStatusHybridDto MapToHybridDto(RevolvingFundStatus entity);
-        private partial VisitorDetailHybridDto MapToHybridDto(VisitorDetail entity);
+        private partial TableHostelHybridDto MapTableHostelToHybridDto(TableHostel entity);
+        private partial RevolvingFundStatusHybridDto MapRevolvingFundStatusToHybridDto(RevolvingFundStatus entity);
+        private partial VisitorDetailHybridDto MapVisitorDetailToHybridDto(VisitorDetail entity);
 
         [MapProperty(nameof(TblServiceCreateDto.Number), nameof(TblService.Number), Use = nameof(GetIntOrDefault))]
         [MapProperty(nameof(TblServiceCreateDto.AmountGenerated), nameof(TblService.AmountGenerated), Use = nameof(GetDecimalOrDefault))]
@@ -53,9 +53,9 @@ namespace Application.Mapper
         [MapProperty(nameof(TblService.ParticipationType.Name), nameof(TblServicesDto.ParticipationTypeName))]
         [MapProperty(nameof(TblService.ApprovedBy.FirstName), nameof(TblServicesDto.ApprovedByName))]
         [MapProperty(nameof(TblService.CreatedBy.FirstName), nameof(TblServicesDto.CreatedByName))]
-        [MapProperty(nameof(TblService.RevolvingFundStatuses), nameof(TblServicesDto.RevolvingFundStatuses), Use = nameof(MapToHybridDto))]
-        [MapProperty(nameof(TblService.Hostels), nameof(TblServicesDto.TableHostels), Use = nameof(MapToHybridDto))]
-        [MapProperty(nameof(TblService.VisitorDetails), nameof(TblServicesDto.VisitorDetails), Use = nameof(MapToHybridDto))]
+        [MapProperty(nameof(TblService.RevolvingFundStatuses), nameof(TblServicesDto.RevolvingFundStatuses), Use = nameof(MapRevolvingFundStatusToHybridDto))]
+        [MapProperty(nameof(TblService.Hostels), nameof(TblServicesDto.TableHostels), Use = nameof(MapTableHostelToHybridDto))]
+        [MapProperty(nameof(TblService.VisitorDetails), nameof(TblServicesDto.VisitorDetails), Use = nameof(MapVisitorDetailToHybridDto))]
         public partial TblServicesDto MapToDtoWithDetails(TblService entity);
 
         // ----------------------------
