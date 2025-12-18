@@ -401,6 +401,25 @@ namespace Infrastructure.DbContext
                 .HasForeignKey<FtiRecommendation>("FtiProgramDetailsId")
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // Configure TblService relationships with child entities
+            modelBuilder.Entity<TblService>()
+                .HasMany(s => s.Hostels)
+                .WithOne(h => h.TblService)
+                .HasForeignKey(h => h.ServiceId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<TblService>()
+                .HasMany(s => s.RevolvingFundStatuses)
+                .WithOne()
+                .HasForeignKey("ServiceId")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<TblService>()
+                .HasMany(s => s.VisitorDetails)
+                .WithOne()
+                .HasForeignKey("ServiceId")
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<TrainerAssignment>()
                 .HasOne(t => t.CreatedBy)
                 .WithMany()
