@@ -75,6 +75,9 @@ namespace Application.Mapper
         [MapProperty(nameof(TblServiceCreateDto.Number), nameof(TblService.Number), Use = nameof(GetIntOrDefault))]
         [MapProperty(nameof(TblServiceCreateDto.AmountGenerated), nameof(TblService.AmountGenerated), Use = nameof(GetDecimalOrDefault))]
         [MapProperty(nameof(TblServiceCreateDto.AmountReleased), nameof(TblService.AmountReleased), Use = nameof(GetDecimalOrDefault))]
+        [MapperIgnoreSource(nameof(TblServiceCreateDto.TableHostels))]
+        [MapperIgnoreSource(nameof(TblServiceCreateDto.RevolvingFundStatuses))]
+        [MapperIgnoreSource(nameof(TblServiceCreateDto.VisitorDetails))]
         public partial TblService MapToEntity(TblServiceCreateDto dto);
 
         [MapProperty(nameof(RevolvingFundStatusCreateDto.OpeningBalance), nameof(RevolvingFundStatus.OpeningBalance), Use = nameof(GetDecimalOrDefault))]
