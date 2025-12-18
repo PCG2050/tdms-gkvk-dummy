@@ -20,8 +20,30 @@ namespace Application.Mapper
         public partial VisitorDetailDto MapToDto(VisitorDetail entity);
 
         // Child entity mappings (Hybrid DTOs for with-children endpoints)
-        // Note: Mapperly auto-generates these, so we use private partial
-        private partial TableHostelHybridDto MapTableHostelToHybridDto(TableHostel entity);
+        // Manual implementation for TableHostel to ensure correct mapping
+        private TableHostelHybridDto MapTableHostelToHybridDto(TableHostel entity)
+        {
+            return new TableHostelHybridDto
+            {
+                Id = entity.Id,
+                Date = entity.Date,
+                Male_SC = entity.Male_SC,
+                Male_ST = entity.Male_ST,
+                Male_OBC = entity.Male_OBC,
+                Male_GEN = entity.Male_GEN,
+                Female_SC = entity.Female_SC,
+                Female_ST = entity.Female_ST,
+                Female_OBC = entity.Female_OBC,
+                Female_GEN = entity.Female_GEN,
+                NumberOfDaysStayed = entity.NumberOfDaysStayed,
+                VillageOrTaluk = entity.VillageOrTaluk,
+                Purpose = entity.Purpose,
+                AmountGenerated = entity.AmountGenerated,
+                SubmittedDate = entity.SubmittedDate
+            };
+        }
+
+        // Note: Mapperly auto-generates these partial methods
         private partial RevolvingFundStatusHybridDto MapRevolvingFundStatusToHybridDto(RevolvingFundStatus entity);
         private partial VisitorDetailHybridDto MapVisitorDetailToHybridDto(VisitorDetail entity);
 
