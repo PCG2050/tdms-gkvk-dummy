@@ -85,14 +85,24 @@ namespace Application.Models
 
         public string? SourceOfFundName { get; set; }
         public string? CreatedByName { get; set; }
-    }
 
-    public class CompleteTblServicesDto : TblServicesDto
-    {
+        // New fields
+        public int? VisitorId { get; set; }
+        public string? VisitorName { get; set; }
+
+        public int? ParticipationTypeId { get; set; }
+        public string? ParticipationTypeName { get; set; }
+
+        // Child entities - populated when using GetWithDetails or with-children endpoints
         public List<TableHostelHybridDto> TableHostels { get; set; } = new();
         public List<RevolvingFundStatusHybridDto> RevolvingFundStatuses { get; set; } = new();
+        public List<VisitorDetailHybridDto> VisitorDetails { get; set; } = new();
+    }
 
-        public List<VisitorDetailHybridDto> Visitors { get; set; } = new();
+    // Complete DTO with all related entities
+    // Note: This class is kept for backward compatibility, but now just inherits from base
+    public class CompleteTblServicesDto : TblServicesDto
+    {
     }
 
     public class TblServiceCreateDto
@@ -128,6 +138,10 @@ namespace Application.Models
         public DateOnly? Date { get; set; }
         public string? RentedTo { get; set; }
         public string? TitleOfActivityConducted { get; set; }
+
+        // New visitor and participation fields
+        public int? VisitorId { get; set; }
+        public int? ParticipationTypeId { get; set; }
 
         // Optional inline children
         public List<TableHostelCreateDto>? TableHostels { get; set; }
@@ -165,6 +179,10 @@ namespace Application.Models
         public DateOnly? Date { get; set; }
         public string? RentedTo { get; set; }
         public string? TitleOfActivityConducted { get; set; }
+
+        // New visitor and participation fields
+        public int? VisitorId { get; set; }
+        public int? ParticipationTypeId { get; set; }
 
         public string? FormStatus { get; set; }
         public string? FormStatusRemarks { get; set; }
@@ -248,7 +266,6 @@ namespace Application.Models
     {
         public int Id { get; set; }
         public int ServiceId { get; set; }
-        public int VisitorId { get; set; }
         public string? Name { get; set; }
         public int? MobileNo { get; set; }
         public DateOnly? Date { get; set; }
@@ -275,7 +292,6 @@ namespace Application.Models
 
     public class VisitorDetailCreateDto
     {
-        public int VisitorId { get; set; }
         public string? Name { get; set; }
         public int? MobileNo { get; set; }
         public DateOnly? Date { get; set; }
@@ -345,7 +361,6 @@ namespace Application.Models
     public class VisitorDetailHybridDto
     {
         public int? Id { get; set; }  // null or 0 = create new, > 0 = update existing
-        public int VisitorId { get; set; }
         public string? Name { get; set; }
         public int? MobileNo { get; set; }
         public DateOnly? Date { get; set; }
@@ -394,6 +409,10 @@ namespace Application.Models
         public DateOnly? Date { get; set; }
         public string? RentedTo { get; set; }
         public string? TitleOfActivityConducted { get; set; }
+
+        // New visitor and participation fields
+        public int? VisitorId { get; set; }
+        public int? ParticipationTypeId { get; set; }
 
         // Child collections - Hybrid Pattern
         // If item has Id > 0: update it

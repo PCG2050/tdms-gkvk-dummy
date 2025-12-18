@@ -28,14 +28,14 @@ namespace Domain.Entities.GenericTables.Service
 
         // Foreign keys
         public int? CategoryId { get; set; }
-     
+
         public ServiceCategory? Category { get; set; }
         [MaxLength(200)]
         public string? OtherCategory { get; set; }
 
         public int? ThemeId { get; set; }
-      
-        public ServiceTheme? Theme { get; set; }   
+
+        public ServiceTheme? Theme { get; set; }
         [MaxLength(200)]
         public string? OtherTheme { get; set; }
 
@@ -46,7 +46,7 @@ namespace Domain.Entities.GenericTables.Service
         public string? Variety { get; set; }
 
         public int? SourceOfFundId { get; set; }
-       
+
         public SourceOfFund? SourceOfFund { get; set; }
 
         [MaxLength(200)]
@@ -54,9 +54,9 @@ namespace Domain.Entities.GenericTables.Service
 
         [MaxLength(250)]
         public string? Component { get; set; }
-        
+
         public int? QuantityUnitId { get; set; }
-      
+
         public QuantityUnit? QuantityUnit { get; set; }
 
         public int Number { get; set; }
@@ -64,7 +64,8 @@ namespace Domain.Entities.GenericTables.Service
         [Column(TypeName = "decimal(18, 2)")]
         public decimal AmountGenerated { get; set; }
 
-      
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal AmountReleased { get; set; }
 
         //Training Hall category
         public DateOnly? Date { get; set; }
@@ -75,7 +76,14 @@ namespace Domain.Entities.GenericTables.Service
         [MaxLength(250)]
         public string? TitleOfActivityConducted { get; set; }
 
-        public decimal AmountReleased { get; set; }
+        // New visitor and participation fields
+        public int? VisitorId { get; set; }
+        [ForeignKey(nameof(VisitorId))]
+        public Visitor? Visitor { get; set; }
+
+        public int? ParticipationTypeId { get; set; }
+        [ForeignKey(nameof(ParticipationTypeId))]
+        public ParticipationType? ParticipationType { get; set; }
 
         // ===== STATUS TRACKING FIELDS =====
         // Status: "Draft", "Pending", "Approved", "Rejected"
@@ -97,6 +105,6 @@ namespace Domain.Entities.GenericTables.Service
         public ICollection<RevolvingFundStatus>? RevolvingFundStatuses { get; set; }
         public ICollection<VisitorDetail>? VisitorDetails { get; set; }
 
-        
+
     }
 }

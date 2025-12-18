@@ -233,6 +233,8 @@ namespace Infrastructure.DbContext
 
         public DbSet<FIUActivity> FIUActivities { get; set; }
 
+        public DbSet<ParticipationType> ParticipationTypes { get; set; }
+
         #endregion
         #region GenericTables
         #region Publications

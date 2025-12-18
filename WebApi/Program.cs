@@ -72,7 +72,7 @@ namespace WebApi
             // CORS Configuration - Secure with allowed origins from configuration
             var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
             var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()
-                ?? new[] { "http://localhost:3000", "http://localhost:4200" };
+                ?? new[] { "http://localhost:7200", "http://localhost:3000" , "http://localhost:4200","http://localhost:7024", "https://gkvk-qaenv.azurewebsites.net" };
 
             builder.Services.AddCors(options =>
             {
@@ -81,8 +81,11 @@ namespace WebApi
                                   {
                                       policy.WithOrigins(allowedOrigins)
                                             .AllowAnyHeader()
-                                            .AllowAnyMethod()
-                                            .AllowCredentials();
+                                            .AllowAnyMethod();
+                                      //      .AllowCredentials();
+                                      //policy.AllowAnyOrigin()
+                                      // .AllowAnyHeader()
+                                      // .AllowAnyMethod();
                                   });
             });
             // Add Health Checks
@@ -390,7 +393,8 @@ namespace WebApi
             app.UseMiddleware<WebApi.Middleware.GlobalExceptionHandlingMiddleware>();
 
             // Configure the HTTP request pipeline - FIXED: Only enable in Development
-            if (app.Environment.IsDevelopment())
+            //if (app.Environment.IsDevelopment() ||  builder.Configuration["EnableScalar"] == "true")
+            if (app.Environment.IsDevelopment() || true)
             {
                 app.MapOpenApi();
                 app.MapScalarApiReference((options) =>

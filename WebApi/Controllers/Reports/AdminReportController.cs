@@ -11,7 +11,7 @@ namespace WebApi.Controllers.Reports
 {
     [ApiController]
     [Route("api/admin/reports")]
-    [Authorize(Roles = RoleString.Admin)]
+    [Authorize(Roles = $"{RoleString.Admin},{RoleString.UnitHead}")]
     public class AdminReportController : ControllerBase
     {
         private readonly IAdminReportService _service;
@@ -32,7 +32,7 @@ namespace WebApi.Controllers.Reports
         /// <summary>
         /// Get filter options (units, locations, years)
         /// </summary>
-        [HttpGet("filter-options")]
+        [HttpGet("filter-options")]        
         public async Task<IActionResult> GetFilterOptions()
         {
             var result = await _service.GetFilterOptionsAsync();
