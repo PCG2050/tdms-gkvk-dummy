@@ -14,6 +14,7 @@ namespace Domain.Entities.GenericTables.Service
         // Foreign key to Service
         public int ServiceId { get; set; }
         [JsonIgnore]
+        [ForeignKey(nameof(ServiceId))]
         public TblService? TblService { get; set; }
 
         public DateOnly? Date { get; set; }
