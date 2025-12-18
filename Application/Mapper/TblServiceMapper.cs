@@ -9,9 +9,9 @@ namespace Application.Mapper
         // Basic Entity ⇆ DTO mappings
         // ----------------------------
         public partial TblServicesDto MapToDto(TblService entity);
-        [MapProperty(nameof(TblService.RevolvingFundStatuses), nameof(CompleteTblServicesDto.RevolvingFundStatuses), Use = nameof(MapRevolvingFundStatusToHybridDto))]
-        [MapProperty(nameof(TblService.Hostels), nameof(CompleteTblServicesDto.TableHostels), Use = nameof(MapTableHostelToHybridDto))]
-        [MapProperty(nameof(TblService.VisitorDetails), nameof(CompleteTblServicesDto.VisitorDetails), Use = nameof(MapVisitorDetailToHybridDto))]
+        [MapProperty(nameof(TblService.RevolvingFundStatuses), nameof(CompleteTblServicesDto.RevolvingFundStatuses), Use = nameof(MapRevolvingFundStatusCollection))]
+        [MapProperty(nameof(TblService.Hostels), nameof(CompleteTblServicesDto.TableHostels), Use = nameof(MapTableHostelCollection))]
+        [MapProperty(nameof(TblService.VisitorDetails), nameof(CompleteTblServicesDto.VisitorDetails), Use = nameof(MapVisitorDetailCollection))]
         public partial CompleteTblServicesDto MapToCompleteDto(TblService entity);
 
         // Child entity mappings (standard DTOs)
@@ -24,6 +24,31 @@ namespace Application.Mapper
         private partial TableHostelHybridDto MapTableHostelToHybridDto(TableHostel entity);
         private partial RevolvingFundStatusHybridDto MapRevolvingFundStatusToHybridDto(RevolvingFundStatus entity);
         private partial VisitorDetailHybridDto MapVisitorDetailToHybridDto(VisitorDetail entity);
+
+        // Collection mapping methods to handle nullable collections properly
+        private List<TableHostelHybridDto> MapTableHostelCollection(ICollection<TableHostel>? entities)
+        {
+            if (entities == null || !entities.Any())
+                return new List<TableHostelHybridDto>();
+
+            return entities.Select(MapTableHostelToHybridDto).ToList();
+        }
+
+        private List<RevolvingFundStatusHybridDto> MapRevolvingFundStatusCollection(ICollection<RevolvingFundStatus>? entities)
+        {
+            if (entities == null || !entities.Any())
+                return new List<RevolvingFundStatusHybridDto>();
+
+            return entities.Select(MapRevolvingFundStatusToHybridDto).ToList();
+        }
+
+        private List<VisitorDetailHybridDto> MapVisitorDetailCollection(ICollection<VisitorDetail>? entities)
+        {
+            if (entities == null || !entities.Any())
+                return new List<VisitorDetailHybridDto>();
+
+            return entities.Select(MapVisitorDetailToHybridDto).ToList();
+        }
 
         [MapProperty(nameof(TblServiceCreateDto.Number), nameof(TblService.Number), Use = nameof(GetIntOrDefault))]
         [MapProperty(nameof(TblServiceCreateDto.AmountGenerated), nameof(TblService.AmountGenerated), Use = nameof(GetDecimalOrDefault))]
@@ -74,9 +99,9 @@ namespace Application.Mapper
         [MapProperty(nameof(TblService.ParticipationType.Name), nameof(TblServicesDto.ParticipationTypeName))]
         [MapProperty(nameof(TblService.ApprovedBy.FirstName), nameof(TblServicesDto.ApprovedByName))]
         [MapProperty(nameof(TblService.CreatedBy.FirstName), nameof(TblServicesDto.CreatedByName))]
-        [MapProperty(nameof(TblService.RevolvingFundStatuses), nameof(TblServicesDto.RevolvingFundStatuses), Use = nameof(MapRevolvingFundStatusToHybridDto))]
-        [MapProperty(nameof(TblService.Hostels), nameof(TblServicesDto.TableHostels), Use = nameof(MapTableHostelToHybridDto))]
-        [MapProperty(nameof(TblService.VisitorDetails), nameof(TblServicesDto.VisitorDetails), Use = nameof(MapVisitorDetailToHybridDto))]
+        [MapProperty(nameof(TblService.RevolvingFundStatuses), nameof(TblServicesDto.RevolvingFundStatuses), Use = nameof(MapRevolvingFundStatusCollection))]
+        [MapProperty(nameof(TblService.Hostels), nameof(TblServicesDto.TableHostels), Use = nameof(MapTableHostelCollection))]
+        [MapProperty(nameof(TblService.VisitorDetails), nameof(TblServicesDto.VisitorDetails), Use = nameof(MapVisitorDetailCollection))]
         public partial TblServicesDto MapToDtoWithDetails(TblService entity);
 
         // ----------------------------
