@@ -82,26 +82,50 @@ namespace Application.Mapper
         [MapProperty(nameof(RevolvingFundStatusCreateDto.Expenditure), nameof(RevolvingFundStatus.Expenditure), Use = nameof(GetDecimalOrDefault))]
         [MapProperty(nameof(RevolvingFundStatusCreateDto.ClosingBalance), nameof(RevolvingFundStatus.ClosingBalance), Use = nameof(GetDoubleOrDefault))]
         public partial RevolvingFundStatus MapToEntity(RevolvingFundStatusCreateDto dto);
-        public partial VisitorDetail MapToEntity(VisitorDetailCreateDto dto);
 
-        // Manual mapping for TableHostelCreateDto to handle SubmittedDate default
+        // Manual mapping for VisitorDetailCreateDto to handle nullable values
+        public VisitorDetail MapToEntity(VisitorDetailCreateDto dto)
+        {
+            return new VisitorDetail
+            {
+                Name = dto.Name,
+                MobileNo = dto.MobileNo,
+                Date = dto.Date,
+                Location = dto.Location,
+                Purpose = dto.Purpose,
+                PurposeOfVisit = dto.PurposeOfVisit,
+                Male_SC = dto.Male_SC ?? 0,
+                Male_ST = dto.Male_ST ?? 0,
+                Male_OBC = dto.Male_OBC ?? 0,
+                Male_GEN = dto.Male_GEN ?? 0,
+                Female_SC = dto.Female_SC ?? 0,
+                Female_ST = dto.Female_ST ?? 0,
+                Female_OBC = dto.Female_OBC ?? 0,
+                Female_GEN = dto.Female_GEN ?? 0,
+                Male_Total = dto.Male_Total ?? 0,
+                Female_Total = dto.Female_Total ?? 0,
+                Total = dto.Total ?? 0
+            };
+        }
+
+        // Manual mapping for TableHostelCreateDto to handle nullable values and defaults
         public TableHostel MapToEntity(TableHostelCreateDto dto)
         {
             return new TableHostel
             {
                 Date = dto.Date,
-                Male_SC = dto.Male_SC,
-                Male_ST = dto.Male_ST,
-                Male_OBC = dto.Male_OBC,
-                Male_GEN = dto.Male_GEN,
-                Female_SC = dto.Female_SC,
-                Female_ST = dto.Female_ST,
-                Female_OBC = dto.Female_OBC,
-                Female_GEN = dto.Female_GEN,
-                NumberOfDaysStayed = dto.NumberOfDaysStayed,
+                Male_SC = dto.Male_SC ?? 0,
+                Male_ST = dto.Male_ST ?? 0,
+                Male_OBC = dto.Male_OBC ?? 0,
+                Male_GEN = dto.Male_GEN ?? 0,
+                Female_SC = dto.Female_SC ?? 0,
+                Female_ST = dto.Female_ST ?? 0,
+                Female_OBC = dto.Female_OBC ?? 0,
+                Female_GEN = dto.Female_GEN ?? 0,
+                NumberOfDaysStayed = dto.NumberOfDaysStayed ?? 0,
                 VillageOrTaluk = dto.VillageOrTaluk,
                 Purpose = dto.Purpose,
-                AmountGenerated = dto.AmountGenerated,
+                AmountGenerated = dto.AmountGenerated ?? 0,
                 SubmittedDate = dto.SubmittedDate ?? DateOnly.FromDateTime(DateTime.UtcNow)
             };
         }
@@ -177,18 +201,18 @@ namespace Application.Mapper
         public void MapUpdateDtoToEntity(TableHostelCreateDto dto, TableHostel entity)
         {
             if (dto.Date.HasValue) entity.Date = dto.Date;
-            entity.Male_SC = dto.Male_SC;
-            entity.Male_ST = dto.Male_ST;
-            entity.Male_OBC = dto.Male_OBC;
-            entity.Male_GEN = dto.Male_GEN;
-            entity.Female_SC = dto.Female_SC;
-            entity.Female_ST = dto.Female_ST;
-            entity.Female_OBC = dto.Female_OBC;
-            entity.Female_GEN = dto.Female_GEN;
-            entity.NumberOfDaysStayed = dto.NumberOfDaysStayed;
+            entity.Male_SC = dto.Male_SC ?? 0;
+            entity.Male_ST = dto.Male_ST ?? 0;
+            entity.Male_OBC = dto.Male_OBC ?? 0;
+            entity.Male_GEN = dto.Male_GEN ?? 0;
+            entity.Female_SC = dto.Female_SC ?? 0;
+            entity.Female_ST = dto.Female_ST ?? 0;
+            entity.Female_OBC = dto.Female_OBC ?? 0;
+            entity.Female_GEN = dto.Female_GEN ?? 0;
+            entity.NumberOfDaysStayed = dto.NumberOfDaysStayed ?? 0;
             entity.VillageOrTaluk = dto.VillageOrTaluk;
             entity.Purpose = dto.Purpose;
-            entity.AmountGenerated = dto.AmountGenerated;
+            entity.AmountGenerated = dto.AmountGenerated ?? 0;
             if (dto.SubmittedDate.HasValue) entity.SubmittedDate = dto.SubmittedDate.Value;
         }
         // ----------------------------
@@ -213,17 +237,17 @@ namespace Application.Mapper
             entity.Location = dto.Location;
             entity.Purpose = dto.Purpose;
             entity.PurposeOfVisit = dto.PurposeOfVisit;
-            entity.Male_SC = dto.Male_SC;
-            entity.Male_ST = dto.Male_ST;
-            entity.Male_OBC = dto.Male_OBC;
-            entity.Male_GEN = dto.Male_GEN;
-            entity.Female_SC = dto.Female_SC;
-            entity.Female_ST = dto.Female_ST;
-            entity.Female_OBC = dto.Female_OBC;
-            entity.Female_GEN = dto.Female_GEN;
-            entity.Male_Total = dto.Male_Total;
-            entity.Female_Total = dto.Female_Total;
-            entity.Total = dto.Total;
+            entity.Male_SC = dto.Male_SC ?? 0;
+            entity.Male_ST = dto.Male_ST ?? 0;
+            entity.Male_OBC = dto.Male_OBC ?? 0;
+            entity.Male_GEN = dto.Male_GEN ?? 0;
+            entity.Female_SC = dto.Female_SC ?? 0;
+            entity.Female_ST = dto.Female_ST ?? 0;
+            entity.Female_OBC = dto.Female_OBC ?? 0;
+            entity.Female_GEN = dto.Female_GEN ?? 0;
+            entity.Male_Total = dto.Male_Total ?? 0;
+            entity.Female_Total = dto.Female_Total ?? 0;
+            entity.Total = dto.Total ?? 0;
         }
 
         // ----------------------------
@@ -256,18 +280,18 @@ namespace Application.Mapper
         public void MapUpdateDtoToEntity(TableHostelHybridDto dto, TableHostel entity)
         {
             if (dto.Date.HasValue) entity.Date = dto.Date;
-            entity.Male_SC = dto.Male_SC;
-            entity.Male_ST = dto.Male_ST;
-            entity.Male_OBC = dto.Male_OBC;
-            entity.Male_GEN = dto.Male_GEN;
-            entity.Female_SC = dto.Female_SC;
-            entity.Female_ST = dto.Female_ST;
-            entity.Female_OBC = dto.Female_OBC;
-            entity.Female_GEN = dto.Female_GEN;
-            entity.NumberOfDaysStayed = dto.NumberOfDaysStayed;
+            entity.Male_SC = dto.Male_SC ?? 0;
+            entity.Male_ST = dto.Male_ST ?? 0;
+            entity.Male_OBC = dto.Male_OBC ?? 0;
+            entity.Male_GEN = dto.Male_GEN ?? 0;
+            entity.Female_SC = dto.Female_SC ?? 0;
+            entity.Female_ST = dto.Female_ST ?? 0;
+            entity.Female_OBC = dto.Female_OBC ?? 0;
+            entity.Female_GEN = dto.Female_GEN ?? 0;
+            entity.NumberOfDaysStayed = dto.NumberOfDaysStayed ?? 0;
             entity.VillageOrTaluk = dto.VillageOrTaluk;
             entity.Purpose = dto.Purpose;
-            entity.AmountGenerated = dto.AmountGenerated;
+            entity.AmountGenerated = dto.AmountGenerated ?? 0;
             if (dto.SubmittedDate.HasValue) entity.SubmittedDate = dto.SubmittedDate.Value;
         }
 
@@ -276,18 +300,18 @@ namespace Application.Mapper
             var entity = new TableHostel
             {
                 Date = dto.Date,
-                Male_SC = dto.Male_SC,
-                Male_ST = dto.Male_ST,
-                Male_OBC = dto.Male_OBC,
-                Male_GEN = dto.Male_GEN,
-                Female_SC = dto.Female_SC,
-                Female_ST = dto.Female_ST,
-                Female_OBC = dto.Female_OBC,
-                Female_GEN = dto.Female_GEN,
-                NumberOfDaysStayed = dto.NumberOfDaysStayed,
+                Male_SC = dto.Male_SC ?? 0,
+                Male_ST = dto.Male_ST ?? 0,
+                Male_OBC = dto.Male_OBC ?? 0,
+                Male_GEN = dto.Male_GEN ?? 0,
+                Female_SC = dto.Female_SC ?? 0,
+                Female_ST = dto.Female_ST ?? 0,
+                Female_OBC = dto.Female_OBC ?? 0,
+                Female_GEN = dto.Female_GEN ?? 0,
+                NumberOfDaysStayed = dto.NumberOfDaysStayed ?? 0,
                 VillageOrTaluk = dto.VillageOrTaluk,
                 Purpose = dto.Purpose,
-                AmountGenerated = dto.AmountGenerated,
+                AmountGenerated = dto.AmountGenerated ?? 0,
                 SubmittedDate = dto.SubmittedDate ?? DateOnly.FromDateTime(DateTime.UtcNow)
             };
             return entity;
@@ -320,17 +344,17 @@ namespace Application.Mapper
             entity.Location = dto.Location;
             entity.Purpose = dto.Purpose;
             entity.PurposeOfVisit = dto.PurposeOfVisit;
-            entity.Male_SC = dto.Male_SC;
-            entity.Male_ST = dto.Male_ST;
-            entity.Male_OBC = dto.Male_OBC;
-            entity.Male_GEN = dto.Male_GEN;
-            entity.Female_SC = dto.Female_SC;
-            entity.Female_ST = dto.Female_ST;
-            entity.Female_OBC = dto.Female_OBC;
-            entity.Female_GEN = dto.Female_GEN;
-            entity.Male_Total = dto.Male_Total;
-            entity.Female_Total = dto.Female_Total;
-            entity.Total = dto.Total;
+            entity.Male_SC = dto.Male_SC ?? 0;
+            entity.Male_ST = dto.Male_ST ?? 0;
+            entity.Male_OBC = dto.Male_OBC ?? 0;
+            entity.Male_GEN = dto.Male_GEN ?? 0;
+            entity.Female_SC = dto.Female_SC ?? 0;
+            entity.Female_ST = dto.Female_ST ?? 0;
+            entity.Female_OBC = dto.Female_OBC ?? 0;
+            entity.Female_GEN = dto.Female_GEN ?? 0;
+            entity.Male_Total = dto.Male_Total ?? 0;
+            entity.Female_Total = dto.Female_Total ?? 0;
+            entity.Total = dto.Total ?? 0;
         }
 
         public VisitorDetail MapToEntity(VisitorDetailHybridDto dto)
@@ -343,17 +367,17 @@ namespace Application.Mapper
                 Location = dto.Location,
                 Purpose = dto.Purpose,
                 PurposeOfVisit = dto.PurposeOfVisit,
-                Male_SC = dto.Male_SC,
-                Male_ST = dto.Male_ST,
-                Male_OBC = dto.Male_OBC,
-                Male_GEN = dto.Male_GEN,
-                Female_SC = dto.Female_SC,
-                Female_ST = dto.Female_ST,
-                Female_OBC = dto.Female_OBC,
-                Female_GEN = dto.Female_GEN,
-                Male_Total = dto.Male_Total,
-                Female_Total = dto.Female_Total,
-                Total = dto.Total
+                Male_SC = dto.Male_SC ?? 0,
+                Male_ST = dto.Male_ST ?? 0,
+                Male_OBC = dto.Male_OBC ?? 0,
+                Male_GEN = dto.Male_GEN ?? 0,
+                Female_SC = dto.Female_SC ?? 0,
+                Female_ST = dto.Female_ST ?? 0,
+                Female_OBC = dto.Female_OBC ?? 0,
+                Female_GEN = dto.Female_GEN ?? 0,
+                Male_Total = dto.Male_Total ?? 0,
+                Female_Total = dto.Female_Total ?? 0,
+                Total = dto.Total ?? 0
             };
         }
     }
