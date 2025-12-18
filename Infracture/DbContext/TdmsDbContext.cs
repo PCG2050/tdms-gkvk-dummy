@@ -410,14 +410,14 @@ namespace Infrastructure.DbContext
 
             modelBuilder.Entity<TblService>()
                 .HasMany(s => s.RevolvingFundStatuses)
-                .WithOne()
-                .HasForeignKey("ServiceId")
+                .WithOne(r => r.Service)
+                .HasForeignKey(r => r.ServiceId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<TblService>()
                 .HasMany(s => s.VisitorDetails)
-                .WithOne()
-                .HasForeignKey("ServiceId")
+                .WithOne(v => v.TblService)
+                .HasForeignKey(v => v.ServiceId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<TrainerAssignment>()
