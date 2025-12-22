@@ -3,6 +3,8 @@ using Application.Interface.Repository;
 using Application.Interface.Repository.DataTables;
 using Application.Interface.Repository.DataTables.FIU;
 using Application.Interface.Repository.DataTables.TblService;
+using Application.Interface.Repository.DataTables.FTI;
+using Application.Interface.Repository.DataTables.SAMETI;
 using Application.Interface.Services.Reports;
 using Application.Models;
 using Application.Models.Reports;
@@ -23,43 +25,49 @@ namespace Infrastructure.Services.Reports
 
         private readonly IDeuProgramDetailsRepository _deuRepository;
         private readonly IEeuProgramDetailsRepository _eeuRepository;
-        private readonly IEeuProgramDetailsRepository _kvkRepository;
+        private readonly IKvkProgramDetailsRepository _kvkRepository;
         private readonly IIbtvaProgramDetailsRepository _ibtvaRepository;
         private readonly INaepProgramDetailsRepository _naepRepository;
         private readonly IStuProgramDetailsRepository _stuRepository;
         private readonly IAticProgramDetailsRepository _aticRepository;
-        //private readonly IFtiProgramDetailsRepository _ftiRepository;
+        private readonly IFtiProgramDetailsRepository _ftiRepository;
         private readonly IASMVisitorDetailsRepository _asmRepository;
+        private readonly ISametiProgramDetailsRepository _sametiRepository;
+        private readonly IFIUProgramActivityRepository _fiuRepository;
 
         private readonly IPublicationRepository _publicationRepository;
         private readonly INominationRewardRepository _nominationRewardRepository;
-
         private readonly IConsultingServiceRepository _consultingRepository;
         private readonly ITableServiceRepository _tblServiceRepository;
         private readonly ITableOtherActivityRepository _otherActivityRepository;
+        private readonly IFinancialBudgetRepository _budgetRepository;
 
         // NEW: FIU Repository
-        private readonly IFIUProgramActivityRepository _fiuRepository;
+       
 
         public AdminReportService(
             ICurrentUserService currentUserService,
             IUnitHeadAssignmentRepository unitHeadAssignmentRepository,
             ITrainerAssignmentRepository trainerAssignmentRepository,
-            IOrganizationUnitRepository organizationUnitRepository,
-            INominationRewardRepository nominationRewardRepository,
-            IPublicationRepository publicationRepository,
-            IConsultingServiceRepository consultingRepository,
-            ITableServiceRepository tblServiceRepository,
+            IOrganizationUnitRepository organizationUnitRepository,         
             INaepProgramDetailsRepository naepRepository,
             IIbtvaProgramDetailsRepository ibtvaRepository,
-            IEeuProgramDetailsRepository kvkRepository,
+            IKvkProgramDetailsRepository kvkRepository,
             IStuProgramDetailsRepository stuRepository,
             IAticProgramDetailsRepository aticRepository,
             IEeuProgramDetailsRepository eeuRepository,
             IDeuProgramDetailsRepository deuRepository,
             IFIUProgramActivityRepository fiuRepository,
             IASMVisitorDetailsRepository asmRepository,
-            ITableOtherActivityRepository otherActivityRepository
+            INominationRewardRepository nominationRewardRepository,
+            IPublicationRepository publicationRepository,
+            IConsultingServiceRepository consultingRepository,
+            ITableServiceRepository tblServiceRepository,
+            ITableOtherActivityRepository otherActivityRepository,
+            IFinancialBudgetRepository budgetRepository,
+            IFtiProgramDetailsRepository ftiRepository,
+            ISametiProgramDetailsRepository sametiRepository
+
             )
         {
             _currentUserService = currentUserService;
@@ -71,6 +79,7 @@ namespace Infrastructure.Services.Reports
             _consultingRepository = consultingRepository;
             _tblServiceRepository = tblServiceRepository;
             _otherActivityRepository = otherActivityRepository;
+            _budgetRepository = budgetRepository;
             _naepRepository = naepRepository;
             _ibtvaRepository = ibtvaRepository;
             _kvkRepository = kvkRepository;
@@ -80,6 +89,9 @@ namespace Infrastructure.Services.Reports
             _deuRepository = deuRepository;
             _fiuRepository = fiuRepository;
             _asmRepository = asmRepository;
+            _budgetRepository = budgetRepository;
+            _ftiRepository = ftiRepository;
+            _sametiRepository = sametiRepository;
         }
 
         public async Task<ServiceResult<ReportFilterOptionsDto>> GetFilterOptionsAsync()
@@ -391,6 +403,24 @@ namespace Infrastructure.Services.Reports
                     Status = x.Status?.Name ?? "-"
                 }));
 
+            // SAMETI Programs
+            var sametiPrograms = await _sametiRepository.GetAllAsync();
+            report.Programs.AddRange(sametiPrograms
+                .Where(x => x.UnitLocationId == filter.UnitLocationId &&
+                           (x.FormStatus == "Approved") &&
+                           x.CreatedAt >= startDate && x.CreatedAt < endDate)
+                .Select(x => new ReportProgramDto
+                {
+                    ProgramType = x.ProgramType?.Name ?? "-",
+                    Title = x.Title ?? "-",
+                    DateFrom = x.StartDate != default(DateOnly) ? x.StartDate.ToString("dd/MM/yyyy") : "-",
+                    DateTo = x.EndDate != default(DateOnly) ? x.EndDate.ToString("dd/MM/yyyy") : "-",
+                    Duration = x.Duration ?? "-",
+                    Participants = x.ParticipantDemographics?.Sum(pd => pd.Total ?? 0) ?? 0,
+                    Status = x.Status?.Name ?? "-"
+                }));
+
+
             // ========== CONSULTANCY ==========
             var consultancies = await _consultingRepository.GetAllAsync();
             report.Consultancies = consultancies
@@ -419,6 +449,21 @@ namespace Infrastructure.Services.Reports
                     Unit = x.QuantityUnit?.Name ?? "-",
                     Quantity = x.Number,
                     Amount = x.AmountGenerated
+                })
+                .ToList();
+
+            // ========== Financial Budget ==========
+            var budgets = await _budgetRepository.GetAllAsync();
+            report.FinancialBudgets = budgets
+                .Where(x => x.UnitLocationId == filter.UnitLocationId &&
+                           x.FormStatus == "Approved" &&
+                           x.CreatedAt >= startDate && x.CreatedAt < endDate)
+                .Select(x => new ReportFinancialBudgetDto
+                {
+                    Sanctioned = x.Budgets.Sum(d => d.Sanctioned ?? 0m),
+                    Balance = x.Budgets.Sum(d => d.Balance ?? 0m),
+                    Released = x.Budgets.Sum(d => d.Released ?? 0m),
+                    Expenditure = x.Budgets.Sum(d => d.Expenditure ?? 0m)
                 })
                 .ToList();
 

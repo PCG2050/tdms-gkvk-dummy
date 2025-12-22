@@ -150,6 +150,18 @@ namespace Domain.Entities.EEU
 
 
         //New Fields
+        public int? CollaboratorId { get; set; }
+        [JsonIgnore]
+        public Collaborator ? Collaborator { get; set; }
+
+        public string? CollaboratorOther { get; set; }
+
+        public int? CollaborativeProgramOptionId { get; set; }
+        [JsonIgnore]
+        public CollaborativeProgramOption? CollaborativeProgramOption { get; set; }
+
+        public string? CollaborativeProgramOptionOther { get; set; }
+
         [MaxLength(50)]
         public string? T01 { get; set; }
         [MaxLength(50)]

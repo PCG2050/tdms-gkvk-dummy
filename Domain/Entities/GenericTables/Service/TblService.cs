@@ -104,7 +104,5 @@ namespace Domain.Entities.GenericTables.Service
         public ICollection<TableHostel>? Hostels { get; set; }
         public ICollection<RevolvingFundStatus>? RevolvingFundStatuses { get; set; }
         public ICollection<VisitorDetail>? VisitorDetails { get; set; }
-
-
     }
 }

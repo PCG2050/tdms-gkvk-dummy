@@ -10,6 +10,7 @@ using Application.Interface.Services;
 using Application.Models;
 using Application.Services.Common;
 using Microsoft.EntityFrameworkCore;
+using Application.Interface.Repository.DataTables.SAMETI;
 
 namespace Infrastructure.Services
 {
@@ -22,7 +23,9 @@ namespace Infrastructure.Services
         private readonly IEeuProgramDetailsRepository _eeuRepository;
         private readonly IAticProgramDetailsRepository _aticRepository;
         private readonly IIbtvaProgramDetailsRepository _ibtvaRepository;
-        private readonly IEeuProgramDetailsRepository _kvkRepository;
+        private readonly IKvkProgramDetailsRepository _kvkRepository;
+        private readonly ISametiProgramDetailsRepository _sametiRepository;
+
 
         public SuccessStoryService(
             IStuProgramDetailsRepository stuRepository,
@@ -32,7 +35,8 @@ namespace Infrastructure.Services
             IEeuProgramDetailsRepository eeuRepository,
             IAticProgramDetailsRepository aticRepository,
             IIbtvaProgramDetailsRepository ibtvaRepository,
-            IEeuProgramDetailsRepository kvkRepository)
+            ISametiProgramDetailsRepository sametiRepository,
+            IKvkProgramDetailsRepository kvkRepository)
         {
             _stuRepository = stuRepository;
             _naepRepository = naepRepository;
@@ -42,6 +46,7 @@ namespace Infrastructure.Services
             _aticRepository = aticRepository;
             _ibtvaRepository = ibtvaRepository;
             _kvkRepository = kvkRepository;
+            _sametiRepository = sametiRepository;
         }
 
         public async Task<PaginatedResult<SuccessStoryDto>> GetSuccessStoriesAsync(
@@ -76,6 +81,9 @@ namespace Infrastructure.Services
 
             var kvkStories = await GetKvkSuccessStoriesAsync(startDate, endDate);
             allStories.AddRange(kvkStories);
+
+            var sametiStories = await GetSametiSuccessStoriesAsync(startDate, endDate);
+            allStories.AddRange(sametiStories);
 
             // Order by date descending and paginate
             var totalCount = allStories.Count;
@@ -365,6 +373,47 @@ namespace Infrastructure.Services
                     Id = p.Id,
                     ProgramType = "IBTVA",
                     Title = p.Title ?? "IBTVA Program",
+                    StartDate = p.StartDate,
+                    EndDate = p.EndDate,
+                    UserId = p.CreatedById ?? 0,
+                    UserName = $"{p.CreatedBy?.FirstName} {p.CreatedBy?.LastName}".Trim(),
+                    ProfileImageUrl = p.CreatedBy?.ProfileImageUrl,
+                    Department = p.UnitLocation?.Unit?.Name ?? "Unknown",
+                    Position = string.Equals(p.CreatedBy?.Role.ToString(), "TRAINER", StringComparison.OrdinalIgnoreCase)
+                        ? "STAFF"
+                        : (p.CreatedBy?.Role.ToString() ?? "Unknown"),
+                    SuccessStoryContent = p.Recommendations!.SuccessStories!,
+                    CreatedAt = p.CreatedAt
+                }).ToList();
+        }
+
+        private async Task<List<SuccessStoryDto>> GetSametiSuccessStoriesAsync(
+            DateOnly? startDate,
+            DateOnly? endDate)
+        {
+            var query = _ibtvaRepository.GetQueryable()
+                .Include(x => x.Recommendations)
+                .Include(x => x.CreatedBy)
+                .Include(x => x.UnitLocation)
+                    .ThenInclude(ul => ul.Unit)
+                .Where(x => x.FormStatus == "Approved")
+                .Where(x => x.Recommendations != null && !string.IsNullOrEmpty(x.Recommendations.SuccessStories));
+
+            if (startDate.HasValue)
+                query = query.Where(x => x.StartDate >= startDate.Value);
+
+            if (endDate.HasValue)
+                query = query.Where(x => x.EndDate <= endDate.Value);
+
+            var programs = await query.ToListAsync();
+
+            return programs
+                .Where(p => p.Recommendations != null && !string.IsNullOrEmpty(p.Recommendations.SuccessStories))
+                .Select(p => new SuccessStoryDto
+                {
+                    Id = p.Id,
+                    ProgramType = "Sameti",
+                    Title = p.Title ?? "Sameti Program",
                     StartDate = p.StartDate,
                     EndDate = p.EndDate,
                     UserId = p.CreatedById ?? 0,

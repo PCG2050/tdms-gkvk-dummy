@@ -1,4 +1,5 @@
 ﻿
+
 using Application.Interface.Repository.DataTables.TblService;
 using Application.Services.Common;
 
@@ -216,23 +217,33 @@ namespace Infrastructure.Services.DataTables
 
             if (tableHostelService.FormStatus != "Draft")
                 return ServiceResult<TableHostelDto>.Failure(
-                    "Cannot edit mode and outreach for submitted consulting services",
+                    "Cannot edit mode and outreach for submitted services",
                     ServiceErrorStatus.INVALIDOPERATION);
 
-            tableHostel.Male_GEN = dto.Male_GEN;
-            tableHostel.Male_OBC = dto.Male_OBC;
-            tableHostel.Male_SC = dto.Male_SC;
-            tableHostel.Male_ST = dto.Male_ST;
-            tableHostel.Female_GEN = dto.Female_GEN;
-            tableHostel.Female_OBC = dto.Female_OBC;
-            tableHostel.Female_SC = dto.Female_SC;
-            tableHostel.Female_ST = dto.Female_ST;
-            tableHostel.NumberOfDaysStayed = dto.NumberOfDaysStayed;
-            tableHostel.VillageOrTaluk = dto.VillageOrTaluk;
-            tableHostel.Purpose = dto.Purpose;
-            tableHostel.SubmittedDate = (DateOnly)dto.Date;
-            tableHostel.NumberOfDaysStayed = dto.NumberOfDaysStayed;
-            tableHostel.AmountGenerated = dto.AmountGenerated;
+            // Map fields - use incoming value when present, otherwise keep existing
+            tableHostel.Male_GEN = dto.Male_GEN ?? tableHostel.Male_GEN;
+            tableHostel.Male_OBC = dto.Male_OBC ?? tableHostel.Male_OBC;
+            tableHostel.Male_SC = dto.Male_SC ?? tableHostel.Male_SC;
+            tableHostel.Male_ST = dto.Male_ST ?? tableHostel.Male_ST;
+            tableHostel.Female_GEN = dto.Female_GEN ?? tableHostel.Female_GEN;
+            tableHostel.Female_OBC = dto.Female_OBC ?? tableHostel.Female_OBC;
+            tableHostel.Female_SC = dto.Female_SC ?? tableHostel.Female_SC;
+            tableHostel.Female_ST = dto.Female_ST ?? tableHostel.Female_ST;
+            tableHostel.NumberOfDaysStayed = dto.NumberOfDaysStayed ?? tableHostel.NumberOfDaysStayed;
+            tableHostel.VillageOrTaluk = dto.VillageOrTaluk ?? tableHostel.VillageOrTaluk;
+            tableHostel.Purpose = dto.Purpose ?? tableHostel.Purpose;
+
+            // SubmittedDate and Date are DateOnly? on DTO. Only set SubmittedDate when DTO provides a value.
+            if (dto.SubmittedDate.HasValue)
+            {
+                tableHostel.SubmittedDate = dto.SubmittedDate.Value;
+            }
+            else if (dto.Date.HasValue)
+            {
+                tableHostel.SubmittedDate = dto.Date.Value;
+            }
+
+            tableHostel.AmountGenerated = dto.AmountGenerated ?? tableHostel.AmountGenerated;
             tableHostel.UpdatedById = _currentUserService.UserId;
             tableHostel.UpdatedAt = DateTimeOffset.UtcNow;
 

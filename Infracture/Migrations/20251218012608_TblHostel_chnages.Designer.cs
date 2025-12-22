@@ -4,6 +4,7 @@ using Infrastructure.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(TdmsDbContext))]
-    partial class TdmsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251218012608_TblHostel_chnages")]
+    partial class TblHostel_chnages
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -350,18 +353,6 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int?>("CollaborativeProgramOptionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CollaborativeProgramOptionOther")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("CollaboratorId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CollaboratorOther")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Copi")
                         .HasColumnType("nvarchar(max)");
 
@@ -436,12 +427,6 @@ namespace Infrastructure.Migrations
                     b.Property<string>("OtherSourceOfInformation")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("ParticipantFileUpload")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ParticipatedAsId")
-                        .HasColumnType("int");
 
                     b.Property<string>("PiAddress")
                         .HasMaxLength(500)
@@ -565,17 +550,11 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("CollaborativeProgramOptionId");
-
-                    b.HasIndex("CollaboratorId");
-
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("ModeId");
 
                     b.HasIndex("OrganizationId");
-
-                    b.HasIndex("ParticipatedAsId");
 
                     b.HasIndex("ProgramTypeId");
 
@@ -819,6 +798,84 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UpdatedById");
 
                     b.ToTable("AticResourcePersons");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ATIC.AticSales", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset?>("ApprovedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("ApprovedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Attachements")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Details")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("FormStatus")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("FormStatusRemarks")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Quantity")
+                        .HasColumnType("float");
+
+                    b.Property<string>("QuantityType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
+
+                    b.Property<int>("UnitLocationId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApprovedById");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.HasIndex("UnitLocationId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("AticSales");
                 });
 
             modelBuilder.Entity("Domain.Entities.ATIC.AticTeachingAidsDeveloped", b =>
@@ -1181,18 +1238,6 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int?>("CollaborativeProgramOptionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CollaborativeProgramOptionOther")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("CollaboratorId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CollaboratorOther")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Copi")
                         .HasColumnType("nvarchar(max)");
 
@@ -1267,12 +1312,6 @@ namespace Infrastructure.Migrations
                     b.Property<string>("OtherSourceOfInformation")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("ParticipantFileUpload")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ParticipatedAsId")
-                        .HasColumnType("int");
 
                     b.Property<string>("PiAddress")
                         .HasMaxLength(500)
@@ -1396,17 +1435,11 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("CollaborativeProgramOptionId");
-
-                    b.HasIndex("CollaboratorId");
-
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("ModeId");
 
                     b.HasIndex("OrganizationId");
-
-                    b.HasIndex("ParticipatedAsId");
 
                     b.HasIndex("ProgramTypeId");
 
@@ -2446,18 +2479,6 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int?>("CollaborativeProgramOptionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CollaborativeProgramOptionOther")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("CollaboratorId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CollaboratorOther")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Copi")
                         .HasColumnType("nvarchar(max)");
 
@@ -2695,10 +2716,6 @@ namespace Infrastructure.Migrations
                     b.HasIndex("ApprovedById");
 
                     b.HasIndex("CategoryId");
-
-                    b.HasIndex("CollaborativeProgramOptionId");
-
-                    b.HasIndex("CollaboratorId");
 
                     b.HasIndex("CreatedById");
 
@@ -4252,9 +4269,6 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Particulars")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
-
-                    b.Property<decimal?>("PercentageOfExpenditure")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("Released")
                         .HasColumnType("decimal(18,2)");
@@ -6059,18 +6073,6 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int?>("CollaborativeProgramOptionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CollaborativeProgramOptionOther")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("CollaboratorId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CollaboratorOther")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Copi")
                         .HasColumnType("nvarchar(max)");
 
@@ -6145,12 +6147,6 @@ namespace Infrastructure.Migrations
                     b.Property<string>("OtherSourceOfInformation")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("ParticipantFileUpload")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ParticipatedAsId")
-                        .HasColumnType("int");
 
                     b.Property<string>("PiAddress")
                         .HasMaxLength(500)
@@ -6274,17 +6270,11 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("CollaborativeProgramOptionId");
-
-                    b.HasIndex("CollaboratorId");
-
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("ModeId");
 
                     b.HasIndex("OrganizationId");
-
-                    b.HasIndex("ParticipatedAsId");
 
                     b.HasIndex("ProgramTypeId");
 
@@ -7604,18 +7594,6 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int?>("CollaborativeProgramOptionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CollaborativeProgramOptionOther")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("CollaboratorId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CollaboratorOther")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Copi")
                         .HasColumnType("nvarchar(max)");
 
@@ -7853,10 +7831,6 @@ namespace Infrastructure.Migrations
                     b.HasIndex("ApprovedById");
 
                     b.HasIndex("CategoryId");
-
-                    b.HasIndex("CollaborativeProgramOptionId");
-
-                    b.HasIndex("CollaboratorId");
 
                     b.HasIndex("CreatedById");
 
@@ -9583,18 +9557,6 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int?>("CollaborativeProgramOptionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CollaborativeProgramOptionOther")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("CollaboratorId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CollaboratorOther")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Copi")
                         .HasColumnType("nvarchar(max)");
 
@@ -9669,12 +9631,6 @@ namespace Infrastructure.Migrations
                     b.Property<string>("OtherSourceOfInformation")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("ParticipantFileUpload")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ParticipatedAsId")
-                        .HasColumnType("int");
 
                     b.Property<string>("PiAddress")
                         .HasMaxLength(500)
@@ -9798,17 +9754,11 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("CollaborativeProgramOptionId");
-
-                    b.HasIndex("CollaboratorId");
-
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("ModeId");
 
                     b.HasIndex("OrganizationId");
-
-                    b.HasIndex("ParticipatedAsId");
 
                     b.HasIndex("ProgramTypeId");
 
@@ -10473,18 +10423,6 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int?>("CollaborativeProgramOptionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CollaborativeProgramOptionOther")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("CollaboratorId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CollaboratorOther")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Copi")
                         .HasColumnType("nvarchar(max)");
 
@@ -10559,12 +10497,6 @@ namespace Infrastructure.Migrations
                     b.Property<string>("OtherSourceOfInformation")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("ParticipantFileUpload")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ParticipatedAsId")
-                        .HasColumnType("int");
 
                     b.Property<string>("PiAddress")
                         .HasMaxLength(500)
@@ -10688,17 +10620,11 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("CollaborativeProgramOptionId");
-
-                    b.HasIndex("CollaboratorId");
-
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("ModeId");
 
                     b.HasIndex("OrganizationId");
-
-                    b.HasIndex("ParticipatedAsId");
 
                     b.HasIndex("ProgramTypeId");
 
@@ -11304,18 +11230,6 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int?>("CollaborativeProgramOptionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CollaborativeProgramOptionOther")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("CollaboratorId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CollaboratorOther")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Copi")
                         .HasColumnType("nvarchar(max)");
 
@@ -11390,12 +11304,6 @@ namespace Infrastructure.Migrations
                     b.Property<string>("OtherSourceOfInformation")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("ParticipantFileUpload")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ParticipatedAsId")
-                        .HasColumnType("int");
 
                     b.Property<string>("PiAddress")
                         .HasMaxLength(500)
@@ -11519,17 +11427,11 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("CollaborativeProgramOptionId");
-
-                    b.HasIndex("CollaboratorId");
-
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("ModeId");
 
                     b.HasIndex("OrganizationId");
-
-                    b.HasIndex("ParticipatedAsId");
 
                     b.HasIndex("ProgramTypeId");
 
@@ -12280,16 +12182,6 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.MasterData.CollaborativeProgramOption", "CollaborativeProgramOption")
-                        .WithMany()
-                        .HasForeignKey("CollaborativeProgramOptionId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Domain.Entities.MasterData.Collaborator", "Collaborator")
-                        .WithMany()
-                        .HasForeignKey("CollaboratorId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
@@ -12305,11 +12197,6 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.HasOne("Domain.Entities.MasterData.Participant", "ParticipatedAs")
-                        .WithMany()
-                        .HasForeignKey("ParticipatedAsId")
-                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Domain.Entities.MasterData.ProgramType", "ProgramType")
                         .WithMany()
@@ -12366,17 +12253,11 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("Category");
 
-                    b.Navigation("CollaborativeProgramOption");
-
-                    b.Navigation("Collaborator");
-
                     b.Navigation("CreatedBy");
 
                     b.Navigation("Mode");
 
                     b.Navigation("Organization");
-
-                    b.Navigation("ParticipatedAs");
 
                     b.Navigation("ProgramType");
 
@@ -12470,6 +12351,43 @@ namespace Infrastructure.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("ProgramContentAndResources");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ATIC.AticSales", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "ApprovedBy")
+                        .WithMany()
+                        .HasForeignKey("ApprovedById");
+
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("Domain.Entities.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Junction.OrganizationUnitLocation", "UnitLocation")
+                        .WithMany()
+                        .HasForeignKey("UnitLocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById");
+
+                    b.Navigation("ApprovedBy");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Organization");
+
+                    b.Navigation("UnitLocation");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -12624,16 +12542,6 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.MasterData.CollaborativeProgramOption", "CollaborativeProgramOption")
-                        .WithMany()
-                        .HasForeignKey("CollaborativeProgramOptionId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Domain.Entities.MasterData.Collaborator", "Collaborator")
-                        .WithMany()
-                        .HasForeignKey("CollaboratorId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
@@ -12649,11 +12557,6 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.HasOne("Domain.Entities.MasterData.Participant", "ParticipatedAs")
-                        .WithMany()
-                        .HasForeignKey("ParticipatedAsId")
-                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Domain.Entities.MasterData.ProgramType", "ProgramType")
                         .WithMany()
@@ -12710,17 +12613,11 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("Category");
 
-                    b.Navigation("CollaborativeProgramOption");
-
-                    b.Navigation("Collaborator");
-
                     b.Navigation("CreatedBy");
 
                     b.Navigation("Mode");
 
                     b.Navigation("Organization");
-
-                    b.Navigation("ParticipatedAs");
 
                     b.Navigation("ProgramType");
 
@@ -13143,16 +13040,6 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.MasterData.CollaborativeProgramOption", "CollaborativeProgramOption")
-                        .WithMany()
-                        .HasForeignKey("CollaborativeProgramOptionId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Domain.Entities.MasterData.Collaborator", "Collaborator")
-                        .WithMany()
-                        .HasForeignKey("CollaboratorId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
@@ -13228,10 +13115,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("ApprovedBy");
 
                     b.Navigation("Category");
-
-                    b.Navigation("CollaborativeProgramOption");
-
-                    b.Navigation("Collaborator");
 
                     b.Navigation("CreatedBy");
 
@@ -14754,16 +14637,6 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.MasterData.CollaborativeProgramOption", "CollaborativeProgramOption")
-                        .WithMany()
-                        .HasForeignKey("CollaborativeProgramOptionId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Domain.Entities.MasterData.Collaborator", "Collaborator")
-                        .WithMany()
-                        .HasForeignKey("CollaboratorId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
@@ -14779,11 +14652,6 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.HasOne("Domain.Entities.MasterData.Participant", "ParticipatedAs")
-                        .WithMany()
-                        .HasForeignKey("ParticipatedAsId")
-                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Domain.Entities.MasterData.ProgramType", "ProgramType")
                         .WithMany()
@@ -14840,17 +14708,11 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("Category");
 
-                    b.Navigation("CollaborativeProgramOption");
-
-                    b.Navigation("Collaborator");
-
                     b.Navigation("CreatedBy");
 
                     b.Navigation("Mode");
 
                     b.Navigation("Organization");
-
-                    b.Navigation("ParticipatedAs");
 
                     b.Navigation("ProgramType");
 
@@ -15491,16 +15353,6 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.MasterData.CollaborativeProgramOption", "CollaborativeProgramOption")
-                        .WithMany()
-                        .HasForeignKey("CollaborativeProgramOptionId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Domain.Entities.MasterData.Collaborator", "Collaborator")
-                        .WithMany()
-                        .HasForeignKey("CollaboratorId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
@@ -15576,10 +15428,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("ApprovedBy");
 
                     b.Navigation("Category");
-
-                    b.Navigation("CollaborativeProgramOption");
-
-                    b.Navigation("Collaborator");
 
                     b.Navigation("CreatedBy");
 
@@ -15860,16 +15708,6 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.MasterData.CollaborativeProgramOption", "CollaborativeProgramOption")
-                        .WithMany()
-                        .HasForeignKey("CollaborativeProgramOptionId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Domain.Entities.MasterData.Collaborator", "Collaborator")
-                        .WithMany()
-                        .HasForeignKey("CollaboratorId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
@@ -15885,11 +15723,6 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.HasOne("Domain.Entities.MasterData.Participant", "ParticipatedAs")
-                        .WithMany()
-                        .HasForeignKey("ParticipatedAsId")
-                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Domain.Entities.MasterData.ProgramType", "ProgramType")
                         .WithMany()
@@ -15946,17 +15779,11 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("Category");
 
-                    b.Navigation("CollaborativeProgramOption");
-
-                    b.Navigation("Collaborator");
-
                     b.Navigation("CreatedBy");
 
                     b.Navigation("Mode");
 
                     b.Navigation("Organization");
-
-                    b.Navigation("ParticipatedAs");
 
                     b.Navigation("ProgramType");
 
@@ -16227,16 +16054,6 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.MasterData.CollaborativeProgramOption", "CollaborativeProgramOption")
-                        .WithMany()
-                        .HasForeignKey("CollaborativeProgramOptionId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Domain.Entities.MasterData.Collaborator", "Collaborator")
-                        .WithMany()
-                        .HasForeignKey("CollaboratorId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
@@ -16252,11 +16069,6 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.HasOne("Domain.Entities.MasterData.Participant", "ParticipatedAs")
-                        .WithMany()
-                        .HasForeignKey("ParticipatedAsId")
-                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Domain.Entities.MasterData.ProgramType", "ProgramType")
                         .WithMany()
@@ -16313,17 +16125,11 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("Category");
 
-                    b.Navigation("CollaborativeProgramOption");
-
-                    b.Navigation("Collaborator");
-
                     b.Navigation("CreatedBy");
 
                     b.Navigation("Mode");
 
                     b.Navigation("Organization");
-
-                    b.Navigation("ParticipatedAs");
 
                     b.Navigation("ProgramType");
 
@@ -16572,16 +16378,6 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Domain.Entities.MasterData.CollaborativeProgramOption", "CollaborativeProgramOption")
-                        .WithMany()
-                        .HasForeignKey("CollaborativeProgramOptionId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Domain.Entities.MasterData.Collaborator", "Collaborator")
-                        .WithMany()
-                        .HasForeignKey("CollaboratorId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("Domain.Entities.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
@@ -16597,11 +16393,6 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.HasOne("Domain.Entities.MasterData.Participant", "ParticipatedAs")
-                        .WithMany()
-                        .HasForeignKey("ParticipatedAsId")
-                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Domain.Entities.MasterData.ProgramType", "ProgramType")
                         .WithMany()
@@ -16658,17 +16449,11 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("Category");
 
-                    b.Navigation("CollaborativeProgramOption");
-
-                    b.Navigation("Collaborator");
-
                     b.Navigation("CreatedBy");
 
                     b.Navigation("Mode");
 
                     b.Navigation("Organization");
-
-                    b.Navigation("ParticipatedAs");
 
                     b.Navigation("ProgramType");
 

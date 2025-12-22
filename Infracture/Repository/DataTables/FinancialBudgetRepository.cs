@@ -20,6 +20,27 @@ namespace Infrastructure.Repository.DataTables
             return _context.FinancialBudgets.AsQueryable();
         }
 
+        public async Task<List<FinancialBudget>> GetAllAsync()
+        {
+            //get all with related entities
+            return await _context.FinancialBudgets
+                .Include(f => f.UnitLocation)
+                    .ThenInclude(ul => ul.Unit)               
+                .Include(f => f.DetailsOfBankAccounts)
+                .Include(f => f.Budgets)
+                .Include(f => f.RevolvingFunds)
+                    .Include(n => n.UnitLocation)
+                     .ThenInclude(ul => ul.Unit)
+                 .Include(n => n.UnitLocation)
+                     .ThenInclude(ul => ul.District)
+                         .ThenInclude(d => d.State)
+                 .Include(n => n.Organization)
+                 .Include(n => n.CreatedBy)
+                 .Include(n => n.UpdatedBy)
+                .AsSplitQuery()
+                .ToListAsync(); 
+        }
+
         public async Task<FinancialBudget?> GetByIdAsync(int id)
         {
             return await _context.FinancialBudgets.FindAsync(id);

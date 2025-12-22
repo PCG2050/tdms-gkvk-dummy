@@ -70,6 +70,17 @@ namespace Application.Models.DataTables.STU
         public string? ReportingVideo { get; set; }
         public string? Attachements { get; set; }
 
+        // New fields for collaborator and program details
+        public int? CollaboratorId { get; set; }
+        public string? CollaboratorName { get; set; }
+        public string? CollaboratorOther { get; set; }
+        public int? CollaborativeProgramOptionId { get; set; }
+        public string? CollaborativeProgramOptionName { get; set; }
+        public string? CollaborativeProgramOptionOther { get; set; }
+        public int? ParticipatedAsId { get; set; }
+        public string? ParticipatedAsName { get; set; }
+        public string? ParticipantFileUpload { get; set; }
+
         // Status tracking
         public string FormStatus { get; set; } = "Draft";
         public string? FormStatusRemarks { get; set; }
@@ -141,6 +152,14 @@ namespace Application.Models.DataTables.STU
         public string? FundsSanctionLetterUploadFile { get; set; }
         public string? ReportingVideo { get; set; }
         public string? Attachements { get; set; }
+
+        // Collaborator and participant fields
+        public int? CollaboratorId { get; set; }
+        public string? CollaboratorOther { get; set; }
+        public int? CollaborativeProgramOptionId { get; set; }
+        public string? CollaborativeProgramOptionOther { get; set; }
+        public int? ParticipatedAsId { get; set; }
+        public string? ParticipantFileUpload { get; set; }
     }
 
     public class StuProgramUpdateDto : IUpdateDto
@@ -196,10 +215,15 @@ namespace Application.Models.DataTables.STU
         public string? FundsSanctionLetterUploadFile { get; set; }
         public string? ReportingVideo { get; set; }
         public string? Attachements { get; set; }
+
+        // Collaborator and participant fields
+        public int? CollaboratorId { get; set; }
+        public string? CollaboratorOther { get; set; }
+        public int? CollaborativeProgramOptionId { get; set; }
+        public string? CollaborativeProgramOptionOther { get; set; }
+        public int? ParticipatedAsId { get; set; }
+        public string? ParticipantFileUpload { get; set; }
     }
-
-
-
 
    public class StuProgramCompleteDto
     {

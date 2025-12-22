@@ -75,6 +75,27 @@ namespace Application.Models.DataTables.EEU
         public string? ReportingVideo { get; set; }
         public string? Attachements { get; set; }
 
+        // New fields for collaborator and program details
+        public int? CollaboratorId { get; set; }
+        public string? CollaboratorName { get; set; }
+        public string? CollaboratorOther { get; set; }
+        public int? CollaborativeProgramOptionId { get; set; }
+        public string? CollaborativeProgramOptionName { get; set; }
+        public string? CollaborativeProgramOptionOther { get; set; }
+        public string? T01 { get; set; }
+        public string? T02 { get; set; }
+        public string? T03 { get; set; }
+        public string? T04 { get; set; }
+        public string? T05 { get; set; }
+        public string? StageOfCrop { get; set; }
+        public int? NoOfDemos { get; set; }
+        public int? NoOfTrails { get; set; }
+        public int? NoOfChecks { get; set; }
+        public int? NoOfVisits { get; set; }
+        public int? ParticipatedAsId { get; set; }
+        public string? ParticipatedAsName { get; set; }
+        public string? ParticipantFileUpload { get; set; }
+
         // Status tracking
         public string FormStatus { get; set; } = "Draft";
         public string? FormStatusRemarks { get; set; }
@@ -124,6 +145,12 @@ namespace Application.Models.DataTables.EEU
         public string? Copi { get; set; }
         public string? PiAddress { get; set; }
         public int? BatchNo { get; set; }
+
+        // Collaborator fields
+        public int? CollaboratorId { get; set; }
+        public string? CollaboratorOther { get; set; }
+        public int? CollaborativeProgramOptionId { get; set; }
+        public string? CollaborativeProgramOptionOther { get; set; }
 
         //newly added 
         public string? T01 { get; set; }
@@ -204,6 +231,12 @@ namespace Application.Models.DataTables.EEU
         public string? PiAddress { get; set; }
         public int? BatchNo { get; set; }
         public int? Area { get; set; }
+
+        // Collaborator fields
+        public int? CollaboratorId { get; set; }
+        public string? CollaboratorOther { get; set; }
+        public int? CollaborativeProgramOptionId { get; set; }
+        public string? CollaborativeProgramOptionOther { get; set; }
 
         public string? T01 { get; set; }
 

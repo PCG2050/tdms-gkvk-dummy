@@ -14,6 +14,7 @@ namespace Application.Models.DataTables
         public decimal? Released { get; set; }
         public decimal? Expenditure { get; set; }
         public decimal? Balance { get; set; }
+        public decimal? PercentageOfExpenditure { get; set; }
     }
 
     public class BudgetCreateDto
@@ -25,6 +26,7 @@ namespace Application.Models.DataTables
         public decimal? Released { get; set; }
         public decimal? Expenditure { get; set; }
         public decimal? Balance { get; set; }
+        public decimal? PercentageOfExpenditure { get; set; }
     }
 
     public class BudgetUpdateDto
@@ -37,6 +39,7 @@ namespace Application.Models.DataTables
         public decimal? Released { get; set; }
         public decimal? Expenditure { get; set; }
         public decimal? Balance { get; set; }
+        public decimal? PercentageOfExpenditure { get; set; }
     }
 
     // ===== REVOLVING FUND DTOs =====

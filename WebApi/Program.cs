@@ -9,6 +9,8 @@ using Infrastructure.Repository.DataTables.SAMETI;
 using Infrastructure.Services.DataTables.FTI;
 using Infrastructure.Services.DataTables.SAMETI;
 using Infrastructure.Services.DataTables.STU;
+using Serilog.Events;
+using Serilog.Formatting.Compact;
 
 namespace WebApi
 {
@@ -20,8 +22,23 @@ namespace WebApi
 
             // Configure Serilog from appsettings.json
             Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(builder.Configuration)               
-                .CreateLogger();
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .MinimumLevel.Override("System", LogEventLevel.Warning)
+    .Enrich.FromLogContext()
+    .WriteTo.Console(new RenderedCompactJsonFormatter())
+    .WriteTo.File(
+        new RenderedCompactJsonFormatter(),
+        path: "LogFiles/serilog/log-.json",
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 30
+    )
+    .WriteTo.File(
+        path: "LogFiles/serilog/exceptions-.txt",
+        rollingInterval: RollingInterval.Day,
+        restrictedToMinimumLevel: LogEventLevel.Error
+    )
+    .CreateLogger();
 
             builder.Host.UseSerilog();
 
@@ -53,6 +70,7 @@ namespace WebApi
             //    options.GroupNameFormat = "'v'VVV";
             //    options.SubstituteApiVersionInUrl = true;
             //});
+
 
             // Mapperly Mapper - Singleton (stateless)
             builder.Services.AddSingleton<PublicationMapper>();
@@ -401,7 +419,7 @@ namespace WebApi
                 {
                     options
                     .WithTitle("GKVK Api")
-                    .WithTheme(ScalarTheme.DeepSpace);
+                    .WithTheme(ScalarTheme.DeepSpace);               
                 });
             }
             else

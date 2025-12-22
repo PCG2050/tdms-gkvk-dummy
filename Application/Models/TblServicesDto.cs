@@ -227,18 +227,18 @@ namespace Application.Models
     public class TableHostelCreateDto
     {
         public DateOnly? Date { get; set; }
-        public int Male_SC { get; set; }
-        public int Male_ST { get; set; }
-        public int Male_OBC { get; set; }
-        public int Male_GEN { get; set; }
-        public int Female_SC { get; set; }
-        public int Female_ST { get; set; }
-        public int Female_OBC { get; set; }
-        public int Female_GEN { get; set; }
-        public int NumberOfDaysStayed { get; set; }
+        public int? Male_SC { get; set; }
+        public int? Male_ST { get; set; }
+        public int? Male_OBC { get; set; }
+        public int? Male_GEN { get; set; }
+        public int? Female_SC { get; set; }
+        public int? Female_ST { get; set; }
+        public int? Female_OBC { get; set; }
+        public int? Female_GEN { get; set; }
+        public int? NumberOfDaysStayed { get; set; }
         public string? VillageOrTaluk { get; set; }
         public string? Purpose { get; set; }
-        public decimal AmountGenerated { get; set; }
+        public decimal? AmountGenerated { get; set; }
         public DateOnly? SubmittedDate { get; set; }
     }
 
@@ -300,20 +300,20 @@ namespace Application.Models
         public string? PurposeOfVisit { get; set; }
 
         // Male counts
-        public int Male_SC { get; set; } = 0;
-        public int Male_ST { get; set; } = 0;
-        public int Male_OBC { get; set; } = 0;
-        public int Male_GEN { get; set; } = 0;
+        public int? Male_SC { get; set; }
+        public int? Male_ST { get; set; }
+        public int? Male_OBC { get; set; }
+        public int? Male_GEN { get; set; }
 
         // Female counts
-        public int Female_SC { get; set; } = 0;
-        public int Female_ST { get; set; } = 0;
-        public int Female_OBC { get; set; } = 0;
-        public int Female_GEN { get; set; } = 0;
+        public int? Female_SC { get; set; }
+        public int? Female_ST { get; set; }
+        public int? Female_OBC { get; set; }
+        public int? Female_GEN { get; set; }
 
-        public int Male_Total { get; set; }
-        public int Female_Total { get; set; }
-        public int Total { get; set; }
+        public int? Male_Total { get; set; }
+        public int? Female_Total { get; set; }
+        public int? Total { get; set; }
     }
 
     // ============================
@@ -328,18 +328,18 @@ namespace Application.Models
     {
         public int? Id { get; set; }  // null or 0 = create new, > 0 = update existing
         public DateOnly? Date { get; set; }
-        public int Male_SC { get; set; }
-        public int Male_ST { get; set; }
-        public int Male_OBC { get; set; }
-        public int Male_GEN { get; set; }
-        public int Female_SC { get; set; }
-        public int Female_ST { get; set; }
-        public int Female_OBC { get; set; }
-        public int Female_GEN { get; set; }
-        public int NumberOfDaysStayed { get; set; }
+        public int? Male_SC { get; set; }
+        public int? Male_ST { get; set; }
+        public int? Male_OBC { get; set; }
+        public int? Male_GEN { get; set; }
+        public int? Female_SC { get; set; }
+        public int? Female_ST { get; set; }
+        public int? Female_OBC { get; set; }
+        public int? Female_GEN { get; set; }
+        public int? NumberOfDaysStayed { get; set; }
         public string? VillageOrTaluk { get; set; }
         public string? Purpose { get; set; }
-        public decimal AmountGenerated { get; set; }
+        public decimal? AmountGenerated { get; set; }
         public DateOnly? SubmittedDate { get; set; }
     }
 
@@ -367,17 +367,17 @@ namespace Application.Models
         public string? Location { get; set; }
         public string? Purpose { get; set; }
         public string? PurposeOfVisit { get; set; }
-        public int Male_SC { get; set; } = 0;
-        public int Male_ST { get; set; } = 0;
-        public int Male_OBC { get; set; } = 0;
-        public int Male_GEN { get; set; } = 0;
-        public int Female_SC { get; set; } = 0;
-        public int Female_ST { get; set; } = 0;
-        public int Female_OBC { get; set; } = 0;
-        public int Female_GEN { get; set; } = 0;
-        public int Male_Total { get; set; }
-        public int Female_Total { get; set; }
-        public int Total { get; set; }
+        public int? Male_SC { get; set; }
+        public int? Male_ST { get; set; }
+        public int? Male_OBC { get; set; }
+        public int? Male_GEN { get; set; }
+        public int? Female_SC { get; set; }
+        public int? Female_ST { get; set; }
+        public int? Female_OBC { get; set; }
+        public int? Female_GEN { get; set; }
+        public int? Male_Total { get; set; }
+        public int? Female_Total { get; set; }
+        public int? Total { get; set; }
     }
 
     /// <summary>

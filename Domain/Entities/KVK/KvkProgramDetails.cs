@@ -116,6 +116,7 @@ namespace Domain.Entities.KVK
         public string? SourceOfTitle { get; set; }
 
         // Proposal details
+
         public DateOnly? ProposalDate { get; set; }
         [MaxLength(500)]
         public string? ProposalUploadFile { get; set; }
@@ -150,6 +151,18 @@ namespace Domain.Entities.KVK
 
 
         //New Fields
+        public int? CollaboratorId { get; set; }
+        [JsonIgnore]
+        public Collaborator ? Collaborator { get; set; }
+
+        public string? CollaboratorOther { get; set; }
+
+        public int? CollaborativeProgramOptionId { get; set; }
+        [JsonIgnore]
+        public CollaborativeProgramOption? CollaborativeProgramOption { get; set; }
+
+        public string? CollaborativeProgramOptionOther { get; set; }
+
         [MaxLength(50)]
         public string? T01 { get; set; }
         [MaxLength(50)]
@@ -176,6 +189,7 @@ namespace Domain.Entities.KVK
         [JsonIgnore]
         public Participant? ParticipatedAs { get; set; }
 
+        
         public string? ParticipantFileUpload { get; set; }
 
 

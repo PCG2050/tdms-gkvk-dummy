@@ -149,6 +149,25 @@ namespace Domain.Entities.ATIC
         [MaxLength(500)]
         public string? ReportingVideo { get; set; }
 
+        //New Fields
+        public int? CollaboratorId { get; set; }
+        [JsonIgnore]
+        public Collaborator? Collaborator { get; set; }
+
+        public string? CollaboratorOther { get; set; }
+
+        public int? CollaborativeProgramOptionId { get; set; }
+        [JsonIgnore]
+        public CollaborativeProgramOption? CollaborativeProgramOption { get; set; }
+
+        public string? CollaborativeProgramOptionOther { get; set; }
+
+        public int? ParticipatedAsId { get; set; }
+        [JsonIgnore]
+        public Participant? ParticipatedAs { get; set; }
+
+        public string? ParticipantFileUpload { get; set; }
+
         public ICollection<AticParticipantDemographics>? ParticipantDemographics { get; set; }
 
         public ICollection<AticProgramContentAndResources>? ProgramContent { get; set; }

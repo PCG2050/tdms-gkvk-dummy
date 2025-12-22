@@ -6,6 +6,7 @@ namespace Application.Interface.Repository.DataTables
     public interface IFinancialBudgetRepository
     {
         IQueryable<FinancialBudget> GetQueryable();
+        Task<List<FinancialBudget>> GetAllAsync();
         Task<FinancialBudget?> GetByIdAsync(int id);
         Task<FinancialBudget?> GetWithDetailsAsync(int id);
         Task<FinancialBudget> CreateAsync(FinancialBudget entity);

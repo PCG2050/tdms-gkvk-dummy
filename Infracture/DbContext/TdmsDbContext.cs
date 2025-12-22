@@ -370,7 +370,7 @@ namespace Infrastructure.DbContext
             modelBuilder.Entity<FtiProgramDetailsGeneric>()
                 .ToTable("FtiProgramDetails");
 
-          
+
             modelBuilder.Entity<FtiProgramDetailsGeneric>()
                 .HasMany(p => p.ParticipantDemographics)
                 .WithOne()
@@ -400,6 +400,26 @@ namespace Infrastructure.DbContext
                 .WithOne()
                 .HasForeignKey<FtiRecommendation>("FtiProgramDetailsId")
                 .OnDelete(DeleteBehavior.Cascade);
+
+            //// Configure TblService relationships with child entities
+            //modelBuilder.Entity<TblService>()
+            //    .HasMany(s => s.Hostels)
+            //    .WithOne(h => h.TblService)
+            //    .HasForeignKey(h => h.ServiceId)
+            //    .OnDelete(DeleteBehavior.Cascade);
+
+            //modelBuilder.Entity<TblService>()
+            //    .HasMany(s => s.RevolvingFundStatuses)
+            //    .WithOne(r => r.Service)
+            //    .HasForeignKey(r => r.ServiceId)
+            //    .OnDelete(DeleteBehavior.Cascade);
+
+            //modelBuilder.Entity<TblService>()
+            //    .HasMany(s => s.VisitorDetails)
+            //    .WithOne(v => v.TblService)
+            //    .HasForeignKey(v => v.ServiceId)
+            //    .OnDelete(DeleteBehavior.Cascade);
+
 
             modelBuilder.Entity<TrainerAssignment>()
                 .HasOne(t => t.CreatedBy)
@@ -447,9 +467,8 @@ namespace Infrastructure.DbContext
                 }
             }
             new OrganizationTypeConfiguration().Configure(modelBuilder.Entity<Organization>());
-            new UserTypeConfiguration().Configure(modelBuilder.Entity<User>());
-            new AticSalesTypeConfiguration().Configure(modelBuilder.Entity<AticSales>());
-            //new DeuCourseTypeConfiguration().Configure(modelBuilder.Entity<DeuCourse>());
+            new UserTypeConfiguration().Configure(modelBuilder.Entity<User>());       
+         
 
 
             //Configuring Defaults for createdAt only (UpdatedAt will be handled by savechanges override) 

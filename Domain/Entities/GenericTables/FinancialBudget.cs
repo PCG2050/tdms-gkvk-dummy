@@ -72,6 +72,7 @@ namespace Domain.Entities.GenericTables
         public decimal? Released { get; set; }
         public decimal? Expenditure { get; set; }
         public decimal? Balance { get; set; }
+        public decimal? PercentageOfExpenditure { get; set; }
     }
 
     /// <summary>

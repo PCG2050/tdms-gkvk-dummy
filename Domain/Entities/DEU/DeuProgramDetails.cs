@@ -149,6 +149,25 @@ namespace Domain.Entities.DEU
         [MaxLength(500)]
         public string? ReportingVideo { get; set; }
 
+        //New Fields
+        public int? CollaboratorId { get; set; }
+        [JsonIgnore]
+        public Collaborator? Collaborator { get; set; }
+
+        public string? CollaboratorOther { get; set; }
+
+        public int? CollaborativeProgramOptionId { get; set; }
+        [JsonIgnore]
+        public CollaborativeProgramOption? CollaborativeProgramOption { get; set; }
+
+        public string? CollaborativeProgramOptionOther { get; set; }
+
+        public int? ParticipatedAsId { get; set; }
+        [JsonIgnore]
+        public Participant? ParticipatedAs { get; set; }
+
+        public string? ParticipantFileUpload { get; set; }
+
         public ICollection<DeuParticipantDemographics>? ParticipantDemographics { get; set; }
 
         public ICollection<DeuProgramContentAndResources>? ProgramContent { get; set; }

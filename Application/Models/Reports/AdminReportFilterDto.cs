@@ -34,6 +34,7 @@ namespace Application.Models.Reports
         public List<ReportConsultancyDto> Consultancies { get; set; } = new();
         public List<ReportServiceDto> Services { get; set; } = new();
         public List<ReportOtherActivityDto> OtherActivities { get; set; } = new();
+        public List<ReportFinancialBudgetDto> FinancialBudgets { get; set; } = new();
 
         // NEW: FIU Activities (only populated for FIU unit)
         public ReportFIUActivitiesDto? FIUActivities { get; set; }
@@ -159,6 +160,7 @@ namespace Application.Models.Reports
 
         public string Unit { get; set; } = string.Empty;
         public decimal Amount { get; set; }
+
         //public string Discipline { get; set; } = string.Empty;
         //public string Particular { get; set; } = string.Empty;        
         //public DateOnly Date { get; set; }
@@ -168,5 +170,15 @@ namespace Application.Models.Reports
     {
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+    }
+
+    public class ReportFinancialBudgetDto
+    {
+        public decimal Sanctioned { get; set; }
+        public decimal Released { get; set; }
+        public decimal Expenditure { get; set; }
+        public decimal Balance { get; set; }
+        
+
     }
 }

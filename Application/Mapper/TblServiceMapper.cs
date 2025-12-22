@@ -9,9 +9,9 @@ namespace Application.Mapper
         // Basic Entity ⇆ DTO mappings
         // ----------------------------
         public partial TblServicesDto MapToDto(TblService entity);
-        [MapProperty(nameof(TblService.RevolvingFundStatuses), nameof(CompleteTblServicesDto.RevolvingFundStatuses), Use = nameof(MapRevolvingFundStatusToHybridDto))]
-        [MapProperty(nameof(TblService.Hostels), nameof(CompleteTblServicesDto.TableHostels), Use = nameof(MapTableHostelToHybridDto))]
-        [MapProperty(nameof(TblService.VisitorDetails), nameof(CompleteTblServicesDto.VisitorDetails), Use = nameof(MapVisitorDetailToHybridDto))]
+        [MapProperty(nameof(TblService.RevolvingFundStatuses), nameof(CompleteTblServicesDto.RevolvingFundStatuses), Use = nameof(MapRevolvingFundStatusCollection))]
+        [MapProperty(nameof(TblService.Hostels), nameof(CompleteTblServicesDto.TableHostels), Use = nameof(MapTableHostelCollection))]
+        [MapProperty(nameof(TblService.VisitorDetails), nameof(CompleteTblServicesDto.VisitorDetails), Use = nameof(MapVisitorDetailCollection))]
         public partial CompleteTblServicesDto MapToCompleteDto(TblService entity);
 
         // Child entity mappings (standard DTOs)
@@ -20,14 +20,64 @@ namespace Application.Mapper
         public partial VisitorDetailDto MapToDto(VisitorDetail entity);
 
         // Child entity mappings (Hybrid DTOs for with-children endpoints)
-        // Note: Mapperly auto-generates these, so we use private partial
-        private partial TableHostelHybridDto MapTableHostelToHybridDto(TableHostel entity);
+        // Manual implementation for TableHostel to ensure correct mapping
+        private TableHostelHybridDto MapTableHostelToHybridDto(TableHostel entity)
+        {
+            return new TableHostelHybridDto
+            {
+                Id = entity.Id,
+                Date = entity.Date,
+                Male_SC = entity.Male_SC,
+                Male_ST = entity.Male_ST,
+                Male_OBC = entity.Male_OBC,
+                Male_GEN = entity.Male_GEN,
+                Female_SC = entity.Female_SC,
+                Female_ST = entity.Female_ST,
+                Female_OBC = entity.Female_OBC,
+                Female_GEN = entity.Female_GEN,
+                NumberOfDaysStayed = entity.NumberOfDaysStayed,
+                VillageOrTaluk = entity.VillageOrTaluk,
+                Purpose = entity.Purpose,
+                AmountGenerated = entity.AmountGenerated,
+                SubmittedDate = entity.SubmittedDate
+            };
+        }
+
+        // Note: Mapperly auto-generates these partial methods
         private partial RevolvingFundStatusHybridDto MapRevolvingFundStatusToHybridDto(RevolvingFundStatus entity);
         private partial VisitorDetailHybridDto MapVisitorDetailToHybridDto(VisitorDetail entity);
+
+        // Collection mapping methods to handle nullable collections properly
+        private List<TableHostelHybridDto> MapTableHostelCollection(ICollection<TableHostel>? entities)
+        {
+            if (entities == null || !entities.Any())
+                return new List<TableHostelHybridDto>();
+
+            return entities.Select(MapTableHostelToHybridDto).ToList();
+        }
+
+        private List<RevolvingFundStatusHybridDto> MapRevolvingFundStatusCollection(ICollection<RevolvingFundStatus>? entities)
+        {
+            if (entities == null || !entities.Any())
+                return new List<RevolvingFundStatusHybridDto>();
+
+            return entities.Select(MapRevolvingFundStatusToHybridDto).ToList();
+        }
+
+        private List<VisitorDetailHybridDto> MapVisitorDetailCollection(ICollection<VisitorDetail>? entities)
+        {
+            if (entities == null || !entities.Any())
+                return new List<VisitorDetailHybridDto>();
+
+            return entities.Select(MapVisitorDetailToHybridDto).ToList();
+        }
 
         [MapProperty(nameof(TblServiceCreateDto.Number), nameof(TblService.Number), Use = nameof(GetIntOrDefault))]
         [MapProperty(nameof(TblServiceCreateDto.AmountGenerated), nameof(TblService.AmountGenerated), Use = nameof(GetDecimalOrDefault))]
         [MapProperty(nameof(TblServiceCreateDto.AmountReleased), nameof(TblService.AmountReleased), Use = nameof(GetDecimalOrDefault))]
+        [MapperIgnoreSource(nameof(TblServiceCreateDto.TableHostels))]
+        [MapperIgnoreSource(nameof(TblServiceCreateDto.RevolvingFundStatuses))]
+        [MapperIgnoreSource(nameof(TblServiceCreateDto.VisitorDetails))]
         public partial TblService MapToEntity(TblServiceCreateDto dto);
 
         [MapProperty(nameof(RevolvingFundStatusCreateDto.OpeningBalance), nameof(RevolvingFundStatus.OpeningBalance), Use = nameof(GetDecimalOrDefault))]
@@ -35,26 +85,50 @@ namespace Application.Mapper
         [MapProperty(nameof(RevolvingFundStatusCreateDto.Expenditure), nameof(RevolvingFundStatus.Expenditure), Use = nameof(GetDecimalOrDefault))]
         [MapProperty(nameof(RevolvingFundStatusCreateDto.ClosingBalance), nameof(RevolvingFundStatus.ClosingBalance), Use = nameof(GetDoubleOrDefault))]
         public partial RevolvingFundStatus MapToEntity(RevolvingFundStatusCreateDto dto);
-        public partial VisitorDetail MapToEntity(VisitorDetailCreateDto dto);
 
-        // Manual mapping for TableHostelCreateDto to handle SubmittedDate default
+        // Manual mapping for VisitorDetailCreateDto to handle nullable values
+        public VisitorDetail MapToEntity(VisitorDetailCreateDto dto)
+        {
+            return new VisitorDetail
+            {
+                Name = dto.Name,
+                MobileNo = dto.MobileNo,
+                Date = dto.Date,
+                Location = dto.Location,
+                Purpose = dto.Purpose,
+                PurposeOfVisit = dto.PurposeOfVisit,
+                Male_SC = dto.Male_SC ?? 0,
+                Male_ST = dto.Male_ST ?? 0,
+                Male_OBC = dto.Male_OBC ?? 0,
+                Male_GEN = dto.Male_GEN ?? 0,
+                Female_SC = dto.Female_SC ?? 0,
+                Female_ST = dto.Female_ST ?? 0,
+                Female_OBC = dto.Female_OBC ?? 0,
+                Female_GEN = dto.Female_GEN ?? 0,
+                Male_Total = dto.Male_Total ?? 0,
+                Female_Total = dto.Female_Total ?? 0,
+                Total = dto.Total ?? 0
+            };
+        }
+
+        // Manual mapping for TableHostelCreateDto to handle nullable values and defaults
         public TableHostel MapToEntity(TableHostelCreateDto dto)
         {
             return new TableHostel
             {
                 Date = dto.Date,
-                Male_SC = dto.Male_SC,
-                Male_ST = dto.Male_ST,
-                Male_OBC = dto.Male_OBC,
-                Male_GEN = dto.Male_GEN,
-                Female_SC = dto.Female_SC,
-                Female_ST = dto.Female_ST,
-                Female_OBC = dto.Female_OBC,
-                Female_GEN = dto.Female_GEN,
-                NumberOfDaysStayed = dto.NumberOfDaysStayed,
+                Male_SC = dto.Male_SC ?? 0,
+                Male_ST = dto.Male_ST ?? 0,
+                Male_OBC = dto.Male_OBC ?? 0,
+                Male_GEN = dto.Male_GEN ?? 0,
+                Female_SC = dto.Female_SC ?? 0,
+                Female_ST = dto.Female_ST ?? 0,
+                Female_OBC = dto.Female_OBC ?? 0,
+                Female_GEN = dto.Female_GEN ?? 0,
+                NumberOfDaysStayed = dto.NumberOfDaysStayed ?? 0,
                 VillageOrTaluk = dto.VillageOrTaluk,
                 Purpose = dto.Purpose,
-                AmountGenerated = dto.AmountGenerated,
+                AmountGenerated = dto.AmountGenerated ?? 0,
                 SubmittedDate = dto.SubmittedDate ?? DateOnly.FromDateTime(DateTime.UtcNow)
             };
         }
@@ -74,9 +148,9 @@ namespace Application.Mapper
         [MapProperty(nameof(TblService.ParticipationType.Name), nameof(TblServicesDto.ParticipationTypeName))]
         [MapProperty(nameof(TblService.ApprovedBy.FirstName), nameof(TblServicesDto.ApprovedByName))]
         [MapProperty(nameof(TblService.CreatedBy.FirstName), nameof(TblServicesDto.CreatedByName))]
-        [MapProperty(nameof(TblService.RevolvingFundStatuses), nameof(TblServicesDto.RevolvingFundStatuses), Use = nameof(MapRevolvingFundStatusToHybridDto))]
-        [MapProperty(nameof(TblService.Hostels), nameof(TblServicesDto.TableHostels), Use = nameof(MapTableHostelToHybridDto))]
-        [MapProperty(nameof(TblService.VisitorDetails), nameof(TblServicesDto.VisitorDetails), Use = nameof(MapVisitorDetailToHybridDto))]
+        [MapProperty(nameof(TblService.RevolvingFundStatuses), nameof(TblServicesDto.RevolvingFundStatuses), Use = nameof(MapRevolvingFundStatusCollection))]
+        [MapProperty(nameof(TblService.Hostels), nameof(TblServicesDto.TableHostels), Use = nameof(MapTableHostelCollection))]
+        [MapProperty(nameof(TblService.VisitorDetails), nameof(TblServicesDto.VisitorDetails), Use = nameof(MapVisitorDetailCollection))]
         public partial TblServicesDto MapToDtoWithDetails(TblService entity);
 
         // ----------------------------
@@ -130,18 +204,18 @@ namespace Application.Mapper
         public void MapUpdateDtoToEntity(TableHostelCreateDto dto, TableHostel entity)
         {
             if (dto.Date.HasValue) entity.Date = dto.Date;
-            entity.Male_SC = dto.Male_SC;
-            entity.Male_ST = dto.Male_ST;
-            entity.Male_OBC = dto.Male_OBC;
-            entity.Male_GEN = dto.Male_GEN;
-            entity.Female_SC = dto.Female_SC;
-            entity.Female_ST = dto.Female_ST;
-            entity.Female_OBC = dto.Female_OBC;
-            entity.Female_GEN = dto.Female_GEN;
-            entity.NumberOfDaysStayed = dto.NumberOfDaysStayed;
+            entity.Male_SC = dto.Male_SC ?? 0;
+            entity.Male_ST = dto.Male_ST ?? 0;
+            entity.Male_OBC = dto.Male_OBC ?? 0;
+            entity.Male_GEN = dto.Male_GEN ?? 0;
+            entity.Female_SC = dto.Female_SC ?? 0;
+            entity.Female_ST = dto.Female_ST ?? 0;
+            entity.Female_OBC = dto.Female_OBC ?? 0;
+            entity.Female_GEN = dto.Female_GEN ?? 0;
+            entity.NumberOfDaysStayed = dto.NumberOfDaysStayed ?? 0;
             entity.VillageOrTaluk = dto.VillageOrTaluk;
             entity.Purpose = dto.Purpose;
-            entity.AmountGenerated = dto.AmountGenerated;
+            entity.AmountGenerated = dto.AmountGenerated ?? 0;
             if (dto.SubmittedDate.HasValue) entity.SubmittedDate = dto.SubmittedDate.Value;
         }
         // ----------------------------
@@ -166,17 +240,17 @@ namespace Application.Mapper
             entity.Location = dto.Location;
             entity.Purpose = dto.Purpose;
             entity.PurposeOfVisit = dto.PurposeOfVisit;
-            entity.Male_SC = dto.Male_SC;
-            entity.Male_ST = dto.Male_ST;
-            entity.Male_OBC = dto.Male_OBC;
-            entity.Male_GEN = dto.Male_GEN;
-            entity.Female_SC = dto.Female_SC;
-            entity.Female_ST = dto.Female_ST;
-            entity.Female_OBC = dto.Female_OBC;
-            entity.Female_GEN = dto.Female_GEN;
-            entity.Male_Total = dto.Male_Total;
-            entity.Female_Total = dto.Female_Total;
-            entity.Total = dto.Total;
+            entity.Male_SC = dto.Male_SC ?? 0;
+            entity.Male_ST = dto.Male_ST ?? 0;
+            entity.Male_OBC = dto.Male_OBC ?? 0;
+            entity.Male_GEN = dto.Male_GEN ?? 0;
+            entity.Female_SC = dto.Female_SC ?? 0;
+            entity.Female_ST = dto.Female_ST ?? 0;
+            entity.Female_OBC = dto.Female_OBC ?? 0;
+            entity.Female_GEN = dto.Female_GEN ?? 0;
+            entity.Male_Total = dto.Male_Total ?? 0;
+            entity.Female_Total = dto.Female_Total ?? 0;
+            entity.Total = dto.Total ?? 0;
         }
 
         // ----------------------------
@@ -209,18 +283,18 @@ namespace Application.Mapper
         public void MapUpdateDtoToEntity(TableHostelHybridDto dto, TableHostel entity)
         {
             if (dto.Date.HasValue) entity.Date = dto.Date;
-            entity.Male_SC = dto.Male_SC;
-            entity.Male_ST = dto.Male_ST;
-            entity.Male_OBC = dto.Male_OBC;
-            entity.Male_GEN = dto.Male_GEN;
-            entity.Female_SC = dto.Female_SC;
-            entity.Female_ST = dto.Female_ST;
-            entity.Female_OBC = dto.Female_OBC;
-            entity.Female_GEN = dto.Female_GEN;
-            entity.NumberOfDaysStayed = dto.NumberOfDaysStayed;
+            entity.Male_SC = dto.Male_SC ?? 0;
+            entity.Male_ST = dto.Male_ST ?? 0;
+            entity.Male_OBC = dto.Male_OBC ?? 0;
+            entity.Male_GEN = dto.Male_GEN ?? 0;
+            entity.Female_SC = dto.Female_SC ?? 0;
+            entity.Female_ST = dto.Female_ST ?? 0;
+            entity.Female_OBC = dto.Female_OBC ?? 0;
+            entity.Female_GEN = dto.Female_GEN ?? 0;
+            entity.NumberOfDaysStayed = dto.NumberOfDaysStayed ?? 0;
             entity.VillageOrTaluk = dto.VillageOrTaluk;
             entity.Purpose = dto.Purpose;
-            entity.AmountGenerated = dto.AmountGenerated;
+            entity.AmountGenerated = dto.AmountGenerated ?? 0;
             if (dto.SubmittedDate.HasValue) entity.SubmittedDate = dto.SubmittedDate.Value;
         }
 
@@ -229,18 +303,18 @@ namespace Application.Mapper
             var entity = new TableHostel
             {
                 Date = dto.Date,
-                Male_SC = dto.Male_SC,
-                Male_ST = dto.Male_ST,
-                Male_OBC = dto.Male_OBC,
-                Male_GEN = dto.Male_GEN,
-                Female_SC = dto.Female_SC,
-                Female_ST = dto.Female_ST,
-                Female_OBC = dto.Female_OBC,
-                Female_GEN = dto.Female_GEN,
-                NumberOfDaysStayed = dto.NumberOfDaysStayed,
+                Male_SC = dto.Male_SC ?? 0,
+                Male_ST = dto.Male_ST ?? 0,
+                Male_OBC = dto.Male_OBC ?? 0,
+                Male_GEN = dto.Male_GEN ?? 0,
+                Female_SC = dto.Female_SC ?? 0,
+                Female_ST = dto.Female_ST ?? 0,
+                Female_OBC = dto.Female_OBC ?? 0,
+                Female_GEN = dto.Female_GEN ?? 0,
+                NumberOfDaysStayed = dto.NumberOfDaysStayed ?? 0,
                 VillageOrTaluk = dto.VillageOrTaluk,
                 Purpose = dto.Purpose,
-                AmountGenerated = dto.AmountGenerated,
+                AmountGenerated = dto.AmountGenerated ?? 0,
                 SubmittedDate = dto.SubmittedDate ?? DateOnly.FromDateTime(DateTime.UtcNow)
             };
             return entity;
@@ -273,17 +347,17 @@ namespace Application.Mapper
             entity.Location = dto.Location;
             entity.Purpose = dto.Purpose;
             entity.PurposeOfVisit = dto.PurposeOfVisit;
-            entity.Male_SC = dto.Male_SC;
-            entity.Male_ST = dto.Male_ST;
-            entity.Male_OBC = dto.Male_OBC;
-            entity.Male_GEN = dto.Male_GEN;
-            entity.Female_SC = dto.Female_SC;
-            entity.Female_ST = dto.Female_ST;
-            entity.Female_OBC = dto.Female_OBC;
-            entity.Female_GEN = dto.Female_GEN;
-            entity.Male_Total = dto.Male_Total;
-            entity.Female_Total = dto.Female_Total;
-            entity.Total = dto.Total;
+            entity.Male_SC = dto.Male_SC ?? 0;
+            entity.Male_ST = dto.Male_ST ?? 0;
+            entity.Male_OBC = dto.Male_OBC ?? 0;
+            entity.Male_GEN = dto.Male_GEN ?? 0;
+            entity.Female_SC = dto.Female_SC ?? 0;
+            entity.Female_ST = dto.Female_ST ?? 0;
+            entity.Female_OBC = dto.Female_OBC ?? 0;
+            entity.Female_GEN = dto.Female_GEN ?? 0;
+            entity.Male_Total = dto.Male_Total ?? 0;
+            entity.Female_Total = dto.Female_Total ?? 0;
+            entity.Total = dto.Total ?? 0;
         }
 
         public VisitorDetail MapToEntity(VisitorDetailHybridDto dto)
@@ -296,17 +370,17 @@ namespace Application.Mapper
                 Location = dto.Location,
                 Purpose = dto.Purpose,
                 PurposeOfVisit = dto.PurposeOfVisit,
-                Male_SC = dto.Male_SC,
-                Male_ST = dto.Male_ST,
-                Male_OBC = dto.Male_OBC,
-                Male_GEN = dto.Male_GEN,
-                Female_SC = dto.Female_SC,
-                Female_ST = dto.Female_ST,
-                Female_OBC = dto.Female_OBC,
-                Female_GEN = dto.Female_GEN,
-                Male_Total = dto.Male_Total,
-                Female_Total = dto.Female_Total,
-                Total = dto.Total
+                Male_SC = dto.Male_SC ?? 0,
+                Male_ST = dto.Male_ST ?? 0,
+                Male_OBC = dto.Male_OBC ?? 0,
+                Male_GEN = dto.Male_GEN ?? 0,
+                Female_SC = dto.Female_SC ?? 0,
+                Female_ST = dto.Female_ST ?? 0,
+                Female_OBC = dto.Female_OBC ?? 0,
+                Female_GEN = dto.Female_GEN ?? 0,
+                Male_Total = dto.Male_Total ?? 0,
+                Female_Total = dto.Female_Total ?? 0,
+                Total = dto.Total ?? 0
             };
         }
     }

@@ -367,10 +367,10 @@ namespace Infrastructure.Services.Reports
                 "string" => CalculateStringFieldWidth(col.Key, col.DisplayName, totalColumns),
 
                 // Fixed-size fields
-                "date" => 12,
+                "date" => 8,
                 "number" => 8,
-                "decimal" => 10,
-                "currency" => 12,
+                "decimal" => 8,
+                "currency" => 8,
 
                 _ => 15
             };
@@ -472,10 +472,10 @@ namespace Infrastructure.Services.Reports
             return dataType switch
             {
                 "string" => 12,    // Strings can wrap, so allow smaller
-                "date" => 10,
+                "date" => 8,
                 "number" => 6,
                 "decimal" => 8,
-                "currency" => 10,
+                "currency" => 8,
                 _ => 10
             };
         }
