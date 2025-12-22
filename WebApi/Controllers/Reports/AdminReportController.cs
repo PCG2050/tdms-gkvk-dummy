@@ -116,6 +116,10 @@ namespace WebApi.Controllers.Reports
         /// <summary>
         /// Generate comprehensive multi-step report with all sections
         /// POST /api/admin/reports/comprehensive/generate
+        ///
+        /// Use either:
+        /// - UnitLocationIds: List of specific unit location IDs
+        /// - UnitId: Get ALL unit locations for this unit type (e.g., all KVK locations)
         /// </summary>
         [HttpPost("comprehensive/generate")]
         public async Task<IActionResult> GenerateComprehensiveReport([FromBody] ComprehensiveReportRequest request)
@@ -123,13 +127,55 @@ namespace WebApi.Controllers.Reports
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (request.UnitLocationIds == null || !request.UnitLocationIds.Any())
-                return BadRequest(new { message = "At least one unit location must be specified" });
+            // Validate: Either UnitId or UnitLocationIds must be provided
+            bool hasUnitId = request.UnitId.HasValue;
+            bool hasLocationIds = request.UnitLocationIds != null && request.UnitLocationIds.Any();
+
+            if (!hasUnitId && !hasLocationIds)
+                return BadRequest(new { message = "Either UnitId or UnitLocationIds must be specified" });
 
             if (string.IsNullOrEmpty(request.ReportType))
                 return BadRequest(new { message = "Report type is required" });
 
             var result = await _comprehensiveReportService.GenerateReportAsync(request);
+
+            if (!result.IsSuccess)
+                return BadRequest(new { message = result.ErrorMessage });
+
+            return Ok(result.Data);
+        }
+
+        /// <summary>
+        /// Generate comprehensive report for ALL locations of a unit type
+        /// POST /api/admin/reports/comprehensive/all-unit
+        ///
+        /// This is a convenience endpoint that generates a report for all unit locations
+        /// of a specific unit type (e.g., all KVK locations, all EEU locations)
+        /// </summary>
+        [HttpPost("comprehensive/all-unit")]
+        public async Task<IActionResult> GenerateAllUnitReport([FromBody] AllUnitReportRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (request.UnitId <= 0)
+                return BadRequest(new { message = "Valid UnitId is required" });
+
+            if (string.IsNullOrEmpty(request.ReportType))
+                return BadRequest(new { message = "Report type is required" });
+
+            // Convert to ComprehensiveReportRequest
+            var comprehensiveRequest = new ComprehensiveReportRequest
+            {
+                UnitId = request.UnitId,
+                Month = request.Month,
+                Year = request.Year,
+                ReportType = request.ReportType,
+                FormStatus = request.FormStatus,
+                IncludeSubSections = request.IncludeSubSections
+            };
+
+            var result = await _comprehensiveReportService.GenerateReportAsync(comprehensiveRequest);
 
             if (!result.IsSuccess)
                 return BadRequest(new { message = result.ErrorMessage });

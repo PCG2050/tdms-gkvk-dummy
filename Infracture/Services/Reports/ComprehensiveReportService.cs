@@ -99,18 +99,48 @@ namespace Infrastructure.Services.Reports
         {
             try
             {
+                // Resolve UnitLocationIds from UnitId if provided
+                List<int> unitLocationIds;
+                int unitId;
+
+                if (request.UnitId.HasValue)
+                {
+                    // Get ALL unit locations for this unit type
+                    unitId = request.UnitId.Value;
+                    var allLocationsResult = await GetUnitLocationsByUnitIdAsync(unitId);
+                    if (!allLocationsResult.IsSuccess)
+                        return ServiceResult<ComprehensiveReportResponse>.Failure(allLocationsResult.ErrorMessage);
+
+                    unitLocationIds = allLocationsResult.Data!;
+
+                    if (!unitLocationIds.Any())
+                        return ServiceResult<ComprehensiveReportResponse>.Failure(
+                            $"No unit locations found for unit ID: {unitId}");
+                }
+                else if (request.UnitLocationIds != null && request.UnitLocationIds.Any())
+                {
+                    unitLocationIds = request.UnitLocationIds;
+                    // Get unit ID from first location
+                    var firstLoc = await _organizationUnitRepository.GetByIdAsync(unitLocationIds.First());
+                    if (firstLoc == null)
+                        return ServiceResult<ComprehensiveReportResponse>.Failure("Invalid unit location ID");
+                    unitId = firstLoc.UnitId;
+                }
+                else
+                {
+                    return ServiceResult<ComprehensiveReportResponse>.Failure(
+                        "Either UnitId or UnitLocationIds must be provided");
+                }
+
                 // Validate access
-                var accessResult = await ValidateAccessAsync(request.UnitLocationIds);
+                var accessResult = await ValidateAccessAsync(unitLocationIds);
                 if (!accessResult.IsSuccess)
                     return ServiceResult<ComprehensiveReportResponse>.Failure(accessResult.ErrorMessage);
 
                 // Get unit location details
-                var unitLocations = await _organizationUnitRepository.GetByIdsAsync(request.UnitLocationIds);
+                var unitLocations = await _organizationUnitRepository.GetByIdsAsync(unitLocationIds);
                 if (!unitLocations.Any())
                     return ServiceResult<ComprehensiveReportResponse>.Failure("No valid unit locations found");
-
-                var firstLocation = unitLocations.First();
-                var unitId = firstLocation.UnitId;
 
                 // Build response
                 var response = new ComprehensiveReportResponse
@@ -122,27 +152,27 @@ namespace Infrastructure.Services.Reports
                 switch (request.ReportType.ToLower())
                 {
                     case "program":
-                        await BuildProgramReportAsync(response, request, unitId, request.UnitLocationIds);
+                        await BuildProgramReportAsync(response, request, unitId, unitLocationIds);
                         break;
 
                     case "publication":
-                        await BuildPublicationReportAsync(response, request, request.UnitLocationIds);
+                        await BuildPublicationReportAsync(response, request, unitLocationIds);
                         break;
 
                     case "awards":
-                        await BuildAwardsReportAsync(response, request, request.UnitLocationIds);
+                        await BuildAwardsReportAsync(response, request, unitLocationIds);
                         break;
 
                     case "consultancy":
-                        await BuildConsultancyReportAsync(response, request, request.UnitLocationIds);
+                        await BuildConsultancyReportAsync(response, request, unitLocationIds);
                         break;
 
                     case "services":
-                        await BuildServicesReportAsync(response, request, request.UnitLocationIds);
+                        await BuildServicesReportAsync(response, request, unitLocationIds);
                         break;
 
                     case "financial":
-                        await BuildFinancialReportAsync(response, request, request.UnitLocationIds);
+                        await BuildFinancialReportAsync(response, request, unitLocationIds);
                         break;
 
                     default:
@@ -230,6 +260,51 @@ namespace Infrastructure.Services.Reports
             }
 
             return ServiceResult.Success();
+        }
+
+        /// <summary>
+        /// Get all unit location IDs for a specific unit type, filtered by user access
+        /// </summary>
+        private async Task<ServiceResult<List<int>>> GetUnitLocationsByUnitIdAsync(int unitId)
+        {
+            try
+            {
+                // Get all locations for this unit type
+                var allLocations = await _organizationUnitRepository.GetByUnitIdAsync(unitId);
+
+                if (allLocations == null || !allLocations.Any())
+                    return ServiceResult<List<int>>.Failure($"No locations found for unit ID: {unitId}");
+
+                var allLocationIds = allLocations.Select(l => l.Id).ToList();
+
+                // Filter by user access
+                if (_currentUserService.Role == Role.UNITHEAD)
+                {
+                    var allowedLocationIds = await _unitHeadAssignmentRepository
+                        .GetUnitLocationIdsByUnitHeadIdAsync(_currentUserService.UserId);
+
+                    allLocationIds = allLocationIds.Intersect(allowedLocationIds).ToList();
+
+                    if (!allLocationIds.Any())
+                        return ServiceResult<List<int>>.Failure(
+                            "You don't have access to any locations for this unit type",
+                            ServiceErrorStatus.FORBIDDEN);
+                }
+                else if (_currentUserService.Role == Role.ADMIN)
+                {
+                    // Admin can access all locations in their organization
+                    var orgLocations = await _organizationUnitRepository
+                        .GetUnitLocationIdsByOrganizationIdAsync(_currentUserService.OrganizationId);
+
+                    allLocationIds = allLocationIds.Intersect(orgLocations).ToList();
+                }
+
+                return ServiceResult<List<int>>.Success(allLocationIds);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<List<int>>.Failure($"Failed to get unit locations: {ex.Message}");
+            }
         }
 
         private ReportMetadata BuildMetadata(

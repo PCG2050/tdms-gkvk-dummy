@@ -10,10 +10,16 @@ namespace Application.Models.ComprehensiveReports
     public class ComprehensiveReportRequest
     {
         /// <summary>
-        /// Single unit location ID OR comma-separated list for multi-unit reports
+        /// Single unit location ID OR list for multi-unit reports
+        /// Use this OR UnitId, not both
         /// </summary>
-        [Required]
-        public List<int> UnitLocationIds { get; set; } = new();
+        public List<int>? UnitLocationIds { get; set; }
+
+        /// <summary>
+        /// Unit ID to get ALL unit locations for that unit type
+        /// Use this OR UnitLocationIds, not both
+        /// </summary>
+        public int? UnitId { get; set; }
 
         [Required]
         [Range(1, 12)]
@@ -33,6 +39,41 @@ namespace Application.Models.ComprehensiveReports
         /// If not provided, returns all entries for the month/year
         /// </summary>
         public int? ReportEntryId { get; set; }
+
+        /// <summary>
+        /// Optional: Filter by form status (default: "Approved")
+        /// </summary>
+        public string? FormStatus { get; set; } = "Approved";
+
+        /// <summary>
+        /// Whether to include sub-section data (demographics, resource persons, etc.)
+        /// </summary>
+        public bool IncludeSubSections { get; set; } = true;
+    }
+
+    /// <summary>
+    /// Simplified request for generating reports for ALL locations of a unit type
+    /// </summary>
+    public class AllUnitReportRequest
+    {
+        /// <summary>
+        /// Unit ID (e.g., 10 for KVK, 9 for EEU) - generates report for ALL locations of this unit type
+        /// </summary>
+        [Required]
+        public int UnitId { get; set; }
+
+        [Required]
+        [Range(1, 12)]
+        public int Month { get; set; }
+
+        [Required]
+        public int Year { get; set; }
+
+        /// <summary>
+        /// Report type: "program", "publication", "awards", "consultancy", "services", "financial"
+        /// </summary>
+        [Required]
+        public string ReportType { get; set; } = string.Empty;
 
         /// <summary>
         /// Optional: Filter by form status (default: "Approved")
