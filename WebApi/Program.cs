@@ -368,6 +368,7 @@ namespace WebApi
 
             builder.Services.AddScoped<IAdminReportService, AdminReportService>();
             builder.Services.AddScoped<IDynamicReportService, DynamicReportService>();
+            builder.Services.AddScoped<IComprehensiveReportService, ComprehensiveReportService>();
             // Success Story Service
             builder.Services.AddScoped<ISuccessStoryService, SuccessStoryService>();
 
