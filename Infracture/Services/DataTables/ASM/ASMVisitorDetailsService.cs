@@ -541,8 +541,8 @@ namespace Infrastructure.Services.DataTables.ASM
             int pageNumber = 1,
             int pageSize = 10)
         {
-           var query = _repository.GetQueryable()
-                .Include(x=> x.InstituteName);
+            // Note: No Include needed - InstituteName is a scalar property, not a navigation property
+            var query = _repository.GetQueryable();
 
             return await _historyService.GetTrainerHistoryAsync(
                 query,
