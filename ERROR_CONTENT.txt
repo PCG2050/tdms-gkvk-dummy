@@ -1,0 +1,94 @@
+For KVK Unit ENDpoint  /api/kvk/KvkProgram/{programId}/content-with-children 
+{
+  
+    "title": null,
+    "description": null,
+    "resourcePersons": [
+      {
+        "name": "aaa",
+        "designation": "aaa",
+        "resourceTypeId": 1,
+        "responsibilityId": 1,
+        "institutionOrDepartment": "1" 
+      }
+    ],
+    "topicsCovered": [
+      {
+        "date": "2025-01-10",
+        "title": "aa",
+        "photoUpload": "aa"
+      }
+    ],
+    "teachingAids": [
+      {
+        "typeOfAidId": 1,
+        "otherTypeOfAid": null,
+        "purpose": "aaa",
+        "number": 1
+      }
+    ],
+    "fieldVisits": [
+      {
+        "date": null,
+        "scientistOfficerVisitedName": null,
+        "purpose": null,
+        "noOfFieldsCovered": null,
+        "noOfFarmerCovered": null,
+        "photoUpload": null
+      }
+    ],
+    "fieldDays": [
+      {}
+    ],
+    "farmerScientistInteractions": [
+      {
+        "date": null,
+        "scientistOfficerName": null,
+        "topicDiscussed": null,
+        "noOfFarmersParticipated": null,
+        "photoUpload": null
+      }
+    ]
+  }
+} and this is the response {
+  "isSuccess": true,
+  "successMessage": "Operation successful.",
+  "data": {
+    "id": 183,
+    "kvkProgramDetailsId": 288,
+    "resourcePersons": [],
+    "topicsCovered": [],
+    "teachingAids": []
+  },
+  "errorStatus": 0
+}and its not sending child elemnts created in body and also in db it not saving event though there is  a success message . 
+
+For the EndPoint  /api/kvk/KvkProgram/{programId}/advisory-services-with-children
+For this request
+{
+  "noOfFacebookSMS":1,
+  "noOfSMSSentToRegisteredFarmers": 1,
+  "noOfWhatsappGroups":2,
+  "noOfWhatsappSMS": 2,
+  "noOfAnsweredWhatsappQueries": 2,
+  "noOfPhoneCalls": 2,
+  "noOfFaceToFaceDiscussions": 2,
+  "noOfGroupDiscussions": 2,
+  "noOfEmailsSent": 2,
+  "noOfNewspaperCoverage": 2,
+  "noOfBeneficiaries":2,
+  "criticalInputsDistributed": [
+    {
+      "inputName": "gd",
+      "quantityDistributed": null,
+      "noOfRecipients": null
+    }
+  ]
+}
+{
+  "isSuccess": false,
+  "errorMessage": "Error creating advisory services: An error occurred while saving the entity changes. See the inner exception for details.",
+  "errorStatus": 8
+}
+
+Its not saving in DB 
