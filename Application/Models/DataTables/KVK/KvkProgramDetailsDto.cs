@@ -96,6 +96,29 @@ namespace Application.Models.DataTables.KVK
         public string? ParticipatedAsName { get; set; }
         public string? ParticipantFileUpload { get; set; }
 
+        // New fields
+        public string? TypeTopic { get; set; }
+        public string? PurposeOfVisit { get; set; }
+        public int? EventNamesId { get; set; }
+        public string? EventNamesName { get; set; }
+        public string? OtherEventNames { get; set; }
+        public string? Facilitator { get; set; }
+        public int? VAPOptionsId { get; set; }
+        public string? VAPOptionsName { get; set; }
+        public int? SampleCollected { get; set; }
+        public int? SampleAnalyzed { get; set; }
+        public int? TargetFarmersId { get; set; }
+        public string? TargetFarmersName { get; set; }
+        public int? ZonesOptionsId { get; set; }
+        public string? ZonesOptionsName { get; set; }
+        public string? OtherLocation { get; set; }
+        public int? PlaceId { get; set; }
+        public string? PlaceName { get; set; }
+        public DateOnly? PaperPosterAbstractDate { get; set; }
+        public string? PaperPosterAbstractFile { get; set; }
+        public DateOnly? UniversityPermissionLetterDate { get; set; }
+        public string? UniversityPermissionLetterFile { get; set; }
+
         // Status tracking
         public string FormStatus { get; set; } = "Draft";
         public string? FormStatusRemarks { get; set; }
@@ -173,6 +196,25 @@ namespace Application.Models.DataTables.KVK
         public int? ParticipatedAsId { get; set; }
 
         public string? ParticipantFileUpload { get; set; }
+
+        // New fields
+        public string? TypeTopic { get; set; }
+        public string? PurposeOfVisit { get; set; }
+        public int? EventNamesId { get; set; }
+        public string? OtherEventNames { get; set; }
+        public string? Facilitator { get; set; }
+        public int? VAPOptionsId { get; set; }
+        public int? SampleCollected { get; set; }
+        public int? SampleAnalyzed { get; set; }
+        public int? TargetFarmersId { get; set; }
+        public int? ZonesOptionsId { get; set; }
+        public string? OtherLocation { get; set; }
+        public int? PlaceId { get; set; }
+        public DateOnly? PaperPosterAbstractDate { get; set; }
+        public string? PaperPosterAbstractFile { get; set; }
+        public DateOnly? UniversityPermissionLetterDate { get; set; }
+        public string? UniversityPermissionLetterFile { get; set; }
+
         public decimal? Area { get; set; }
         public string? OrganizerBroucherFile { get; set; }
         public string? OrganizerInstitutionName { get; set; }
@@ -197,7 +239,7 @@ namespace Application.Models.DataTables.KVK
         public string? ReportingVideo { get; set; }
         public string? Attachements { get; set; }
 
-     
+
     }
 
     public class KvkProgramUpdateDto : IUpdateDto
@@ -262,6 +304,25 @@ namespace Application.Models.DataTables.KVK
         public int? ParticipatedAsId { get; set; }
 
         public string? ParticipantFileUpload { get; set; }
+
+        // New fields
+        public string? TypeTopic { get; set; }
+        public string? PurposeOfVisit { get; set; }
+        public int? EventNamesId { get; set; }
+        public string? OtherEventNames { get; set; }
+        public string? Facilitator { get; set; }
+        public int? VAPOptionsId { get; set; }
+        public int? SampleCollected { get; set; }
+        public int? SampleAnalyzed { get; set; }
+        public int? TargetFarmersId { get; set; }
+        public int? ZonesOptionsId { get; set; }
+        public string? OtherLocation { get; set; }
+        public int? PlaceId { get; set; }
+        public DateOnly? PaperPosterAbstractDate { get; set; }
+        public string? PaperPosterAbstractFile { get; set; }
+        public DateOnly? UniversityPermissionLetterDate { get; set; }
+        public string? UniversityPermissionLetterFile { get; set; }
+
         public string? OrganizerBroucherFile { get; set; }
         public string? OrganizerInstitutionName { get; set; }
         public string? OrganizerInstitutionAddress { get; set; }
@@ -388,6 +449,58 @@ namespace Application.Models.DataTables.KVK
         public int? Total { get; set; }
     }
 
+    /// <summary>
+    /// Hybrid item for Participant Demographics - can be new (no Id) or existing (has Id)
+    /// Used in update operations to support create/update in one call
+    /// </summary>
+    public class KvkParticipantDemographicsHybridDto
+    {
+        public int? Id { get; set; }  // null or 0 = create new, has value = update existing
+        public int? ParticipantId { get; set; }
+        public int? Male_SC { get; set; }
+        public int? Male_ST { get; set; }
+        public int? Male_OBC { get; set; }
+        public int? Male_GEN { get; set; }
+        public int? SC_Male_StayedInHostel { get; set; }
+        public int? ST_Male_StayedInHostel { get; set; }
+        public int? OBC_Male_StayedInHostel { get; set; }
+        public int? GEN_Male_StayedInHostel { get; set; }
+        public int? Female_SC { get; set; }
+        public int? Female_ST { get; set; }
+        public int? Female_OBC { get; set; }
+        public int? Female_GEN { get; set; }
+        public int? SC_Female_StayedInHostel { get; set; }
+        public int? ST_Female_StayedInHostel { get; set; }
+        public int? OBC_Female_StayedInHostel { get; set; }
+        public int? GEN_Female_StayedInHostel { get; set; }
+        public int? Total { get; set; }
+    }
+
+    /// <summary>
+    /// Wrapper DTO for adding multiple demographics with hybrid pattern
+    /// Use this to add all demographics for a program in a single POST request
+    /// Perfect for "Save & Next" button - handles all demographics in one transaction
+    /// </summary>
+    public class KvkDemographicsWithChildrenCreateDto
+    {
+        [Required]
+        public List<KvkParticipantDemographicsHybridDto> Demographics { get; set; } = new();
+    }
+
+    /// <summary>
+    /// Wrapper DTO for updating demographics using Hybrid Pattern
+    /// - Items WITH Id: UPDATE existing
+    /// - Items WITHOUT Id (null or 0): CREATE new
+    /// - Items in DB but NOT in list: DELETE
+    /// Perfect for "Save & Next" button with inline editing
+    /// All changes happen in a single transaction with automatic rollback on failure
+    /// </summary>
+    public class KvkDemographicsWithChildrenUpdateDto
+    {
+        [Required]
+        public List<KvkParticipantDemographicsHybridDto> Demographics { get; set; } = new();
+    }
+
     // ============================
     // PROGRAM CONTENT DTOs
     // ============================
@@ -438,8 +551,8 @@ namespace Application.Models.DataTables.KVK
         public int? Id { get; set; }  // null = create new, has value = update existing
         public string? Name { get; set; }
         public string? Designation { get; set; }
-        public int? ResourceType { get; set; }
-        public int? Responsibility { get; set; }
+        public int? ResourceTypeId { get; set; }
+        public int? ResponsibilityId { get; set; }
         public string? InstitutionOrDepartment { get; set; }
     }
 
@@ -449,7 +562,7 @@ namespace Application.Models.DataTables.KVK
     public class KvkTopicsCoveredHybridDto
     {
         public int? Id { get; set; }  // null = create new, has value = update existing
-        public DateTime? Date { get; set; }
+        public DateOnly? Date { get; set; }
         public string? Title { get; set; }
         public string? PhotoUpload { get; set; }
     }
@@ -489,6 +602,9 @@ namespace Application.Models.DataTables.KVK
         public List<KvkFieldVisitHybridDto>? FieldVisits { get; set; }
         public List<KvkFieldDayHybridDto>? FieldDays { get; set; }
         public List<KvkFarmerScientistInteractionHybridDto>? FarmerScientistInteractions { get; set; }
+
+        // Demographics Hybrid List (NEW)
+        public List<KvkParticipantDemographicsHybridDto>? Demographics { get; set; }
     }
 
     // Resource Person DTOs
@@ -497,8 +613,10 @@ namespace Application.Models.DataTables.KVK
         public int Id { get; set; }
         public string? Name { get; set; }
         public string? Designation { get; set; }
-        public int? ResourceType { get; set; }
-        public int? Responsibility { get; set; }
+        public int? ResourceTypeId { get; set; }
+        public string? ResourceTypeName { get; set; }
+        public int? ResponsibilityId { get; set; }
+        public string? ResponsibilityName { get; set; }
         public string? InstitutionOrDepartment { get; set; }
     }
 
@@ -506,8 +624,8 @@ namespace Application.Models.DataTables.KVK
     {
         public string? Name { get; set; }
         public string? Designation { get; set; }
-        public int? ResourceType { get; set; }
-        public int? Responsibility { get; set; }
+        public int? ResourceTypeId { get; set; }
+        public int? ResponsibilityId { get; set; }
         public string? InstitutionOrDepartment { get; set; }
     }
 
@@ -516,8 +634,8 @@ namespace Application.Models.DataTables.KVK
         public int Id { get; set; }
         public string? Name { get; set; }
         public string? Designation { get; set; }
-        public int? ResourceType { get; set; }
-        public int? Responsibility { get; set; }
+        public int? ResourceTypeId { get; set; }
+        public int? ResponsibilityId { get; set; }
         public string? InstitutionOrDepartment { get; set; }
     }
 
@@ -606,6 +724,7 @@ namespace Application.Models.DataTables.KVK
         public int? NoOfFieldsCovered { get; set; }
         public int? NoOfFarmerCovered { get; set; }
         public string? PhotoUpload { get; set; }
+
     }
 
     /// <summary>
@@ -628,18 +747,31 @@ namespace Application.Models.DataTables.KVK
     public class KvkFieldDayDto
     {
         public int Id { get; set; }
-        // Add KvkFieldDay fields based on your entity
+
+        public DateOnly? Date { get; set; }
+        public string? FarmerName { get; set; }
+        public string? Place { get; set; }
+
+        public int? NoOfBeneficieries { get; set; }
     }
 
     public class KvkFieldDayCreateDto
     {
-        // Add KvkFieldDay fields based on your entity
+        public DateOnly? Date { get; set; }
+        public string? FarmerName { get; set; }
+        public string? Place { get; set; }
+
+        public int? NoOfBeneficieries { get; set; }
     }
 
     public class KvkFieldDayUpdateDto : IUpdateDto
     {
         public int Id { get; set; }
-        // Add KvkFieldDay fields based on your entity
+        public DateOnly? Date { get; set; }
+        public string? FarmerName { get; set; }
+        public string? Place { get; set; }
+
+        public int? NoOfBeneficieries { get; set; }
     }
 
     /// <summary>
@@ -648,7 +780,12 @@ namespace Application.Models.DataTables.KVK
     public class KvkFieldDayHybridDto
     {
         public int? Id { get; set; }  // null = create new, has value = update existing
-        // Add KvkFieldDay fields based on your entity
+
+        public DateOnly? Date { get; set; }
+        public string? FarmerName { get; set; }
+        public string? Place { get; set; }
+
+        public int? NoOfBeneficieries { get; set; }
     }
 
     // ============================

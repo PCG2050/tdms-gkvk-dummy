@@ -416,8 +416,8 @@ namespace Infrastructure.Services.DataTables.STU
                         Id = rp.Id ?? 0, // 0 means new
                         Name = rp.Name,
                         Designation = rp.Designation,
-                        ResourceType = rp.ResourceType,
-                        Responsibility = rp.Responsibility,
+                        ResourceTypeId = rp.ResourceTypeId,
+                        ResponsibilityId = rp.ResponsibilityId,
                         InstitutionOrDepartment = rp.InstitutionOrDepartment,
                         UnitLocationId = program.UnitLocationId,
                         OrganizationId = program.OrganizationId

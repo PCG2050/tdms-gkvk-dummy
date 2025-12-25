@@ -39,7 +39,16 @@ namespace Infrastructure.Repository.DataTables.ATIC
         }
         public async Task<AticProgramDetails?> GetByIdAsync(int id)
         {
-            return await _context.AticProgramDetails.FindAsync(id);
+            return await _context.AticProgramDetails
+                .Include(p => p.Collaborator)
+                .Include(p => p.CollaborativeProgramOption)
+                .Include(p => p.ParticipatedAs)
+                .Include(p => p.EventNames)
+                .Include(p => p.VAPOptions)
+                .Include(p => p.TargetFarmers)
+                .Include(p => p.ZoneOptions)
+                .Include(p => p.Place)
+                .FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task<AticProgramDetails?> GetWithDetailsAsync(int id)
@@ -64,6 +73,14 @@ namespace Infrastructure.Repository.DataTables.ATIC
                 .Include(p => p.CreatedBy)
                 .Include(p => p.UpdatedBy)
                 .Include(p => p.ApprovedBy)
+                .Include(p => p.Collaborator)
+                .Include(p => p.CollaborativeProgramOption)
+                .Include(p => p.ParticipatedAs)
+                .Include(p => p.EventNames)
+                .Include(p => p.VAPOptions)
+                .Include(p => p.TargetFarmers)
+                .Include(p => p.ZoneOptions)
+                .Include(p => p.Place)
                 .Include(p => p.ParticipantDemographics)
                 // Fix: Use correct nullability for ThenInclude chains
                 .Include(p => p.ProgramContent!)

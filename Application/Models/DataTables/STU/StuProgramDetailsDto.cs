@@ -371,8 +371,8 @@ namespace Application.Models.DataTables.STU
         public int? Id { get; set; }  // null = create new, has value = update existing
         public string? Name { get; set; }
         public string? Designation { get; set; }
-        public int? ResourceType { get; set; }
-        public int? Responsibility { get; set; }
+        public int? ResourceTypeId { get; set; }
+        public int? ResponsibilityId { get; set; }
         public string? InstitutionOrDepartment { get; set; }
     }
 
@@ -427,8 +427,10 @@ namespace Application.Models.DataTables.STU
         public int Id { get; set; }
         public string? Name { get; set; }
         public string? Designation { get; set; }
-        public int? ResourceType { get; set; }
-        public int? Responsibility { get; set; }
+        public int? ResourceTypeId { get; set; }
+        public string? ResourceTypeName { get; set; }
+        public int? ResponsibilityId { get; set; }
+        public string? ResponsibilityName { get; set; }
         public string? InstitutionOrDepartment { get; set; }
     }
 
@@ -436,8 +438,8 @@ namespace Application.Models.DataTables.STU
     {
         public string? Name { get; set; }
         public string? Designation { get; set; }
-        public int? ResourceType { get; set; }
-        public int? Responsibility { get; set; }
+        public int? ResourceTypeId { get; set; }
+        public int? ResponsibilityId { get; set; }
         public string? InstitutionOrDepartment { get; set; }
     }
 
@@ -446,8 +448,8 @@ namespace Application.Models.DataTables.STU
         public int Id { get; set; }
         public string? Name { get; set; }
         public string? Designation { get; set; }
-        public int? ResourceType { get; set; }
-        public int? Responsibility { get; set; }
+        public int? ResourceTypeId { get; set; }
+        public int? ResponsibilityId { get; set; }
         public string? InstitutionOrDepartment { get; set; }
     }
 

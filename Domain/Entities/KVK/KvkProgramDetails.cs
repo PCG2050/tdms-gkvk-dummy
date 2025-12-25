@@ -192,6 +192,59 @@ namespace Domain.Entities.KVK
         
         public string? ParticipantFileUpload { get; set; }
 
+        // New fields
+        [MaxLength(250)]
+        public string? TypeTopic { get; set; }
+
+        [MaxLength(500)]
+        public string? PurposeOfVisit { get; set; }
+
+        public int? EventNamesId { get; set; }
+        [JsonIgnore]
+        public EventName? EventNames { get; set; }
+
+        [MaxLength(200)]
+        public string? OtherEventNames { get; set; }
+
+        [MaxLength(200)]
+        public string? Facilitator { get; set; }
+
+        public int? VAPOptionsId { get; set; }
+        [JsonIgnore]
+        public VAPOption? VAPOptions { get; set; }
+
+        public int? SampleCollected { get; set; }
+
+        public int? SampleAnalyzed { get; set; }
+
+        public int? TargetFarmersId { get; set; }
+        [JsonIgnore]
+        public TargetFarmer? TargetFarmers { get; set; }
+
+        public int? ZonesOptionsId { get; set; }
+        [JsonIgnore]
+        public ZoneOption? ZoneOptions { get; set; }
+
+        public int? DistrictId { get; set; }
+        [JsonIgnore]
+        public District? District { get; set; }
+
+        [MaxLength(250)]
+        public string? OtherLocation { get; set; }
+
+        public int? PlaceId { get; set; }
+        [JsonIgnore]
+        [ForeignKey(nameof(PlaceId))]
+        public District? Place { get; set; }
+
+        public DateOnly? PaperPosterAbstractDate { get; set; }
+        [MaxLength(500)]
+        public string? PaperPosterAbstractFile { get; set; }
+
+        public DateOnly? UniversityPermissionLetterDate { get; set; }
+        [MaxLength(500)]
+        public string? UniversityPermissionLetterFile { get; set; }
+
 
         public ICollection<KvkParticipantDemographics>? ParticipantDemographics { get; set; }
 

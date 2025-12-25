@@ -17,12 +17,19 @@ namespace Infrastructure.Repository.DataTables.NAEP
 
         public async Task<NaepResourcePerson?> GetByIdAsync(int id)
         {
-            return await _context.NaepResourcePersons.FindAsync(id);
+            return await _context.NaepResourcePersons
+                .Include(r => r.ResourceType)
+                .Include(r => r.Responsibility)
+                .Include(r => r.ProgramContentAndResources)
+                    .ThenInclude(pc => pc.ProgramDetails)
+                .FirstOrDefaultAsync(r => r.Id == id);
         }
 
         public async Task<List<NaepResourcePerson>> GetByContentIdAsync(int contentId)
         {
             return await _context.NaepResourcePersons
+                .Include(r => r.ResourceType)
+                .Include(r => r.Responsibility)
                 .Where(rp => rp.NaepProgramContentAndResourcesId == contentId)
                 .OrderBy(rp => rp.CreatedAt)
                 .ToListAsync();

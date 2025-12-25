@@ -25,6 +25,8 @@ namespace Infrastructure.Repository.DataTables.EEU
         public async Task<EeuResourcePerson?> GetByIdAsync(int id)
         {
             return await _context.EeuResourcePersons
+                .Include(r => r.ResourceType)
+                .Include(r => r.Responsibility)
                 .Include(r => r.ProgramContentAndResources)
                     .ThenInclude(pc => pc.ProgramDetails)
                 .FirstOrDefaultAsync(r => r.Id == id);
@@ -33,6 +35,8 @@ namespace Infrastructure.Repository.DataTables.EEU
         public async Task<List<EeuResourcePerson>> GetByContentIdAsync(int contentId)
         {
             return await _context.EeuResourcePersons
+                .Include(r => r.ResourceType)
+                .Include(r => r.Responsibility)
                 .Where(r => r.EeuProgramContentAndResourcesId == contentId)
                 .OrderByDescending(r => r.CreatedAt)
                 .ToListAsync();

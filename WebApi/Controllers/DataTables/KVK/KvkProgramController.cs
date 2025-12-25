@@ -116,6 +116,92 @@ namespace WebApi.Controllers.DataTables.KVK
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
+        /// <summary>
+        /// Add multiple participant demographics entries with hybrid pattern in a single transaction
+        /// This endpoint solves the problem of needing parent ID before creating children by handling everything in a single transaction
+        /// Perfect for "Save & Next" button - handles all demographics in one call
+        /// </summary>
+        /// <remarks>
+        /// Sample request (creates 3 demographics entries):
+        ///
+        ///     POST /api/kvk/program/5/demographics-with-children
+        ///     {
+        ///       "demographics": [
+        ///         {
+        ///           "participantId": 1,
+        ///           "male_SC": 10,
+        ///           "male_ST": 5,
+        ///           "female_SC": 8,
+        ///           "female_ST": 6,
+        ///           "total": 29
+        ///         },
+        ///         {
+        ///           "participantId": 2,
+        ///           "male_OBC": 15,
+        ///           "male_GEN": 20,
+        ///           "female_OBC": 12,
+        ///           "female_GEN": 18,
+        ///           "total": 65
+        ///         },
+        ///         {
+        ///           "participantId": 3,
+        ///           "male_SC": 5,
+        ///           "female_SC": 5,
+        ///           "total": 10
+        ///         }
+        ///       ]
+        ///     }
+        ///
+        /// All entries are created in a single transaction
+        /// </remarks>
+        [HttpPost("{programId}/demographics-with-children")]
+        public async Task<IActionResult> AddDemographicsWithChildren(int programId, [FromBody] KvkDemographicsWithChildrenCreateDto dto)
+        {
+            var result = await _service.AddDemographicsWithChildrenAsync(programId, dto);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
+        /// <summary>
+        /// Update all participant demographics for a program using Hybrid Pattern (perfect for "Save & Next" button)
+        /// - Items WITH Id: UPDATE existing
+        /// - Items WITHOUT Id (null or 0): CREATE new
+        /// - Items in DB but NOT in request list: DELETE
+        /// All changes happen in a single transaction with automatic rollback on failure
+        /// </summary>
+        /// <remarks>
+        /// Sample request (demonstrates CREATE, UPDATE, DELETE):
+        ///
+        ///     PUT /api/kvk/program/5/demographics-with-children
+        ///     {
+        ///       "demographics": [
+        ///         {
+        ///           "id": 10,
+        ///           "participantId": 1,
+        ///           "male_SC": 12,
+        ///           "female_SC": 10,
+        ///           "total": 22
+        ///         },
+        ///         {
+        ///           "participantId": 2,
+        ///           "male_OBC": 20,
+        ///           "female_OBC": 15,
+        ///           "total": 35
+        ///         }
+        ///       ]
+        ///     }
+        ///
+        /// In this example:
+        /// - Entry with id=10 will be UPDATED
+        /// - Entry without id (participantId=2) will be CREATED
+        /// - Any existing entries not in the list will be DELETED
+        /// </remarks>
+        [HttpPut("{programId}/demographics-with-children")]
+        public async Task<IActionResult> UpdateDemographicsWithChildren(int programId, [FromBody] KvkDemographicsWithChildrenUpdateDto dto)
+        {
+            var result = await _service.UpdateDemographicsWithChildrenAsync(programId, dto);
+            return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
+        }
+
         // ============================
         // SECTION C: PROGRAM CONTENT & RESOURCES
         // ============================

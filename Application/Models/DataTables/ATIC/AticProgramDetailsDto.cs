@@ -70,6 +70,40 @@ namespace Application.Models.DataTables.ATIC
         public string? ReportingVideo { get; set; }
         public string? Attachements { get; set; }
 
+        // Collaborator and participant fields
+        public int? CollaboratorId { get; set; }
+        public string? CollaboratorName { get; set; }
+        public string? CollaboratorOther { get; set; }
+        public int? CollaborativeProgramOptionId { get; set; }
+        public string? CollaborativeProgramOptionName { get; set; }
+        public string? CollaborativeProgramOptionOther { get; set; }
+        public int? ParticipatedAsId { get; set; }
+        public string? ParticipatedAsName { get; set; }
+        public string? ParticipantFileUpload { get; set; }
+
+        // New fields
+        public string? TypeTopic { get; set; }
+        public string? PurposeOfVisit { get; set; }
+        public int? EventNamesId { get; set; }
+        public string? EventNamesName { get; set; }
+        public string? OtherEventNames { get; set; }
+        public string? Facilitator { get; set; }
+        public int? VAPOptionsId { get; set; }
+        public string? VAPOptionsName { get; set; }
+        public int? SampleCollected { get; set; }
+        public int? SampleAnalyzed { get; set; }
+        public int? TargetFarmersId { get; set; }
+        public string? TargetFarmersName { get; set; }
+        public int? ZonesOptionsId { get; set; }
+        public string? ZonesOptionsName { get; set; }
+        public string? OtherLocation { get; set; }
+        public int? PlaceId { get; set; }
+        public string? PlaceName { get; set; }
+        public DateOnly? PaperPosterAbstractDate { get; set; }
+        public string? PaperPosterAbstractFile { get; set; }
+        public DateOnly? UniversityPermissionLetterDate { get; set; }
+        public string? UniversityPermissionLetterFile { get; set; }
+
         // Status tracking
         public string FormStatus { get; set; } = "Draft";
         public string? FormStatusRemarks { get; set; }
@@ -141,6 +175,32 @@ namespace Application.Models.DataTables.ATIC
         public string? FundsSanctionLetterUploadFile { get; set; }
         public string? ReportingVideo { get; set; }
         public string? Attachements { get; set; }
+        
+        // Collaborator and participant fields
+        public int? CollaboratorId { get; set; }
+        public string? CollaboratorOther { get; set; }
+        public int? CollaborativeProgramOptionId { get; set; }
+        public string? CollaborativeProgramOptionOther { get; set; }
+        public int? ParticipatedAsId { get; set; }
+        public string? ParticipantFileUpload { get; set; }
+        
+        // New fields
+        public string? TypeTopic { get; set; }
+        public string? PurposeOfVisit { get; set; }
+        public int? EventNamesId { get; set; }
+        public string? OtherEventNames { get; set; }
+        public string? Facilitator { get; set; }
+        public int? VAPOptionsId { get; set; }
+        public int? SampleCollected { get; set; }
+        public int? SampleAnalyzed { get; set; }
+        public int? TargetFarmersId { get; set; }
+        public int? ZonesOptionsId { get; set; }
+        public string? OtherLocation { get; set; }
+        public int? PlaceId { get; set; }
+        public DateOnly? PaperPosterAbstractDate { get; set; }
+        public string? PaperPosterAbstractFile { get; set; }
+        public DateOnly? UniversityPermissionLetterDate { get; set; }
+        public string? UniversityPermissionLetterFile { get; set; }
     }
 
     public class AticProgramUpdateDto : IUpdateDto
@@ -302,6 +362,33 @@ namespace Application.Models.DataTables.ATIC
         public int? Total { get; set; }
     }
 
+    /// <summary>
+    /// Hybrid item for Participant Demographics - can be new (no Id) or existing (has Id)
+    /// Used in update operations to support create/update in one call
+    /// </summary>
+    public class AticParticipantDemographicsHybridDto
+    {
+        public int? Id { get; set; }  // null or 0 = create new, has value = update existing
+        public int? ParticipantId { get; set; }
+        public int? Male_SC { get; set; }
+        public int? Male_ST { get; set; }
+        public int? Male_OBC { get; set; }
+        public int? Male_GEN { get; set; }
+        public int? SC_Male_StayedInHostel { get; set; }
+        public int? ST_Male_StayedInHostel { get; set; }
+        public int? OBC_Male_StayedInHostel { get; set; }
+        public int? GEN_Male_StayedInHostel { get; set; }
+        public int? Female_SC { get; set; }
+        public int? Female_ST { get; set; }
+        public int? Female_OBC { get; set; }
+        public int? Female_GEN { get; set; }
+        public int? SC_Female_StayedInHostel { get; set; }
+        public int? ST_Female_StayedInHostel { get; set; }
+        public int? OBC_Female_StayedInHostel { get; set; }
+        public int? GEN_Female_StayedInHostel { get; set; }
+        public int? Total { get; set; }
+    }
+
 
     // ============================
     // PROGRAM CONTENT DTOs
@@ -347,8 +434,8 @@ namespace Application.Models.DataTables.ATIC
         public int? Id { get; set; }  // null = create new, has value = update existing
         public string? Name { get; set; }
         public string? Designation { get; set; }
-        public int? ResourceType { get; set; }
-        public int? Responsibility { get; set; }
+        public int? ResourceTypeId { get; set; }
+        public int? ResponsibilityId { get; set; }
         public string? InstitutionOrDepartment { get; set; }
     }
 
@@ -395,6 +482,9 @@ namespace Application.Models.DataTables.ATIC
         public List<AticResourcePersonHybridDto>? ResourcePersons { get; set; }
         public List<AticTopicsCoveredHybridDto>? TopicsCovered { get; set; }
         public List<AticTeachingAidsHybridDto>? TeachingAids { get; set; }
+        
+        // Demographics Hybrid List (NEW)
+        public List<AticParticipantDemographicsHybridDto>? Demographics { get; set; }
     }
 
     // Resource Person DTOs
@@ -403,8 +493,10 @@ namespace Application.Models.DataTables.ATIC
         public int Id { get; set; }
         public string? Name { get; set; }
         public string? Designation { get; set; }
-        public int? ResourceType { get; set; }
-        public int? Responsibility { get; set; }
+        public int? ResourceTypeId { get; set; }
+        public string? ResourceTypeName { get; set; }
+        public int? ResponsibilityId { get; set; }
+        public string? ResponsibilityName { get; set; }
         public string? InstitutionOrDepartment { get; set; }
     }
 
@@ -412,8 +504,8 @@ namespace Application.Models.DataTables.ATIC
     {
         public string? Name { get; set; }
         public string? Designation { get; set; }
-        public int? ResourceType { get; set; }
-        public int? Responsibility { get; set; }
+        public int? ResourceTypeId { get; set; }
+        public int? ResponsibilityId { get; set; }
         public string? InstitutionOrDepartment { get; set; }
     }
 
@@ -422,8 +514,8 @@ namespace Application.Models.DataTables.ATIC
         public int Id { get; set; }
         public string? Name { get; set; }
         public string? Designation { get; set; }
-        public int? ResourceType { get; set; }
-        public int? Responsibility { get; set; }
+        public int? ResourceTypeId { get; set; }
+        public int? ResponsibilityId { get; set; }
         public string? InstitutionOrDepartment { get; set; }
     }
 

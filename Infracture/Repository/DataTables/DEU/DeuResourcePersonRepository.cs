@@ -17,12 +17,19 @@ namespace Infrastructure.Repository.DataTables.DEU
 
         public async Task<DeuResourcePerson?> GetByIdAsync(int id)
         {
-            return await _context.DeuResourcePersons.FindAsync(id);
+            return await _context.DeuResourcePersons
+                .Include(r => r.ResourceType)
+                .Include(r => r.Responsibility)
+                .Include(r => r.ProgramContentAndResources)
+                    .ThenInclude(pc => pc.ProgramDetails)
+                .FirstOrDefaultAsync(r => r.Id == id);
         }
 
         public async Task<List<DeuResourcePerson>> GetByContentIdAsync(int contentId)
         {
             return await _context.DeuResourcePersons
+                .Include(r => r.ResourceType)
+                .Include(r => r.Responsibility)
                 .Where(rp => rp.DeuProgramContentAndResourcesId == contentId)
                 .OrderBy(rp => rp.CreatedAt)
                 .ToListAsync();

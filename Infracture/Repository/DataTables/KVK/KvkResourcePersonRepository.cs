@@ -25,6 +25,8 @@ namespace Infrastructure.Repository.DataTables.KVK
         public async Task<KvkResourcePerson?> GetByIdAsync(int id)
         {
             return await _context.KvkResourcePersons
+                .Include(r => r.ResourceType)
+                .Include(r => r.Responsibility)
                 .Include(r => r.ProgramContentAndResources)
                     .ThenInclude(pc => pc.ProgramDetails)
                 .FirstOrDefaultAsync(r => r.Id == id);
@@ -33,6 +35,8 @@ namespace Infrastructure.Repository.DataTables.KVK
         public async Task<List<KvkResourcePerson>> GetByContentIdAsync(int contentId)
         {
             return await _context.KvkResourcePersons
+                .Include(r => r.ResourceType)
+                .Include(r => r.Responsibility)
                 .Where(r => r.KvkProgramContentAndResourcesId == contentId)
                 .OrderByDescending(r => r.CreatedAt)
                 .ToListAsync();

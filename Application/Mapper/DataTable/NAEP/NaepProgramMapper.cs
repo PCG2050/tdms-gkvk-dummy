@@ -83,6 +83,8 @@ namespace Application.Mapper.DataTable.NAEP
         // RESOURCE PERSON MAPPINGS
         // ============================
 
+        [MapProperty(nameof(NaepResourcePerson.ResourceType.Name), nameof(NaepResourcePersonDto.ResourceTypeName))]
+        [MapProperty(nameof(NaepResourcePerson.Responsibility.Name), nameof(NaepResourcePersonDto.ResponsibilityName))]
         public partial NaepResourcePersonDto MapToDto(NaepResourcePerson entity);
 
         public partial NaepResourcePerson MapToEntity(NaepResourcePersonCreateDto dto);
@@ -93,6 +95,8 @@ namespace Application.Mapper.DataTable.NAEP
         [MapperIgnoreTarget(nameof(NaepResourcePerson.CreatedById))]
         [MapperIgnoreTarget(nameof(NaepResourcePerson.UpdatedAt))]
         [MapperIgnoreTarget(nameof(NaepResourcePerson.UpdatedById))]
+        [MapperIgnoreTarget(nameof(NaepResourcePerson.ResourceType))]
+        [MapperIgnoreTarget(nameof(NaepResourcePerson.Responsibility))]
         public partial void MapUpdateDtoToEntity(NaepResourcePersonUpdateDto dto, NaepResourcePerson entity);
 
         // ============================

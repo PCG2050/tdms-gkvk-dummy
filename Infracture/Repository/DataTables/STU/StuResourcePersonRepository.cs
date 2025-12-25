@@ -17,12 +17,19 @@ namespace Infrastructure.Repository.DataTables.STU
 
         public async Task<StuResourcePerson?> GetByIdAsync(int id)
         {
-            return await _context.StuResourcePersons.FindAsync(id);
+            return await _context.StuResourcePersons
+                .Include(r => r.ResourceType)
+                .Include(r => r.Responsibility)
+                .Include(r => r.ProgramContentAndResources)
+                    .ThenInclude(pc => pc.ProgramDetails)
+                .FirstOrDefaultAsync(r => r.Id == id);
         }
 
         public async Task<List<StuResourcePerson>> GetByContentIdAsync(int contentId)
         {
             return await _context.StuResourcePersons
+                .Include(r => r.ResourceType)
+                .Include(r => r.Responsibility)
                 .Where(rp => rp.StuProgramContentAndResourcesId == contentId)
                 .OrderBy(rp => rp.CreatedAt)
                 .ToListAsync();

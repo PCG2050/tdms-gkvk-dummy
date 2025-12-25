@@ -13,6 +13,16 @@ namespace Application.Mapper.DataTable.KVK
         // PROGRAM DETAILS MAPPINGS
         // ============================
 
+        [MapProperty(nameof(KvkProgramDetails.EventNames.Name), nameof(KvkProgramDetailsDto.EventNamesName))]
+        [MapProperty(nameof(KvkProgramDetails.VAPOptions.Name), nameof(KvkProgramDetailsDto.VAPOptionsName))]
+        [MapProperty(nameof(KvkProgramDetails.TargetFarmers.Name), nameof(KvkProgramDetailsDto.TargetFarmersName))]
+        [MapProperty(nameof(KvkProgramDetails.ZoneOptions.Name), nameof(KvkProgramDetailsDto.ZonesOptionsName))]
+        [MapProperty(nameof(KvkProgramDetails.Place.Name), nameof(KvkProgramDetailsDto.PlaceName))]
+        [MapperIgnoreTarget(nameof(KvkProgramDetails.EventNames))]
+        [MapperIgnoreTarget(nameof(KvkProgramDetails.VAPOptions))]
+        [MapperIgnoreTarget(nameof(KvkProgramDetails.TargetFarmers))]
+        [MapperIgnoreTarget(nameof(KvkProgramDetails.ZoneOptions))]
+        [MapperIgnoreTarget(nameof(KvkProgramDetails.Place))]
         public partial KvkProgramDetailsDto MapToDto(KvkProgramDetails entity);
 
         public partial KvkProgramDetails MapToEntity(KvkProgramCreateDto dto);
@@ -26,6 +36,11 @@ namespace Application.Mapper.DataTable.KVK
         [MapperIgnoreTarget(nameof(KvkProgramDetails.FormStatusRemarks))]
         [MapperIgnoreTarget(nameof(KvkProgramDetails.ApprovedAt))]
         [MapperIgnoreTarget(nameof(KvkProgramDetails.ApprovedById))]
+        [MapperIgnoreTarget(nameof(KvkProgramDetails.EventNames))]
+        [MapperIgnoreTarget(nameof(KvkProgramDetails.VAPOptions))]
+        [MapperIgnoreTarget(nameof(KvkProgramDetails.TargetFarmers))]
+        [MapperIgnoreTarget(nameof(KvkProgramDetails.ZoneOptions))]
+        [MapperIgnoreTarget(nameof(KvkProgramDetails.Place))]
         public partial void MapUpdateDtoToEntity(KvkProgramUpdateDto dto, KvkProgramDetails entity);
 
         // Custom mapping for complete program
@@ -106,6 +121,8 @@ namespace Application.Mapper.DataTable.KVK
         // RESOURCE PERSON MAPPINGS
         // ============================
 
+        [MapProperty(nameof(KvkResourcePerson.ResourceType.Name), nameof(KvkResourcePersonDto.ResourceTypeName))]
+        [MapProperty(nameof(KvkResourcePerson.Responsibility.Name), nameof(KvkResourcePersonDto.ResponsibilityName))]
         public partial KvkResourcePersonDto MapToDto(KvkResourcePerson entity);
 
         public partial KvkResourcePerson MapToEntity(KvkResourcePersonCreateDto dto);
@@ -116,13 +133,21 @@ namespace Application.Mapper.DataTable.KVK
         [MapperIgnoreTarget(nameof(KvkResourcePerson.CreatedById))]
         [MapperIgnoreTarget(nameof(KvkResourcePerson.UpdatedAt))]
         [MapperIgnoreTarget(nameof(KvkResourcePerson.UpdatedById))]
+        [MapperIgnoreTarget(nameof(KvkResourcePerson.ResourceType))]
+        [MapperIgnoreTarget(nameof(KvkResourcePerson.Responsibility))]
         public partial void MapUpdateDtoToEntity(KvkResourcePersonUpdateDto dto, KvkResourcePerson entity);
 
         // ============================
         // TOPICS COVERED MAPPINGS
         // ============================
 
+        [MapProperty(nameof(KvkTopicsCoveredInClass.Date), nameof(KvkTopicsCoveredDto.Date), Use = nameof(MapDateOnlyToDateTime))]
         public partial KvkTopicsCoveredDto MapToDto(KvkTopicsCoveredInClass entity);
+
+        private DateTime? MapDateOnlyToDateTime(DateOnly? dateOnly)
+        {
+            return dateOnly.HasValue ? dateOnly.Value.ToDateTime(TimeOnly.MinValue) : null;
+        }
 
         public partial KvkTopicsCoveredInClass MapToEntity(KvkTopicsCoveredCreateDto dto);
 

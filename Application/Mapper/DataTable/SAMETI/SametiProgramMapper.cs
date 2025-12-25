@@ -83,6 +83,8 @@ namespace Application.Mapper.DataTable.SAMETI
         // RESOURCE PERSON MAPPINGS
         // ============================
 
+        [MapProperty(nameof(SametiResourcePerson.ResourceType.Name), nameof(SametiResourcePersonDto.ResourceTypeName))]
+        [MapProperty(nameof(SametiResourcePerson.Responsibility.Name), nameof(SametiResourcePersonDto.ResponsibilityName))]
         public partial SametiResourcePersonDto MapToDto(SametiResourcePerson entity);
 
         public partial SametiResourcePerson MapToEntity(SametiResourcePersonCreateDto dto);
@@ -93,6 +95,8 @@ namespace Application.Mapper.DataTable.SAMETI
         [MapperIgnoreTarget(nameof(SametiResourcePerson.CreatedById))]
         [MapperIgnoreTarget(nameof(SametiResourcePerson.UpdatedAt))]
         [MapperIgnoreTarget(nameof(SametiResourcePerson.UpdatedById))]
+        [MapperIgnoreTarget(nameof(SametiResourcePerson.ResourceType))]
+        [MapperIgnoreTarget(nameof(SametiResourcePerson.Responsibility))]
         public partial void MapUpdateDtoToEntity(SametiResourcePersonUpdateDto dto, SametiResourcePerson entity);
 
         // ============================

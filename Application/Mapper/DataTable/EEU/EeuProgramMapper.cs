@@ -106,6 +106,8 @@ namespace Application.Mapper.DataTable.EEU
         // RESOURCE PERSON MAPPINGS
         // ============================
 
+        [MapProperty(nameof(EeuResourcePerson.ResourceType.Name), nameof(EeuResourcePersonDto.ResourceTypeName))]
+        [MapProperty(nameof(EeuResourcePerson.Responsibility.Name), nameof(EeuResourcePersonDto.ResponsibilityName))]
         public partial EeuResourcePersonDto MapToDto(EeuResourcePerson entity);
 
         public partial EeuResourcePerson MapToEntity(EeuResourcePersonCreateDto dto);
@@ -116,6 +118,8 @@ namespace Application.Mapper.DataTable.EEU
         [MapperIgnoreTarget(nameof(EeuResourcePerson.CreatedById))]
         [MapperIgnoreTarget(nameof(EeuResourcePerson.UpdatedAt))]
         [MapperIgnoreTarget(nameof(EeuResourcePerson.UpdatedById))]
+        [MapperIgnoreTarget(nameof(EeuResourcePerson.ResourceType))]
+        [MapperIgnoreTarget(nameof(EeuResourcePerson.Responsibility))]
         public partial void MapUpdateDtoToEntity(EeuResourcePersonUpdateDto dto, EeuResourcePerson entity);
 
         // ============================

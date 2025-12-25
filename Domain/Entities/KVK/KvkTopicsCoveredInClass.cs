@@ -13,7 +13,7 @@ namespace Domain.Entities.KVK
         [ForeignKey(nameof(KvkProgramContentAndResourcesId))]
         public KvkProgramContentAndResources? ProgramContentAndResources { get; set; }
 
-        public DateTime? Date { get; set; }
+        public DateOnly? Date { get; set; }
 
         [MaxLength(250)]
         public string? Title { get; set; }

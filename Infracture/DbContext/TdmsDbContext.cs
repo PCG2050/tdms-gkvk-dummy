@@ -235,6 +235,10 @@ namespace Infrastructure.DbContext
 
         public DbSet<ParticipationType> ParticipationTypes { get; set; }
 
+        public DbSet<VAPOption> VAPOptions { get; set; }
+
+        public DbSet<ZoneOption> ZoneOptions { get; set; }
+
         #endregion
         #region GenericTables
         #region Publications

@@ -17,12 +17,19 @@ namespace Infrastructure.Repository.DataTables.SAMETI
 
         public async Task<SametiResourcePerson?> GetByIdAsync(int id)
         {
-            return await _context.SametiResourcePersons.FindAsync(id);
+            return await _context.SametiResourcePersons
+                .Include(r => r.ResourceType)
+                .Include(r => r.Responsibility)
+                .Include(r => r.ProgramContentAndResources)
+                    .ThenInclude(pc => pc.ProgramDetails)
+                .FirstOrDefaultAsync(r => r.Id == id);
         }
 
         public async Task<List<SametiResourcePerson>> GetByContentIdAsync(int contentId)
         {
             return await _context.SametiResourcePersons
+                .Include(r => r.ResourceType)
+                .Include(r => r.Responsibility)
                 .Where(rp => rp.SametiProgramContentAndResourcesId == contentId)
                 .OrderBy(rp => rp.CreatedAt)
                 .ToListAsync();

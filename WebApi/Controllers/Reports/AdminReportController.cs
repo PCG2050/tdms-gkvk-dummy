@@ -16,13 +16,16 @@ namespace WebApi.Controllers.Reports
     {
         private readonly IAdminReportService _service;
         private readonly IDynamicReportService _dynamicReportService;
+        private readonly IComprehensiveReportService _comprehensiveReportService;
 
         public AdminReportController(
             IAdminReportService service,
-            IDynamicReportService dynamicReportService)
+            IDynamicReportService dynamicReportService,
+            IComprehensiveReportService comprehensiveReportService)
         {
             _service = service;
             _dynamicReportService = dynamicReportService;
+            _comprehensiveReportService = comprehensiveReportService;
         }
 
         // ========================================
@@ -32,7 +35,7 @@ namespace WebApi.Controllers.Reports
         /// <summary>
         /// Get filter options (units, locations, years)
         /// </summary>
-        [HttpGet("filter-options")]        
+        [HttpGet("filter-options")]
         public async Task<IActionResult> GetFilterOptions()
         {
             var result = await _service.GetFilterOptionsAsync();
@@ -98,6 +101,135 @@ namespace WebApi.Controllers.Reports
 
             // Generate preview with limited rows
             var result = await _dynamicReportService.GenerateDynamicReportAsync(request, previewMode: true, maxRowsPerSection: 5);
+
+            if (!result.IsSuccess)
+                return BadRequest(new { message = result.ErrorMessage });
+
+            return Ok(result.Data);
+        }
+
+        // ========================================
+        // COMPREHENSIVE REPORT ENDPOINTS
+        // ========================================
+
+        /// <summary>
+        /// Generate comprehensive multi-step report with all sections
+        /// POST /api/admin/reports/comprehensive/generate
+        ///
+        /// Use either:
+        /// - UnitLocationIds: List of specific unit location IDs
+        /// - UnitId: Get ALL unit locations for this unit type (e.g., all KVK locations)
+        /// </summary>
+        [HttpPost("comprehensive/generate")]
+        public async Task<IActionResult> GenerateComprehensiveReport([FromBody] ComprehensiveReportRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            // Validate: Either UnitId or UnitLocationIds must be provided
+            bool hasUnitId = request.UnitId.HasValue;
+            bool hasLocationIds = request.UnitLocationIds != null && request.UnitLocationIds.Any();
+
+            if (!hasUnitId && !hasLocationIds)
+                return BadRequest(new { message = "Either UnitId or UnitLocationIds must be specified" });
+
+            if (string.IsNullOrEmpty(request.ReportType))
+                return BadRequest(new { message = "Report type is required" });
+
+            var result = await _comprehensiveReportService.GenerateReportAsync(request);
+
+            if (!result.IsSuccess)
+                return BadRequest(new { message = result.ErrorMessage });
+
+            return Ok(result.Data);
+        }
+
+        /// <summary>
+        /// Generate comprehensive report for ALL locations of a unit type
+        /// POST /api/admin/reports/comprehensive/all-unit
+        ///
+        /// This is a convenience endpoint that generates a report for all unit locations
+        /// of a specific unit type (e.g., all KVK locations, all 
+        /// locations)
+        /// </summary>
+        [HttpPost("comprehensive/all-unit")]
+        public async Task<IActionResult> GenerateAllUnitReport([FromBody] AllUnitReportRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (request.UnitId <= 0)
+                return BadRequest(new { message = "Valid UnitId is required" });
+
+            if (string.IsNullOrEmpty(request.ReportType))
+                return BadRequest(new { message = "Report type is required" });
+
+            // Convert to ComprehensiveReportRequest
+            var comprehensiveRequest = new ComprehensiveReportRequest
+            {
+                UnitId = request.UnitId,
+                Month = request.Month,
+                Year = request.Year,
+                ReportType = request.ReportType,
+                FormStatus = request.FormStatus,
+                IncludeSubSections = request.IncludeSubSections
+            };
+
+            var result = await _comprehensiveReportService.GenerateReportAsync(comprehensiveRequest);
+
+            if (!result.IsSuccess)
+                return BadRequest(new { message = result.ErrorMessage });
+
+            return Ok(result.Data);
+        }
+
+        /// <summary>
+        /// Generate comprehensive multi-unit report (aggregates data from multiple unit locations)
+        /// POST /api/admin/reports/comprehensive/multi-unit
+        /// </summary>
+        [HttpPost("comprehensive/multi-unit")]
+        public async Task<IActionResult> GenerateMultiUnitReport([FromBody] ComprehensiveReportRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (request.UnitLocationIds == null || request.UnitLocationIds.Count < 2)
+                return BadRequest(new { message = "Multi-unit report requires at least 2 unit locations" });
+
+            var result = await _comprehensiveReportService.GenerateMultiUnitReportAsync(request);
+
+            if (!result.IsSuccess)
+                return BadRequest(new { message = result.ErrorMessage });
+
+            return Ok(result.Data);
+        }
+
+        /// <summary>
+        /// Preview comprehensive report (limited rows per section)
+        /// POST /api/admin/reports/comprehensive/preview
+        /// </summary>
+        [HttpPost("comprehensive/preview")]
+        public async Task<IActionResult> PreviewComprehensiveReport([FromBody] ComprehensiveReportRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _comprehensiveReportService.PreviewReportAsync(request, maxRowsPerSection: 5);
+
+            if (!result.IsSuccess)
+                return BadRequest(new { message = result.ErrorMessage });
+
+            return Ok(result.Data);
+        }
+
+        /// <summary>
+        /// Get available report types for a specific unit
+        /// GET /api/admin/reports/comprehensive/report-types?unitId=10
+        /// </summary>
+        [HttpGet("comprehensive/report-types")]
+        public async Task<IActionResult> GetAvailableReportTypes([FromQuery] int unitId)
+        {
+            var result = await _comprehensiveReportService.GetAvailableReportTypesAsync(unitId);
 
             if (!result.IsSuccess)
                 return BadRequest(new { message = result.ErrorMessage });

@@ -373,12 +373,22 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
+                    b.Property<int?>("DistrictId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Duration")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<DateOnly>("EndDate")
                         .HasColumnType("date");
+
+                    b.Property<int?>("EventNamesId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Facilitator")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("FormStatus")
                         .IsRequired()
@@ -433,7 +443,22 @@ namespace Infrastructure.Migrations
                     b.Property<string>("OrganizerInstitutionName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("OtherEventNames")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("OtherLocation")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
                     b.Property<string>("OtherSourceOfInformation")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateOnly?>("PaperPosterAbstractDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("PaperPosterAbstractFile")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -446,6 +471,9 @@ namespace Infrastructure.Migrations
                     b.Property<string>("PiAddress")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("PlaceId")
+                        .HasColumnType("int");
 
                     b.Property<int?>("ProgramTypeId")
                         .HasColumnType("int");
@@ -464,6 +492,10 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<string>("PurposeOfVisit")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<int?>("RegionId")
                         .HasMaxLength(150)
                         .HasColumnType("int");
@@ -475,6 +507,12 @@ namespace Infrastructure.Migrations
                     b.Property<string>("ReportingVideo")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("SampleAnalyzed")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SampleCollected")
+                        .HasColumnType("int");
 
                     b.Property<int?>("SourceId")
                         .HasColumnType("int");
@@ -503,6 +541,9 @@ namespace Infrastructure.Migrations
 
                     b.Property<int?>("TPNo")
                         .HasMaxLength(100)
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TargetFarmersId")
                         .HasColumnType("int");
 
                     b.Property<int?>("ThematicAreaId")
@@ -536,6 +577,10 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<string>("TypeTopic")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
                     b.Property<DateOnly?>("UniImplDate")
                         .HasColumnType("date");
 
@@ -545,6 +590,13 @@ namespace Infrastructure.Migrations
 
                     b.Property<int>("UnitLocationId")
                         .HasColumnType("int");
+
+                    b.Property<DateOnly?>("UniversityPermissionLetterDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("UniversityPermissionLetterFile")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateOnly?>("UniversitySanctionLetterDate")
                         .HasColumnType("date");
@@ -559,6 +611,15 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("UpdatedById")
                         .HasColumnType("int");
 
+                    b.Property<int?>("VAPOptionsId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ZoneOptionsId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ZonesOptionsId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ApprovedById");
@@ -571,11 +632,17 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CreatedById");
 
+                    b.HasIndex("DistrictId");
+
+                    b.HasIndex("EventNamesId");
+
                     b.HasIndex("ModeId");
 
                     b.HasIndex("OrganizationId");
 
                     b.HasIndex("ParticipatedAsId");
+
+                    b.HasIndex("PlaceId");
 
                     b.HasIndex("ProgramTypeId");
 
@@ -587,6 +654,8 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("StatusId");
 
+                    b.HasIndex("TargetFarmersId");
+
                     b.HasIndex("ThematicAreaId");
 
                     b.HasIndex("ThemeId");
@@ -596,6 +665,10 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UnitLocationId");
 
                     b.HasIndex("UpdatedById");
+
+                    b.HasIndex("VAPOptionsId");
+
+                    b.HasIndex("ZoneOptionsId");
 
                     b.ToTable("AticProgramDetails");
                 });
@@ -793,12 +866,10 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("OrganizationId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ResourceType")
-                        .HasMaxLength(150)
+                    b.Property<int?>("ResourceTypeId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Responsibility")
-                        .HasMaxLength(250)
+                    b.Property<int?>("ResponsibilityId")
                         .HasColumnType("int");
 
                     b.Property<int?>("UnitLocationId")
@@ -815,6 +886,10 @@ namespace Infrastructure.Migrations
                     b.HasIndex("AticProgramContentAndResourcesId");
 
                     b.HasIndex("CreatedById");
+
+                    b.HasIndex("ResourceTypeId");
+
+                    b.HasIndex("ResponsibilityId");
 
                     b.HasIndex("UpdatedById");
 
@@ -1624,12 +1699,10 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("OrganizationId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ResourceType")
-                        .HasMaxLength(150)
+                    b.Property<int?>("ResourceTypeId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Responsibility")
-                        .HasMaxLength(250)
+                    b.Property<int?>("ResponsibilityId")
                         .HasColumnType("int");
 
                     b.Property<int?>("UnitLocationId")
@@ -1646,6 +1719,10 @@ namespace Infrastructure.Migrations
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("DeuProgramContentAndResourcesId");
+
+                    b.HasIndex("ResourceTypeId");
+
+                    b.HasIndex("ResponsibilityId");
 
                     b.HasIndex("UpdatedById");
 
@@ -2924,12 +3001,10 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("OrganizationId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ResourceType")
-                        .HasMaxLength(150)
+                    b.Property<int?>("ResourceTypeId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Responsibility")
-                        .HasMaxLength(250)
+                    b.Property<int?>("ResponsibilityId")
                         .HasColumnType("int");
 
                     b.Property<int?>("UnitLocationId")
@@ -2946,6 +3021,10 @@ namespace Infrastructure.Migrations
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("EeuProgramContentAndResourcesId");
+
+                    b.HasIndex("ResourceTypeId");
+
+                    b.HasIndex("ResponsibilityId");
 
                     b.HasIndex("UpdatedById");
 
@@ -3935,12 +4014,10 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("OrganizationId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ResourceType")
-                        .HasMaxLength(150)
+                    b.Property<int?>("ResourceTypeId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Responsibility")
-                        .HasMaxLength(250)
+                    b.Property<int?>("ResponsibilityId")
                         .HasColumnType("int");
 
                     b.Property<int?>("UnitLocationId")
@@ -3957,6 +4034,10 @@ namespace Infrastructure.Migrations
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("FtiProgramContentAndResourcesId");
+
+                    b.HasIndex("ResourceTypeId");
+
+                    b.HasIndex("ResponsibilityId");
 
                     b.HasIndex("UpdatedById");
 
@@ -4589,9 +4670,9 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AmountPerCopy")
+                    b.Property<decimal?>("AmountPerCopy")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -4604,16 +4685,16 @@ namespace Infrastructure.Migrations
                     b.Property<DateOnly?>("Date")
                         .HasColumnType("date");
 
-                    b.Property<string>("NumberOfCopies")
+                    b.Property<int?>("NumberOfCopies")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("int");
 
                     b.Property<int>("PublicationId")
                         .HasColumnType("int");
 
-                    b.Property<string>("TotalAmount")
+                    b.Property<decimal?>("TotalAmount")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
@@ -6502,12 +6583,10 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("OrganizationId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ResourceType")
-                        .HasMaxLength(150)
+                    b.Property<int?>("ResourceTypeId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Responsibility")
-                        .HasMaxLength(250)
+                    b.Property<int?>("ResponsibilityId")
                         .HasColumnType("int");
 
                     b.Property<int?>("UnitLocationId")
@@ -6524,6 +6603,10 @@ namespace Infrastructure.Migrations
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("IbtvaProgramContentAndResourcesId");
+
+                    b.HasIndex("ResourceTypeId");
+
+                    b.HasIndex("ResponsibilityId");
 
                     b.HasIndex("UpdatedById");
 
@@ -7627,12 +7710,22 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
+                    b.Property<int?>("DistrictId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Duration")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<DateOnly>("EndDate")
                         .HasColumnType("date");
+
+                    b.Property<int?>("EventNamesId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Facilitator")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("FormStatus")
                         .IsRequired()
@@ -7699,7 +7792,22 @@ namespace Infrastructure.Migrations
                     b.Property<string>("OrganizerInstitutionName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("OtherEventNames")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("OtherLocation")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
                     b.Property<string>("OtherSourceOfInformation")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateOnly?>("PaperPosterAbstractDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("PaperPosterAbstractFile")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -7712,6 +7820,9 @@ namespace Infrastructure.Migrations
                     b.Property<string>("PiAddress")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("PlaceId")
+                        .HasColumnType("int");
 
                     b.Property<int?>("ProgramTypeId")
                         .HasColumnType("int");
@@ -7730,6 +7841,10 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<string>("PurposeOfVisit")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<int?>("RegionId")
                         .HasMaxLength(150)
                         .HasColumnType("int");
@@ -7741,6 +7856,12 @@ namespace Infrastructure.Migrations
                     b.Property<string>("ReportingVideo")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("SampleAnalyzed")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SampleCollected")
+                        .HasColumnType("int");
 
                     b.Property<int?>("SourceId")
                         .HasColumnType("int");
@@ -7794,6 +7915,9 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("int");
 
+                    b.Property<int?>("TargetFarmersId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("ThematicAreaId")
                         .HasMaxLength(150)
                         .HasColumnType("int");
@@ -7825,6 +7949,10 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<string>("TypeTopic")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
                     b.Property<DateOnly?>("UniImplDate")
                         .HasColumnType("date");
 
@@ -7834,6 +7962,13 @@ namespace Infrastructure.Migrations
 
                     b.Property<int>("UnitLocationId")
                         .HasColumnType("int");
+
+                    b.Property<DateOnly?>("UniversityPermissionLetterDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("UniversityPermissionLetterFile")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateOnly?>("UniversitySanctionLetterDate")
                         .HasColumnType("date");
@@ -7848,6 +7983,15 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("UpdatedById")
                         .HasColumnType("int");
 
+                    b.Property<int?>("VAPOptionsId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ZoneOptionsId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ZonesOptionsId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ApprovedById");
@@ -7860,11 +8004,17 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CreatedById");
 
+                    b.HasIndex("DistrictId");
+
+                    b.HasIndex("EventNamesId");
+
                     b.HasIndex("ModeId");
 
                     b.HasIndex("OrganizationId");
 
                     b.HasIndex("ParticipatedAsId");
+
+                    b.HasIndex("PlaceId");
 
                     b.HasIndex("ProgramTypeId");
 
@@ -7876,6 +8026,8 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("StatusId");
 
+                    b.HasIndex("TargetFarmersId");
+
                     b.HasIndex("ThematicAreaId");
 
                     b.HasIndex("ThemeId");
@@ -7885,6 +8037,10 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UnitLocationId");
 
                     b.HasIndex("UpdatedById");
+
+                    b.HasIndex("VAPOptionsId");
+
+                    b.HasIndex("ZoneOptionsId");
 
                     b.ToTable("KvkProgramDetails");
                 });
@@ -8074,12 +8230,10 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("OrganizationId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ResourceType")
-                        .HasMaxLength(150)
+                    b.Property<int?>("ResourceTypeId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Responsibility")
-                        .HasMaxLength(250)
+                    b.Property<int?>("ResponsibilityId")
                         .HasColumnType("int");
 
                     b.Property<int?>("UnitLocationId")
@@ -8096,6 +8250,10 @@ namespace Infrastructure.Migrations
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("KvkProgramContentAndResourcesId");
+
+                    b.HasIndex("ResourceTypeId");
+
+                    b.HasIndex("ResponsibilityId");
 
                     b.HasIndex("UpdatedById");
 
@@ -8223,8 +8381,8 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("Date")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly?>("Date")
+                        .HasColumnType("date");
 
                     b.Property<int>("KvkProgramContentAndResourcesId")
                         .HasColumnType("int");
@@ -9285,6 +9443,31 @@ namespace Infrastructure.Migrations
                     b.ToTable("TypeOfAids");
                 });
 
+            modelBuilder.Entity("Domain.Entities.MasterData.VAPOption", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("VAPOptions");
+                });
+
             modelBuilder.Entity("Domain.Entities.MasterData.VillageAdoptiveProgram", b =>
                 {
                     b.Property<int>("Id")
@@ -9333,6 +9516,31 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Visitors");
+                });
+
+            modelBuilder.Entity("Domain.Entities.MasterData.ZoneOption", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ZoneOptions");
                 });
 
             modelBuilder.Entity("Domain.Entities.NAEP.NaepAdvisoryServices", b =>
@@ -10026,12 +10234,10 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("OrganizationId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ResourceType")
-                        .HasMaxLength(150)
+                    b.Property<int?>("ResourceTypeId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Responsibility")
-                        .HasMaxLength(250)
+                    b.Property<int?>("ResponsibilityId")
                         .HasColumnType("int");
 
                     b.Property<int?>("UnitLocationId")
@@ -10048,6 +10254,10 @@ namespace Infrastructure.Migrations
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("NaepProgramContentAndResourcesId");
+
+                    b.HasIndex("ResourceTypeId");
+
+                    b.HasIndex("ResponsibilityId");
 
                     b.HasIndex("UpdatedById");
 
@@ -10913,12 +11123,10 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("OrganizationId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ResourceType")
-                        .HasMaxLength(150)
+                    b.Property<int?>("ResourceTypeId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Responsibility")
-                        .HasMaxLength(250)
+                    b.Property<int?>("ResponsibilityId")
                         .HasColumnType("int");
 
                     b.Property<int>("SametiProgramContentAndResourcesId")
@@ -10936,6 +11144,10 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
+
+                    b.HasIndex("ResourceTypeId");
+
+                    b.HasIndex("ResponsibilityId");
 
                     b.HasIndex("SametiProgramContentAndResourcesId");
 
@@ -11744,12 +11956,10 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("OrganizationId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ResourceType")
-                        .HasMaxLength(150)
+                    b.Property<int?>("ResourceTypeId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Responsibility")
-                        .HasMaxLength(250)
+                    b.Property<int?>("ResponsibilityId")
                         .HasColumnType("int");
 
                     b.Property<int>("StuProgramContentAndResourcesId")
@@ -11767,6 +11977,10 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
+
+                    b.HasIndex("ResourceTypeId");
+
+                    b.HasIndex("ResponsibilityId");
 
                     b.HasIndex("StuProgramContentAndResourcesId");
 
@@ -12295,6 +12509,16 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.HasOne("Domain.Entities.District", "District")
+                        .WithMany()
+                        .HasForeignKey("DistrictId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.EventName", "EventNames")
+                        .WithMany()
+                        .HasForeignKey("EventNamesId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Domain.Entities.MasterData.Mode", "Mode")
                         .WithMany()
                         .HasForeignKey("ModeId")
@@ -12309,6 +12533,11 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.MasterData.Participant", "ParticipatedAs")
                         .WithMany()
                         .HasForeignKey("ParticipatedAsId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.District", "Place")
+                        .WithMany()
+                        .HasForeignKey("PlaceId")
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Domain.Entities.MasterData.ProgramType", "ProgramType")
@@ -12334,6 +12563,11 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.MasterData.Status", "Status")
                         .WithMany()
                         .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.TargetFarmer", "TargetFarmers")
+                        .WithMany()
+                        .HasForeignKey("TargetFarmersId")
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Domain.Entities.MasterData.ThematicArea", "ThematicArea")
@@ -12362,6 +12596,16 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("UpdatedById")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.HasOne("Domain.Entities.MasterData.VAPOption", "VAPOptions")
+                        .WithMany()
+                        .HasForeignKey("VAPOptionsId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.ZoneOption", "ZoneOptions")
+                        .WithMany()
+                        .HasForeignKey("ZoneOptionsId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.Navigation("ApprovedBy");
 
                     b.Navigation("Category");
@@ -12372,11 +12616,17 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("CreatedBy");
 
+                    b.Navigation("District");
+
+                    b.Navigation("EventNames");
+
                     b.Navigation("Mode");
 
                     b.Navigation("Organization");
 
                     b.Navigation("ParticipatedAs");
+
+                    b.Navigation("Place");
 
                     b.Navigation("ProgramType");
 
@@ -12388,6 +12638,8 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("Status");
 
+                    b.Navigation("TargetFarmers");
+
                     b.Navigation("ThematicArea");
 
                     b.Navigation("Theme");
@@ -12397,6 +12649,10 @@ namespace Infrastructure.Migrations
                     b.Navigation("UnitLocation");
 
                     b.Navigation("UpdatedBy");
+
+                    b.Navigation("VAPOptions");
+
+                    b.Navigation("ZoneOptions");
                 });
 
             modelBuilder.Entity("Domain.Entities.ATIC.AticRecommendation", b =>
@@ -12462,6 +12718,16 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.HasOne("Domain.Entities.MasterData.ResourceType", "ResourceType")
+                        .WithMany()
+                        .HasForeignKey("ResourceTypeId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.Responsibility", "Responsibility")
+                        .WithMany()
+                        .HasForeignKey("ResponsibilityId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
                         .HasForeignKey("UpdatedById")
@@ -12470,6 +12736,10 @@ namespace Infrastructure.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("ProgramContentAndResources");
+
+                    b.Navigation("ResourceType");
+
+                    b.Navigation("Responsibility");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -12806,6 +13076,16 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("Domain.Entities.MasterData.ResourceType", "ResourceType")
+                        .WithMany()
+                        .HasForeignKey("ResourceTypeId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.Responsibility", "Responsibility")
+                        .WithMany()
+                        .HasForeignKey("ResponsibilityId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
                         .HasForeignKey("UpdatedById")
@@ -12814,6 +13094,10 @@ namespace Infrastructure.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("ProgramContentAndResources");
+
+                    b.Navigation("ResourceType");
+
+                    b.Navigation("Responsibility");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -13325,6 +13609,16 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("Domain.Entities.MasterData.ResourceType", "ResourceType")
+                        .WithMany()
+                        .HasForeignKey("ResourceTypeId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.Responsibility", "Responsibility")
+                        .WithMany()
+                        .HasForeignKey("ResponsibilityId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
                         .HasForeignKey("UpdatedById")
@@ -13333,6 +13627,10 @@ namespace Infrastructure.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("ProgramContentAndResources");
+
+                    b.Navigation("ResourceType");
+
+                    b.Navigation("Responsibility");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -13744,6 +14042,16 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("Domain.Entities.MasterData.ResourceType", "ResourceType")
+                        .WithMany()
+                        .HasForeignKey("ResourceTypeId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.Responsibility", "Responsibility")
+                        .WithMany()
+                        .HasForeignKey("ResponsibilityId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
                         .HasForeignKey("UpdatedById")
@@ -13752,6 +14060,10 @@ namespace Infrastructure.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("ProgramContentAndResources");
+
+                    b.Navigation("ResourceType");
+
+                    b.Navigation("Responsibility");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -14936,6 +15248,16 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("Domain.Entities.MasterData.ResourceType", "ResourceType")
+                        .WithMany()
+                        .HasForeignKey("ResourceTypeId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.Responsibility", "Responsibility")
+                        .WithMany()
+                        .HasForeignKey("ResponsibilityId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
                         .HasForeignKey("UpdatedById")
@@ -14944,6 +15266,10 @@ namespace Infrastructure.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("ProgramContentAndResources");
+
+                    b.Navigation("ResourceType");
+
+                    b.Navigation("Responsibility");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -15506,6 +15832,16 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.HasOne("Domain.Entities.District", "District")
+                        .WithMany()
+                        .HasForeignKey("DistrictId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.EventName", "EventNames")
+                        .WithMany()
+                        .HasForeignKey("EventNamesId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Domain.Entities.MasterData.Mode", "Mode")
                         .WithMany()
                         .HasForeignKey("ModeId")
@@ -15520,6 +15856,11 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.MasterData.Participant", "ParticipatedAs")
                         .WithMany()
                         .HasForeignKey("ParticipatedAsId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.District", "Place")
+                        .WithMany()
+                        .HasForeignKey("PlaceId")
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Domain.Entities.MasterData.ProgramType", "ProgramType")
@@ -15545,6 +15886,11 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.MasterData.Status", "Status")
                         .WithMany()
                         .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.TargetFarmer", "TargetFarmers")
+                        .WithMany()
+                        .HasForeignKey("TargetFarmersId")
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Domain.Entities.MasterData.ThematicArea", "ThematicArea")
@@ -15573,6 +15919,16 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("UpdatedById")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.HasOne("Domain.Entities.MasterData.VAPOption", "VAPOptions")
+                        .WithMany()
+                        .HasForeignKey("VAPOptionsId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.ZoneOption", "ZoneOptions")
+                        .WithMany()
+                        .HasForeignKey("ZoneOptionsId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.Navigation("ApprovedBy");
 
                     b.Navigation("Category");
@@ -15583,11 +15939,17 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("CreatedBy");
 
+                    b.Navigation("District");
+
+                    b.Navigation("EventNames");
+
                     b.Navigation("Mode");
 
                     b.Navigation("Organization");
 
                     b.Navigation("ParticipatedAs");
+
+                    b.Navigation("Place");
 
                     b.Navigation("ProgramType");
 
@@ -15599,6 +15961,8 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("Status");
 
+                    b.Navigation("TargetFarmers");
+
                     b.Navigation("ThematicArea");
 
                     b.Navigation("Theme");
@@ -15608,6 +15972,10 @@ namespace Infrastructure.Migrations
                     b.Navigation("UnitLocation");
 
                     b.Navigation("UpdatedBy");
+
+                    b.Navigation("VAPOptions");
+
+                    b.Navigation("ZoneOptions");
                 });
 
             modelBuilder.Entity("Domain.Entities.KVK.KvkRecommendation", b =>
@@ -15673,6 +16041,16 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("Domain.Entities.MasterData.ResourceType", "ResourceType")
+                        .WithMany()
+                        .HasForeignKey("ResourceTypeId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.Responsibility", "Responsibility")
+                        .WithMany()
+                        .HasForeignKey("ResponsibilityId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
                         .HasForeignKey("UpdatedById")
@@ -15681,6 +16059,10 @@ namespace Infrastructure.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("ProgramContentAndResources");
+
+                    b.Navigation("ResourceType");
+
+                    b.Navigation("Responsibility");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -16042,6 +16424,16 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("Domain.Entities.MasterData.ResourceType", "ResourceType")
+                        .WithMany()
+                        .HasForeignKey("ResourceTypeId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.Responsibility", "Responsibility")
+                        .WithMany()
+                        .HasForeignKey("ResponsibilityId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
                         .HasForeignKey("UpdatedById")
@@ -16050,6 +16442,10 @@ namespace Infrastructure.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("ProgramContentAndResources");
+
+                    b.Navigation("ResourceType");
+
+                    b.Navigation("Responsibility");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -16403,6 +16799,16 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.HasOne("Domain.Entities.MasterData.ResourceType", "ResourceType")
+                        .WithMany()
+                        .HasForeignKey("ResourceTypeId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.Responsibility", "Responsibility")
+                        .WithMany()
+                        .HasForeignKey("ResponsibilityId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Domain.Entities.SAMETI.SametiProgramContentAndResources", "ProgramContentAndResources")
                         .WithMany("ResourcePersons")
                         .HasForeignKey("SametiProgramContentAndResourcesId")
@@ -16417,6 +16823,10 @@ namespace Infrastructure.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("ProgramContentAndResources");
+
+                    b.Navigation("ResourceType");
+
+                    b.Navigation("Responsibility");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -16748,6 +17158,16 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.HasOne("Domain.Entities.MasterData.ResourceType", "ResourceType")
+                        .WithMany()
+                        .HasForeignKey("ResourceTypeId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Domain.Entities.MasterData.Responsibility", "Responsibility")
+                        .WithMany()
+                        .HasForeignKey("ResponsibilityId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Domain.Entities.STU.StuProgramContentAndResources", "ProgramContentAndResources")
                         .WithMany("ResourcePersons")
                         .HasForeignKey("StuProgramContentAndResourcesId")
@@ -16762,6 +17182,10 @@ namespace Infrastructure.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("ProgramContentAndResources");
+
+                    b.Navigation("ResourceType");
+
+                    b.Navigation("Responsibility");
 
                     b.Navigation("UpdatedBy");
                 });

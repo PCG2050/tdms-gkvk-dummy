@@ -244,7 +244,8 @@ namespace Application.Models
         public bool DefaultSelected { get; set; } = true;
 
         /// <summary>
-        /// Optional: Group for UI organization (e.g., "Basic Info", "Financial", "Demographics")
+        /// Optional: Group for UI organization (e.g., "program_organized", "demographics", "advisory_services")
+        /// Used for stepper grouping in the frontend
         /// </summary>
         public string? Group { get; set; }
 
@@ -262,5 +263,11 @@ namespace Application.Models
         /// Optional: Column width percentage
         /// </summary>
         public int? Width { get; set; }
+
+        /// <summary>
+        /// Whether this field contains array data (e.g., list of resource persons, topics)
+        /// Array fields will be concatenated into strings for display
+        /// </summary>
+        public bool IsArray { get; set; } = false;
     }
 }

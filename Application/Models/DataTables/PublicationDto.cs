@@ -340,16 +340,13 @@ namespace Application.Models.DataTables
     {
         public DateOnly? Date { get; set; }
 
-        [MaxLength(50, ErrorMessage = "Amount per copy cannot exceed 50 characters")]
-        [RegularExpression(@"^\d+(\.\d{1,2})?$", ErrorMessage = "Amount must be a valid number")]
-        public string? AmountPerCopy { get; set; }
+   
+        public decimal? AmountPerCopy { get; set; }
 
-        [MaxLength(50, ErrorMessage = "Number of copies cannot exceed 50 characters")]
-        [RegularExpression(@"^\d+$", ErrorMessage = "Number of copies must be a whole number")]
-        public string? NumberOfCopies { get; set; }
+      
+        public int? NumberOfCopies { get; set; }
 
-        [MaxLength(50, ErrorMessage = "Total amount cannot exceed 50 characters")]
-        [RegularExpression(@"^\d+(\.\d{1,2})?$", ErrorMessage = "Total amount must be a valid number")]
-        public string? TotalAmount { get; set; }
+  
+        public decimal? TotalAmount { get; set; }
     }
 }

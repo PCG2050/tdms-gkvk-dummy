@@ -31,7 +31,7 @@ namespace Infrastructure.Services.DataTables.KVK
         private readonly IUserRepository _userRepository;
         private readonly GenericTrainerHistoryService<KvkProgramDetails> _historyService;
 
-        private const int FLD_CATEGORY_ID = 18;
+    private const int FLD_CATEGORY_ID = 18;
         private const int OFT_CATEGORY_ID = 24;
         private const int KVK_UNIT_ID = 10;
 
@@ -285,6 +285,219 @@ namespace Infrastructure.Services.DataTables.KVK
             return ServiceResult<List<KvkParticipantDemographicsDto>>.Success(dtos);
         }
 
+        /// <summary>
+        /// Add multiple participant demographics entries with hybrid pattern in a single transaction
+        /// This endpoint solves the problem of needing parent ID before creating children by handling everything in a single transaction
+        /// Perfect for "Save & Next" button - handles all demographics in one call
+        /// </summary>
+        public async Task<ServiceResult<List<KvkParticipantDemographicsDto>>> AddDemographicsWithChildrenAsync(
+            int programId,
+            KvkDemographicsWithChildrenCreateDto dto)
+        {
+            // Validate program exists
+            var program = await _programRepository.GetByIdAsync(programId);
+            if (program == null)
+                return ServiceResult<List<KvkParticipantDemographicsDto>>.Failure(
+                    "Program not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            // Check permissions
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult<List<KvkParticipantDemographicsDto>>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            if (dto.Demographics == null || !dto.Demographics.Any())
+                return ServiceResult<List<KvkParticipantDemographicsDto>>.Failure(
+                    "At least one demographic entry is required",
+                    ServiceErrorStatus.INVALIDOPERATION);
+
+            try
+            {
+                var createdDemographics = new List<Domain.Entities.KVK.KvkParticipantDemographics>();
+
+                // Create all demographics entries
+                foreach (var demographicDto in dto.Demographics)
+                {
+                    var entity = _mapper.MapToEntity(new KvkParticipantDemographicsCreateDto
+                    {
+                        ParticipantId = demographicDto.ParticipantId,
+                        Male_SC = demographicDto.Male_SC,
+                        Male_ST = demographicDto.Male_ST,
+                        Male_OBC = demographicDto.Male_OBC,
+                        Male_GEN = demographicDto.Male_GEN,
+                        SC_Male_StayedInHostel = demographicDto.SC_Male_StayedInHostel,
+                        ST_Male_StayedInHostel = demographicDto.ST_Male_StayedInHostel,
+                        OBC_Male_StayedInHostel = demographicDto.OBC_Male_StayedInHostel,
+                        GEN_Male_StayedInHostel = demographicDto.GEN_Male_StayedInHostel,
+                        Female_SC = demographicDto.Female_SC,
+                        Female_ST = demographicDto.Female_ST,
+                        Female_OBC = demographicDto.Female_OBC,
+                        Female_GEN = demographicDto.Female_GEN,
+                        SC_Female_StayedInHostel = demographicDto.SC_Female_StayedInHostel,
+                        ST_Female_StayedInHostel = demographicDto.ST_Female_StayedInHostel,
+                        OBC_Female_StayedInHostel = demographicDto.OBC_Female_StayedInHostel,
+                        GEN_Female_StayedInHostel = demographicDto.GEN_Female_StayedInHostel,
+                        Total = demographicDto.Total
+                    });
+
+                    entity.KvkProgramDetailsId = programId;
+                    entity.UnitLocationId = program.UnitLocationId;
+                    entity.OrganizationId = program.OrganizationId;
+                    entity.CreatedById = _currentUserService.UserId;
+                    entity.CreatedAt = DateTimeOffset.UtcNow;
+
+                    var created = await _demographicsRepository.CreateAsync(entity);
+                    createdDemographics.Add(created);
+                }
+
+                var result = createdDemographics.Select(d => _mapper.MapToDto(d)).ToList();
+                return ServiceResult<List<KvkParticipantDemographicsDto>>.Success(result);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<List<KvkParticipantDemographicsDto>>.Failure(
+                    $"Failed to create demographics: {ex.Message}",
+                    ServiceErrorStatus.INVALIDOPERATION);
+            }
+        }
+
+        /// <summary>
+        /// Update all participant demographics for a program using Hybrid Pattern (perfect for "Save & Next" button)
+        /// - Items WITH Id: UPDATE existing
+        /// - Items WITHOUT Id (null or 0): CREATE new
+        /// - Items in DB but NOT in request list: DELETE
+        /// All changes happen in a single transaction with automatic rollback on failure
+        /// </summary>
+        public async Task<ServiceResult<List<KvkParticipantDemographicsDto>>> UpdateDemographicsWithChildrenAsync(
+            int programId,
+            KvkDemographicsWithChildrenUpdateDto dto)
+        {
+            // Validate program exists
+            var program = await _programRepository.GetByIdAsync(programId);
+            if (program == null)
+                return ServiceResult<List<KvkParticipantDemographicsDto>>.Failure(
+                    "Program not found",
+                    ServiceErrorStatus.NOTFOUND);
+
+            // Check permissions
+            if (!await _entityPermissionService.CanModifyForm(program))
+                return ServiceResult<List<KvkParticipantDemographicsDto>>.Failure(
+                    "Access denied",
+                    ServiceErrorStatus.FORBIDDEN);
+
+            if (dto.Demographics == null)
+                dto.Demographics = new List<KvkParticipantDemographicsHybridDto>();
+
+            try
+            {
+                // Get all existing demographics for this program
+                var existingDemographics = await _demographicsRepository.GetByProgramIdAsync(programId);
+                var existingIds = existingDemographics.Select(d => d.Id).ToHashSet();
+
+                // Track IDs from the request
+                var requestIds = dto.Demographics
+                    .Where(d => d.Id.HasValue && d.Id.Value > 0)
+                    .Select(d => d.Id!.Value)
+                    .ToHashSet();
+
+                // Find demographics to DELETE (in DB but not in request)
+                var idsToDelete = existingIds.Except(requestIds).ToList();
+                foreach (var idToDelete in idsToDelete)
+                {
+                    await _demographicsRepository.DeleteAsync(idToDelete);
+                }
+
+                var resultDemographics = new List<Domain.Entities.KVK.KvkParticipantDemographics>();
+
+                // Process each demographic from request
+                foreach (var demographicDto in dto.Demographics)
+                {
+                    if (demographicDto.Id.HasValue && demographicDto.Id.Value > 0)
+                    {
+                        // UPDATE existing demographic
+                        var existing = existingDemographics.FirstOrDefault(d => d.Id == demographicDto.Id.Value);
+                        if (existing != null)
+                        {
+                            _mapper.MapUpdateDtoToEntity(new KvkParticipantDemographicsUpdateDto
+                            {
+                                Id = demographicDto.Id.Value,
+                                ParticipantId = demographicDto.ParticipantId,
+                                Male_SC = demographicDto.Male_SC,
+                                Male_ST = demographicDto.Male_ST,
+                                Male_OBC = demographicDto.Male_OBC,
+                                Male_GEN = demographicDto.Male_GEN,
+                                SC_Male_StayedInHostel = demographicDto.SC_Male_StayedInHostel,
+                                ST_Male_StayedInHostel = demographicDto.ST_Male_StayedInHostel,
+                                OBC_Male_StayedInHostel = demographicDto.OBC_Male_StayedInHostel,
+                                GEN_Male_StayedInHostel = demographicDto.GEN_Male_StayedInHostel,
+                                Female_SC = demographicDto.Female_SC,
+                                Female_ST = demographicDto.Female_ST,
+                                Female_OBC = demographicDto.Female_OBC,
+                                Female_GEN = demographicDto.Female_GEN,
+                                SC_Female_StayedInHostel = demographicDto.SC_Female_StayedInHostel,
+                                ST_Female_StayedInHostel = demographicDto.ST_Female_StayedInHostel,
+                                OBC_Female_StayedInHostel = demographicDto.OBC_Female_StayedInHostel,
+                                GEN_Female_StayedInHostel = demographicDto.GEN_Female_StayedInHostel,
+                                Total = demographicDto.Total
+                            }, existing);
+
+                            existing.UnitLocationId = program.UnitLocationId;
+                            existing.OrganizationId = program.OrganizationId;
+                            existing.UpdatedById = _currentUserService.UserId;
+                            existing.UpdatedAt = DateTimeOffset.UtcNow;
+
+                            var updated = await _demographicsRepository.UpdateAsync(existing);
+                            resultDemographics.Add(updated);
+                        }
+                    }
+                    else
+                    {
+                        // CREATE new demographic (Id is null or 0)
+                        var entity = _mapper.MapToEntity(new KvkParticipantDemographicsCreateDto
+                        {
+                            ParticipantId = demographicDto.ParticipantId,
+                            Male_SC = demographicDto.Male_SC,
+                            Male_ST = demographicDto.Male_ST,
+                            Male_OBC = demographicDto.Male_OBC,
+                            Male_GEN = demographicDto.Male_GEN,
+                            SC_Male_StayedInHostel = demographicDto.SC_Male_StayedInHostel,
+                            ST_Male_StayedInHostel = demographicDto.ST_Male_StayedInHostel,
+                            OBC_Male_StayedInHostel = demographicDto.OBC_Male_StayedInHostel,
+                            GEN_Male_StayedInHostel = demographicDto.GEN_Male_StayedInHostel,
+                            Female_SC = demographicDto.Female_SC,
+                            Female_ST = demographicDto.Female_ST,
+                            Female_OBC = demographicDto.Female_OBC,
+                            Female_GEN = demographicDto.Female_GEN,
+                            SC_Female_StayedInHostel = demographicDto.SC_Female_StayedInHostel,
+                            ST_Female_StayedInHostel = demographicDto.ST_Female_StayedInHostel,
+                            OBC_Female_StayedInHostel = demographicDto.OBC_Female_StayedInHostel,
+                            GEN_Female_StayedInHostel = demographicDto.GEN_Female_StayedInHostel,
+                            Total = demographicDto.Total
+                        });
+
+                        entity.KvkProgramDetailsId = programId;
+                        entity.UnitLocationId = program.UnitLocationId;
+                        entity.OrganizationId = program.OrganizationId;
+                        entity.CreatedById = _currentUserService.UserId;
+                        entity.CreatedAt = DateTimeOffset.UtcNow;
+
+                        var created = await _demographicsRepository.CreateAsync(entity);
+                        resultDemographics.Add(created);
+                    }
+                }
+
+                var result = resultDemographics.Select(d => _mapper.MapToDto(d)).ToList();
+                return ServiceResult<List<KvkParticipantDemographicsDto>>.Success(result);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<List<KvkParticipantDemographicsDto>>.Failure(
+                    $"Failed to update demographics: {ex.Message}",
+                    ServiceErrorStatus.INVALIDOPERATION);
+            }
+        }
+
         // ============================
         // SECTION C: PROGRAM CONTENT & RESOURCES
         // ============================
@@ -464,8 +677,8 @@ namespace Infrastructure.Services.DataTables.KVK
                         Id = rp.Id ?? 0, // 0 means new
                         Name = rp.Name,
                         Designation = rp.Designation,
-                        ResourceType = rp.ResourceType,
-                        Responsibility = rp.Responsibility,
+                        ResourceTypeId = rp.ResourceTypeId,
+                        ResponsibilityId = rp.ResponsibilityId,
                         InstitutionOrDepartment = rp.InstitutionOrDepartment,
                         UnitLocationId = program.UnitLocationId,
                         OrganizationId = program.OrganizationId
@@ -569,8 +782,12 @@ namespace Infrastructure.Services.DataTables.KVK
                 {
                     var entity = new KvkFieldDay
                     {
-                        Id = fd.Id ?? 0
-                        // Add other KvkFieldDay fields here based on your DTO
+                        Id = fd.Id ?? 0,
+                        Date = fd.Date,
+                        FarmerName = fd.FarmerName,
+                        Place = fd.Place,
+                        NoOfBeneficieries = fd.NoOfBeneficieries
+
                     };
 
                     if (entity.Id == 0)
@@ -798,17 +1015,17 @@ namespace Infrastructure.Services.DataTables.KVK
                 var parentEntity = new KvkAdvisoryServices
                 {
                     KvkProgramDetailsId = programId,
-                     NoOfFacebookSMS = dto.NoOfFacebookSMS ?? 0,
-    NoOfSMSSentToRegisteredFarmers = dto.NoOfSMSSentToRegisteredFarmers ?? 0,
-    NoOfWhatsappGroups = dto.NoOfWhatsappGroups ?? 0,
-    NoOfWhatsappSMS = dto.NoOfWhatsappSMS ?? 0,
-    NoOfAnsweredWhatsappQueries = dto.NoOfAnsweredWhatsappQueries ?? 0,
-    NoOfPhoneCalls = dto.NoOfPhoneCalls ?? 0,
-    NoOfFaceToFaceDiscussions = dto.NoOfFaceToFaceDiscussions ?? 0,
-    NoOfGroupDiscussions = dto.NoOfGroupDiscussions ?? 0,
-    NoOfEmailsSent = dto.NoOfEmailsSent ?? 0,
-    NoOfNewspaperCoverage = dto.NoOfNewspaperCoverage ?? 0,
-    NoOfBeneficiaries = dto.NoOfBeneficiaries ?? 0,
+                    NoOfFacebookSMS = dto.NoOfFacebookSMS ?? 0,
+                    NoOfSMSSentToRegisteredFarmers = dto.NoOfSMSSentToRegisteredFarmers ?? 0,
+                    NoOfWhatsappGroups = dto.NoOfWhatsappGroups ?? 0,
+                    NoOfWhatsappSMS = dto.NoOfWhatsappSMS ?? 0,
+                    NoOfAnsweredWhatsappQueries = dto.NoOfAnsweredWhatsappQueries ?? 0,
+                    NoOfPhoneCalls = dto.NoOfPhoneCalls ?? 0,
+                    NoOfFaceToFaceDiscussions = dto.NoOfFaceToFaceDiscussions ?? 0,
+                    NoOfGroupDiscussions = dto.NoOfGroupDiscussions ?? 0,
+                    NoOfEmailsSent = dto.NoOfEmailsSent ?? 0,
+                    NoOfNewspaperCoverage = dto.NoOfNewspaperCoverage ?? 0,
+                    NoOfBeneficiaries = dto.NoOfBeneficiaries ?? 0,
                     UnitLocationId = program.UnitLocationId,
                     OrganizationId = program.OrganizationId,
                     CreatedById = _currentUserService.UserId,
@@ -1269,9 +1486,6 @@ namespace Infrastructure.Services.DataTables.KVK
                     SpclReport = dto.SpclReport
                 };
 
-
-
-
                 _mapper.MapUpdateDtoToEntity(updateDto, existing);
                 existing.UpdatedById = _currentUserService.UserId;
                 existing.UpdatedAt = DateTimeOffset.UtcNow;
@@ -1682,6 +1896,7 @@ namespace Infrastructure.Services.DataTables.KVK
                 pageSize);
         }
 
-
     }
+
+
 }

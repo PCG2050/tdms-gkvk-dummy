@@ -15,11 +15,13 @@
         [MaxLength(150)]
         public string? Designation { get; set; }
 
-        [MaxLength(150)]
-        public int? ResourceType { get; set; }
+        public int? ResourceTypeId { get; set; }
+        [ForeignKey(nameof(ResourceTypeId))]
+        public ResourceType? ResourceType { get; set; }
 
-        [MaxLength(250)]
-        public int? Responsibility { get; set; }
+        public int? ResponsibilityId { get; set; }
+        [ForeignKey(nameof(ResponsibilityId))]
+        public Responsibility? Responsibility { get; set; }
 
         [MaxLength(250)]
         public string? InstitutionOrDepartment { get; set; }

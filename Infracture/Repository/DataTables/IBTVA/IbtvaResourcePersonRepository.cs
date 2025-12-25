@@ -17,12 +17,19 @@ namespace Infrastructure.Repository.DataTables.IBTVA
 
         public async Task<IbtvaResourcePerson?> GetByIdAsync(int id)
         {
-            return await _context.IbtvaResourcePersons.FindAsync(id);
+            return await _context.IbtvaResourcePersons
+                .Include(r => r.ResourceType)
+                .Include(r => r.Responsibility)
+                .Include(r => r.ProgramContentAndResources)
+                    .ThenInclude(pc => pc.ProgramDetails)
+                .FirstOrDefaultAsync(r => r.Id == id);
         }
 
         public async Task<List<IbtvaResourcePerson>> GetByContentIdAsync(int contentId)
         {
             return await _context.IbtvaResourcePersons
+                .Include(r => r.ResourceType)
+                .Include(r => r.Responsibility)
                 .Where(rp => rp.IbtvaProgramContentAndResourcesId == contentId)
                 .OrderBy(rp => rp.CreatedAt)
                 .ToListAsync();

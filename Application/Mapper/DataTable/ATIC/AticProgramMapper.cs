@@ -12,6 +12,16 @@ namespace Application.Mapper.DataTable.ATIC
         // PROGRAM DETAILS MAPPINGS
         // ============================
 
+        [MapProperty(nameof(AticProgramDetails.EventNames.Name), nameof(AticProgramDetailsDto.EventNamesName))]
+        [MapProperty(nameof(AticProgramDetails.VAPOptions.Name), nameof(AticProgramDetailsDto.VAPOptionsName))]
+        [MapProperty(nameof(AticProgramDetails.TargetFarmers.Name), nameof(AticProgramDetailsDto.TargetFarmersName))]
+        [MapProperty(nameof(AticProgramDetails.ZoneOptions.Name), nameof(AticProgramDetailsDto.ZonesOptionsName))]
+        [MapProperty(nameof(AticProgramDetails.Place.Name), nameof(AticProgramDetailsDto.PlaceName))]
+        [MapperIgnoreTarget(nameof(AticProgramDetails.EventNames))]
+        [MapperIgnoreTarget(nameof(AticProgramDetails.VAPOptions))]
+        [MapperIgnoreTarget(nameof(AticProgramDetails.TargetFarmers))]
+        [MapperIgnoreTarget(nameof(AticProgramDetails.ZoneOptions))]
+        [MapperIgnoreTarget(nameof(AticProgramDetails.Place))]
         public partial AticProgramDetailsDto MapToDto(AticProgramDetails entity);
 
         public partial AticProgramDetails MapToEntity(AticProgramCreateDto dto);
@@ -25,6 +35,11 @@ namespace Application.Mapper.DataTable.ATIC
         [MapperIgnoreTarget(nameof(AticProgramDetails.FormStatusRemarks))]
         [MapperIgnoreTarget(nameof(AticProgramDetails.ApprovedAt))]
         [MapperIgnoreTarget(nameof(AticProgramDetails.ApprovedById))]
+        [MapperIgnoreTarget(nameof(AticProgramDetails.EventNames))]
+        [MapperIgnoreTarget(nameof(AticProgramDetails.VAPOptions))]
+        [MapperIgnoreTarget(nameof(AticProgramDetails.TargetFarmers))]
+        [MapperIgnoreTarget(nameof(AticProgramDetails.ZoneOptions))]
+        [MapperIgnoreTarget(nameof(AticProgramDetails.Place))]
         public partial void MapUpdateDtoToEntity(AticProgramUpdateDto dto, AticProgramDetails entity);
 
         // Custom mapping for complete program
@@ -83,6 +98,8 @@ namespace Application.Mapper.DataTable.ATIC
         // RESOURCE PERSON MAPPINGS
         // ============================
 
+        [MapProperty(nameof(AticResourcePerson.ResourceType.Name), nameof(AticResourcePersonDto.ResourceTypeName))]
+        [MapProperty(nameof(AticResourcePerson.Responsibility.Name), nameof(AticResourcePersonDto.ResponsibilityName))]
         public partial AticResourcePersonDto MapToDto(AticResourcePerson entity);
 
         public partial AticResourcePerson MapToEntity(AticResourcePersonCreateDto dto);
@@ -93,6 +110,8 @@ namespace Application.Mapper.DataTable.ATIC
         [MapperIgnoreTarget(nameof(AticResourcePerson.CreatedById))]
         [MapperIgnoreTarget(nameof(AticResourcePerson.UpdatedAt))]
         [MapperIgnoreTarget(nameof(AticResourcePerson.UpdatedById))]
+        [MapperIgnoreTarget(nameof(AticResourcePerson.ResourceType))]
+        [MapperIgnoreTarget(nameof(AticResourcePerson.Responsibility))]
         public partial void MapUpdateDtoToEntity(AticResourcePersonUpdateDto dto, AticResourcePerson entity);
 
         // ============================

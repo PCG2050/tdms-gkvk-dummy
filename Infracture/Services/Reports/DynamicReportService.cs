@@ -2,11 +2,21 @@
 using Application.Interface.Repository.DataTables;
 using Application.Interface.Repository.DataTables.ConsultSocialMedia;
 using Application.Interface.Repository.DataTables.TblService;
+using Application.Interface.Repository.DataTables.KVK;
+using Application.Interface.Repository.DataTables.EEU;
+using Application.Interface.Repository.DataTables.FTI;
+using Application.Interface.Repository.DataTables.STU;
+using Application.Interface.Repository.DataTables.IBTVA;
+using Application.Interface.Repository.DataTables.ATIC;
+using Application.Interface.Repository.DataTables.DEU;
+using Application.Interface.Repository.DataTables.NAEP;
+using Application.Interface.Repository.DataTables.SAMETI;
 using Application.Interface.Services;
 using Application.Interface.Services.Reports;
 using Application.Models;
 using Application.Services;
 using Application.Services.Reports;
+using Application.Constants;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 
@@ -19,8 +29,20 @@ namespace Infrastructure.Services.Reports
         private readonly IConsultingServiceRepository _consultancyRepository;
         private readonly ITableServiceRepository _serviceRepository;
         private readonly ITableOtherActivityRepository _otherActivityRepository;
+        private readonly IFinancialBudgetRepository _financialBudgetRepository;
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly ICurrentUserService _currentUserService;
+
+        // Unit-specific program repositories
+        private readonly IKvkProgramDetailsRepository _kvkRepository;
+        private readonly IEeuProgramDetailsRepository _eeuRepository;
+        private readonly IFtiProgramDetailsRepository _ftiRepository;
+        private readonly IStuProgramDetailsRepository _stuRepository;
+        private readonly IIbtvaProgramDetailsRepository _ibtvaRepository;
+        private readonly IAticProgramDetailsRepository _aticRepository;
+        private readonly IDeuProgramDetailsRepository _deuRepository;
+        private readonly INaepProgramDetailsRepository _naepRepository;
+        private readonly ISametiProgramDetailsRepository _sametiRepository;
 
         public DynamicReportService(
             IPublicationRepository publicationRepository,
@@ -28,16 +50,36 @@ namespace Infrastructure.Services.Reports
             IConsultingServiceRepository consultancyRepository,
             ITableServiceRepository serviceRepository,
             ITableOtherActivityRepository otherActivityRepository,
+            IFinancialBudgetRepository financialBudgetRepository,
             IOrganizationUnitRepository organizationUnitRepository,
-            ICurrentUserService currentUserService)
+            ICurrentUserService currentUserService,
+            IKvkProgramDetailsRepository kvkRepository,
+            IEeuProgramDetailsRepository eeuRepository,
+            IFtiProgramDetailsRepository ftiRepository,
+            IStuProgramDetailsRepository stuRepository,
+            IIbtvaProgramDetailsRepository ibtvaRepository,
+            IAticProgramDetailsRepository aticRepository,
+            IDeuProgramDetailsRepository deuRepository,
+            INaepProgramDetailsRepository naepRepository,
+            ISametiProgramDetailsRepository sametiRepository)
         {
             _publicationRepository = publicationRepository;
             _nominationRepository = nominationRepository;
             _consultancyRepository = consultancyRepository;
             _serviceRepository = serviceRepository;
             _otherActivityRepository = otherActivityRepository;
+            _financialBudgetRepository = financialBudgetRepository;
             _organizationUnitRepository = organizationUnitRepository;
             _currentUserService = currentUserService;
+            _kvkRepository = kvkRepository;
+            _eeuRepository = eeuRepository;
+            _ftiRepository = ftiRepository;
+            _stuRepository = stuRepository;
+            _ibtvaRepository = ibtvaRepository;
+            _aticRepository = aticRepository;
+            _deuRepository = deuRepository;
+            _naepRepository = naepRepository;
+            _sametiRepository = sametiRepository;
         }
 
         public async Task<ServiceResult<DynamicReportData>> GenerateDynamicReportAsync(
@@ -106,12 +148,14 @@ namespace Infrastructure.Services.Reports
             // Build section based on key
             return sectionRequest.SectionKey switch
             {
+                ReportColumnRegistry.PROGRAMS => await BuildProgramsSectionAsync(sectionRequest, unitLocationId, month, year, sectionDef, maxRows),
                 ReportColumnRegistry.PUBLICATIONS => await BuildPublicationsSectionAsync(sectionRequest, unitLocationId, month, year, sectionDef, maxRows),
                 ReportColumnRegistry.NOMINATIONS => await BuildNominationsSectionAsync(sectionRequest, unitLocationId, month, year, sectionDef, maxRows),
                 ReportColumnRegistry.CONSULTANCIES => await BuildConsultanciesSectionAsync(sectionRequest, unitLocationId, month, year, sectionDef, maxRows),
                 ReportColumnRegistry.SERVICES => await BuildServicesSectionAsync(sectionRequest, unitLocationId, month, year, sectionDef, maxRows),
+                ReportColumnRegistry.FINANCIAL_STATUS => await BuildFinancialStatusSectionAsync(sectionRequest, unitLocationId, month, year, sectionDef, maxRows),
                 ReportColumnRegistry.OTHER_ACTIVITIES => await BuildOtherActivitiesSectionAsync(sectionRequest, unitLocationId, month, year, sectionDef, maxRows),
-                // Programs, FIU Activities, and ASM Activities require specific unit repositories
+                // FIU Activities, and ASM Activities require special handling
                 // These will be implemented separately or through unit-specific endpoints
                 _ => null
             };
@@ -134,17 +178,27 @@ namespace Infrastructure.Services.Reports
                     && p.FormStatus == "Approved"
                     && p.CreatedAt.Month == month
                     && p.CreatedAt.Year == year)
-                .Include(p => p.Category);
+                .Include(p => p.Category)
+                .Include(p => p.Mode)
+                .Include(p => p.Region)
+                .Include(p => p.PublisherDetails)
+                .Include(p => p.ExtensionLiteratures);
 
             var total = await query.CountAsync();
             var data = await query.Take(maxRows).ToListAsync();
 
             var rows = data.Select(p => BuildRow(p, request.SelectedColumns, new Dictionary<string, Func<object, object?>>
             {
-                ["category"] = (entity) => ((dynamic)entity).Category?.Name,
                 ["title"] = (entity) => ((dynamic)entity).Title,
-                ["pages"] = (entity) => ((dynamic)entity).TotalPages,
-                ["publishedDate"] = (entity) => ((dynamic)entity).PublishedDate?.ToString("yyyy-MM-dd")
+                ["category"] = (entity) => ((dynamic)entity).Category?.Name,
+                ["mode"] = (entity) => ((dynamic)entity).Mode?.Name ?? ((dynamic)entity).ModePublication ?? "-",
+                ["region"] = (entity) => ((dynamic)entity).Region?.Name ?? "-",
+                ["publicationYear"] = (entity) => ((dynamic)entity).PublicationYear,
+                ["publicationDate"] = (entity) => ((dynamic)entity).PublicationDate?.ToString("yyyy-MM-dd"),
+                ["publisherName"] = (entity) => ((dynamic)entity).PublisherDetails?.PublisherName ?? "-",
+                ["publisherInstitution"] = (entity) => ((dynamic)entity).PublisherDetails?.PublisherInstitutionName ?? "-",
+                ["publisherAddress"] = (entity) => ((dynamic)entity).PublisherDetails?.PublisherAddress ?? "-",
+                ["extensionLiterature"] = (entity) => ((dynamic)entity).ExtensionLiteratures
             })).ToList();
 
             return new ReportSection
@@ -169,17 +223,22 @@ namespace Infrastructure.Services.Reports
                 .Where(n => n.UnitLocationId == unitLocationId
                     && n.FormStatus == "Approved"
                     && n.CreatedAt.Month == month
-                    && n.CreatedAt.Year == year);
+                    && n.CreatedAt.Year == year)
+                .Include(n => n.Type)
+                .Include(n => n.Region)
+                .Include(n => n.Achievements)
+                .Include(n => n.AwardRecognitions)
+                    .ThenInclude(a => a.Contribution);
 
             var total = await query.CountAsync();
             var data = await query.Take(maxRows).ToListAsync();
 
             var rows = data.Select(n => BuildRow(n, request.SelectedColumns, new Dictionary<string, Func<object, object?>>
             {
-                ["type"] = (entity) => ((dynamic)entity).IsNomination ? "Nomination" : "Reward",
-                ["awardName"] = (entity) => ((dynamic)entity).AwardName,
-                ["category"] = (entity) => ((dynamic)entity).Category,
-                ["date"] = (entity) => ((dynamic)entity).Date?.ToString("yyyy-MM-dd")
+                ["type"] = (entity) => ((dynamic)entity).Type?.Name ?? ((dynamic)entity).OtherType ?? "-",
+                ["region"] = (entity) => ((dynamic)entity).Region?.Name ?? ((dynamic)entity).OtherRegion ?? "-",
+                ["achievements"] = (entity) => ((dynamic)entity).Achievements,
+                ["awards"] = (entity) => ((dynamic)entity).AwardRecognitions
             })).ToList();
 
             return new ReportSection
@@ -268,6 +327,41 @@ namespace Infrastructure.Services.Reports
             };
         }
 
+        private async Task<ReportSection> BuildFinancialStatusSectionAsync(
+            SectionRequest request,
+            int unitLocationId,
+            int month,
+            int year,
+            SectionDefinition sectionDef,
+            int maxRows)
+        {
+            var query = _financialBudgetRepository.GetQueryable()
+                .Where(f => f.UnitLocationId == unitLocationId
+                    && f.FormStatus == "Approved"
+                    && f.CreatedAt.Month == month
+                    && f.CreatedAt.Year == year)
+                .Include(f => f.Budgets)
+                .Include(f => f.RevolvingFunds);
+
+            var total = await query.CountAsync();
+            var data = await query.Take(maxRows).ToListAsync();
+
+            var rows = data.Select(f => BuildRow(f, request.SelectedColumns, new Dictionary<string, Func<object, object?>>
+            {
+                ["budgets"] = (entity) => ((dynamic)entity).Budgets,
+                ["revolvingFunds"] = (entity) => ((dynamic)entity).RevolvingFunds
+            })).ToList();
+
+            return new ReportSection
+            {
+                SectionKey = request.SectionKey,
+                DisplayName = sectionDef.DisplayName,
+                TotalRecords = total,
+                Columns = BuildColumnMetadata(request.SelectedColumns, sectionDef),
+                Rows = rows
+            };
+        }
+
         private async Task<ReportSection> BuildOtherActivitiesSectionAsync(
             SectionRequest request,
             int unitLocationId,
@@ -298,6 +392,139 @@ namespace Infrastructure.Services.Reports
                 TotalRecords = total,
                 Columns = BuildColumnMetadata(request.SelectedColumns, sectionDef),
                 Rows = rows
+            };
+        }
+
+        private async Task<ReportSection?> BuildProgramsSectionAsync(
+            SectionRequest request,
+            int unitLocationId,
+            int month,
+            int year,
+            SectionDefinition sectionDef,
+            int maxRows)
+        {
+            // Get unit location to determine which unit repository to use
+            var unitLocation = await _organizationUnitRepository.GetByIdAsync(unitLocationId);
+            if (unitLocation == null)
+                return null;
+
+            var unitId = unitLocation.UnitId;
+
+            // Query the appropriate repository based on unit ID
+            IQueryable<dynamic> query = unitId switch
+            {
+                UnitConstants.KVK_UNIT_ID => _kvkRepository.GetQueryable()
+                    .Where(p => p.UnitLocationId == unitLocationId && p.FormStatus == "Approved"
+                        && p.CreatedAt.Month == month && p.CreatedAt.Year == year),
+                UnitConstants.EEU_UNIT_ID => _eeuRepository.GetQueryable()
+                    .Where(p => p.UnitLocationId == unitLocationId && p.FormStatus == "Approved"
+                        && p.CreatedAt.Month == month && p.CreatedAt.Year == year),
+                UnitConstants.FTI_UNIT_ID => _ftiRepository.GetQueryable()
+                    .Where(p => p.UnitLocationId == unitLocationId && p.FormStatus == "Approved"
+                        && p.CreatedAt.Month == month && p.CreatedAt.Year == year),
+                UnitConstants.STU_UNIT_ID => _stuRepository.GetQueryable()
+                    .Where(p => p.UnitLocationId == unitLocationId && p.FormStatus == "Approved"
+                        && p.CreatedAt.Month == month && p.CreatedAt.Year == year),
+                UnitConstants.IBTVA_UNIT_ID => _ibtvaRepository.GetQueryable()
+                    .Where(p => p.UnitLocationId == unitLocationId && p.FormStatus == "Approved"
+                        && p.CreatedAt.Month == month && p.CreatedAt.Year == year),
+                UnitConstants.ATIC_UNIT_ID => _aticRepository.GetQueryable()
+                    .Where(p => p.UnitLocationId == unitLocationId && p.FormStatus == "Approved"
+                        && p.CreatedAt.Month == month && p.CreatedAt.Year == year),
+                UnitConstants.DEU_UNIT_ID => _deuRepository.GetQueryable()
+                    .Where(p => p.UnitLocationId == unitLocationId && p.FormStatus == "Approved"
+                        && p.CreatedAt.Month == month && p.CreatedAt.Year == year),
+                UnitConstants.NAEP_UNIT_ID => _naepRepository.GetQueryable()
+                    .Where(p => p.UnitLocationId == unitLocationId && p.FormStatus == "Approved"
+                        && p.CreatedAt.Month == month && p.CreatedAt.Year == year),
+                UnitConstants.SAMETI_UNIT_ID => _sametiRepository.GetQueryable()
+                    .Where(p => p.UnitLocationId == unitLocationId && p.FormStatus == "Approved"
+                        && p.CreatedAt.Month == month && p.CreatedAt.Year == year),
+                _ => null
+            };
+
+            if (query == null)
+                return null;
+
+            var total = await query.CountAsync();
+            var data = await query.Take(maxRows).ToListAsync();
+
+            // Build column mappings for program fields
+            var columnMappings = BuildProgramColumnMappings();
+
+            var rows = data.Select(p => BuildRow((object)p, request.SelectedColumns, columnMappings)).ToList();
+
+            return new ReportSection
+            {
+                SectionKey = request.SectionKey,
+                DisplayName = sectionDef.DisplayName,
+                TotalRecords = total,
+                Columns = BuildColumnMetadata(request.SelectedColumns, sectionDef),
+                Rows = rows
+            };
+        }
+
+        private Dictionary<string, Func<object, object?>> BuildProgramColumnMappings()
+        {
+            return new Dictionary<string, Func<object, object?>>
+            {
+                // Stepper 1: Program Details (direct properties on entity)
+                ["title"] = (entity) => ((dynamic)entity).Title,
+                ["startDate"] = (entity) => ((dynamic)entity).StartDate.ToString("yyyy-MM-dd"),
+                ["endDate"] = (entity) => ((dynamic)entity).EndDate.ToString("yyyy-MM-dd"),
+                ["programType"] = (entity) => ((dynamic)entity).ProgramType?.Type,
+                ["category"] = (entity) => ((dynamic)entity).Category?.Name,
+                ["type"] = (entity) => ((dynamic)entity).Type?.Name,
+                ["theme"] = (entity) => ((dynamic)entity).Theme?.Name,
+                ["sponsoredOrganization"] = (entity) => ((dynamic)entity).SponsoredOrganizationName,
+                ["collaborator"] = (entity) => ((dynamic)entity).Collaborator?.Name,
+                ["collaborativeProgram"] = (entity) => ((dynamic)entity).CollaborativeProgramOption?.Name,
+                ["mode"] = (entity) => ((dynamic)entity).Mode?.Name,
+                ["region"] = (entity) => ((dynamic)entity).Region?.Name,
+                ["duration"] = (entity) => ((dynamic)entity).Duration,
+                ["tpNo"] = (entity) => ((dynamic)entity).TPNo,
+                ["location"] = (entity) => ((dynamic)entity).Location,
+                ["sourceOfFund"] = (entity) => ((dynamic)entity).SourceOfFund?.Name,
+                ["totalOutlay"] = (entity) => ((dynamic)entity).TotalOutlayRs,
+
+                // Stepper 2: Participant Demographics (collection property)
+                ["participantCategory"] = (entity) => ((dynamic)entity).ParticipantDemographics,
+                ["maleTotal"] = (entity) => ((dynamic)entity).ParticipantDemographics,
+                ["femaleTotal"] = (entity) => ((dynamic)entity).ParticipantDemographics,
+                ["grandTotal"] = (entity) => ((dynamic)entity).ParticipantDemographics,
+                ["stayedInHostel"] = (entity) => ((dynamic)entity).ParticipantDemographics,
+
+                // Stepper 3: Program Content & Resources (nested collections)
+                ["resourcePersons"] = (entity) => ((dynamic)entity).ProgramContent,
+                ["topicsCovered"] = (entity) => ((dynamic)entity).ProgramContent,
+                ["teachingAids"] = (entity) => ((dynamic)entity).ProgramContent,
+
+                // Stepper 4: Advisory Services (single object)
+                ["noOfFacebookSMS"] = (entity) => ((dynamic)entity).AdvisoryServices?.NoOfFacebookSMS,
+                ["noOfWhatsAppSMS"] = (entity) => ((dynamic)entity).AdvisoryServices?.NoOfWhatsAppSMS,
+                ["noOfWhatsAppQueries"] = (entity) => ((dynamic)entity).AdvisoryServices?.NoOfAnsweredWhatsappQueries,
+                ["noOfPhoneCalls"] = (entity) => ((dynamic)entity).AdvisoryServices?.NoOfPhoneCalls,
+                ["noOfFaceToFaceDiscussions"] = (entity) => ((dynamic)entity).AdvisoryServices?.NoOfFaceToFaceDiscussions,
+                ["noOfEmailsSent"] = (entity) => ((dynamic)entity).AdvisoryServices?.NoOfEmailsSent,
+                ["noOfBeneficiaries"] = (entity) => ((dynamic)entity).AdvisoryServices?.NoOfBeneficiaries,
+                ["criticalInputsDistributed"] = (entity) => ((dynamic)entity).AdvisoryServices?.CriticalInputsDistributed,
+
+                // Stepper 5: Results (nested within Results object)
+                ["fldResults"] = (entity) => ((dynamic)entity).Results?.FldResults,
+                ["oftResults"] = (entity) => ((dynamic)entity).Results?.OftResults,
+
+                // Stepper 6: Report (Reports property, not Report)
+                ["reportingDate"] = (entity) => ((dynamic)entity).Reports?.ReportDate?.ToString("yyyy-MM-dd"),
+                ["significantOutcome"] = (entity) => ((dynamic)entity).Reports?.Outcome,
+                ["geoTaggedPhoto"] = (entity) => ((dynamic)entity).Reports?.GeoTaggedPhoto,
+
+                // Stepper 7: Recommendations (Recommendations property, not Recommendation)
+                ["problemsIdentified"] = (entity) => ((dynamic)entity).Recommendations?.ProblemsIdentified,
+                ["recommendations"] = (entity) => ((dynamic)entity).Recommendations?.Recommendation,
+                ["actionTaken"] = (entity) => ((dynamic)entity).Recommendations?.ActionTaken,
+                ["significantAchievement"] = (entity) => ((dynamic)entity).Recommendations?.SignificantAchievement,
+                ["successStories"] = (entity) => ((dynamic)entity).Recommendations?.SuccessStories,
+                ["outcome"] = (entity) => ((dynamic)entity).Recommendations?.ImpactOutcome
             };
         }
 
@@ -473,7 +700,7 @@ namespace Infrastructure.Services.Reports
             {
                 "string" => 12,    // Strings can wrap, so allow smaller
                 "date" => 8,
-                "number" => 6,
+                "number" => 8,
                 "decimal" => 8,
                 "currency" => 8,
                 _ => 10

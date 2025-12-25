@@ -83,6 +83,8 @@ namespace Application.Mapper.DataTable.IBTVA
         // RESOURCE PERSON MAPPINGS
         // ============================
 
+        [MapProperty(nameof(IbtvaResourcePerson.ResourceType.Name), nameof(IbtvaResourcePersonDto.ResourceTypeName))]
+        [MapProperty(nameof(IbtvaResourcePerson.Responsibility.Name), nameof(IbtvaResourcePersonDto.ResponsibilityName))]
         public partial IbtvaResourcePersonDto MapToDto(IbtvaResourcePerson entity);
 
         public partial IbtvaResourcePerson MapToEntity(IbtvaResourcePersonCreateDto dto);
@@ -93,6 +95,8 @@ namespace Application.Mapper.DataTable.IBTVA
         [MapperIgnoreTarget(nameof(IbtvaResourcePerson.CreatedById))]
         [MapperIgnoreTarget(nameof(IbtvaResourcePerson.UpdatedAt))]
         [MapperIgnoreTarget(nameof(IbtvaResourcePerson.UpdatedById))]
+        [MapperIgnoreTarget(nameof(IbtvaResourcePerson.ResourceType))]
+        [MapperIgnoreTarget(nameof(IbtvaResourcePerson.Responsibility))]
         public partial void MapUpdateDtoToEntity(IbtvaResourcePersonUpdateDto dto, IbtvaResourcePerson entity);
 
         // ============================

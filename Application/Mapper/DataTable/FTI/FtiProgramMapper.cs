@@ -84,6 +84,8 @@ namespace Application.Mapper.DataTable.FTI
         // RESOURCE PERSON MAPPINGS
         // ============================
 
+        [MapProperty(nameof(FtiResourcePerson.ResourceType.Name), nameof(FtiResourcePersonDto.ResourceTypeName))]
+        [MapProperty(nameof(FtiResourcePerson.Responsibility.Name), nameof(FtiResourcePersonDto.ResponsibilityName))]
         public partial FtiResourcePersonDto MapToDto(FtiResourcePerson entity);
 
         public partial FtiResourcePerson MapToEntity(FtiResourcePersonCreateDto dto);
@@ -94,6 +96,8 @@ namespace Application.Mapper.DataTable.FTI
         [MapperIgnoreTarget(nameof(FtiResourcePerson.CreatedById))]
         [MapperIgnoreTarget(nameof(FtiResourcePerson.UpdatedAt))]
         [MapperIgnoreTarget(nameof(FtiResourcePerson.UpdatedById))]
+        [MapperIgnoreTarget(nameof(FtiResourcePerson.ResourceType))]
+        [MapperIgnoreTarget(nameof(FtiResourcePerson.Responsibility))]
         public partial void MapUpdateDtoToEntity(FtiResourcePersonUpdateDto dto, FtiResourcePerson entity);
 
         // ============================

@@ -165,12 +165,12 @@ namespace Domain.Entities.GenericTables
         public DateOnly? Date { get; set; }
 
         [MaxLength(50)]
-        public string? AmountPerCopy { get; set; }
+        public decimal? AmountPerCopy { get; set; }
 
         [MaxLength(50)]
-        public string? NumberOfCopies { get; set; }
+        public int? NumberOfCopies { get; set; }
 
         [MaxLength(50)]
-        public string? TotalAmount { get; set; }
+        public decimal? TotalAmount { get; set; }
     }
 }

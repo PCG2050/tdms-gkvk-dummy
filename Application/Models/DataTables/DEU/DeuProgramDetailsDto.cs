@@ -347,8 +347,8 @@ namespace Application.Models.DataTables.DEU
         public int? Id { get; set; }  // null = create new, has value = update existing
         public string? Name { get; set; }
         public string? Designation { get; set; }
-        public int? ResourceType { get; set; }
-        public int? Responsibility { get; set; }
+        public int? ResourceTypeId { get; set; }
+        public int? ResponsibilityId { get; set; }
         public string? InstitutionOrDepartment { get; set; }
     }
 
@@ -403,8 +403,10 @@ namespace Application.Models.DataTables.DEU
         public int Id { get; set; }
         public string? Name { get; set; }
         public string? Designation { get; set; }
-        public int? ResourceType { get; set; }
-        public int? Responsibility { get; set; }
+        public int? ResourceTypeId { get; set; }
+        public string? ResourceTypeName { get; set; }
+        public int? ResponsibilityId { get; set; }
+        public string? ResponsibilityName { get; set; }
         public string? InstitutionOrDepartment { get; set; }
     }
 
@@ -412,8 +414,8 @@ namespace Application.Models.DataTables.DEU
     {
         public string? Name { get; set; }
         public string? Designation { get; set; }
-        public int? ResourceType { get; set; }
-        public int? Responsibility { get; set; }
+        public int? ResourceTypeId { get; set; }
+        public int? ResponsibilityId { get; set; }
         public string? InstitutionOrDepartment { get; set; }
     }
 
@@ -422,8 +424,8 @@ namespace Application.Models.DataTables.DEU
         public int Id { get; set; }
         public string? Name { get; set; }
         public string? Designation { get; set; }
-        public int? ResourceType { get; set; }
-        public int? Responsibility { get; set; }
+        public int? ResourceTypeId { get; set; }
+        public int? ResponsibilityId { get; set; }
         public string? InstitutionOrDepartment { get; set; }
     }
 
@@ -532,7 +534,7 @@ namespace Application.Models.DataTables.DEU
     public class DeuReportDto
     {
         public int Id { get; set; }
-       
+
 
         //public string? ReportingYear { get; set; }
         public DateOnly? ReportDate { get; set; }
@@ -555,7 +557,7 @@ namespace Application.Models.DataTables.DEU
 
     public class DeuReportCreateDto
     {
-       
+
         public DateOnly? ReportDate { get; set; }
 
         public string? ProgressReport { get; set; }
@@ -577,7 +579,7 @@ namespace Application.Models.DataTables.DEU
     public class DeuReportUpdateDto : IUpdateDto
     {
         public int Id { get; set; }
-       
+
         public DateOnly? ReportDate { get; set; }
 
         public string? ProgressReport { get; set; }

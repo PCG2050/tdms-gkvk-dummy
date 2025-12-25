@@ -19,12 +19,19 @@ namespace Infrastructure.Repository.DataTables.FTI
 
         public async Task<FtiResourcePerson?> GetByIdAsync(int id)
         {
-            return await _context.FtiResourcePersons.FindAsync(id);
+            return await _context.FtiResourcePersons
+                .Include(r => r.ResourceType)
+                .Include(r => r.Responsibility)
+                .Include(r => r.ProgramContentAndResources)
+                    .ThenInclude(pc => pc.ProgramDetails)
+                .FirstOrDefaultAsync(r => r.Id == id);
         }
 
         public async Task<List<FtiResourcePerson>> GetByContentIdAsync(int contentId)
         {
             return await _context.FtiResourcePersons
+                .Include(r => r.ResourceType)
+                .Include(r => r.Responsibility)
                 .Where(rp => rp.FtiProgramContentAndResourcesId == contentId)
                 .OrderBy(rp => rp.CreatedAt)
                 .ToListAsync();

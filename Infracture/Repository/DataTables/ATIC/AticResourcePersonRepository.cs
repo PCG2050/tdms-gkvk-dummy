@@ -17,12 +17,19 @@ namespace Infrastructure.Repository.DataTables.ATIC
 
         public async Task<AticResourcePerson?> GetByIdAsync(int id)
         {
-            return await _context.AticResourcePersons.FindAsync(id);
+            return await _context.AticResourcePersons
+                .Include(r => r.ResourceType)
+                .Include(r => r.Responsibility)
+                .Include(r => r.ProgramContentAndResources)
+                    .ThenInclude(pc => pc.ProgramDetails)
+                .FirstOrDefaultAsync(r => r.Id == id);
         }
 
         public async Task<List<AticResourcePerson>> GetByContentIdAsync(int contentId)
         {
             return await _context.AticResourcePersons
+                .Include(r => r.ResourceType)
+                .Include(r => r.Responsibility)
                 .Where(rp => rp.AticProgramContentAndResourcesId == contentId)
                 .OrderBy(rp => rp.CreatedAt)
                 .ToListAsync();

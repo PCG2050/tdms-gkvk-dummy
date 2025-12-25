@@ -23,6 +23,21 @@ namespace Application.Interface.Services.DataTables.KVK
         Task<ServiceResult<KvkParticipantDemographicsDto>> UpdateDemographicsAsync(int demographicsId, KvkParticipantDemographicsUpdateDto dto);
         Task<ServiceResult> DeleteDemographicsAsync(int demographicsId);
         Task<ServiceResult<List<KvkParticipantDemographicsDto>>> GetDemographicsByProgramIdAsync(int programId);
+        /// <summary>
+        /// Add multiple participant demographics entries with hybrid pattern in a single transaction
+        /// This endpoint solves the problem of needing parent ID before creating children by handling everything in a single transaction
+        /// Perfect for "Save & Next" button - handles all demographics in one call
+        /// </summary>
+        Task<ServiceResult<List<KvkParticipantDemographicsDto>>> AddDemographicsWithChildrenAsync(int programId, KvkDemographicsWithChildrenCreateDto dto);
+
+        /// <summary>
+        /// Update all participant demographics for a program using Hybrid Pattern (perfect for "Save & Next" button)
+        /// - Items WITH Id: UPDATE existing
+        /// - Items WITHOUT Id (null or 0): CREATE new
+        /// - Items in DB but NOT in request list: DELETE
+        /// All changes happen in a single transaction with automatic rollback on failure
+        /// </summary>
+        Task<ServiceResult<List<KvkParticipantDemographicsDto>>> UpdateDemographicsWithChildrenAsync(int programId, KvkDemographicsWithChildrenUpdateDto dto);
 
         // ============================
         // SECTION C: PROGRAM CONTENT & RESOURCES

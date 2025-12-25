@@ -222,6 +222,13 @@ namespace Domain.Entities.MasterData
         {
             public string Name { get; set; } = default!;
         }
+        public class ZoneOption : BaseEntity
+        {
+            public string Name { get; set; } = default!;
+        }
+        public class VAPOption : BaseEntity
+        {
+            public string Name { get; set; } = default!;
+        }
 
-
-}
+    }
