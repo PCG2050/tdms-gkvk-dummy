@@ -37,6 +37,9 @@ namespace Infrastructure.Repository.DataTables.KVK
                 .Include(c => c.TopicsCovered!)
                 .Include(c => c.TeachingAids!)
                     .ThenInclude(ta => ta.TypeOfAid)
+                .Include(c => c.FieldVisits!)
+                .Include(c => c.FieldDays!)
+                .Include(c => c.FarmerScientistInteractions!)
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
 
@@ -47,6 +50,9 @@ namespace Infrastructure.Repository.DataTables.KVK
                 .Include(c => c.TopicsCovered!)
                 .Include(c => c.TeachingAids!)
                     .ThenInclude(ta => ta.TypeOfAid)
+                .Include(c => c.FieldVisits!)
+                .Include(c => c.FieldDays!)
+                .Include(c => c.FarmerScientistInteractions!)
                 .Where(c => c.KvkProgramDetailsId == programId)
                 .OrderByDescending(c => c.CreatedAt)
                 .ToListAsync();
@@ -374,8 +380,12 @@ namespace Infrastructure.Repository.DataTables.KVK
                             var existingDay = existingDays.FirstOrDefault(d => d.Id == day.Id);
                             if (existingDay != null)
                             {
-                                // Update all fields from KvkFieldDay entity
-                                // Note: Add the actual fields from your KvkFieldDay entity here
+                                existingDay.Date = day.Date;
+                                existingDay.FarmerName = day.FarmerName;
+                                existingDay.Place = day.Place;
+                                existingDay.NoOfBeneficieries = day.NoOfBeneficieries;
+                                existingDay.UnitLocationId = day.UnitLocationId;
+                                existingDay.OrganizationId = day.OrganizationId;
                                 existingDay.UpdatedById = day.UpdatedById;
                                 existingDay.UpdatedAt = day.UpdatedAt;
                                 _context.Set<KvkFieldDay>().Update(existingDay);
