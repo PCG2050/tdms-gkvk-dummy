@@ -1060,18 +1060,11 @@ namespace Infrastructure.Services.DataTables.KVK
         }
 
         public async Task<ServiceResult<KvkAdvisoryServicesDto>> UpdateAdvisoryServicesWithChildrenAsync(
-            int advisoryServicesId,
+            int programId,
             KvkAdvisoryServicesHybridUpdateDto dto)
         {
-            // Validate advisory services exists
-            var advisory = await _advisoryRepository.GetWithDetailsAsync(advisoryServicesId);
-            if (advisory == null)
-                return ServiceResult<KvkAdvisoryServicesDto>.Failure(
-                    "Advisory services not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            // Validate program and permissions
-            var program = await _programRepository.GetByIdAsync(advisory.KvkProgramDetailsId ?? 0);
+            // Validate program exists and check permissions
+            var program = await _programRepository.GetByIdAsync(programId);
             if (program == null)
                 return ServiceResult<KvkAdvisoryServicesDto>.Failure(
                     "Program not found",
@@ -1082,12 +1075,21 @@ namespace Infrastructure.Services.DataTables.KVK
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
+            // Fetch advisory services by programId
+            var advisory = await _advisoryRepository.GetByProgramIdAsync(programId);
+            if (advisory == null)
+                return ServiceResult<KvkAdvisoryServicesDto>.Failure(
+                    "Advisory services not found for this program",
+                    ServiceErrorStatus.NOTFOUND);
+
             try
             {
+                var advisoryServiceId = advisory.Id;
+
                 // Prepare parent entity for update
                 var parentEntity = new KvkAdvisoryServices
                 {
-                    Id = advisoryServicesId,
+                    Id = advisoryServiceId,
                     NoOfFacebookSMS = dto.NoOfFacebookSMS ?? 0,
                     NoOfSMSSentToRegisteredFarmers = dto.NoOfSMSSentToRegisteredFarmers ?? 0,
                     NoOfWhatsappGroups = dto.NoOfWhatsappGroups ?? 0,

@@ -303,10 +303,10 @@ namespace WebApi.Controllers.DataTables.KVK
         /// - Items in DB but NOT in request: DELETE
         /// All changes happen in a single transaction with automatic rollback on failure
         /// </summary>
-        [HttpPut("advisory-services/{advisoryServicesId}/with-children")]
-        public async Task<IActionResult> UpdateAdvisoryServicesWithChildren(int advisoryServicesId, [FromBody] KvkAdvisoryServicesHybridUpdateDto dto)
+        [HttpPut("{programId}/advisory-services/with-children")]
+        public async Task<IActionResult> UpdateAdvisoryServicesWithChildren(int programId, [FromBody] KvkAdvisoryServicesHybridUpdateDto dto)
         {
-            var result = await _service.UpdateAdvisoryServicesWithChildrenAsync(advisoryServicesId, dto);
+            var result = await _service.UpdateAdvisoryServicesWithChildrenAsync(programId, dto);
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 
