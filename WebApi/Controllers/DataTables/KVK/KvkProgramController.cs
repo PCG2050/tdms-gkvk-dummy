@@ -224,10 +224,10 @@ namespace WebApi.Controllers.DataTables.KVK
         /// - Items in DB but NOT in request: DELETE
         /// All changes happen in a single transaction with automatic rollback on failure
         /// </summary>
-        [HttpPut("content/{contentId}/with-children")]
-        public async Task<IActionResult> UpdateProgramContentWithChildren(int contentId, [FromBody] KvkProgramContentWithChildrenUpdateDto dto)
+        [HttpPut("{programId}/content/with-children")]
+        public async Task<IActionResult> UpdateProgramContentWithChildren(int programId, [FromBody] KvkProgramContentWithChildrenUpdateDto dto)
         {
-            var result = await _service.UpdateProgramContentWithChildrenAsync(contentId, dto);
+            var result = await _service.UpdateProgramContentWithChildrenAsync(programId, dto);
             return result.IsSuccess ? Ok(result) : StatusCode(GetStatusCode(result.ErrorStatus), result);
         }
 

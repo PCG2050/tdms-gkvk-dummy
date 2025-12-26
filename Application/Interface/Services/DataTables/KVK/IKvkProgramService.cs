@@ -55,7 +55,7 @@ namespace Application.Interface.Services.DataTables.KVK
         /// - Items in DB but NOT in arrays: DELETE
         /// Perfect for "Save & Next" button with inline editing
         /// </summary>
-        Task<ServiceResult<KvkProgramContentDto>> UpdateProgramContentWithChildrenAsync(int contentId, KvkProgramContentWithChildrenUpdateDto dto);
+        Task<ServiceResult<KvkProgramContentDto>> UpdateProgramContentWithChildrenAsync(int programId, KvkProgramContentWithChildrenUpdateDto dto);
 
         Task<ServiceResult<KvkProgramContentDto>> GetProgramContentByIdAsync(int contentId);
         Task<ServiceResult> DeleteProgramContentAsync(int contentId);

@@ -632,18 +632,11 @@ namespace Infrastructure.Services.DataTables.KVK
         /// - Items in DB but NOT in arrays: DELETE
         /// </summary>
         public async Task<ServiceResult<KvkProgramContentDto>> UpdateProgramContentWithChildrenAsync(
-            int contentId,
+            int programId,
             KvkProgramContentWithChildrenUpdateDto dto)
         {
-            // Validate content exists
-            var content = await _contentRepository.GetWithDetailsAsync(contentId);
-            if (content == null)
-                return ServiceResult<KvkProgramContentDto>.Failure(
-                    "Content not found",
-                    ServiceErrorStatus.NOTFOUND);
-
-            // Validate program and permissions
-            var program = await _programRepository.GetByIdAsync(content.KvkProgramDetailsId ?? 0);
+            // Validate program exists and check permissions
+            var program = await _programRepository.GetByIdAsync(programId);
             if (program == null)
                 return ServiceResult<KvkProgramContentDto>.Failure(
                     "Program not found",
@@ -654,6 +647,16 @@ namespace Infrastructure.Services.DataTables.KVK
                     "Access denied",
                     ServiceErrorStatus.FORBIDDEN);
 
+            // Fetch content entries for this program
+            var contentList = await _contentRepository.GetByProgramIdAsync(programId);
+            if (contentList == null || !contentList.Any())
+                return ServiceResult<KvkProgramContentDto>.Failure(
+                    "No content found for this program",
+                    ServiceErrorStatus.NOTFOUND);
+
+            // Get the first content entry (most recent one since GetByProgramIdAsync orders by CreatedAt desc)
+            var content = contentList.First();
+
             //if (program.FormStatus != "Draft" && program.FormStatus != "Rejected" && program.FormStatus != "Pending")
             //    return ServiceResult<KvkProgramContentDto>.Failure(
             //        "Cannot update content in approved programs",
@@ -661,6 +664,8 @@ namespace Infrastructure.Services.DataTables.KVK
 
             try
             {
+                var contentId = content.Id;
+
                 // Prepare parent entity for update
                 var parentEntity = new KvkProgramContentAndResources
                 {
